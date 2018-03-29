@@ -165,25 +165,6 @@ device to your nearest shelf as soon as possible.`,
         case 'logout':
           this.completeReturn();
           break;
-        case 'return':
-          // Ensure that can proceed isn't disabled because of a previous check.
-          this.flowSequenceButtons.canProceed = true;
-          break;
-        // Checks if surveys are required and if so that they are filled out.
-        case 'survey':
-          if (this.surveyAnswer == null &&
-              this.surveyComponent.answerRequired) {
-            this.flowSequenceButtons.canProceed = false;
-            this.survey.answer.subscribe(val => {
-              this.surveyAnswer = val;
-              if (this.surveyAnswer !== null) {
-                this.flowSequenceButtons.canProceed = true;
-              } else {
-                this.flowSequenceButtons.canProceed = false;
-              }
-            });
-          }
-          break;
         default:
           break;
       }
