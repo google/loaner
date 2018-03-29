@@ -1,7 +1,7 @@
 # Grab n Go API
 
 
-[TOC]
+
 
 ## Getting Started with the GnG API
 

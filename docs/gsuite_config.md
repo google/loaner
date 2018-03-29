@@ -1,7 +1,7 @@
 # Configure the G Suite Environment
 
 
-[TOC]
+
 
 ## Set Up G Suite
 

@@ -1,7 +1,7 @@
 # Deploy the Grab n Go Chrome OS App
 
 
-[TOC]
+
 
 ## Prerequisites
 

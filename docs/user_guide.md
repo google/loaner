@@ -1,7 +1,7 @@
 # Using Grab n Go
 
 
-[TOC]
+
 
 # Managing a Single Device
 

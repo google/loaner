@@ -1,7 +1,7 @@
 # FAQ
 
 
-[TOC]
+
 
 ## What's the difference between Grab n Go devices and standard Chromebooks?
 

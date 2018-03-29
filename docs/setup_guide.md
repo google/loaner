@@ -1,7 +1,7 @@
 # Grab n Go Setup
 
 
-[TOC]
+
 
 ## About
 
