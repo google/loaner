@@ -1,0 +1,25 @@
+<div *ngIf="loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!loading" class="status-box">
+  <loaner-greetings-card [userDisplayName]="userDisplayName"
+                         [dueDate]="dueDate">
+  </loaner-greetings-card>
+  <br />
+
+  <loaner-loan-actions-card tabindex="0"
+                            [additionalManagementText]="additionalText">
+    <loan-button extendButton
+                 [canExtend]="canExtend()"
+                 [dueDate]="dueDate"
+                 [maxExtendDate]="maxExtendDate"
+                 (done)="onExtended($event)"></loan-button>
+    <loan-button guestButton
+                 [guestEnabled]="guestEnabled"
+                 [guestAllowed]="guestAllowed"
+                 (done)="onGuestModeEnabled()"></loan-button>
+    <loan-button returnButton (done)="onReturned()"></loan-button>
+    <loan-button damagedButton (done)="onDamaged($event)"></loan-button>
+  </loaner-loan-actions-card>
+</div>

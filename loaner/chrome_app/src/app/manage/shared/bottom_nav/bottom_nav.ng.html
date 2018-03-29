@@ -1,0 +1,15 @@
+<div class="bottom-nav-bar" fxLayout="row" fxLayoutAlign="center none" fxFlex>
+  <a class="nav-item" *ngFor="let tab of tabs" fxLayout="column"
+     [routerLink]="tab.link" routerLinkActive="active"
+     fxLayoutAlign="space-between none" [attr.aria-label]="tab.ariaLabel"
+     matRipple fxFlex>
+    <div class="nav-item-title" fxFlex>
+      <mat-icon>
+        {{ tab.icon }}
+      </mat-icon>
+    </div>
+    <div class="nav-item-title" fxFlex>
+      {{ tab.title }}
+    </div>
+  </a>
+</div>

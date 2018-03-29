@@ -1,0 +1,33 @@
+<mat-card>
+  <div>
+    <h1 class="mat-title">
+      Maintain your loan
+    </h1>
+    <p class="card-description">
+      <ng-container *ngIf="pendingReturn">
+        This device
+        <ng-container *ngIf="oneOfMany">
+          ({{ assetTag ? 'asset tag' : 'serial number' }} {{ assetTag ? assetTag : serialNumber }})
+        </ng-container>
+        is marked as pending to be returned. Please return to the nearest shelf at your
+        earliest convenience. If you'd like to continue using it, log back in and it will be
+        re-assigned to you!
+      </ng-container>
+      <ng-container *ngIf="dueDate && !pendingReturn">
+        <p>
+          Please return this device
+          ({{ assetTag ? 'asset tag' : 'serial number'}} {{assetTag ? assetTag : serialNumber }})
+          by:
+        </p>
+        <span class="mat-title">{{ dueDate | date: 'fullDate' }}</span>
+      </ng-container>
+    </p>
+    <ng-content select="loan-button[extendButton]"></ng-content>
+    <ng-content select="loan-button[guestButton]"></ng-content>
+    <ng-content select="loan-button[returnButton]"></ng-content>
+  </div>
+  <div>
+    <ng-content select="loan-button[damagedButton]"></ng-content>
+    <ng-content select="loan-button[lostButton]"></ng-content>
+  </div>
+</mat-card>

@@ -1,0 +1,9 @@
+<div>
+  <div class="spinner-loader" *ngIf="loading && loaderType == 'spinner'">
+    <mat-spinner  mode="indeterminate"></mat-spinner>
+  </div>
+  <div class="bar-loader" *ngIf="loaderType == 'bar'">
+    <mat-progress-bar [hidden]="!loading" mode="indeterminate">
+    </mat-progress-bar>
+  </div>
+</div>

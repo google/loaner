@@ -1,0 +1,10 @@
+mat-progress-bar[hidden] {
+  visibility: hidden;
+}
+
+.spinner-loader {
+  left: 50%;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}

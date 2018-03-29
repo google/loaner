@@ -1,0 +1,47 @@
+<div *ngIf="toBeSubmitted && !loading">
+  <p matDialogTitle>Oh no!</p>
+  <div mat-dialog-content>
+    <p>
+      We are sorry to hear that your device has been damaged.
+      Please describe the specific problem(s) with this device.
+    </p>
+    <mat-form-field class="full-width">
+      <input matInput placeholder="What is damaged?"
+             [(ngModel)]="damagedReason"
+             aria-label="Write a short description of what is damaged with this device."
+             i18n-aria-label="Write a short description of what is damaged with this device.">
+    </mat-form-field>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="reportDamaged()"
+            id="submit"
+            class="action-button">
+      Submit
+    </button>
+    <button mat-button (click)="closeDialog()"
+            id="cancel"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="damaged-loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!toBeSubmitted && !loading" tabindex="0" loaner-focus>
+  <h1 mat-dialog-title>Thanks and sorry for the troubles!</h1>
+  <div mat-dialog-content>
+    <p>{{ damagedReturnMessage }}</p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="closeDialog()"
+            id="close"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Close
+    </button>
+  </div>
+</div>

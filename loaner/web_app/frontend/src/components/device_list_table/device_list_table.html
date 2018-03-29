@@ -1,0 +1,114 @@
+<loaner-loader loaderType='bar' [loading]="loading"></loaner-loader>
+<mat-card class="loaner-table">
+  <mat-card-title>
+    <span class="title">
+      {{ cardTitle }}
+    </span>
+    <loaner-device-buttons *ngIf="showButtons"></loaner-device-buttons>
+    <div fxFlex></div>
+    <!-- <mat-form-field floatLabel="never" class="filter-form-field"> -->
+    <mat-form-field class="filter-form-field">
+      <input matInput #filter placeholder="Filter devices">
+    </mat-form-field>
+  </mat-card-title>
+  <mat-card-content>
+    <loaner-device-action-box *ngIf="currentAction"
+                              [action]="currentAction"
+                              (takeAction)="takeActionOnDevice($event)">
+    </loaner-device-action-box>
+    <mat-table #table [dataSource]="dataSource" matSort>
+      <ng-container cdkColumnDef="identifier">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Identifier
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let device">{{device.id}}</mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="assignedUser">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Assigned to
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let device">
+          {{ device.assignedUser }}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="dueDate">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Due date
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let device">
+          {{device.assignedUser ? (device.dueDate | date) : ""}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="deviceModel">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Device Model
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let device"> {{device.deviceModel}} </mat-cell>
+      </ng-container>
+
+      <ng-container *ngIf="showStatus" cdkColumnDef="status">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Status
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let device" class="chips-cell">
+          <mat-chip-list>
+            <mat-basic-chip *ngFor="let chip of device.chips"
+                            class="status {{ chip.color }}"
+                            [matTooltip]="chip.tooltip"
+                            (focus)="pauseLoading=true;"
+                            (blur)="pauseLoading=false;"
+                            [attr.aria-label]="chip.tooltip">
+              <mat-icon>{{ chip.icon }}</mat-icon>
+              <span>{{ chip.label }}</span>
+            </mat-basic-chip>
+          </mat-chip-list>
+        </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="icons">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let device">
+            <button mat-icon-button
+                    (focus)="pauseLoading=true;"
+                    (blur)="pauseLoading=false;">
+              <mat-icon matTooltip="More"
+                       matTooltipPosition="above"
+                       class="icon-more"
+                       [matMenuTriggerFor]="actionsMenu"
+                       (click)="$event.stopPropagation(); pauseLoading=true;">
+                more_vert
+              </mat-icon>
+            </button>
+            <mat-menu #actionsMenu="matMenu" class="actions-menu" (closed)="pauseLoading=false;">
+              <button [disabled]="!device.assignedUser"
+                      (click)="extendDevice(device)" mat-menu-item>
+                <mat-icon>update</mat-icon>Extend</button>
+              <button [disabled]="device.pendingReturn" (click)="onReturned(device)"
+                      class="button-return" mat-menu-item>
+                <mat-icon>exit_to_app</mat-icon>Return</button>
+              <button [disabled]="device.guestAllowed && device.guestEnabled"
+                      (click)="enableGuestMode(device)" class="button-guest"
+                      mat-menu-item>
+                <mat-icon>account_circle</mat-icon>Enable guest</button>
+              <button [disabled]="device.damaged"
+                      (click)="onDamaged(device)" mat-menu-item>
+                <mat-icon>build</mat-icon>Mark as damaged</button>
+              <button [disabled]="device.lost"
+                      (click)="onLost(device)" mat-menu-item>
+                <mat-icon>gps_off</mat-icon>Mark as lost</button>
+            </mat-menu>
+          </mat-cell>
+      </ng-container>
+
+      <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *cdkRowDef="let device; columns: displayedColumns;"
+              routerLink="/device/{{device.serialNumber}}"
+               (focus)="pauseLoading=true;"
+               (blur)="pauseLoading=false;">
+      </mat-row>
+    </mat-table>
+  </mat-card-content>
+</mat-card>

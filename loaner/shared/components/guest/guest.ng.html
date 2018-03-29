@@ -1,0 +1,19 @@
+<div *ngIf="loading" class="guestLoading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!loading" tabindex="0" loaner-focus>
+  <p matDialogTitle>Success!</p>
+  <div mat-dialog-content>
+    <p>
+      Guest mode has successfully been enabled for your device. This can take up to 15 minutes to
+      become active. Once active, the option to use guest mode will be available on the bottom of
+      the login screen!
+    </p>
+    <button mat-button (click)="closeDialog()"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Close
+    </button>
+  </div>
+</div>

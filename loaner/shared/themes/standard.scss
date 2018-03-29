@@ -1,0 +1,27 @@
+@import '~@angular/material/theming';
+
+// Angular theming.
+@include mat-core();
+$primary: mat-palette($mat-blue);
+$accent: mat-palette($mat-amber);
+$warn: mat-palette($mat-red);
+
+$theme: mat-light-theme($primary, $accent, $warn);
+
+@include angular-material-theme($theme);
+
+// Colors.
+$black-54-opacity: rgba(#000, .54);
+$off-white: rgba(#fafafa, 1);
+$white-54-opacity: rgba(#fff, .54);
+$white: #fff;
+
+// General styles.
+.card-description {
+  color: $black-54-opacity;
+  font-size: 12px;
+}
+
+.card-title {
+  font-size: 16px;
+}

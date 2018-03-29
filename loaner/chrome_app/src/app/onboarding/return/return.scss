@@ -1,0 +1,17 @@
+@import '../../assets/global';
+
+.date-picker {
+  text-align: center;
+}
+
+.return-card {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+}
+
+.return-loading {
+  height: 200px;
+  width: 200px;
+}

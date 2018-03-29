@@ -1,0 +1,25 @@
+<div class="buttons" fxLayout="row" fxLayoutAlign="space-between">
+  <div *ngIf="currentStepNumber == 0">
+    <ng-content select="[returnButton]"></ng-content>
+  </div>
+  <div *ngIf="currentStepNumber != 0">
+    <button mat-mini-fab color="primary" (click)="goBack()"
+            [attr.aria-label]="navLabels.previous.aria"
+            [matTooltip]="navLabels.previous.toolTip"
+            matTooltipPosition="above">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+  </div>
+  <div fxFlex></div>
+  <div>
+    <button mat-mini-fab color="primary"
+            (click)="maxStepNumber != currentStepNumber ? goForward() : finishFlow()"
+            [attr.aria-label]="maxStepNumber != currentStepNumber ? navLabels.next.aria : navLabels.done.aria"
+            [matTooltip]="maxStepNumber != currentStepNumber ? navLabels.next.toolTip : navLabels.done.toolTip"
+            matTooltipPosition="above" [disabled]="!canProceed">
+      <mat-icon>
+        {{ (maxStepNumber != currentStepNumber ? 'arrow_forward' : 'done') }}
+      </mat-icon>
+    </button>
+  </div>
+</div>

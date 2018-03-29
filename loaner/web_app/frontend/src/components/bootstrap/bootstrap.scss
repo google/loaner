@@ -1,0 +1,29 @@
+@import '../../app';
+
+.mat-card {
+  width: 640px;
+}
+
+.mat-expansion-panel-header-title,
+.mat-expansion-panel-header-description {
+  flex-basis: 0;
+}
+
+.mat-expansion-panel-header-description {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.success {
+  color: mat-color(mat-palette($mat-green), 500);
+}
+
+.failure {
+  color: mat-color($warn, 500);
+}
+
+.button-row {
+  display: flex;
+  justify-content: center;
+  padding-top: 1.5em;
+}

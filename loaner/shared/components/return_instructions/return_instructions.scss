@@ -1,0 +1,20 @@
+@import '../../themes/standard';
+
+
+.return-card {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 550px;
+}
+
+.return-icon {
+  vertical-align: middle;
+}
+
+.return-text {
+  font-size: 14px;
+  font-style: bold;
+  line-height: 200%;
+}

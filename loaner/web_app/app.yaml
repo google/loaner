@@ -1,0 +1,84 @@
+# Copyright 2018 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+service: default
+runtime: python27
+api_version: 1
+threadsafe: true
+
+builtins:
+- appstats: on
+- deferred: on
+- remote_api: on
+
+libraries:
+- name: jinja2
+  version: "2.6"
+- name: protorpc
+  version: "1.0"
+- name: pycrypto
+  version: "2.6.1"
+- name: ssl
+  version: "2.7.11"
+- name: webapp2
+  version: "2.5.2"
+
+handlers:
+- url: /_cron/.*
+  script: loaner.web_app.main.web_app
+  login: admin
+  secure: always
+
+- url: /_ah/queue/deferred
+  script: google.appengine.ext.deferred.deferred.application
+  login: admin
+
+- url: /_ah/queue/.*
+  script: loaner.web_app.main.web_app
+  login: admin
+  secure: always
+
+- url: /favicon\.ico
+  static_files: loaner/web_app/frontend/src/assets/favicon.ico
+  upload: loaner/web_app/frontend/src/assets/favicon\.ico
+
+- url: /assets
+  static_dir: loaner/web_app/frontend/src/assets/
+  login: required
+  secure: always
+
+- url: /style.css
+  static_files: loaner/web_app/frontend/src/style.css
+  upload: loaner/web_app/frontend/src/style\.css
+  login: required
+  secure: always
+
+- url: /.*
+  script: loaner.web_app.main.web_app
+  login: required
+  secure: always
+
+skip_files:
+# Default patterns skipped by App Engine, which must be repeated since
+# specifying skip_files overrides them otherwise.  See
+# https://developers.google.com/appengine/docs/python/config/appconfig#Skipping_Files.
+- ^(.*/)?app\.yaml
+- ^(.*/)?app\.yml
+- ^(.*/)?index\.yaml
+- ^(.*/)?index\.yml
+- ^(.*/)?#.*#
+- ^(.*/)?.*~
+- ^(.*/)?.*\.pyo
+- ^(.*/)?.*/RCS/.*
+- ^(.*/)?\..*

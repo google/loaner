@@ -1,0 +1,31 @@
+{
+  "description": "Start and manage your GnG experience here!",
+  "version": "0.0.36",
+  "manifest_version": 2,
+  "name": "GnG Loaner App",
+  "permissions": [
+    "alarms",
+    "enterprise.deviceAttributes",
+    "identity",
+    "notifications",
+    "storage",
+    "webview",
+    "app.window.alwaysOnTop"
+  ],
+  "app": {
+    "background": {
+      "scripts": [ "background.js" ]
+    }
+  },
+  "icons": {
+    "16": "assets/icons/gng16.png",
+    "48": "assets/icons/gng48.png",
+    "128": "assets/icons/gng128.png"
+  },
+  "oauth2": {
+    "client_id": "PUT_YOUR_CLIENT_ID_HERE",
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email"
+    ]
+  }
+}

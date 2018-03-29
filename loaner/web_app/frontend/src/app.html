@@ -1,0 +1,35 @@
+<div class="body-container">
+  <mat-toolbar class="loaner-toolbar">
+    <button mat-icon-button (click)="sidenav.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    <span>{{title}}</span>
+  </mat-toolbar>
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #sidenav mode="over" class="loaner-sidenav">
+      <mat-nav-list>
+        <div *ngFor="let navigationItem of navigationItems">
+          <ng-container *ngIf="canShow(navigationItem)">
+            <a mat-list-item
+               *ngIf="navigationItem.routerLink"
+               (click)="sidenav.close()"
+               routerLink="{{navigationItem.routerLink}}"
+               routerLinkActive="active">
+              <mat-icon class="loaner-sidenav-icon">{{navigationItem.icon}}</mat-icon>
+              {{navigationItem.name}}
+            </a>
+            <a *ngIf="navigationItem.url && !navigationItem.routerLink" target="_blank"
+               mat-list-item href="{{navigationItem.url}}">
+              <mat-icon class="loaner-sidenav-icon">{{navigationItem.icon}}</mat-icon>
+                {{navigationItem.name}}
+            </a>
+          </ng-container>
+        </div>
+      </mat-nav-list>
+    </mat-sidenav>
+    <div class="loaner-body-content">
+      <loaner-loader [loading]="loading"></loaner-loader>
+      <router-outlet></router-outlet>
+    </div>
+  </mat-sidenav-container>
+</div>

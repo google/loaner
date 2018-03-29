@@ -1,0 +1,11 @@
+<div class="info-card" *ngIf="title || body">
+  <mat-card tabindex="0" loaner-focus>
+    <h1 class="card-title" *ngIf="title">
+      {{ title }}
+    </h1>
+    <p class="card-description" *ngIf="body">
+      {{ body }}
+    </p>
+  </mat-card>
+</div>
+

@@ -1,0 +1,15 @@
+body {
+  background-color: #fafafa;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.logo-background {
+  left: 50%;
+  opacity: .05;
+  position: fixed;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: -1;
+}

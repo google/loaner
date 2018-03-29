@@ -1,0 +1,9 @@
+@import '../../themes/standard';
+
+.info-card {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 400px;
+}

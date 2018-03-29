@@ -1,0 +1,39 @@
+# Copyright 2018 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+cron:
+- description: run custom events
+  url: /_cron/run_custom_events
+  schedule: every 5 minutes
+  target: action-system
+
+- description: run reminder events (mark devices only)
+  url: /_cron/run_reminder_events?find_remindable_devices=true
+  schedule: every 5 minutes
+  target: action-system
+
+- description: run reminder events (send reminders only)
+  url: /_cron/run_reminder_events?remind_for_devices=true
+  schedule: every 15 minutes
+  target: action-system
+
+- description: run shelf audit events
+  url: /_cron/run_shelf_audit_events
+  schedule: every 60 minutes
+  target: action-system
+
+- description: sync roles for users
+  url: /_cron/sync_user_roles
+  schedule: every 30 minutes
+  target: default

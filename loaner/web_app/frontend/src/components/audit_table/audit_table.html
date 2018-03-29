@@ -1,0 +1,86 @@
+<mat-card class="loaner-table">
+  <mat-card-title class="title">
+    <button (click)="back()"
+            class="button-icon"
+            mat-icon-button
+            aria-label="Back">
+      <mat-icon matTooltip="Back"
+                matTooltipPosition="above"
+                aria-hidden="true">
+        arrow_back
+      </mat-icon>
+    </button>
+    <span>
+      {{shelf.name}}
+    </span>
+    <div fxFlex></div>
+    <mat-form-field>
+      <input matInput
+            (keyup.enter)="addDevice(currentInput)"
+            placeholder="Serial Number"
+            #currentInput>
+    </mat-form-field>
+    <button class="add-to-audit-list-button"
+            mat-icon-button
+            aria-label="Add device"
+            (click)="addDevice(currentInput)">
+      <mat-icon matTooltip="Add device">add</mat-icon>
+    </button>
+  </mat-card-title>
+  <span class="header-row">
+    <span>Identifier</span>
+  </span>
+  <mat-card-content>
+    <mat-list *ngIf="!isEmpty">
+      <mat-list-item *ngFor="let device of devicesToBeCheckedIn">
+        <span>{{device.device.serialNumber}}</span>
+        <span fxFlex></span>
+        <mat-progress-spinner *ngIf="device.status == status.IN_PROGRESS"
+                              [diameter]="24" [strokeWidth]="24 / 10"
+                              color="accent"
+                              mode="indeterminate">
+        </mat-progress-spinner>
+
+        <!-- Device ready for audit indicator -->
+        <mat-icon *ngIf="device.status == status.READY"
+                  matTooltip="{{device.message}}"
+                  aria-hidden="false"
+                  aria-label="Device ready for audit"
+                  class="status ready">
+          check
+        </mat-icon>
+
+        <!-- Cannot audit indicator -->
+        <div *ngIf="device.status == status.ERROR">
+          <mat-icon matTooltip="{{device.message}}"
+                    aria-hidden="true"
+                    class="status error">
+            error
+          </mat-icon>
+          <span class="cdk-visually-hidden">Error auditing device: {{device.message}}</span>
+        </div>
+
+        <!-- Remove device from audit button -->
+        <button mat-icon-button
+                (click)="removeDevice(device)"
+                aria-label="Remove device from audit">
+          <mat-icon aria-hidden="true"
+                    matTooltip="Remove device from audit">
+            close
+          </mat-icon>
+        </button>
+      </mat-list-item>
+    </mat-list>
+    <div class="no-devices" *ngIf="isEmpty">
+      There are no devices added for check-in yet.
+    </div>
+    <p>
+      <button mat-raised-button
+              color="primary"
+              [disabled]="!isReadyForAudit"
+              class="audit"
+              (click)="audit()">Audit</button>
+    </p>
+  </mat-card-content>
+</mat-card>
+

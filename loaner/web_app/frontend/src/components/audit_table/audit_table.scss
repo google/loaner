@@ -1,0 +1,41 @@
+@import '../../scss_mixins/loaner-table';
+
+.audit {
+  margin: 0 auto;
+}
+
+.no-devices {
+  font-size: 16px;
+  padding-top: 20px;
+  text-align: center;
+}
+
+.mat-card-content {
+  padding: 0 20px 20px;
+}
+
+.header-row {
+  align-items: center;
+  background-color: mat-color($primary, 300);
+  color: $white;
+  display: flex;
+  font-size: 18px;
+  height: 48px;
+  padding: 0 24px;
+}
+
+.status {
+  &.ready {
+    color: mat-color(mat-palette($mat-green), 500) !important;
+  }
+
+  &.error {
+    color: mat-color($warn, 500) !important;
+  }
+}
+
+.mat-list-item {
+  border-bottom-color: mat-color($mat-grey, 300);
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+}

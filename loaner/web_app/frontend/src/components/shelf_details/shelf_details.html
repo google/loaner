@@ -1,0 +1,55 @@
+<mat-card class="loaner-table">
+  <mat-card-title class="title">
+    <button (click)="back()" class="button-icon" mat-icon-button>
+      <mat-icon matTooltip="Back" matTooltipPosition="above">
+        arrow_back
+      </mat-icon>
+    </button>
+    <span>Shelf Details</span>
+    <span fxFlex></span>
+    <button mat-icon-button>
+      <mat-icon class="icon-more"
+                [matMenuTriggerFor]="actionsMenu">more_vert</mat-icon>
+    </button>
+    <mat-menu #actionsMenu="matMenu" class="actions-menu">
+      <button routerLink="/shelf/{{shelf.location}}/audit" mat-menu-item>
+        <mat-icon svgIcon="checkin"></mat-icon>Audit</button>
+      <button (click)="edit()" class="button-edit" mat-menu-item>
+        <mat-icon>edit</mat-icon>Edit</button>
+      <button (click)="openDisableDialog()" class="button-delete" mat-menu-item>
+        <mat-icon>delete</mat-icon>Delete</button>
+    </mat-menu>
+  </mat-card-title>
+  <mat-card-content>
+    <div *ngIf="shelf">
+      <section fxLayout="row" fxLayout.xs="column">
+        <loaner-viewonly-label topLabel="Location" class="location"
+                text="{{shelf.location}}" fxFlex>
+        </loaner-viewonly-label>
+        <loaner-viewonly-label topLabel="Friendly Name" class="friendlyName"
+                text="{{shelf.friendlyName}}" fxFlex>
+        </loaner-viewonly-label>
+      </section>
+      <section fxLayout="row" fxLayout.xs="column">
+        <loaner-viewonly-label topLabel="Capacity" class="capacity"
+                text="{{shelf.capacity}}" fxFlex>
+        </loaner-viewonly-label>
+        <loaner-viewonly-label topLabel="Latitude" class="latitude"
+                text="{{shelf.latitude}}" fxFlex>
+        </loaner-viewonly-label>
+        <loaner-viewonly-label topLabel="Longitude" class="longitude"
+                text="{{shelf.longitude}}" fxFlex>
+        </loaner-viewonly-label>
+        <loaner-viewonly-label topLabel="Altitude" class="altitude"
+                text="{{shelf.altitude}}" fxFlex>
+        </loaner-viewonly-label>
+      </section>
+      <section fxLayout="row" fxLayout.xs="column">
+        <loaner-viewonly-label topLabel="Responsible" class="responsible"
+                  text="{{shelf.responsibleForAudit}}" fxFlex>
+          </loaner-viewonly-label>
+      </section>
+    </div>
+  </mat-card-content>
+</mat-card>
+

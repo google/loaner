@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+  <script src="https://apis.google.com/js/client.js?onload=init"></script>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons"
+      rel="stylesheet">
+  <script>
+    window.CONFIG = {
+      'gapiClientId': '{{WEB_APP_CLIENT_ID}}',
+      'endpointsHostname':
+          window.location.protocol + '//{{ENDPOINTS_HOSTNAME}}',
+      'appName': '{{APP_NAME}}',
+    };
+  </script>
+</head>
+<body>
+  <app-root>Loading...</app-root>
+</body>
+</html>

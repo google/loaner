@@ -1,0 +1,58 @@
+<div *ngIf="toBeSubmitted && !loading">
+  <p mat-dialog-title>Extend your loaner</p>
+  <div mat-dialog-content>
+    <p>
+      Select a new return date below by clicking the calendar icon.
+    </p>
+    <mat-form-field>
+      <input matInput [matDatepicker]="picker"
+             placeholder="Pick a new return date"
+             [(ngModel)]="newReturnDate"
+             [min]="getMinimumReturnDate()"
+             [max]="maxExtendDate"
+             [maxlength]="10"
+             (keypress)="validateField($event)"
+             required>
+      <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    </mat-form-field>
+    <mat-datepicker touchUi="true" #picker></mat-datepicker>
+  </div>
+  <mat-error *ngIf="!validDate" class="invalid-date-text">
+    The date you selected was invalid!
+  </mat-error>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="extendDate(date)"
+            id="submit"
+            class="action-button">
+      Submit
+    </button>
+    <button mat-button (click)="closeDialog()"
+            id="cancel"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="extend-loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!toBeSubmitted && !loading" tabindex="0" loaner-focus>
+  <h1 mat-dialog-title>Your loan has successfully been extended!</h1>
+  <div mat-dialog-content>
+    <p>
+      You have successfully extended your loan. Please make sure to return the
+      loaner by <strong>{{ dueDate | date:'fullDate' }}</strong>!
+    </p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="closeDialog()"
+            id="close"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Close
+    </button>
+  </div>
+</div>

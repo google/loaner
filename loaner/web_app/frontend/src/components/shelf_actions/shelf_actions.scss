@@ -1,0 +1,15 @@
+@import '../../scss_mixins/loaner-table';
+
+button {
+  margin-top: 10px;
+}
+
+.mat-card-content {
+  padding: 24px;
+}
+
+mat-form-field,
+mat-select {
+  font-size: 18px;
+  margin: 5px;
+}

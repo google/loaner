@@ -1,0 +1,68 @@
+<div fxLayout="column" fxLayoutAlign="center center">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <h1>Setup</h1>
+      </mat-card-title>
+      <mat-card-subtitle>
+          This first-time step will automate the installation process.
+      </mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-accordion *ngIf="hasTasks" multi="true">
+        <mat-expansion-panel *ngFor="let task of bootstrapStatus.tasks"
+                             [hideToggle]="!(task.timestamp && task.details)">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{task.name || task.description}}
+            </mat-panel-title>
+            <mat-panel-description>
+              {{task.description || task.name}}
+              <mat-icon *ngIf="bootstrapStarted && !task.success && !task.timestamp">
+                <mat-spinner [diameter]="24"></mat-spinner>
+              </mat-icon>
+              <span *ngIf="bootstrapStarted && !task.success && !task.timestamp"
+                    class="cdk-visually-hidden">
+                In progress
+              </span>
+              <mat-icon *ngIf="task.success"
+                        class="success"
+                        aria-hidden="true">
+                check_circle
+              </mat-icon>
+              <span *ngIf="task.success"
+                    class="cdk-visually-hidden">
+                Finished successfully
+              </span>
+              <mat-icon *ngIf="!task.success && task.timestamp"
+                        class="failure"
+                        aria-hidden="true">
+                error
+              </mat-icon>
+              <span *ngIf="!task.success && task.timestamp"
+                    class="cdk-visually-hidden">
+                Task failed
+              </span>
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+          <p>{{task.details}}</p>
+        </mat-expansion-panel>
+      </mat-accordion>
+      <div class="button-row">
+        <button mat-raised-button
+                *ngIf="(!bootstrapTasksFinished) && (!canRetry)"
+                color="primary"
+                [disabled]="!canBootstrap"
+                (click)="bootstrapApplication()">Begin bootstrap</button>
+        <button mat-raised-button
+                *ngIf="bootstrapTasksFinished"
+                color="primary"
+                (click)="redirectToApp()">Get started with {{appName}}</button>
+        <button mat-raised-button
+                *ngIf="canRetry"
+                color="primary"
+                (click)="bootstrapApplication()">Retry failed tasks</button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

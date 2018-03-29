@@ -1,0 +1,33 @@
+<div class="troubleshoot-card">
+  <mat-card tabindex="0" loaner-focus>
+    <h1 class="mat-title">
+      Having issues?
+    </h1>
+    <p class="card-description">
+        {{ troubleshootingInformation }}
+    </p>
+    <div>
+      <div *ngIf="contactPhone"
+           fxLayout="row"
+           fxLayoutAlign="center center">
+        <mat-icon>phone</mat-icon>
+        <span class="icon-padding"></span>
+        {{ contactPhone }}
+      </div>
+      <div *ngIf="contactEmail"
+           fxLayout="row"
+           fxLayoutAlign="center center">
+        <mat-icon>email</mat-icon>
+        <span class="icon-padding"></span>
+        {{ contactEmail }}
+      </div>
+      <div *ngIf="contactWebsite"
+           fxLayout="row"
+           fxLayoutAlign="center center">
+        <mat-icon>web</mat-icon>
+        <span class="icon-padding"></span>
+        <a target="_blank" [href]="contactWebsite">{{ contactWebsite }}</a>
+      </div>
+    </div>
+  </mat-card>
+</div>

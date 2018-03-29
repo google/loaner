@@ -1,0 +1,10 @@
+<div class="app-container">
+    <div class="app-content">
+        <router-outlet></router-outlet>
+    </div>
+    <bottom-nav id="botton-navigation" [tabs]="navBarTabs"></bottom-nav>
+</div>
+<img *ngIf="backgroundLogoEnabled" [src]="backgroundLogo.url"
+     class="logo-background" aria-hidden="true"
+     [alt]="backgroundLogo.altText"
+     role="presentation" />

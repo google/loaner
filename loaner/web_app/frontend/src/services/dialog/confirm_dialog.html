@@ -1,0 +1,8 @@
+<h1>{{ title }}</h1>
+<p>{{ message }}</p>
+<section>
+  <button type="button" mat-button mat-raised-button color="primary"
+    (click)="dialogRef.close(true)">Yes</button>
+  <button type="button" mat-button mat-raised-button
+    (click)="dialogRef.close()">No</button>
+</section>

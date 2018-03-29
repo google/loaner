@@ -1,0 +1,34 @@
+<div *ngIf="loading" class="return-loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!loading" class="return-card">
+  <mat-card tabindex="0" loaner-focus>
+    <h1 class="card-title">
+      Choose a return date
+    </h1>
+    <p class="card-description">
+      Please select an anticipated return date. You can always extend this later if you need to.
+    </p>
+    <br/>
+    <div class="date-picker">
+      <mat-form-field>
+        <input matInput [matDatepicker]="picker"
+               placeholder="Choose your return date"
+               [(ngModel)]="newReturnDate"
+               (ngModelChange)="sendNewReturnDate()"
+               [min]="getMinimumReturnDate()"
+               [max]="maxReturnDate"
+               [maxlength]="10"
+               (keypress)="validateField($event)"
+               required>
+        <mat-datepicker-toggle matSuffix [for]="picker">
+        </mat-datepicker-toggle>
+      </mat-form-field>
+      <mat-datepicker touchUi="true" #picker></mat-datepicker>
+      <mat-error *ngIf="!validDate">
+        The date you selected was invalid!
+      </mat-error>
+    </div>
+  </mat-card>
+</div>

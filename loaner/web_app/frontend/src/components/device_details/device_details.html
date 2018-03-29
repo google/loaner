@@ -1,0 +1,91 @@
+<loaner-loader loaderType='bar' [loading]="loading"></loaner-loader>
+<mat-card class="loaner-table">
+  <mat-card-title>
+    <button (click)="back()" class="button-back" mat-icon-button>
+      <mat-icon matTooltip="Back" matTooltipPosition="above">
+          arrow_back
+      </mat-icon>
+    </button>
+    <span>Serial No: {{device.serialNumber}} </span>
+    <div fxFlex></div>
+    <button mat-icon-button>
+      <mat-icon matTooltip="More"
+               matTooltipPosition="above"
+               class="icon-more"
+               [matMenuTriggerFor]="actionsMenu">
+        more_vert
+      </mat-icon>
+    </button>
+    <mat-menu #actionsMenu="matMenu" class="actions-menu">
+      <button [disabled]="!device.assignedUser"
+              (click)="extendDevice(device)" mat-menu-item>
+        <mat-icon>update</mat-icon>Extend</button>
+      <button [disabled]="device.pendingReturn" (click)="onReturned(device)"
+              class="button-return" mat-menu-item>
+         <mat-icon>exit_to_app</mat-icon>Return</button>
+      <button [disabled]="device.guestAllowed && device.guestEnabled"
+              (click)="enableGuestMode(device)" class="button-guest"
+              mat-menu-item>
+        <mat-icon>account_circle</mat-icon>Enable guest</button>
+      <button [disabled]="device.damaged"
+              (click)="onDamaged(device)" mat-menu-item>
+        <mat-icon>build</mat-icon>Mark as damaged</button>
+      <button [disabled]="device.lost" (click)="onLost(device)" mat-menu-item>
+        <mat-icon>gps_off</mat-icon>Mark as lost</button>
+      <button (click)="openRemoveDeviceDialog()" class="remove-device" mat-menu-item>
+        <mat-icon>phonelink_off</mat-icon>Unenroll</button>
+    </mat-menu>
+  </mat-card-title>
+  <mat-card-content>
+      <mat-list>
+        <section fxLayout="row" fxLayout.xs="column">
+          <mat-list-item fxFlex>
+            <p mat-line>Device model</p>
+            <p mat-line class="secondary-text">{{device.deviceModel}}</p>
+          </mat-list-item>
+          <mat-list-item fxFlex>
+            <p mat-line>Asset tag</p>
+            <p mat-line class="secondary-text">{{device.assetTag}}</p>
+          </mat-list-item>
+          <mat-list-item fxFlex>
+            <p mat-line>Assigned to</p>
+            <p mat-line class="secondary-text">{{device.assignedUser}}</p>
+          </mat-list-item>
+        </section>
+        <section fxLayout="row" fxLayout.xs="column">
+          <mat-list-item fxFlex>
+            <p mat-line>Current Shelf</p>
+            <p mat-line class="secondary-text">{{device.shelf.name}}</p>
+          </mat-list-item>
+          <mat-list-item fxFlex>
+            <p mat-line>Current OU</p>
+            <p mat-line class="secondary-text">{{device.currentOu}}</p>
+          </mat-list-item>
+          <mat-list-item fxFlex>
+            <p mat-line>Due date</p>
+            <p *ngIf="device.assignedUser"
+               mat-line class="secondary-text">{{device.dueDate}}</p>
+          </mat-list-item>
+        </section>
+        <section fxLayout="row" fxLayout.xs="column">
+          <mat-list-item fxFlex>
+            <p mat-line>Status</p>
+            <p mat-line class="secondary-text">
+              {{device.assignedUser ? 'Assigned' : 'Unassigned'}}</p>
+            <p *ngIf="device.isOverdue"
+               mat-line class="secondary-text">Overdue</p>
+            <p *ngIf="device.pendingReturn"
+               mat-line class="secondary-text">Pending return</p>
+            <p *ngIf="device.guestEnabled"
+               mat-line class="secondary-text">Guest Enabled</p>
+            <p *ngIf="device.damaged"
+               mat-line class="secondary-text">Marked as damaged</p>
+            <p *ngIf="device.lost"
+               mat-line class="secondary-text">Marked as lost</p>
+          </mat-list-item>
+        </section>
+      </mat-list>
+  </mat-card-content>
+</mat-card>
+
+

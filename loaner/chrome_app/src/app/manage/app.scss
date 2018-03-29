@@ -1,0 +1,29 @@
+@import '../assets/global';
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  flex-direction: column;
+}
+
+.app-content {
+  flex: 1;
+  height: 100%;
+  margin-bottom: 56px;
+
+}
+
+body {
+  margin: 0;
+}
+
+// Needed to allow scroll bar in chrome application
+html {
+  overflow-y: scroll;
+}
+
+#botton-navigation {
+  bottom: 0;
+  position: fixed;
+  width: 100%;
+}

@@ -1,0 +1,22 @@
+<mat-toolbar color="primary">
+  <span>{{ steps[currentStep].title }}</span>
+  <span fxFlex></span>
+  <img *ngIf="toolbarIconEnabled" class="toolbar-icon" [src]="toolbarIcon.url"
+       [alt]="toolbarIcon.altText" role="presentation" />
+</mat-toolbar>
+<loaner-flow-sequence>
+  <welcome loanerFlowChild></welcome>
+  <survey loanerFlowChild></survey>
+  <return loanerFlowChild></return>
+  <loaner-return-instructions [flow]="flows.ONBOARDING" loanerFlowChild>
+  </loaner-return-instructions>
+</loaner-flow-sequence>
+<div class="navigation-progress">
+  <loaner-flow-sequence-buttons [steps]="steps" [navLabels]="labels">
+  </loaner-flow-sequence-buttons>
+  <loaner-progress [current]="currentStep" [max]="maxStep"></loaner-progress>
+</div>
+<img *ngIf="backgroundLogoEnabled" [src]="backgroundLogo.url"
+     class="logo-background" aria-hidden="true"
+     [alt]="backgroundLogo.altText"
+     role="presentation" />

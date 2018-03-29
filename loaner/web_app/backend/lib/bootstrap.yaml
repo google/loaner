@@ -1,0 +1,379 @@
+# Copyright 2018 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Core events required by the app.
+
+core_events:
+
+- name: device_loan_assign
+  description: Event run when a device is assigned.
+  enabled: True
+  actions:
+  - send_welcome
+
+- name: device_enroll
+  description: Event run when a device is enrolled.
+  enabled: True
+
+- name: device_enroll_lost_or_locked
+  description: Event run when newly enrolled device was previously lost/locked.
+
+- name: device_loan_return
+  description: Event run when a device is returned.
+  enabled: True
+  actions:
+  - send_return_thanks
+
+- name: device_unenroll
+  description: Event run when a device is unenrolled.
+  enabled: True
+
+- name: shelf_audited
+  description: Event run when a shelf has been audited.
+  enabled: True
+
+- name: shelf_enroll
+  description: Event run when a shelf has been enrolled.
+  enabled: True
+
+- name: shelf_disable
+  description: Event run when a shelf has been disabled.
+  enabled: True
+
+
+# The single Shelf Audit event required by the app. The request_shelf_audit
+# action is automatically included, but you can apend more.
+
+shelf_audit_events:
+
+- enabled: True
+
+
+# Suggested reminder events. The send_reminder action is automatically included.
+
+reminder_events:
+
+- level: 0
+  description: Device due in less than one day (but not in the past).
+  enabled: True
+  interval: 0  # Send only once.
+  template: reminder_due
+  conditions:
+  - name: due_date
+    opsymbol: '<'
+    value: 'TIME:+1d'
+  - name: due_date
+    opsymbol: '>'
+    value: 'TIME:+0d'
+
+- level: 1
+  description: Device overdue by one day, but by less than a week.
+  enabled: True
+  interval: 1  # Send once a day.
+  template: reminder_overdue
+  conditions:
+  - name: due_date
+    opsymbol: '<'
+    value: 'TIME:-1d'
+  - name: due_date
+    opsymbol: '>'
+    value: 'TIME:-7d'
+
+- level: 2
+  description: Device overdue by more than a week but less than two.
+  enabled: True
+  interval: 1 # Send once a day.
+  template: reminder_suspiciously_overdue
+  conditions:
+  - name: due_date
+    opsymbol: '<'
+    value: 'TIME:-7d'
+  - name: due_date
+    opsymbol: '>'
+    value: 'TIME:-14d'
+
+- level: 3
+  description: Device overdue by more than two weeks.
+  enabled: True
+  interval: 1 # Send once a day.
+  template: reminder_suspiciously_overdue
+  actions:
+  - lock_device  # In addition to the built-in send_reminder.
+  conditions:
+  - name: due_date
+    opsymbol: '<'
+    value: 'TIME:-14d'
+  - name: locked
+    opsymbol: '!='
+    value: True
+
+# Survey questions and answers.
+
+survey_questions:
+
+- question_type: RETURN
+  question_text: 'How was your experience with this loaner device?'
+  enabled: true
+  rand_weight: 1
+  answers:
+  - text: 'It was great!'
+    more_info_enabled: false
+  - text: 'Could use some improvements.'
+    more_info_enabled: true
+    placeholder_text: 'Tell us more...'
+  - text: 'I had trouble with it.'
+    more_info_enabled: true
+    placeholder_text: 'Tell us more...'
+
+- question_type: ASSIGNMENT
+  question_text: 'Why are you using a loaner device today?'
+  enabled: true
+  rand_weight: 1
+  answers:
+  - text: 'I forgot my computer.'
+    more_info_enabled: false
+  - text: 'I need it for a meeting or interview.'
+    more_info_enabled: false
+  - text: 'I want to try out Chrome OS.'
+    more_info_enabled: false
+  - text: 'Other.'
+    more_info_enabled: true
+    placeholder_text: 'Tell us more...'
+
+# Suggested e-mail templates.
+
+templates:
+
+- name: reminder_base
+  body: '<html>
+        <body>
+          <table style=" padding:.1cm; max-width:800px; margin-left:0 auto">
+            <tr>
+            <td style="display:inline-block;text-align:center;width:100%">
+                <img src="{{ img_banner }}" style="max-width:100%; max-height:75%;">
+              </td>
+              <td></td>
+            </tr>
+            <tr>
+              <td></td>
+            </tr>
+            <tr>
+              <td style="font-family:Roboto, Arial, sans-serif; padding:.3cm;">
+                {% block body %}{% endblock %}
+                <p>
+                  To manage your loan, click the button below.
+                </p>
+                <p>Thanks,<br>The Loaner Service</p>
+              </td>
+            </tr>
+            {% block footer %}
+              <tr height=80px>
+                <td style="display:inline-block;text-align:center;width:100%">
+                    <a href="https://{{ origin }}/user/{{ serial_number }}"
+                         style="display: inline-block;">
+                        <img src="{{ img_button_manage }}"
+                             style="max-height:3em;"
+                             alt="Manage your loan"
+                             title="Manage your loan"></img>
+                    </a>
+                </td>
+              </tr>
+            {% endblock %}
+            <tr>
+              <td align="center">
+                <!--Feedback link goes here.-->
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>'
+
+- name: reminder_return_thanks
+  title: Thanks for returning your Grab n Go Loaner Chromebook!
+  body: '{% extends "reminder_base" %}
+      {% block body %}
+        <p>Hello!<p>
+        <p>
+          We received your <span style="color:#15499f;font-weight:bold;">Grab n
+          Go Loaner Chromebook</span> and marked it as returned. This is the
+          machine you borrowed on {{assignment_date}} with the
+          {% if asset_tag %}
+            asset tag <span style="font-weight:bold;color:#15499f;">
+            {{asset_tag}}</span>.
+          {% else %}
+            serial number <span style="font-weight:bold;color:#15499f;">
+            {{serial_number}}</span>.
+          {% endif %}
+        </p>
+      {% endblock %}'
+
+- name: reminder_welcome
+  title: You're using a Grab n Go Loaner Chromebook!
+  body: '{% extends "reminder_base" %}
+      {% block body %}
+        <p>
+          <em>If you recently returned your Grab n Go Loaner Chromebook you&lsquo;ll receive an email
+          confirmation shortly and can ignore this email. If you returned the machine more than 24
+          hours ago and feel this email is in error, or if you&lsquo;ve lost the device, please click the
+          &quot;Manage Loan&quot; button and let us know you don&lsquo;t have it.</em>
+        </p>
+        <p>Hello!</p>
+        <p>
+          You just signed into a Grab n Go Loaner Chromebook! It&lsquo;s temporarily assigned to you and
+          is due on {{due_date}}. If you need it for longer, click the management button below.
+        </p>
+        <p>
+          When you&lsquo;re done please return the Chromebook to the nearest Grab n Go Loaner shelf and
+          plug it in. If you&lsquo;ve already returned it, you&lsquo;ll receive a confirmation of the
+          return within about one business day. If you think you received this email in error, please
+          click the management button below to let us know you don&lsquo;t have this device.
+        </p>
+      {% endblock %}'
+
+- name: reminder_due
+  title: Your loaner is due soon
+  body: '{% extends "reminder_base" %}
+      {% block body %}
+        <p>
+          <em>If you recently returned your Grab n Go Loaner Chromebook you&lsquo;ll receive an email
+          confirmation shortly and can ignore this email. If you returned the machine more than 24
+          hours ago and feel this email is in error, or if you&lsquo;ve lost the device, please click the
+          &quot;Manage Loan&quot; button and let us know you don&lsquo;t have it.</em>
+        </p>
+        <p>Hello!</p>
+        <p>
+          Just a friendly reminder that your Grab n Go Loaner Chromebook
+          <span style="font-weight:bold;">is due.</span>
+        </p>
+        <p>
+          <ul>
+            {% if asset_tag %}
+              <li>Asset tag: <span style="font-weight:bold;color:#15499f;">{{asset_tag}}</span></li>
+            {% else %}
+              <li>Serial number: <span style="font-weight:bold;color:#15499f;">{{serial_number}}</span></li>
+            {% endif %}
+            <li>Checked out on: <span style="font-weight:bold;color:#15499f;">{{assignment_date}}</span></li>
+            <li>Due on: <span style="font-weight:bold;color:#15499f;">{{due_date}}</span></li>
+          </ul>
+        </p>
+        <p>
+           <span style="font-weight:bold;">Please return it to the nearest Grab n Go shelf and plug it
+             in when you&lsquo;re done with it.</span>
+          {% if extend %}
+            If you&lsquo;d like to keep it for a little longer, click the button below to extend your loan
+            by {{loan_duration}} days.
+          {% endif %}
+        </p>
+      {% endblock %}'
+
+- name: reminder_overdue
+  title: Your loaner is overdue
+  body: '{% extends "reminder_base" %}
+      {% block body %}
+        <p>
+          <em>If you recently returned your Grab n Go Loaner Chromebook you&lsquo;ll receive an email
+          confirmation shortly and can ignore this email. If you returned the machine more than 24
+          hours ago and feel this email is in error, or if you&lsquo;ve lost the device, please click the
+          &quot;Manage Loan&quot; button and let us know you don&lsquo;t have it.</em>
+        </p>
+        <p>Hello!</p>
+        <p>
+          Just a friendly reminder that your Grab n Go Loaner Chromebook
+          <span style="font-weight:bold;">is due.</span>
+        </p>
+        <p>
+          <ul>
+            {% if asset_tag %}
+              <li>Asset tag: <span style="font-weight:bold;color:#15499f;">{{asset_tag}}</span></li>
+            {% else %}
+              <li>Serial number: <span style="font-weight:bold;color:#15499f;">{{serial_number}}</span></li>
+            {% endif %}
+            <li>Checked out on: <span style="font-weight:bold;color:#15499f;">{{assignment_date}}</span></li>
+            <li>Due on: <span style="font-weight:bold;color:#15499f;">{{due_date}}</span></li>
+          </ul>
+        </p>
+        <p>
+           <span style="font-weight:bold;">Please return it to the nearest Grab n Go shelf and plug it
+             in when you&lsquo;re done with it.</span>
+          {% if extend %}
+            If you&lsquo;d like to keep it for a little longer, click the button below to extend your loan
+            by {{loan_duration}} days.
+          {% endif %}
+        </p>
+      {% endblock %}'
+
+- name: reminder_suspiciously_overdue
+  title: Your loaner is very overdue
+  body: '{% extends "reminder_base" %}
+      {% block body %}
+        <p>
+          <em>If you recently returned your Grab n Go Loaner Chromebook you&lsquo;ll receive an email
+          confirmation shortly and can ignore this email. If you returned the machine more than 24
+          hours ago and feel this email is in error, or if you&lsquo;ve lost the device, please click the
+          &quot;Manage Loan&quot; button and let us know you don&lsquo;t have it.</em>
+        </p>
+        <p>Hello!</p>
+        <p>
+          Just a friendly reminder that your Grab n Go Loaner Chromebook
+          <span style="font-weight:bold;">is due.</span>
+        </p>
+        <p>
+          <ul>
+            {% if asset_tag %}
+              <li>Asset tag: <span style="font-weight:bold;color:#15499f;">{{asset_tag}}</span></li>
+            {% else %}
+              <li>Serial number: <span style="font-weight:bold;color:#15499f;">{{serial_number}}</span></li>
+            {% endif %}
+            <li>Checked out on: <span style="font-weight:bold;color:#15499f;">{{assignment_date}}</span></li>
+            <li>Due on: <span style="font-weight:bold;color:#15499f;">{{due_date}}</span></li>
+          </ul>
+        </p>
+        <p>
+           <span style="font-weight:bold;">Please return it to the nearest Grab n Go shelf and plug it
+             in when you&lsquo;re done with it.</span>
+          {% if extend %}
+            If you&lsquo;d like to keep it for a little longer, click the button below to extend your loan
+            by {{loan_duration}} days.
+          {% endif %}
+        </p>
+      {% endblock %}'
+
+- name: shelf_audit_base
+  body: '<html>
+        <body>
+          <table style=" padding:.1cm; max-width:800px; margin-left:0 auto">
+            <tr>
+              <td style="font-family:Roboto, Arial, sans-serif; padding:.3cm;">
+                {% block body %}{% endblock %}
+                <p>Thanks,<br>The Loaner Service</p>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>'
+
+- name: shelf_audit_request
+  title: Shelf {{location}} {% if friendly_name %} ({{friendly_name}}) {% endif %} needs an audit
+  body: '{% extends "shelf_audit_base" %}
+      {% block body %}
+        <p>Hello!</p>
+        <p>
+          The Grab n Go loaner shelf at {{location}}
+            {% if friendly_name %}
+              ({{friendly_name}})
+            {% endif %}
+          has not been audited in {{hours_since_audit}} hours and needs to be.
+          Please audit this shelf as soon as possible.
+        </p>
+      {% endblock %}'

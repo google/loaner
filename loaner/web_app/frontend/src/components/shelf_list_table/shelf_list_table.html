@@ -1,0 +1,63 @@
+<loaner-loader loaderType='bar' [loading]="loading"></loaner-loader>
+<mat-card class="loaner-table">
+  <mat-card-title>
+    <span class="title">
+      Shelf List
+    </span>
+    <loaner-shelf-buttons></loaner-shelf-buttons>
+    <div fxFlex></div>
+    <mat-form-field floatLabel="never">
+      <input matInput #filter placeholder="Filter shelves">
+    </mat-form-field>
+  </mat-card-title>
+  <mat-card-content>
+    <mat-table #table [dataSource]="dataSource" matSort>
+      <ng-container cdkColumnDef="name">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header> Name </mat-header-cell>
+        <mat-cell *cdkCellDef="let shelf"> {{shelf.name}} </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="capacity">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Capacity
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let shelf"> {{shelf.capacity}} </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="lastAuditTime">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Last Audit Time
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let shelf">
+          {{shelf.lastAuditTime | date}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="lastAuditBy">
+        <mat-header-cell *cdkHeaderCellDef mat-sort-header>
+          Last Audit By
+        </mat-header-cell>
+        <mat-cell *cdkCellDef="let shelf"> {{shelf.lastAuditBy}} </mat-cell>
+      </ng-container>
+
+      <ng-container cdkColumnDef="icons">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let shelf">
+            <button mat-icon-button routerLink="/shelf/{{shelf.location}}/audit"
+                    (focus)="pauseLoading=true;"
+                    (blur)="pauseLoading=false;">
+              <mat-icon svgIcon="checkin"
+                        matTooltip="Audit Shelf"
+                        matTooltipPosition="above"></mat-icon>
+            </button>
+          </mat-cell>
+      </ng-container>
+
+      <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *cdkRowDef="let shelf; columns: displayedColumns;"
+              routerLink="/shelf/{{shelf.location}}/details"
+               (focus)="pauseLoading=true;"
+               (blur)="pauseLoading=false;"></mat-row>
+    </mat-table>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,27 @@
+@import '../../assets/global';
+
+
+.continue-text {
+  font-size: 14px;
+  font-style: italic;
+  line-height: 200%;
+  text-align: right;
+}
+
+.welcome-card {
+  left: 50%;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 550px;
+}
+
+.welcome-icon {
+  vertical-align: middle;
+}
+
+.welcome-text {
+  font-size: 14px;
+  font-style: bold;
+  line-height: 200%;
+}

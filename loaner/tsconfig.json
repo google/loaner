@@ -1,0 +1,26 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "target": "es5",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
+    "typeRoots": [
+      "node_modules/@types",
+      "node_modules/@types/chrome"
+    ],
+    "lib": ["es2015", "es2016", "dom"]
+  },
+  "exclude": [
+    "node_modules",
+  ],
+  "angularCompilerOptions": {
+    "genDir": ".",
+    "skipMetadataEmit" : true
+  }
+}

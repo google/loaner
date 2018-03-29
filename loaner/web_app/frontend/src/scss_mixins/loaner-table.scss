@@ -1,0 +1,75 @@
+@import '../app';
+
+.loaner-table {
+
+  &.mat-card {
+    margin-bottom: 40px;
+    padding: 0;
+  }
+
+  .mat-card-title {
+    * {
+      margin: auto 0;
+    }
+
+    display: flex;
+    background-color: mat-color($primary, 500);
+    font-size: 18px;
+    color: white;
+    padding: 0 12px;
+    margin-bottom: 0;
+    min-height: 64px;
+
+    button[mat-raised-button] {
+      color: mat-color($primary, 500);
+    }
+
+    .mat-form-field {
+      margin: auto 0;
+      margin-top: 10px;
+      font-size: 12px;
+
+      /deep/ .mat-form-field-label {
+        color: white;
+      }
+
+      /deep/ .mat-form-field-underline {
+        background-color: white;
+      }
+
+      /deep/ .mat-form-field-ripple {
+        background-color: white;
+      }
+    }
+
+  };
+
+  .mat-header-row {
+    background-color: mat-color($primary, 300);
+    padding: 0 12px;
+
+    .mat-header-cell {
+      color: white;
+      font-size: 14px;
+    }
+  };
+
+  .mat-row {
+    padding: 0 12px;
+
+    &[ng-reflect-router-link] {
+      color: inherit;
+      text-decoration: none;
+
+      &:hover {
+        cursor: pointer;
+        background-color: mat-color($mat-grey, 200);
+      }
+    }
+  }
+
+  .mat-column-icons {
+    max-width: 40px;
+    text-align: right
+  }
+}

@@ -1,0 +1,40 @@
+<div fxLayout="column" fxLayoutAlign="center center">
+  <div fxFlex>
+    <ng-container *ngIf="loanedDevices">
+      <loaner-greetings-card [userDisplayName]="user ? user.givenName : 'there'"
+                             [numberOfAssignedDevices]="loanedDevices ? loanedDevices.length : 0">
+      </loaner-greetings-card>
+      <mat-tab-group [selectedIndex]="selectedTab">
+        <mat-tab *ngFor="let device of loanedDevices">
+          <ng-template mat-tab-label>
+            <mat-icon>laptop_chromebook</mat-icon>
+            {{ device.id }}
+          </ng-template>
+          <div fxLayout="column" fxLayoutAlign="center center">
+            <loaner-loan-actions-card [pendingReturn]="device.pendingReturn"
+                                      [dueDate]="device.dueDate"
+                                      [serialNumber]="device.serialNumber"
+                                      [assetTag]="device.assetTag"
+                                      [oneOfMany]="loanedDevices.length > 1">
+              <loan-button extendButton
+                           [canExtend]="device.canExtend"
+                           [dueDate]="device.dueDate"
+                           [maxExtendDate]="device.maxExtendDate"
+                           (done)="onExtended(device, $event)"></loan-button>
+              <loan-button guestButton
+                           *ngIf="!device.pendingReturn"
+                           [guestEnabled]="device.guestEnabled"
+                           [guestAllowed]="device.guestAllowed"
+                           (done)="onGuestModeEnabled(device)"></loan-button>
+              <loan-button returnButton
+                           *ngIf="!device.pendingReturn"
+                           (done)="onReturned(device)"></loan-button>
+              <loan-button damagedButton (done)="onDamaged(device, $event)"></loan-button>
+              <loan-button lostButton (done)="onLost(device)"></loan-button>
+            </loaner-loan-actions-card>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </ng-container>
+  </div>
+</div>

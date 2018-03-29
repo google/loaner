@@ -1,0 +1,42 @@
+<div [@bodyExpansion]="state"
+     (@bodyExpansion.done)="animationDone()"
+     class="action-box"
+     *ngIf="action == actions.ENROLL || action == actions.UNENROLL">
+  <div class="action-box-header">
+    <h2 *ngIf="action == actions.ENROLL">Add device:</h2>
+    <h2 *ngIf="action == actions.UNENROLL">Remove device:</h2>
+    <div fxFlex></div>
+    <button class="close-button" mat-icon-button (click)=collapse()>
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+  <form #actionForm=ngForm>
+    <section fxLayout="row" fxLayout.xs="column">
+      <mat-form-field fxFlex class="serial-number">
+        <input #serialNumber matInput
+                (keyup.enter)="assetTag.focus()"
+                placeholder="Serial number"
+                [(ngModel)]="device.serialNumber"
+                name="serialNumber"
+                required>
+      </mat-form-field>
+      <mat-form-field fxFlex class="asset-tag">
+        <input #assetTag matInput
+              (keyup.enter)="takeActionOnDevice()"
+              placeholder="Asset tag (optional)"
+              [(ngModel)]="device.assetTag"
+              name="assetTag">
+      </mat-form-field>
+    </section>
+    <section>
+      <div fxFlex></div>
+      <button mat-button #actionButton
+              type="button"
+              (click)="takeActionOnDevice()"
+              class="action-button"
+              [disabled]="!device.serialNumber">
+        {{ action == actions.ENROLL ? 'ADD' : 'REMOVE' }}
+      </button>
+    </section>
+  </form>
+</div>
