@@ -13,19 +13,21 @@
   <form #actionForm=ngForm>
     <section fxLayout="row" fxLayout.xs="column">
       <mat-form-field fxFlex class="serial-number">
-        <input #serialNumber matInput
-                (keyup.enter)="assetTag.focus()"
-                placeholder="Serial number"
-                [(ngModel)]="device.serialNumber"
-                name="serialNumber"
-                required>
+        <input loanerRemoveWhitespaces
+               #serialNumber matInput
+               (keyup.enter)="assetTag.focus()"
+               placeholder="Serial number"
+               [(ngModel)]="device.serialNumber"
+               name="serialNumber"
+               required>
       </mat-form-field>
       <mat-form-field fxFlex class="asset-tag">
-        <input #assetTag matInput
-              (keyup.enter)="takeActionOnDevice()"
-              placeholder="Asset tag (optional)"
-              [(ngModel)]="device.assetTag"
-              name="assetTag">
+        <input loanerRemoveWhitespaces
+               #assetTag matInput
+               (keyup.enter)="takeActionOnDevice()"
+               placeholder="Asset tag (optional)"
+               [(ngModel)]="device.assetTag"
+               name="assetTag">
       </mat-form-field>
     </section>
     <section>

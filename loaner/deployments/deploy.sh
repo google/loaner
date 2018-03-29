@@ -186,6 +186,11 @@ auth login"
     info_message "Going to the loaner directory..."
     local pwd=$(pwd -P)
     case "${pwd}" in
+      */loaner/loaner)
+        ;;
+      */loaner/loaner/*)
+        cd "${pwd%%/loaner/loaner/*}/loaner/loaner"
+        ;;
       */loaner)
         ;;
       */loaner/*)
