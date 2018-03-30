@@ -17,7 +17,6 @@ import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {MaterialModule} from '../../core/material_module';
-import {DeviceService} from '../../services/device';
 import {AuditTable} from './audit_table';
 
 export * from './audit_table';
@@ -34,7 +33,6 @@ export * from './audit_table';
     FormsModule,
     MaterialModule,
   ],
-  providers: [DeviceService],
 })
 export class AuditTableModule {
 }

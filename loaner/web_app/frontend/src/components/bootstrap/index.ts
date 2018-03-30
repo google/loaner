@@ -17,8 +17,6 @@ import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {MaterialModule} from '../../core/material_module';
-import {BootstrapService} from '../../services/bootstrap';
-import {LoanerSnackBar} from '../../services/snackbar';
 
 import {Bootstrap} from './bootstrap';
 
@@ -35,10 +33,6 @@ export * from './bootstrap';
     BrowserModule,
     FormsModule,
     MaterialModule,
-  ],
-  providers: [
-    BootstrapService,
-    LoanerSnackBar,
   ],
 })
 export class BootstrapModule {

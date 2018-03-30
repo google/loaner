@@ -19,7 +19,6 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {RemoveWhitespacesModule} from '../../../../../shared/directives/remove_whitespaces';
 import {MaterialModule} from '../../core/material_module';
-import {ShelfService} from '../../services/shelf';
 import {DeviceActionBox} from './device_action_box';
 
 export * from './device_action_box';
@@ -37,9 +36,6 @@ export * from './device_action_box';
     FormsModule,
     MaterialModule,
     RemoveWhitespacesModule,
-  ],
-  providers: [
-    ShelfService,
   ],
 })
 export class DeviceActionBoxModule {

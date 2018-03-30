@@ -68,10 +68,7 @@ export class DeviceListTable extends LoaderView implements OnInit {
   /** Current action that will be used in the device-action-box if rendered. */
   currentAction: string;
 
-  /**
-   * When true, pauseLoading will prevent auto refresh from happening on the
-   * table.
-   */
+  /* When true, pauseLoading will prevent auto refresh on the table. */
   pauseLoading = false;
 
   @ViewChild(MatSort) sort: MatSort;

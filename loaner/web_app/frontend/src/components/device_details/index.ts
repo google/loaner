@@ -21,7 +21,6 @@ import {GuestModeModule} from '../../../../../shared/components/guest';
 import {LoaderModule} from '../../../../../shared/components/loader';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
-import {DeviceService} from '../../services/device';
 import {Dialog, DialogsModule} from '../../services/dialog';
 
 import {DeviceDetails} from './device_details';
@@ -46,7 +45,6 @@ export * from './device_details';
     MaterialModule,
   ],
   providers: [
-    DeviceService,
     Dialog,
   ],
 })

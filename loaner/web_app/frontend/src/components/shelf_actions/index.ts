@@ -17,8 +17,6 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
 import {MaterialModule} from '../../core/material_module';
-import {ConfigService} from '../../services/config';
-import {ShelfService} from '../../services/shelf';
 import {ShelfActionsCard} from './shelf_actions';
 
 export * from './shelf_actions';
@@ -36,10 +34,6 @@ export * from './shelf_actions';
     ReactiveFormsModule,
     MaterialModule,
     RouterModule,
-  ],
-  providers: [
-    ConfigService,
-    ShelfService,
   ],
 })
 export class ShelfActionsModule {

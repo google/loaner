@@ -24,7 +24,11 @@ import {LoanerRouterModule} from './app.routing';
 import {MaterialModule, MatIconRegistry} from './core/material_module';
 import {AuthService} from './services/auth';
 import {AuthGuard} from './services/auth_guard';
+import {BootstrapService} from './services/bootstrap';
+import {ConfigService} from './services/config';
+import {DeviceService} from './services/device';
 import {LoanerOAuthInterceptor} from './services/oauth_interceptor';
+import {ShelfService} from './services/shelf';
 import {LoanerSnackBar} from './services/snackbar';
 import {UserService} from './services/user';
 
@@ -45,14 +49,18 @@ import {UserService} from './services/user';
   providers: [
     AuthService,
     AuthGuard,
+    BootstrapService,
+    ConfigService,
+    DeviceService,
+    LoanerSnackBar,
+    ShelfService,
+    Title,
+    UserService,
     {
       provide: HTTP_INTERCEPTORS,
       useClass: LoanerOAuthInterceptor,
       multi: true,
     },
-    LoanerSnackBar,
-    Title,
-    UserService,
   ]
 })
 export class AppModule {

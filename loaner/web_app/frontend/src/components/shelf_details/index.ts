@@ -19,7 +19,6 @@ import {RouterModule} from '@angular/router';
 import {ViewonlyLabelModule} from '../../components/viewonly_label';
 import {MaterialModule} from '../../core/material_module';
 import {Dialog, DialogsModule} from '../../services/dialog';
-import {ShelfService} from '../../services/shelf';
 
 import {ShelfDetails} from './shelf_details';
 
@@ -39,10 +38,7 @@ export * from './shelf_details';
     MaterialModule,
     RouterModule,
     ViewonlyLabelModule,
-  ],
-  providers: [
-    ShelfService,
-  ],
+  ]
 })
 export class ShelfDetailsModule {
 }

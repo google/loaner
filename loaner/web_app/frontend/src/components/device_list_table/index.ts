@@ -22,7 +22,6 @@ import {GuestModeModule} from '../../../../../shared/components/guest';
 import {LoaderModule} from '../../../../../shared/components/loader';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
-import {DeviceService} from '../../services/device';
 import {DeviceActionBoxModule} from '../device_action_box';
 import {DeviceButtonsModule} from '../device_buttons';
 
@@ -51,7 +50,6 @@ export * from './device_list_table';
     RouterModule,
   ],
   providers: [
-    DeviceService,
     DeviceData,
   ],
 })

@@ -24,7 +24,6 @@ import {GreetingsCardModule} from '../../../../../shared/components/loan_managem
 import {LoanActionsCardModule} from '../../../../../shared/components/loan_management/loan_actions_card';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
-import {DeviceService} from '../../services/device';
 
 import {DeviceInfoCard} from './device_info_card';
 
@@ -48,9 +47,6 @@ export * from './device_info_card';
     LostModule,
     MaterialModule,
     MatTooltipModule,
-  ],
-  providers: [
-    DeviceService,
   ],
 })
 export class DeviceInfoCardModule {
