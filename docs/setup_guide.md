@@ -305,7 +305,7 @@ settings without deploying a new version of GnG:
 +   **reminder_email_throtting**: Do not send emails to a user when a reminder
     appears in the loaner's Chrome app.
 +   **reminder_delay**: Number of hours after which GnG will send a reminder
-    e-mail for a device identified as needing a reminder.
+    email for a device identified as needing a reminder.
 +   **shelf_audit**: Enable shelf audit.
 +   **shelf_audit_email**: Whether email should be sent for audits.
 +   **shelf_audit_email_to**: Users who should get the email.
@@ -323,10 +323,10 @@ settings without deploying a new version of GnG:
 +   **anonymous_surveys**: Record surveys anonymously (or not).
 +   **use_asset_tags**: To display device asset tags as user-facing identifiers,
     set as True. Otherwise, set as False to display serial numbers.
-+   **img_banner_**: The banner is a custom image used in the reminder e-mails
++   **img_banner_**: The banner is a custom image used in the reminder emails
     sent to users. Use the URL of an image you have stored in your GCP Storage.
 +   **img_button_**: The button images is a custom image used for reminder
-    e-mails sent to users. Use the URL of an image you have stored in your GCP
+    emails sent to users. Use the URL of an image you have stored in your GCP
     Storage.
 +   **timeout_guest_mode**: Specify that a deferred task should be created to
     time out guest mode.
@@ -412,7 +412,7 @@ due tomorrow or is overdue. These events are numbered starting with 0. You can
 customize the events as need be.
 
 **Note**: If you customize any event, be sure to change the neighboring events,
-too. Reminder events must not overlap with eachother. If so, reminders may
+too. Reminder events must not overlap with each other. If so, reminders may
 provide conflicting information to borrowers.
 
 The reminder events system can access the same set of actions as core and custom

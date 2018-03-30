@@ -312,7 +312,7 @@ Updates a given settings value.
 |                                    | integer_value: int, The integer value   |
 :                                    : of the setting being updated.           :
 |                                    | boolean_value: bool, The boolean value  |
-:                                    : of the seting being updated.            :
+:                                    : of the setting being updated.            :
 |                                    | list_value: list, The list value of the |
 :                                    : setting being updated.                  :
 
@@ -648,9 +648,9 @@ Get a shelf based on location.
 :                         : audit time.                                        :
 |                         | last_audit_by: str, Indicates the last user to     |
 :                         : audit the shelf.                                   :
-|                         | page_token: str, a page token to query next page   |
+|                         | page_token: str, A page token to query next page   |
 :                         : results.                                           :
-|                         | page_size: int, the number of results to query for |
+|                         | page_size: int, The number of results to query for |
 :                         : and display.                                       :
 
 ##### disable
@@ -730,9 +730,9 @@ List enabled or all shelves based on any shelf attribute.
 :                         : audit time.                                        :
 |                         | last_audit_by: str, Indicates the last user to     |
 :                         : audit the shelf.                                   :
-|                         | page_token: str, a page token to query next page   |
+|                         | page_token: str, A page token to query next page   |
 :                         : results.                                           :
-|                         | page_size: int, the number of results to query for |
+|                         | page_size: int, The number of results to query for |
 :                         : and display.                                       :
 
 | Returns                      | Attributes                                    |
@@ -821,13 +821,13 @@ Submit a response to a survey acquired via a request.
 
 | Requests                           | Attributes                              |
 | :--------------------------------- | :-------------------------------------- |
-| SurveySubmission ProtoRPC Message. | survey_urlsafe_key: String, The urlsafe |
+| SurveySubmission ProtoRPC Message. | survey_urlsafe_key: str, The urlsafe |
 :                                    : ndb.Key for a survey_model.Survey       :
-:                                    : instace.                                :
-|                                    | answer_urlsafe_key: String, The urlsafe |
+:                                    : instance.                                :
+|                                    | answer_urlsafe_key: str, The urlsafe |
 :                                    : ndb.Key for a survey_model.Answer       :
-:                                    : instace.                                :
-|                                    | more_info: String, the extra info       |
+:                                    : instance.                                :
+|                                    | more_info: str, the extra info       |
 :                                    : optionally provided for the given       :
 :                                    : Survey and Answer.                      :
 
@@ -843,21 +843,21 @@ List surveys.
 | :---------------------------------- | :------------------------------------ |
 | ListSurveyRequest ProtoRPC Message. | survey_type: survey_model.SurveyType, |
 :                                     : The type of survey to list.           :
-|                                     | enabled: Boolean, True for only       |
+|                                     | enabled: bool, True for only       |
 :                                     : enabled surveys, False to view        :
 :                                     : disabled surveys.                     :
-|                                     | page_size: Integer, The size of the   |
+|                                     | page_size: int, The size of the   |
 :                                     : page to return.                       :
-|                                     | page_token: String, The urlsafe       |
+|                                     | page_token: str, The urlsafe       |
 :                                     : representation of the page token.     :
 
 | Returns                      | Attributes                                   |
 | :--------------------------- | :------------------------------------------- |
 | SurveyList ProtoRPC Message. | surveys: List of Survey, The list of surveys |
 :                              : to return.                                   :
-|                              | page_token: String, The urlsafe              |
+|                              | page_token: str, The urlsafe              |
 :                              : representation of the page token.            :
-|                              | more: Boolean, Whether or not there are more |
+|                              | more: bool, Whether or not there are more |
 :                              : results to be queried.                       :
 
 ##### patch

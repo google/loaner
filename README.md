@@ -26,8 +26,8 @@ Please note that the current release of this application is in ALPHA.
 We will be actively contributing to the project. Please keep an eye out for
 future updates and features!
 
-To discuss this project send an email to loaner@googlegroups.com
-Please file bugs using the GitHub issue tracker.
+* To discuss this project send an email to loaner@googlegroups.com.
+* Please file bugs using the GitHub issue tracker.
 
 ## Technical Stack
 
@@ -41,7 +41,7 @@ Please file bugs using the GitHub issue tracker.
     -   Endpoints Frameworks
     -   Datastore (for app state data)
     -   BigQuery (for historical data)
-    -   Cloud store (for image assets)
+    -   Cloud Storage (for image assets)
     -   Google Admin API
 *   Build Automation
     -   Bash

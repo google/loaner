@@ -42,7 +42,7 @@ class SurveyApi(root_api.Service):
       http_method='POST',
       permission='create_survey')
   def create(self, request):
-    """Create a new survey question_and insert instance into datastore."""
+    """Create a new survey question and insert instance into datastore."""
     self.check_xsrf_token(self.request_state)
     if len(request.answers) < 1:
       raise endpoints.BadRequestException(_NOT_ENOUGH_ANSWERS_MSG)

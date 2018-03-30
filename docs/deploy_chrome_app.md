@@ -205,7 +205,7 @@ Your application can now use OAuth to communicate with the API.
 
 ## Step 5: Whitelist the API to Bypass OAuth Prompts
 
-To avoid prompting users to grant access to their e-mail addresses, whitelist
+To avoid prompting users to grant access to their email addresses, whitelist
 the API client and the scopes. It is important to do this for your domain
 because if the Chrome App cannot collect email addresses automatically, it will
 not be able to assign devices.
@@ -269,7 +269,7 @@ With these requirements completed, edit the configuration file:
 
 1.  Find the variable named `IT_CONTACT_EMAIL`:
 
-    *   Enter your IT departments e-mail, otherwise leave it blank.
+    *   Enter your IT departments email, otherwise leave it blank.
 
 1.  Save and close the file.
 
@@ -292,7 +292,7 @@ To add content to the FAQ section:
         can visit the included `chrome_app/src/app/assets/faq.md` file and look
         at the examples we've included.
 
-NOTE: Any time you need to make changes to the FAQ section, you will have to
+NOTE: Anytime you need to make changes to the FAQ section, you will have to
 update this file using the same steps listed above to modify the file.
 
 ## Step 8: Deploy to the Chrome Webstore
