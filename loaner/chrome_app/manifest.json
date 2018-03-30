@@ -1,6 +1,6 @@
 {
   "description": "Start and manage your GnG experience here!",
-  "version": "0.0.36",
+  "version": "0.0.1",
   "manifest_version": 2,
   "name": "GnG Loaner App",
   "permissions": [
