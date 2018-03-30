@@ -29,6 +29,7 @@ import {Survey, SurveyAnswer, SurveyResponse, SurveyResponseAnswer, SurveyType} 
 export class SurveyComponent extends LoaderView implements OnInit {
   @Input() surveyType?: SurveyType;
   @Input() surveyDescription?: string;
+  answerRequired?: boolean;
   surveyAnswer?: SurveyResponseAnswer;
   surveyData?: SurveyResponse;
   surveySent?: boolean;
@@ -49,7 +50,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
   /**
    * Triggered when the survey value changes.
    * Updates the value on the service.
-   * @param e String ofthe more info input
+   * @param e String of the more info input
    */
   onChange(e: string) {
     if (this.surveyData) {
@@ -75,6 +76,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
           .pipe(take(1))
           .subscribe(
               val => {
+                this.answerRequired = val.required;
                 this.surveyData = val;
                 this.ready();
               },
