@@ -35,8 +35,6 @@ Please file bugs using the GitHub issue tracker.
     -   Angular/Typescript
 *   Frontend
     -   Angular/Typescript
-    -   GAE
-    -   OAuth
 *   Backend
     -   Python
     -   GAE
@@ -80,7 +78,7 @@ to file bugs and feature requests using GitHub's Issue Tracker.
 
 ## Disclaimers
 
-The current release of the application is in active development
+The current release of the application is in active development.
 
 This is **not** an official Google product. This program is not formally
 supported and the code is available as-is with no guarantees.

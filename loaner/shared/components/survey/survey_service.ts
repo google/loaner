@@ -55,6 +55,7 @@ export declare interface SurveyResponse {
   question_type: string;
   question_urlsafe_key: string;
   rand_weight?: number;
+  required?: boolean;
 }
 
 /** Service for retrieving and submitting survey information. */

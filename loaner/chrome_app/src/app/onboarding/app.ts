@@ -162,6 +162,25 @@ export class AppRoot implements OnInit {
 
       // Actions to be taken when certain active/next step is show.
       switch (state.activeStep.id) {
+        case 'welcome':
+          // Ensure that can proceed isn't disabled because of a previous check.
+          this.flowSequenceButtons.canProceed = true;
+          break;
+        // Checks if surveys are required and if so that they are filled out.
+        case 'survey':
+          if (this.surveyAnswer == null &&
+              this.surveyComponent.answerRequired) {
+            this.flowSequenceButtons.canProceed = false;
+            this.survey.answer.subscribe(val => {
+              this.surveyAnswer = val;
+              if (this.surveyAnswer !== null) {
+                this.flowSequenceButtons.canProceed = true;
+              } else {
+                this.flowSequenceButtons.canProceed = false;
+              }
+            });
+          }
+          break;
         // Ensure that the button has been properly set with view changes.
         case 'return':
           this.returnService.validDate.subscribe(val => {
