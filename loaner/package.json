@@ -31,7 +31,7 @@
     "core-js": "2.5.1",
     "es6-shim": "0.35.3",
     "hammerjs": "2.0.8",
-    "marked": "0.3.6",
+    "marked": "0.3.19",
     "material-design-icons": "3.0.1",
     "moment": "2.20.1",
     "reflect-metadata": "0.1.10",
