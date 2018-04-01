@@ -16,7 +16,7 @@ import {ComponentFixture, ComponentFixtureAutoDetect, discardPeriodicTasks, fake
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 
 import {GuestMode} from '../../../../../shared/components/guest';
 import {GuestModeMock} from '../../../../../shared/testing/mocks';

@@ -14,11 +14,11 @@
 
 import {DataSource} from '@angular/cdk/table';
 import {MatSort} from '@angular/material';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {merge} from 'rxjs/observable/merge';
+import {BehaviorSubject, merge, Observable} from 'rxjs';
 import {map} from 'rxjs/operators';
+
 import {Device, DeviceChipStatus} from '../../models/device';
+
 import {DeviceData} from './device_data';
 
 export interface DeviceFilter {
