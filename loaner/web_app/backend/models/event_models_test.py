@@ -45,6 +45,17 @@ class CoreEventTest(loanertest.TestCase):
     fetched_event = event_models.CoreEvent.get('test_core_event')
     self.assertEqual(test_event, fetched_event)
 
+  def test_create_existing(self):
+    existing_event = event_models.CoreEvent.create('test_existing_core_event')
+    existing_event.put()
+
+    self.assertRaises(
+        event_models.ExistingEventError,
+        event_models.CoreEvent.create, 'test_existing_core_event')
+
+  def test_create_type(self):
+    self.assertRaises(TypeError, event_models.CoreEvent.create, 2)
+
 
 class CustomEventTest(loanertest.TestCase):
   """Tests for CustomEvent class."""
@@ -127,7 +138,7 @@ class CustomEventTest(loanertest.TestCase):
   def test_create_timedelta(self):
     self.assertRaises(
         event_models.BadTimeUnitError,
-        event_models.create_timedelta, 5, 'y')  # no years
+        event_models.create_timedelta, 5, 'y')  # No years.
     self.assertEqual(
         event_models.create_timedelta(2, 'h'),
         datetime.timedelta(seconds=2*3600))
@@ -246,6 +257,16 @@ class ReminderEventTest(loanertest.TestCase):
     test_event.put()
 
     self.assertEqual(test_event, event_models.ReminderEvent.get(0))
+
+  def test_create_existing(self):
+    existing_event = event_models.ReminderEvent.create(0)
+    existing_event.put()
+
+    self.assertRaises(
+        event_models.ExistingEventError, event_models.ReminderEvent.create, 0)
+
+  def test_create_type(self):
+    self.assertRaises(TypeError, event_models.ReminderEvent.create, '0')
 
   def test_get_all(self):
     test_event = event_models.ReminderEvent.create(0)

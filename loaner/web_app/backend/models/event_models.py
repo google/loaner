@@ -301,7 +301,7 @@ class ReminderEvent(CustomEvent):
       ExistingEventError: if there's already one with that level.
     """
     if not isinstance(level, int):
-      raise TypeError('The level of the Reminderevent must be an int.')
+      raise TypeError('The level of the Reminder Event must be an int.')
     if cls.get_by_id(str(level)):
       raise ExistingEventError(
           'Cannot create Reminder Event because one for that level exists.')
@@ -324,7 +324,7 @@ class ReminderEvent(CustomEvent):
       TypeError if the level is not an int.
     """
     if not isinstance(level, int):
-      raise TypeError('The level of the Reminderevent must be an int.')
+      raise TypeError('The level of the Reminder Event must be an int.')
     return super(ReminderEvent, cls).get_by_id(str(level))
 
   @property
