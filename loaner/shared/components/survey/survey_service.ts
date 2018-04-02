@@ -15,14 +15,11 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Inject, Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
-import {_throw} from 'rxjs/observable/throw';
+import {BehaviorSubject, Observable, of, Subject, throwError} from 'rxjs';
 import {retry, tap} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
 
 import {ApiConfig} from '../../services/api_config';
+
 /**
  * The type of survey being received from the API.
  * Survey Types match backend SurveyModel SurveyType enum.
@@ -87,7 +84,7 @@ export class Survey {
               },
               error => {
                 this.surveySent.next(false);
-                throw _throw(error);
+                throw throwError(error);
               });
     });
   }

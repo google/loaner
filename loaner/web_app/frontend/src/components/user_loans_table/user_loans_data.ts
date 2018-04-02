@@ -13,8 +13,7 @@
 // limitations under the License.
 
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';

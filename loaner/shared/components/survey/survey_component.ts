@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {Component, Input, OnInit, Output} from '@angular/core';
+import {Subject} from 'rxjs';
 import {take} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
 
 import {LoaderView} from '../loader';
 

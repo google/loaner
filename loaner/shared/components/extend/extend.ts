@@ -15,7 +15,7 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {MatDialog, MatDialogRef} from '@angular/material';
 import * as moment from 'moment';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 
 import {LoaderView} from '../loader';
 

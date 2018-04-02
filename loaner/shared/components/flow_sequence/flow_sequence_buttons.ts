@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Component, Input, OnInit, Output} from '@angular/core';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 
 import {FlowState, NavigationLabels, Step} from './index';
 

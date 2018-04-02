@@ -14,12 +14,8 @@
 
 import {ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material';
-import {Observable} from 'rxjs/Observable';
-import {fromEvent} from 'rxjs/observable/fromEvent';
-import {interval} from 'rxjs/observable/interval';
-import {never} from 'rxjs/observable/never';
+import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
 
 import {LoaderView} from '../../../../../shared/components/loader';
 
@@ -65,7 +61,7 @@ export class ShelfListTable extends LoaderView implements OnInit, OnDestroy {
   ngOnInit() {
     interval(5000)
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
-                if (this.pauseLoading) return never();
+                if (this.pauseLoading) return NEVER;
                 this.loading = true;
                 return this.shelfData.refresh();
               }))

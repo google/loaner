@@ -14,7 +14,7 @@
 
 import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
 import {ListShelfResponse, Shelf, ShelfApiParams} from '../models/shelf';

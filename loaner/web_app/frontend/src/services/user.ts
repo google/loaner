@@ -14,12 +14,8 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
-import {_throw} from 'rxjs/observable/throw';
+import {Observable, of, ReplaySubject, Subscription, throwError} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
-import {Subscription} from 'rxjs/Subscription';
 
 import {CONFIG} from '../app.config';
 import {User, UserApiParams} from '../models/user';
@@ -83,7 +79,7 @@ export class UserService extends ApiService {
     return this.authService.whenLoaded().pipe(
         switchMap(() => {
           if (!this.authService.isSignedIn) {
-            return _throw('Client not signed in. Redirecting.');
+            return throwError('Client not signed in. Redirecting.');
           }
           return this.authService.whenSignedIn();
         }),

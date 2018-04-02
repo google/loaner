@@ -15,7 +15,7 @@
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 
 import {BootstrapService} from '../../services/bootstrap';
 import {BootstrapServiceMock} from '../../testing/mocks';

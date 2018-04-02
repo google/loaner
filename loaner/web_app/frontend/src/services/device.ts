@@ -16,8 +16,7 @@ import {DataSource} from '@angular/cdk/table';
 import {Injectable} from '@angular/core';
 import {Response} from '@angular/http';
 import {MatSort} from '@angular/material';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject, Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
 import {Device, DeviceRequestApiParams, ExtendDeviceRequestApiParams, MarkAsDamagedRequestApiParams} from '../models/device';

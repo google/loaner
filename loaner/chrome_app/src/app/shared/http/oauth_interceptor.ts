@@ -15,7 +15,7 @@
 import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
 import {Injectable, NgZone} from '@angular/core';
 import {ResponseOptions, ResponseType} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {mergeMap} from 'rxjs/operators';
 
 @Injectable()

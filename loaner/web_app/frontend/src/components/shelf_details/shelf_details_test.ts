@@ -17,8 +17,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/co
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
+import {Observable, of} from 'rxjs';
 
 import {Shelf} from '../../models/shelf';
 import {Dialog} from '../../services/dialog';

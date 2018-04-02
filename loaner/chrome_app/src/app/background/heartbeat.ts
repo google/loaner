@@ -17,7 +17,7 @@
  * the device heartbeat.
  */
 
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 
 import {APIService, HEARTBEAT, LOGGING} from '../config';
 import * as DeviceIdentifier from '../shared/device_identifier';

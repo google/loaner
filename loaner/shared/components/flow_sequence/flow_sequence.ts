@@ -13,8 +13,8 @@
 // limitations under the License.
 
 import {AfterViewInit, Component, ContentChildren, Directive, HostBinding, Input, OnInit, Output, QueryList, ViewEncapsulation} from '@angular/core';
+import {Subject} from 'rxjs';
 import {takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
 
 import {LoanerFlowSequenceButtons} from './flow_sequence_buttons';
 import {FlowState, FlowStateOptional, Step} from './index';

@@ -15,12 +15,8 @@
 import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
-import {Observable} from 'rxjs/Observable';
-import {fromEvent} from 'rxjs/observable/fromEvent';
-import {interval} from 'rxjs/observable/interval';
-import {never} from 'rxjs/observable/never';
+import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, finalize, startWith, switchMap, takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
@@ -108,7 +104,7 @@ export class DeviceListTable extends LoaderView implements OnInit {
     this.setDisplayColumns();
     interval(5000)
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
-                if (this.pauseLoading) return never();
+                if (this.pauseLoading) return NEVER;
                 this.loading = true;
                 if (this.shelf) {
                   return this.deviceData.refresh(

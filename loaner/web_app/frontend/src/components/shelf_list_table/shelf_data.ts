@@ -14,9 +14,8 @@
 
 
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {tap} from 'rxjs/operators/tap';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {tap} from 'rxjs/operators';
 
 import {Shelf} from '../../models/shelf';
 import {ShelfService} from '../../services/shelf';

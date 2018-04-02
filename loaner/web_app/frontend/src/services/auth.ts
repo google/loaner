@@ -13,11 +13,8 @@
 // limitations under the License.
 
 import {Injectable, NgZone} from '@angular/core';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
+import {BehaviorSubject, Observable, of, ReplaySubject} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
-import {ReplaySubject} from 'rxjs/ReplaySubject';
 
 import {CONFIG} from '../app.config';
 

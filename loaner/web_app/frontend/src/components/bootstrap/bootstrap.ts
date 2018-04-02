@@ -15,10 +15,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';
-import {interval} from 'rxjs/observable/interval';
-import {never} from 'rxjs/observable/never';
+import {interval, NEVER, Subject} from 'rxjs';
 import {finalize, switchMap, takeUntil} from 'rxjs/operators';
-import {Subject} from 'rxjs/Subject';
 
 import {CONFIG} from '../../app.config';
 import * as bootstrap from '../../models/bootstrap';

@@ -14,8 +14,7 @@
 
 import {Injectable} from '@angular/core';
 import * as moment from 'moment';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
+import {BehaviorSubject, Observable} from 'rxjs';
 
 import {FailAction, FailType, Failure} from './failure';
 import {Loan} from './loan';

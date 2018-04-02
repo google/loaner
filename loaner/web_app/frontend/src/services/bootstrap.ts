@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
 import * as bootstrap from '../models/bootstrap';

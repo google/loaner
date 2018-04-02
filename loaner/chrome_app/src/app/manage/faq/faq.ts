@@ -15,7 +15,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Component, OnInit, SecurityContext} from '@angular/core';
 import {DomSanitizer} from '@angular/platform-browser';
-import {Observable} from 'rxjs/Observable';
+import {Observable} from 'rxjs';
 import * as marked from 'marked';
 
 @Component({

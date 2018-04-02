@@ -12,9 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {of} from 'rxjs/observable/of';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 
 import {CONFIG} from '../app.config';
 import * as config from '../models/config';

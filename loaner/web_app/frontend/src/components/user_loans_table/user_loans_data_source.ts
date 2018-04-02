@@ -14,9 +14,7 @@
 
 import {DataSource} from '@angular/cdk/table';
 import {MatSort} from '@angular/material';
-import {BehaviorSubject} from 'rxjs/BehaviorSubject';
-import {Observable} from 'rxjs/Observable';
-import {merge} from 'rxjs/observable/merge';
+import {BehaviorSubject, merge, Observable} from 'rxjs';
 
 import {Device} from '../../models/device';
 

@@ -14,7 +14,7 @@
 
 import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {Subject} from 'rxjs/Subject';
+import {Subject} from 'rxjs';
 
 import {LoanerFlowSequenceButtons} from './flow_sequence_buttons';
 import {FlowState, NavigationLabels, Step} from './index';

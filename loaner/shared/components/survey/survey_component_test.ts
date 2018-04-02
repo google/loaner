@@ -20,7 +20,7 @@ import {FormsModule} from '@angular/forms';
 import {MatRadioButton} from '@angular/material';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 
 import {ApiConfig, apiConfigFactory} from '../../services/api_config';
 import {LoaderModule} from '../loader';

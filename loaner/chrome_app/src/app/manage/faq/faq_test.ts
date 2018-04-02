@@ -15,7 +15,7 @@
 import {HttpClient, HttpClientModule} from '@angular/common/http';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 
 import {FaqComponent} from './index';
 import {MaterialModule} from './material_module';

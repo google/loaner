@@ -16,7 +16,7 @@ import {HttpClient} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 import * as moment from 'moment';
 
 import {LoaderModule} from '../../../../../shared/components/loader';

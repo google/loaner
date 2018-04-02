@@ -15,9 +15,8 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {URLSearchParams} from '@angular/http';
-import {Observable} from 'rxjs/Observable';
-import {_throw} from 'rxjs/observable/throw';
-import {catchError} from 'rxjs/operators/catchError';
+import {Observable, throwError} from 'rxjs';
+import {catchError} from 'rxjs/operators';
 
 import {CONFIG} from '../app.config';
 
@@ -88,7 +87,7 @@ export abstract class ApiService {
     if (showSnackbarOnFailure) {
       this.snackBar.open(`ERROR: ${error.error.error.message}`);
     }
-    return _throw(error);
+    return throwError(error);
   }
 }
 
