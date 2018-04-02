@@ -179,7 +179,7 @@ Runs request for the Bootstrap API:
 | Requests                      | Attributes                                |
 | :---------------------------- | :---------------------------------------- |
 | RunRequest: Bootstrap request | requested_tasks: BootstrapTask, A list of |
-: ProtoRPC message              : the requested tasks.                      :
+| ProtoRPC message              | the requested tasks.                      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -196,13 +196,13 @@ message_types.VoidMessage | None
 | Returns                             | Attributes                             |
 | :---------------------------------- | :------------------------------------- |
 | GetStatusResponse: Bootstrap status | enabled: bool, indicates if the        |
-: response ProtoRPC                   : bootstrap is enabled.                  :
+| response ProtoRPC                   | bootstrap is enabled.                  |
 |                                     | started: bool, indicated if the        |
-:                                     : bootstrap has been started.            :
+|                                     | bootstrap has been started.            |
 |                                     | completed: bool, indicated if the      |
-:                                     : bootstrap is completed.                :
+|                                     | bootstrap is completed.                |
 |                                     | tasks: BootstrapTask, A list of all of |
-:                                     : the tasks to be displayed.             :
+|                                     | the tasks to be displayed.             |
 
 ### Chrome_api
 
@@ -217,14 +217,14 @@ Heartbeat check-in for Chrome devices:
 | Requests                            | Attributes                        |
 | :---------------------------------- | :-------------------------------- |
 | HeartbeatRequest: Heartbeat Request | device_id: str, The unique Chrome |
-: ProtoRPC message.                   : device ID of the Chrome device.   :
+| ProtoRPC message.                   | device ID of the Chrome device.   |
 
 | Returns                      | Attributes                                    |
 | :--------------------------- | :-------------------------------------------- |
 | HeartbeatResponse: Heartbeat | is_enrolled: bool, Determine if the device is |
-: Response ProtoRPC message.   : enrolled.                                     :
+| Response ProtoRPC message.   | enrolled.                                     |
 |                              | start_assignment: bool, Determine if          |
-:                              : assignment workflow should be started.        :
+|                              | assignment workflow should be started.        |
 
 ##### get_loan
 
@@ -233,23 +233,23 @@ Get the current loan for a given Chrome device:
 | Requests                         | Attributes                               |
 | :------------------------------- | :--------------------------------------- |
 | LoanRequest: Chrome Loan Request | device_id: str, The unique Chrome device |
-: ProtoRPC message.                : ID of the Chrome device.                 :
+| ProtoRPC message.                | ID of the Chrome device.                 |
 |                                  | need_name: bool, If given name should be |
-:                                  : returned.                                :
+|                                  | returned.                                |
 
 | Returns                       | Attributes                                  |
 | :---------------------------- | :------------------------------------------ |
 | LoanResponse: Chrome Loan     | due_date: datetime, The due date for the    |
-: information Response ProtoRPC : device.                                     :
-: message.                      :                                             :
+| information Response ProtoRPC | device.                                     |
+| message.                      |                                             |
 |                               | max_extend_date: datetime, The max date a   |
-:                               : loan can be extended.                       :
+|                               | loan can be extended.                       |
 |                               | given_name: str, The given name for the     |
-:                               : user.                                       :
+|                               | user.                                       |
 |                               | guest_permitted: bool, If guest mode can be |
-:                               : enabled.                                    :
+|                               | enabled.                                    |
 |                               | guest_enabled: bool, If guest mode is       |
-:                               : enabled.                                    :
+|                               | enabled.                                    |
 
 ### Configuration_api
 
@@ -264,23 +264,23 @@ Lists the given setting's value:
 | Requests                            | Attributes                             |
 | :---------------------------------- | :------------------------------------- |
 | GetConfigurationRequest request for | setting: str, The name of the setting  |
-: ProtoRPC message.                   : being requested.                       :
+| ProtoRPC message.                   | being requested.                       |
 |                                     | configuration_type: ConfigurationType, |
-:                                     : The type of configuration to request   :
-:                                     : for.                                   :
+|                                     | The type of configuration to request   |
+|                                     | for.                                   |
 
 | Returns                            | Attributes                              |
 | :--------------------------------- | :-------------------------------------- |
 | ConfigurationResponse response for | setting: str, The name of the setting   |
-: ProtoRPC message.                  : being returned.                         :
+| ProtoRPC message.                  | being returned.                         |
 |                                    | string_value: str, The string value of  |
-:                                    : the setting.                            :
+|                                    | the setting.                            |
 |                                    | integer_value: int, The integer value   |
-:                                    : of the setting.                         :
+|                                    | of the setting.                         |
 |                                    | boolean_value: bool, The boolean value  |
-:                                    : of the setting.                         :
+|                                    | of the setting.                         |
 |                                    | list_value: list, The list value of the |
-:                                    : setting.                                :
+|                                    | setting.                                |
 
 ##### list_configurations
 
@@ -293,8 +293,8 @@ message_types.VoidMessage | None
 | Returns                             | Attributes                            |
 | :---------------------------------- | :------------------------------------ |
 | ListConfigurationsResponse response | settings: ConfigurationResponse, The  |
-: for ProtoRPC message.               : setting and corresponding value being :
-:                                     : returned.                             :
+| for ProtoRPC message.               | setting and corresponding value being |
+|                                     | returned.                             |
 
 ##### update_configuration
 
@@ -303,18 +303,18 @@ Updates a given settings value.
 | Requests                           | Attributes                              |
 | :--------------------------------- | :-------------------------------------- |
 | UpdateConfigurationRequest request | setting: str, The name of the setting   |
-: for ProtoRPC message.              : being requested.                        :
+| for ProtoRPC message.              | being requested.                        |
 |                                    | configuration_type: ConfigurationType,  |
-:                                    : The type of configuration to request    :
-:                                    : for.                                    :
+|                                    | The type of configuration to request    |
+|                                    | for.                                    |
 |                                    | string_value: str, The string value of  |
-:                                    : the setting being updated.              :
+|                                    | the setting being updated.              |
 |                                    | integer_value: int, The integer value   |
-:                                    : of the setting being updated.           :
+|                                    | of the setting being updated.           |
 |                                    | boolean_value: bool, The boolean value  |
-:                                    : of the setting being updated.            :
+|                                    | of the setting being updated.           |
 |                                    | list_value: list, The list value of the |
-:                                    : setting being updated.                  :
+|                                    | setting being updated.                  |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -333,7 +333,7 @@ Datastore import request for the Datastore API.
 | Requests                      | Attributes                            |
 | :---------------------------- | :------------------------------------ |
 | Datastore YAML Import Request | yaml: str, The name of the YAML being |
-: ProtoRPC message.             : imported.                             :
+| ProtoRPC message.             | imported.                             |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -352,15 +352,15 @@ Enrolls a device in the program
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -373,15 +373,15 @@ Unenrolls a device from the program.
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -394,15 +394,15 @@ Runs prechecks on a device to see if it can be audited.
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -415,15 +415,15 @@ Gets a device using any identifier in device_message.DeviceRequest.
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -436,58 +436,58 @@ Lists all devices based on any device attribute.
 | Requests                 | Attributes                                        |
 | :----------------------- | :------------------------------------------------ |
 | Device ProtoRPC message. | serial_number: str, The serial number of the      |
-:                          : Chrome device.                                    :
+|                          | Chrome device.                                    |
 |                          | asset_tag: str, The asset tag of the Chrome       |
-:                          : device.                                           :
+|                          | device.                                           |
 |                          | enrolled: bool, Indicates the enrollment status   |
-:                          : of the device.                                    :
+|                          | of the device.                                    |
 |                          | device_model: int, Identifies the model name of   |
-:                          : the device.                                       :
+|                          | the device.                                       |
 |                          | due_date: datetime, The date that device is due   |
-:                          : for return.                                       :
+|                          | for return.                                       |
 |                          | last_know_healthy: datetime, The date to indicate |
-:                          : the last known healthy status.                    :
+|                          | the last known healthy status.                    |
 |                          | shelf: ndb.key, The shelf key the device is       |
-:                          : placed on.                                        :
+|                          | placed on.                                        |
 |                          | assigned_user: str, The email of the user who is  |
-:                          : assigned to the device.                           :
+|                          | assigned to the device.                           |
 |                          | assignment_date: datetime, The date the device    |
-:                          : was assigned to a user.                           :
+|                          | was assigned to a user.                           |
 |                          | current_ou: str, The current organizational unit  |
-:                          : the device belongs to.                            :
+|                          | the device belongs to.                            |
 |                          | ou_change_date: datetime, The date the            |
-:                          : organizational unit was changed.                  :
+|                          | organizational unit was changed.                  |
 |                          | locked: bool, Indicates whether or not the device |
-:                          : is locked.                                        :
+|                          | is locked.                                        |
 |                          | lost: bool, Indicates whether or not the device   |
-:                          : is lost.                                          :
+|                          | is lost.                                          |
 |                          | mark_pending_return_date: datetime, The date a    |
-:                          : user marked device returned.                      :
+|                          | user marked device returned.                      |
 |                          | chrome_device_id: str, A unique device ID.        |
 |                          | last_heartbeat: datetime, The date of the last    |
-:                          : time the device checked in.                       :
+|                          | time the device checked in.                       |
 |                          | damaged: bool, Indicates the if the device is     |
-:                          : damaged.                                          :
+|                          | damaged.                                          |
 |                          | damaged_reason: str, A string denoting the reason |
-:                          : for being reported as damaged.                    :
+|                          | for being reported as damaged.                    |
 |                          | last_reminder: Reminder, Level, time, and count   |
-:                          : of the last reminder the device had.              :
+|                          | of the last reminder the device had.              |
 |                          | next_reminder: Reminder, Level, time, and count   |
-:                          : of the next reminder.                             :
+|                          | of the next reminder.                             |
 |                          | page_token: str, A page token to query next page  |
-:                          : results.                                          :
+|                          | results.                                          |
 |                          | page_size: int, The number of results to query    |
-:                          : for and display.                                  :
+|                          | for and display.                                  |
 
 | Returns                       | Attributes                                  |
 | :---------------------------- | :------------------------------------------ |
 | List device response ProtoRPC | devices: Device, A device to display.       |
-: message.                      :                                             :
+| message.                      |                                             |
 |                               | additional_results: bool, If there are more |
-:                               : results to be displayed.                    :
+|                               | results to be displayed.                    |
 |                               | page_token: str, A page token that will     |
-:                               : allow be used to query for additional       :
-:                               : results.                                    :
+|                               | allow be used to query for additional       |
+|                               | results.                                    |
 
 ##### enable_guest_mode
 
@@ -496,15 +496,15 @@ Enables Guest Mode for a given device.
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -517,9 +517,9 @@ Extend the current loan for a given Chrome device.
 | Requests                        | Attributes                                |
 | :------------------------------ | :---------------------------------------- |
 | Loan extension request ProtoRPC | device: DeviceRequest, A device to be     |
-: message.                        : fetched.                                  :
+| message.                        | fetched.                                  |
 |                                 | extend_date: datetime, The date to extend |
-:                                 : the loan for.                             :
+|                                 | the loan for.                             |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -532,9 +532,9 @@ Mark that a device is damaged.
 | Requests                         | Attributes                            |
 | :------------------------------- | :------------------------------------ |
 | Damaged device ProtoRPC message. | device: DeviceRequest, A device to be |
-:                                  : fetched.                              :
+|                                  | fetched.                              |
 |                                  | damaged_reason: str, The reason the   |
-:                                  : device is being reported as damaged.  :
+|                                  | device is being reported as damaged.  |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -547,15 +547,15 @@ Mark that a device is damaged.
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -568,15 +568,15 @@ Mark that a device is pending return.
 | Requests                          | Attributes                               |
 | :-------------------------------- | :--------------------------------------- |
 | General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-: message with several identifiers. : Chrome device.                           :
+| message with several identifiers. | Chrome device.                           |
 |                                   | chrome_device_id: str, The Chrome device |
-:                                   : id of the Chrome device.                 :
+|                                   | id of the Chrome device.                 |
 |                                   | serial_number: str, The serial number of |
-:                                   : the Chrome device.                       :
+|                                   | the Chrome device.                       |
 |                                   | urlkey: str, The URL-safe key of a       |
-:                                   : device.                                  :
+|                                   | device.                                  |
 |                                   | unknown_identifier: str, Either an asset |
-:                                   : tag or serial number of the device.      :
+|                                   | tag or serial number of the device.      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -595,21 +595,21 @@ Enroll request for the Shelf API.
 | Requests                             | Attributes                            |
 | :----------------------------------- | :------------------------------------ |
 | EnrollShelfRequest ProtoRPC message. | friendly_name: str, The friendly name |
-:                                      : of the shelf.                         :
+|                                      | of the shelf.                         |
 |                                      | location: str, The location of the    |
-:                                      : shelf.                                :
+|                                      | shelf.                                |
 |                                      | latitude: float, A geographical point |
-:                                      : represented by floating-point.        :
+|                                      | represented by floating-point.        |
 |                                      | longitude: float, A geographical      |
-:                                      : point represented by floating-point.  :
+|                                      | point represented by floating-point.  |
 |                                      | altitude: float, Indicates the floor. |
 |                                      | capacity: int, The amount of devices  |
-:                                      : a shelf can hold.                     :
+|                                      | a shelf can hold.                     |
 |                                      | audit_notification_enabled: bool,     |
-:                                      : Indicates if an audit is enabled for  :
-:                                      : the shelf.                            :
+|                                      | Indicates if an audit is enabled for  |
+|                                      | the shelf.                            |
 |                                      | responsible_for_audit: str, The party |
-:                                      : responsible for audits.               :
+|                                      | responsible for audits.               |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -622,36 +622,36 @@ Get a shelf based on location.
 | Requests                     | Attributes                                |
 | :--------------------------- | :---------------------------------------- |
 | Get or disable Shelf Request | location: str, The location of the shelf. |
-: ProtoRPC message.            :                                           :
+| ProtoRPC message.            |                                           |
 
 | Returns                 | Attributes                                         |
 | :---------------------- | :------------------------------------------------- |
 | Shelf ProtoRPC message. | enabled: bool, Indicates if the shelf is enabled   |
-:                         : or not.                                            :
+|                         | or not.                                            |
 |                         | friendly_name: str, The friendly name of the       |
-:                         : shelf.                                             :
+|                         | shelf.                                             |
 |                         | location: str, The location of the shelf.          |
 |                         | latitude: float, A geographical point represented  |
-:                         : by floating-point.                                 :
+|                         | by floating-point.                                 |
 |                         | longitude: float, A geographical point represented |
-:                         : by floating-point.                                 :
+|                         | by floating-point.                                 |
 |                         | altitude: float, Indicates the floor.              |
 |                         | capacity: int, The amount of devices a shelf can   |
-:                         : hold.                                              :
+|                         | hold.                                              |
 |                         | audit_notification_enabled: bool, Indicates if an  |
-:                         : audit is enabled for the shelf.                    :
+|                         | audit is enabled for the shelf.                    |
 |                         | audit_requested: bool, Indicates if an audit has   |
-:                         : been requested.                                    :
+|                         | been requested.                                    |
 |                         | responsible_for_audit: str, The party responsible  |
-:                         : for audits.                                        :
+|                         | for audits.                                        |
 |                         | last_audit_time: datetime, Indicates the last      |
-:                         : audit time.                                        :
+|                         | audit time.                                        |
 |                         | last_audit_by: str, Indicates the last user to     |
-:                         : audit the shelf.                                   :
+|                         | audit the shelf.                                   |
 |                         | page_token: str, A page token to query next page   |
-:                         : results.                                           :
+|                         | results.                                           |
 |                         | page_size: int, The number of results to query for |
-:                         : and display.                                       :
+|                         | and display.                                       |
 
 ##### disable
 
@@ -660,7 +660,7 @@ Disable a shelf by its location.
 | Requests                     | Attributes                                |
 | :--------------------------- | :---------------------------------------- |
 | Get or disable Shelf Request | location: str, The location of the shelf. |
-: ProtoRPC message.            :                                           :
+| ProtoRPC message.            |                                           |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -673,7 +673,7 @@ Enable a shelf based on its location.
 | Requests                     | Attributes                                |
 | :--------------------------- | :---------------------------------------- |
 | Get or disable Shelf Request | location: str, The location of the shelf. |
-: ProtoRPC message.            :                                           :
+| ProtoRPC message.            |                                           |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -686,16 +686,16 @@ Get a shelf using location to update its properties.
 | Requests                             | Attributes                            |
 | :----------------------------------- | :------------------------------------ |
 | UpdateShelfRequest ProtoRPC message. | current_location: str, The current    |
-:                                      : location of the shelf being           :
-:                                      : requested.                            :
+|                                      | location of the shelf being           |
+|                                      | requested.                            |
 |                                      | friendly_name: str, The friendly name |
-:                                      : of the shelf.                         :
+|                                      | of the shelf.                         |
 |                                      | location: str, The location of the    |
-:                                      : shelf.                                :
+|                                      | shelf.                                |
 |                                      | latitude: float, A geographical point |
-:                                      : represented by floating-point.        :
+|                                      | represented by floating-point.        |
 |                                      | longitude: float, A geographical      |
-:                                      : point represented by floating-point.  :
+|                                      | point represented by floating-point.  |
 |                                      | altitude: float, Indicates the floor. |
 
 Returns                   | Attributes
@@ -709,40 +709,40 @@ List enabled or all shelves based on any shelf attribute.
 | Requests                | Attributes                                         |
 | :---------------------- | :------------------------------------------------- |
 | Shelf ProtoRPC message. | enabled: bool, Indicates if the shelf is enabled   |
-:                         : or not.                                            :
+|                         | or not.                                            |
 |                         | friendly_name: str, The friendly name of the       |
-:                         : shelf.                                             :
+|                         | shelf.                                             |
 |                         | location: str, The location of the shelf.          |
 |                         | latitude: float, A geographical point represented  |
-:                         : by floating-point.                                 :
+|                         | by floating-point.                                 |
 |                         | longitude: float, A geographical point represented |
-:                         : by floating-point.                                 :
+|                         | by floating-point.                                 |
 |                         | altitude: float, Indicates the floor.              |
 |                         | capacity: int, The amount of devices a shelf can   |
-:                         : hold.                                              :
+|                         | hold.                                              |
 |                         | audit_notification_enabled: bool, Indicates if an  |
-:                         : audit is enabled for the shelf.                    :
+|                         | audit is enabled for the shelf.                    |
 |                         | audit_requested: bool, Indicates if an audit has   |
-:                         : been requested.                                    :
+|                         | been requested.                                    |
 |                         | responsible_for_audit: str, The party responsible  |
-:                         : for audits.                                        :
+|                         | for audits.                                        |
 |                         | last_audit_time: datetime, Indicates the last      |
-:                         : audit time.                                        :
+|                         | audit time.                                        |
 |                         | last_audit_by: str, Indicates the last user to     |
-:                         : audit the shelf.                                   :
+|                         | audit the shelf.                                   |
 |                         | page_token: str, A page token to query next page   |
-:                         : results.                                           :
+|                         | results.                                           |
 |                         | page_size: int, The number of results to query for |
-:                         : and display.                                       :
+|                         | and display.                                       |
 
 | Returns                      | Attributes                                    |
 | :--------------------------- | :-------------------------------------------- |
 | List Shelf Response ProtoRPC | shelves: Shelf, The list of shelves being     |
-: message.                     : returned.                                     :
+| message.                     | returned.                                     |
 |                              | additional_results: bool, If there are more   |
-:                              : results to be displayed.                      :
+|                              | results to be displayed.                      |
 |                              | page_token: str, A page token that will allow |
-:                              : be used to query for additional results.      :
+|                              | be used to query for additional results.      |
 
 ##### audit
 
@@ -751,10 +751,10 @@ Performs an audit on a shelf based on location.
 | Requests                            | Attributes                          |
 | :---------------------------------- | :---------------------------------- |
 | ShelfAuditRequest ProtoRPC message. | location: str, The location of the  |
-:                                     : shelf.                              :
+|                                     | shelf.                              |
 |                                     | device_identifiers: list, A list of |
-:                                     : device serial numbers to perform a  :
-:                                     : device audit on.                    :
+|                                     | device serial numbers to perform a  |
+|                                     | device audit on.                    |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -773,18 +773,18 @@ Create a new survey and insert instance into datastore.
 | Requests                             | Attributes                            |
 | :----------------------------------- | :------------------------------------ |
 | Survey ProtoRPC Message to           | survey_type: survey_model.SurveyType, |
-: encapsulate the survey_model.Survey. : The type of survey this is.           :
+| encapsulate the survey_model.Survey. | The type of survey this is.           |
 |                                      | question: str, The text displayed as  |
-:                                      : the question for this survey.         :
+|                                      | the question for this survey.         |
 |                                      | enabled: bool, Whether or not this    |
-:                                      : survey should be enabled.             :
+|                                      | survey should be enabled.             |
 |                                      | rand_weight: int, The weight to be    |
-:                                      : applied to this survey when using the :
-:                                      : get method survey with random.        :
+|                                      | applied to this survey when using the |
+|                                      | get method survey with random.        |
 |                                      | answers: List of Answer, The list of  |
-:                                      : answers possible for this survey.     :
+|                                      | answers possible for this survey.     |
 |                                      | survey_urlsafe_key: str, The          |
-:                                      : ndb.Key.urlsafe() for the survey.     :
+|                                      | ndb.Key.urlsafe() for the survey.     |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -797,23 +797,23 @@ Request a survey by type and present that survey to a Chrome App user.
 | Requests                        | Attributes                                |
 | :------------------------------ | :---------------------------------------- |
 | SurveyRequest ProtoRPC Message. | survey_type: survey_model.SurveyType, The |
-:                                 : type of survey being requested.           :
+|                                 | type of survey being requested.           |
 
 | Returns                              | Attributes                            |
 | :----------------------------------- | :------------------------------------ |
 | Survey ProtoRPC Message to           | survey_type: survey_model.SurveyType, |
-: encapsulate the survey_model.Survey. : The type of survey this is.           :
+| encapsulate the survey_model.Survey. | The type of survey this is.           |
 |                                      | question: str, The text displayed as  |
-:                                      : the question for this survey.         :
+|                                      | the question for this survey.         |
 |                                      | enabled: bool, Whether or not this    |
-:                                      : survey should be enabled.             :
+|                                      | survey should be enabled.             |
 |                                      | rand_weight: int, The weight to be    |
-:                                      : applied to this survey when using the :
-:                                      : get method survey with random.        :
+|                                      | applied to this survey when using the |
+|                                      | get method survey with random.        |
 |                                      | answers: List of Answer, The list of  |
-:                                      : answers possible for this survey.     :
+|                                      | answers possible for this survey.     |
 |                                      | survey_urlsafe_key: str, The          |
-:                                      : ndb.Key.urlsafe() for the survey.     :
+|                                      | ndb.Key.urlsafe() for the survey.     |
 
 ##### submit
 
@@ -821,15 +821,15 @@ Submit a response to a survey acquired via a request.
 
 | Requests                           | Attributes                              |
 | :--------------------------------- | :-------------------------------------- |
-| SurveySubmission ProtoRPC Message. | survey_urlsafe_key: str, The urlsafe |
-:                                    : ndb.Key for a survey_model.Survey       :
-:                                    : instance.                                :
-|                                    | answer_urlsafe_key: str, The urlsafe |
-:                                    : ndb.Key for a survey_model.Answer       :
-:                                    : instance.                                :
-|                                    | more_info: str, the extra info       |
-:                                    : optionally provided for the given       :
-:                                    : Survey and Answer.                      :
+| SurveySubmission ProtoRPC Message. | survey_urlsafe_key: str, The urlsafe    |
+|                                    | ndb.Key for a survey_model.Survey       |
+|                                    | instance.                               |
+|                                    | answer_urlsafe_key: str, The urlsafe    |
+|                                    | ndb.Key for a survey_model.Answer       |
+|                                    | instance.                               |
+|                                    | more_info: str, the extra info          |
+|                                    | optionally provided for the given       |
+|                                    | Survey and Answer.                      |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -842,23 +842,23 @@ List surveys.
 | Requests                            | Attributes                            |
 | :---------------------------------- | :------------------------------------ |
 | ListSurveyRequest ProtoRPC Message. | survey_type: survey_model.SurveyType, |
-:                                     : The type of survey to list.           :
-|                                     | enabled: bool, True for only       |
-:                                     : enabled surveys, False to view        :
-:                                     : disabled surveys.                     :
-|                                     | page_size: int, The size of the   |
-:                                     : page to return.                       :
-|                                     | page_token: str, The urlsafe       |
-:                                     : representation of the page token.     :
+|                                     | The type of survey to list.           |
+|                                     | enabled: bool, True for only          |
+|                                     | enabled surveys, False to view        |
+|                                     | disabled surveys.                     |
+|                                     | page_size: int, The size of the       |
+|                                     | page to return.                       |
+|                                     | page_token: str, The urlsafe          |
+|                                     | representation of the page token.     |
 
 | Returns                      | Attributes                                   |
 | :--------------------------- | :------------------------------------------- |
 | SurveyList ProtoRPC Message. | surveys: List of Survey, The list of surveys |
-:                              : to return.                                   :
-|                              | page_token: str, The urlsafe              |
-:                              : representation of the page token.            :
-|                              | more: bool, Whether or not there are more |
-:                              : results to be queried.                       :
+|                              | to return.                                   |
+|                              | page_token: str, The urlsafe                 |
+|                              | representation of the page token.            |
+|                              | more: bool, Whether or not there are more    |
+|                              | results to be queried.                       |
 
 ##### patch
 
@@ -867,21 +867,21 @@ Patch a given survey.
 | Requests                             | Attributes                            |
 | :----------------------------------- | :------------------------------------ |
 | PatchSurveyRequest ProtoRPC Message. | survey_urlsafe_key: str, The          |
-:                                      : ndb.Key.urlsafe() for the survey.     :
+|                                      | ndb.Key.urlsafe() for the survey.     |
 |                                      | answers: List of Answer, The list of  |
-:                                      : answers possible for this survey.     :
+|                                      | answers possible for this survey.     |
 |                                      | answer_keys_to_remove: List of str,   |
-:                                      : The list of answer_urlsafe_key to     :
-:                                      : remove from this survey.              :
+|                                      | The list of answer_urlsafe_key to     |
+|                                      | remove from this survey.              |
 |                                      | survey_type: survey_model.SurveyType, |
-:                                      : The type of survey this is.           :
+|                                      | The type of survey this is.           |
 |                                      | question: str, The text displayed as  |
-:                                      : the question for this survey.         :
+|                                      | the question for this survey.         |
 |                                      | enabled: bool, Whether or not this    |
-:                                      : survey should be enabled.             :
+|                                      | survey should be enabled.             |
 |                                      | rand_weight: int, The weight to be    |
-:                                      : applied to this survey when using the :
-:                                      : get method survey with random.        :
+|                                      | applied to this survey when using the |
+|                                      | get method survey with random.        |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -900,16 +900,16 @@ Get a user object using the user's email.
 | Requests                        | Attributes                           |
 | :------------------------------ | :----------------------------------- |
 | GetUserRequest request ProtoRPC | email: str, The email of the user to |
-: message.                        : fetch.                               :
+| message.                        | fetch.                               |
 
 | Returns                        | Attributes                                  |
 | :----------------------------- | :------------------------------------------ |
 | UsersRoleResponse response for | email: str, The user email to be displayed. |
-: ProtoRPC message.              :                                             :
+| ProtoRPC message.              |                                             |
 |                                | recorded_time: datetime, The recorded time  |
-:                                : for the user object.                        :
+|                                | for the user object.                        |
 |                                | roles: list, The roles of the user to be    |
-:                                : displayed.                                  :
+|                                | displayed.                                  |
 
 ##### get_role
 
@@ -924,10 +924,10 @@ Requests message_types.VoidMessage
 | Returns                        | Attributes                                  |
 | :----------------------------- | :------------------------------------------ |
 | UsersRoleResponse response for | email: str, The user email to be displayed. |
-: ProtoRPC message.              :                                             :
+| ProtoRPC message.              |                                             |
 |                                | recorded_time: datetime, The recorded time  |
-:                                : for the user object.                        :
+|                                | for the user object.                        |
 |                                | roles: list, The roles of the user to be    |
-:                                : displayed.                                  :
+|                                | displayed.                                  |
 
 [Adding Users to Google Groups]: https://support.google.com/groups/answer/2465464?hl=en&ref_topic=2458761
