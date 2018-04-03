@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material';
 import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
@@ -33,6 +33,9 @@ import {ShelfDataSource} from './shelf_data_source';
   templateUrl: 'shelf_list_table.html',
 })
 export class ShelfListTable extends LoaderView implements OnInit, OnDestroy {
+  /** Title of the table to be displayed. */
+  @Input() cardTitle = 'Shelf List';
+
   /** Observable that iterates once the component is about to be destroyed. */
   private onDestroy = new Subject<void>();
   /** Columns that should be rendered on the frontend table */

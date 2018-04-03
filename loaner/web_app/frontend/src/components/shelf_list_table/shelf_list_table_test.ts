@@ -54,11 +54,19 @@ describe('ShelfListTableComponent', () => {
     expect(shelfListTable).toBeDefined();
   });
 
-  it('should render card title in a mat-card-title', () => {
+  it('should render the default card title in a mat-card-title', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.mat-card-title').textContent)
+    expect(compiled.querySelector('.mat-card-title').innerText)
         .toContain('Shelf List');
+  });
+
+  it('should render the overwritten card title in a mat-card-title', () => {
+    shelfListTable.cardTitle = 'Company X Shelf List';
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-card-title').innerText)
+        .toContain('Company X Shelf List');
   });
 
   it('should render title field "Name" inside .mat-header-row ', () => {

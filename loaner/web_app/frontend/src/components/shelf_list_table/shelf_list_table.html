@@ -2,11 +2,11 @@
 <mat-card class="loaner-table">
   <mat-card-title>
     <span class="title">
-      Shelf List
+      {{ cardTitle }}
     </span>
     <loaner-shelf-buttons></loaner-shelf-buttons>
     <div fxFlex></div>
-    <mat-form-field floatLabel="never">
+    <mat-form-field class="filter-form-field">
       <input matInput #filter placeholder="Filter shelves">
     </mat-form-field>
   </mat-card-title>

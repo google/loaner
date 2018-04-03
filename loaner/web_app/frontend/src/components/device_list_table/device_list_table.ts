@@ -44,7 +44,7 @@ import {DeviceDataSource} from './device_data_source';
 })
 export class DeviceListTable extends LoaderView implements OnInit {
   /** Title of the table to be displayed. */
-  @Input() cardTitle = 'Default Text';
+  @Input() cardTitle = 'Device List';
   /** If whether the action buttons taken on each row should be displayed. */
   @Input() showButtons = true;
   /** If the status column should be displayed on the data table. */
