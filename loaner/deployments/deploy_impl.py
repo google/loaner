@@ -394,7 +394,14 @@ class ChromeAppConfig(LoanerConfig):
     """
     logging.debug('Checking the manifest file...')
     with open(self.manifest_file, 'r') as manifest_data:
-      data = json.load(manifest_data)
+      try:
+        data = json.load(manifest_data)
+      # Catch syntax errors.
+      except ValueError:
+        sys.stderr.write(
+            "The there is a syntax error in the Chrome App's"
+            "manifest.json file, located at: {}\n".format(self.manifest_file))
+        raise ManifestError(os.EX_SOFTWARE)
       # Set the new version.
       current_version = data['version']
       data['version'] = raw_input(
@@ -404,13 +411,14 @@ class ChromeAppConfig(LoanerConfig):
       if not data['key']:
         sys.stderr.write(
             "The manifest key is missing, please place it in the Chrome App's "
-            "manifest.json file, located at: {}".format(self.manifest_file))
+            "manifest.json file, located at: {}\n".format(self.manifest_file))
         raise ManifestError(os.EX_SOFTWARE)
       # Check for the OAuth2 Client ID.
       if not data['oauth2']['client_id']:
         sys.stderr.write(
             "The OAuth2 Client ID is missing for the Chrome App, please place "
-            "it in the Chrome App's manifest.json, file located at: {}".format(
+            "it in the Chrome App's manifest.json, "
+            "file located at: {}\n".format(
                 self.manifest_file))
         raise ManifestError(os.EX_SOFTWARE)
 

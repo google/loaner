@@ -55,6 +55,15 @@ _CORRECT_JSON = '''{
   }
 '''
 
+_JSON_SYNTAX_ERR = '''{
+  "version": "version_value"
+  "key": "key_value",
+  "oauth2": {
+    "client_id": "client_id_value"
+    }
+  }
+'''
+
 _JSON_MISSING_KEY = '''{
   "version": "version_value",
   "key": "",
@@ -350,6 +359,18 @@ class DeployImplTest(absltest.TestCase):
 
   @mock.patch.object(
       __builtin__, 'raw_input', autospec=True, return_value='1.0')
+  def testManifestJsonFailure(self, mock_rawinput):
+    """Test the manifest check fails given syntactically invalid json data."""
+    self.fs.CreateFile(
+        '/this/is/a/workspace/loaner/chrome_app/manifest.json',
+        contents=_JSON_SYNTAX_ERR)
+    test_chrome_app_config = self.CreateTestChromeAppConfig()
+    with self.assertRaises(deploy_impl.ManifestError):
+      test_chrome_app_config._ManifestCheck()
+    assert mock_rawinput.call_count == 0
+
+  @mock.patch.object(
+      __builtin__, 'raw_input', autospec=True, return_value='1.0')
   def testManifestCheckKeyFailure(self, mock_rawinput):
     """Test the manifest check fails without a 'key' value."""
     self.fs.CreateFile(
@@ -358,7 +379,7 @@ class DeployImplTest(absltest.TestCase):
     test_chrome_app_config = self.CreateTestChromeAppConfig()
     with self.assertRaises(deploy_impl.ManifestError):
       test_chrome_app_config._ManifestCheck()
-      assert mock_rawinput.call_count == 1
+    assert mock_rawinput.call_count == 1
 
   @mock.patch.object(
       __builtin__, 'raw_input', autospec=True, return_value='1.0')
@@ -370,7 +391,7 @@ class DeployImplTest(absltest.TestCase):
     test_chrome_app_config = self.CreateTestChromeAppConfig()
     with self.assertRaises(deploy_impl.ManifestError):
       test_chrome_app_config._ManifestCheck()
-      assert mock_rawinput.call_count == 1
+    assert mock_rawinput.call_count == 1
 
   @mock.patch.object(deploy_impl, '_ZipRelativePath', autospec=True)
   @mock.patch.object(deploy_impl, '_ExecuteCommand', autospec=True)
