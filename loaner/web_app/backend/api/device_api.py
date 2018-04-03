@@ -207,6 +207,7 @@ class DeviceApi(root_api.Service):
               last_heartbeat=device.last_heartbeat,
               assignment_date=device.assignment_date,
               max_extend_date=max_extend_date,
+              mark_pending_return_date=device.mark_pending_return_date,
               return_date=return_dates.default,
               guest_enabled=guest_enabled,
               guest_permitted=guest_permitted))
