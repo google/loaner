@@ -31,6 +31,7 @@
                            (done)="onReturned(device)"></loan-button>
               <loan-button damagedButton (done)="onDamaged(device, $event)"></loan-button>
               <loan-button lostButton (done)="onLost(device)"></loan-button>
+              <loan-button resumeButton (done)="onLoanResumed(device)"></loan-button>
             </loaner-loan-actions-card>
           </div>
         </mat-tab>

@@ -5,8 +5,8 @@
         Hi {{ userDisplayName }}!
       </span>
     </p>
-    <p *ngIf="numberOfAssignedDevices > 0">You can manage your loan using the buttons below.</p>
-    <p *ngIf="dueDate">
+    <p *ngIf="numberOfAssignedDevices > 0">You can manage your loan using the button(s) below.</p>
+    <p *ngIf="dueDate && !pendingReturn">
       <span class="mat-title">
         Please return your loaner by:
       </span>

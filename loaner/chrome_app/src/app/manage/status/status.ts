@@ -21,6 +21,7 @@ import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {LoaderView} from '../../../../../shared/components/loader';
+import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {DEV_MODE, LOGGING} from '../../config';
 import {Background} from '../../shared/background_service';
 import {FailAction, FailType, Failure} from '../../shared/failure';
@@ -46,6 +47,7 @@ export class StatusComponent extends LoaderView implements OnInit {
   guestEnabled: boolean;
   maxExtendDate: Date;
   newReturnDate: Date;
+  pendingReturn: boolean;
   userDisplayName: string;
 
   constructor(
@@ -55,6 +57,7 @@ export class StatusComponent extends LoaderView implements OnInit {
       private readonly failure: Failure,
       private readonly guestMode: GuestMode,
       private readonly loan: Loan,
+      private readonly resumeService: ResumeLoan,
       private readonly status: StatusService,
       readonly dialog: MatDialog,
   ) {
@@ -74,23 +77,25 @@ export class StatusComponent extends LoaderView implements OnInit {
 
   /** Set loan information for manage view. */
   setLoanInfo(grabGivenName?: boolean) {
+    let retrievedLoanInfo: LoanResponse;
     this.loan.getLoan(grabGivenName)
+        .pipe(switchMap(loanInfo => {
+          retrievedLoanInfo = loanInfo;
+          return this.loan.getDevice();
+        }))
         .subscribe(
-            loanInfo => {
+            deviceInfo => {
               if (grabGivenName) {
-                if (loanInfo.given_name) {
-                  this.status.setGivenNameInChromeStorage(loanInfo.given_name);
-                  this.userDisplayName = loanInfo.given_name;
+                if (retrievedLoanInfo.given_name) {
+                  this.status.setGivenNameInChromeStorage(
+                      retrievedLoanInfo.given_name);
+                  this.userDisplayName = retrievedLoanInfo.given_name;
                 } else {
                   this.status.setGivenNameInChromeStorage('there');
-                  this.userDisplayName = loanInfo.given_name;
+                  this.userDisplayName = retrievedLoanInfo.given_name;
                 }
               }
-              this.dueDate = moment(loanInfo.due_date).toDate();
-              this.maxExtendDate = moment(loanInfo.max_extend_date).toDate();
-              this.guestEnabled = loanInfo.guest_enabled;
-              this.guestAllowed = loanInfo.guest_permitted;
-              this.canExtend();
+              this.setLocalValues(deviceInfo);
               this.ready();
             },
             error => {
@@ -99,6 +104,19 @@ export class StatusComponent extends LoaderView implements OnInit {
               this.failure.register(
                   message, FailType.Network, FailAction.Quit, error);
             });
+  }
+
+  /**
+   * Sets the local values to the populated info from the API.
+   * @param deviceInfo represents the various info for a given device.
+   */
+  private setLocalValues(deviceInfo: DeviceInfoResponse) {
+    this.dueDate = moment(deviceInfo.due_date!).toDate();
+    this.maxExtendDate = moment(deviceInfo.max_extend_date!).toDate();
+    this.guestEnabled = deviceInfo.guest_enabled!;
+    this.guestAllowed = deviceInfo.guest_permitted!;
+    this.pendingReturn = !!deviceInfo.mark_pending_return_date;
+    this.canExtend();
   }
 
   /** Gets the given name of a user and calls for setting initial loan info. */
@@ -181,13 +199,28 @@ export class StatusComponent extends LoaderView implements OnInit {
             });
   }
 
-  /**
-   * Trigger the return flow.
-   */
+  /** Trigger the return flow. */
   onReturned() {
     if (LOGGING) {
       console.info('Returning Device');
     }
     this.bg.openView('offboarding');
+  }
+
+  /** Calls the loan API to resume the loan. */
+  onLoanResumed() {
+    this.loan.resumeLoan().subscribe(
+        response => {
+          this.resumeService.finished();
+          if (DEV_MODE && LOGGING) {
+            console.info(response);
+          }
+          this.pendingReturn = false;
+        },
+        error => {
+          const message = 'An error occurred when resuming this loan.';
+          this.failure.register(
+              message, FailType.Other, FailAction.Quit, error);
+        });
   }
 }

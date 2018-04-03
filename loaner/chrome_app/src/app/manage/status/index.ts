@@ -22,6 +22,8 @@ import {GuestModeModule} from '../../../../../shared/components/guest';
 import {LoaderModule} from '../../../../../shared/components/loader';
 import {GreetingsCardModule} from '../../../../../shared/components/loan_management/greetings_card';
 import {LoanActionsCardModule} from '../../../../../shared/components/loan_management/loan_actions_card';
+import {ResumeLoanModule} from '../../../../../shared/components/resume_loan';
+import {FocusModule} from '../../../../../shared/directives/focus/index';
 import {Background} from '../../shared/background_service';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -42,9 +44,11 @@ import {StatusService} from './status_service';
     GreetingsCardModule,
     GuestModeModule,
     FailureModule,
+    FocusModule,
     LoaderModule,
     LoanActionsCardModule,
     MaterialModule,
+    ResumeLoanModule,
   ],
   providers: [
     Background,

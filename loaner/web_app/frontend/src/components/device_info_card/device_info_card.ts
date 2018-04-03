@@ -23,6 +23,7 @@ import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
+import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {Device} from '../../models/device';
 import {User} from '../../models/user';
 import {DeviceService} from '../../services/device';
@@ -50,12 +51,13 @@ export class DeviceInfoCard implements OnInit {
 
   constructor(
       private readonly damagedService: Damaged,
-      private readonly lostService: Lost,
       private readonly deviceService: DeviceService,
       private readonly extendService: Extend,
       private readonly guestModeService: GuestMode,
-      private readonly userService: UserService,
-      private readonly route: ActivatedRoute) {}
+      private readonly lostService: Lost,
+      private readonly resumeService: ResumeLoan,
+      private readonly route: ActivatedRoute,
+      private readonly userService: UserService) {}
 
   ngOnInit() {
     this.userService.whenUserLoaded()
@@ -151,5 +153,13 @@ export class DeviceInfoCard implements OnInit {
             () => {
               this.lostService.close();
             });
+  }
+
+  /** Calls the deviceService to resume the loan. */
+  onLoanResumed(device: Device) {
+    this.deviceService.resumeLoan(device.serialNumber).subscribe(() => {
+      this.resumeService.finished();
+      device.pendingReturn = false;
+    });
   }
 }

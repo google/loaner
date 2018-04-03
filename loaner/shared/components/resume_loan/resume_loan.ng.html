@@ -1,0 +1,19 @@
+<div *ngIf="loading" class="resume-loan-loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!loading" tabindex="0" loaner-focus>
+  <p matDialogTitle>Success!</p>
+  <div mat-dialog-content>
+    <p>
+      Your loan has successfully been resumed. The device is no longer marked as
+      being returned.
+    </p>
+    <button mat-button
+            (click)="closeDialog()"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Close
+    </button>
+  </div>
+</div>

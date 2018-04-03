@@ -23,6 +23,7 @@ import {GuestModeModule} from '../../../../../shared/components/guest';
 import {GreetingsCardModule} from '../../../../../shared/components/loan_management/greetings_card';
 import {LoanActionsCardModule} from '../../../../../shared/components/loan_management/loan_actions_card';
 import {LostModule} from '../../../../../shared/components/lost';
+import {ResumeLoanModule} from '../../../../../shared/components/resume_loan';
 import {MaterialModule} from '../../core/material_module';
 
 import {DeviceInfoCard} from './device_info_card';
@@ -47,6 +48,7 @@ export * from './device_info_card';
     LostModule,
     MaterialModule,
     MatTooltipModule,
+    ResumeLoanModule,
   ],
 })
 export class DeviceInfoCardModule {

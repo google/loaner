@@ -12,21 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, Input} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {NgModule} from '@angular/core';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-@Component({
-  host: {
-    'class': 'mat-typography',
-  },
-  selector: 'loaner-greetings-card',
-  styleUrls: ['./greetings_card.scss'],
-  templateUrl: './greetings_card.ng.html',
+import {LoaderModule} from '../loader';
+
+import {MaterialModule} from './material_module';
+import {ResumeLoan, ResumeLoanDialog} from './resume_loan';
+
+@NgModule({
+  declarations: [ResumeLoanDialog],
+  entryComponents: [ResumeLoanDialog],
+  imports: [
+    BrowserAnimationsModule,
+    CommonModule,
+    LoaderModule,
+    MaterialModule,
+  ],
+  providers: [
+    ResumeLoan,
+  ],
 })
-export class GreetingsCardComponent {
-  @Input() dueDate: Date;
-  @Input() userDisplayName: string;
-  @Input() assetTag: string;
-  @Input() serialNumber: string;
-  @Input() numberOfAssignedDevices = 1;
-  @Input() pendingReturn = false;
+export class ResumeLoanModule {
 }
+
+export * from './resume_loan';

@@ -40,6 +40,12 @@ export class GuestModeMock extends DeviceActionsDialogService {
   }
 }
 
+export class ResumeLoanMock extends DeviceActionsDialogService {
+  get onLoanResumed(): Observable<boolean> {
+    return of(true);
+  }
+}
+
 export class LostMock extends DeviceActionsDialogService {
   get onLost(): Observable<boolean> {
     return of(true);

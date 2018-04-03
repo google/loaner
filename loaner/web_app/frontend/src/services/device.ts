@@ -141,6 +141,19 @@ export class DeviceService extends ApiService {
   }
 
   /**
+   * Resumes the loan for a particular device.
+   * @param id Device identifier to resume the loan for.
+   */
+  resumeLoan(id: string) {
+    const request: DeviceRequestApiParams = {
+      'unknown_identifier': id,
+    };
+    return this.post('resume_loan', request).pipe(tap(() => {
+      this.snackBar.open(`Loan resumed for device ${id}.`);
+    }));
+  }
+
+  /**
    * Marks a particular device as damaged.
    * @param id Device identifier to have device marked as damaged.
    * @param reason The reason why the device is being marked as damaged.

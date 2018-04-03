@@ -9,9 +9,8 @@
         <ng-container *ngIf="oneOfMany">
           ({{ assetTag ? 'asset tag' : 'serial number' }} {{ assetTag ? assetTag : serialNumber }})
         </ng-container>
-        is marked as pending to be returned. Please return to the nearest shelf at your
-        earliest convenience. If you'd like to continue using it, log back in and it will be
-        re-assigned to you!
+        is marked as being returned. If you would like to resume your loan,
+        please click the button below.
       </ng-container>
       <ng-container *ngIf="dueDate && !pendingReturn">
         <p>
@@ -22,9 +21,14 @@
         <span class="mat-title">{{ dueDate | date: 'fullDate' }}</span>
       </ng-container>
     </p>
-    <ng-content select="loan-button[extendButton]"></ng-content>
-    <ng-content select="loan-button[guestButton]"></ng-content>
-    <ng-content select="loan-button[returnButton]"></ng-content>
+    <div *ngIf="!pendingReturn">
+      <ng-content select="loan-button[extendButton]"></ng-content>
+      <ng-content select="loan-button[guestButton]"></ng-content>
+      <ng-content select="loan-button[returnButton]"></ng-content>
+    </div>
+  </div>
+  <div *ngIf="pendingReturn">
+    <ng-content select="loan-button[resumeButton]"></ng-content>
   </div>
   <div>
     <ng-content select="loan-button[damagedButton]"></ng-content>

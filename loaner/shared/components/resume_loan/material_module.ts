@@ -12,21 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, Input} from '@angular/core';
+import {NgModule} from '@angular/core';
+import {MatButtonModule, MatDialogModule, MatRippleModule} from '@angular/material';
 
-@Component({
-  host: {
-    'class': 'mat-typography',
-  },
-  selector: 'loaner-greetings-card',
-  styleUrls: ['./greetings_card.scss'],
-  templateUrl: './greetings_card.ng.html',
+const MATERIAL_MODULES = [
+  MatButtonModule,
+  MatDialogModule,
+  MatRippleModule,
+];
+
+@NgModule({
+  imports: MATERIAL_MODULES,
+  exports: MATERIAL_MODULES,
 })
-export class GreetingsCardComponent {
-  @Input() dueDate: Date;
-  @Input() userDisplayName: string;
-  @Input() assetTag: string;
-  @Input() serialNumber: string;
-  @Input() numberOfAssignedDevices = 1;
-  @Input() pendingReturn = false;
+export class MaterialModule {
 }

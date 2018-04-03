@@ -27,6 +27,7 @@ import {GuestButton} from './guest_button';
 import {LoanActionsCardComponent} from './loan_actions_card';
 import {LostButton} from './lost_button';
 import {MaterialModule} from './material_module';
+import {ResumeButton} from './resume_button';
 import {ReturnButton} from './return_button';
 
 const DECLARATIONS_AND_EXPORTS = [
@@ -36,6 +37,7 @@ const DECLARATIONS_AND_EXPORTS = [
   LoanActionsCardComponent,
   LostButton,
   ReturnButton,
+  ResumeButton,
 ];
 
 @NgModule({

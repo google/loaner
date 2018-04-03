@@ -4,12 +4,14 @@
 
 <div *ngIf="!loading" class="status-box">
   <loaner-greetings-card [userDisplayName]="userDisplayName"
-                         [dueDate]="dueDate">
+                         [dueDate]="dueDate"
+                         [pendingReturn]="pendingReturn">
   </loaner-greetings-card>
   <br />
 
   <loaner-loan-actions-card tabindex="0"
-                            [additionalManagementText]="additionalText">
+                            [additionalManagementText]="additionalText"
+                            [pendingReturn]="pendingReturn">
     <loan-button extendButton
                  [canExtend]="canExtend()"
                  [dueDate]="dueDate"
@@ -21,5 +23,6 @@
                  (done)="onGuestModeEnabled()"></loan-button>
     <loan-button returnButton (done)="onReturned()"></loan-button>
     <loan-button damagedButton (done)="onDamaged($event)"></loan-button>
+    <loan-button resumeButton (done)="onLoanResumed($event)"></loan-button>
   </loaner-loan-actions-card>
 </div>

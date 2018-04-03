@@ -155,4 +155,54 @@ export class Loan {
       });
     });
   }
+
+  /**
+   * Resumes the loan and removes the pending return status.
+   */
+  resumeLoan(): Observable<boolean> {
+    return new Observable(observer => {
+      DeviceIdentifier.id().then((deviceId: string) => {
+        const API = this.api.endpoints();
+        const resumeLoanUrl = `${API}/loaner/v1/device/resume_loan`;
+        const request: ResumeLoanRequest = {
+          chrome_device_id: deviceId,
+        };
+
+        this.http.post(resumeLoanUrl, request)
+            .subscribe(
+                () => {
+                  observer.next(true);
+                },
+
+                (error: HttpErrorResponse) => {
+                  observer.error(error);
+                });
+      });
+    });
+  }
+
+  /**
+   * Gets the device info and some additional loan info.
+   */
+  getDevice(): Observable<DeviceInfoResponse> {
+    return new Observable(observer => {
+      DeviceIdentifier.id().then((deviceId: string) => {
+        const API = this.api.endpoints();
+        const getDeviceUrl = `${API}/loaner/v1/device/get`;
+        const request: DeviceInfoRequest = {
+          chrome_device_id: deviceId,
+        };
+
+        this.http.post<DeviceInfoResponse>(getDeviceUrl, request)
+            .subscribe(
+                response => {
+                  observer.next(response);
+                },
+
+                (error: HttpErrorResponse) => {
+                  observer.error(error);
+                });
+      });
+    });
+  }
 }

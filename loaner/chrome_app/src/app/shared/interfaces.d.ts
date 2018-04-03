@@ -36,6 +36,33 @@ declare interface DamagedReasonRequest {
   device: {chrome_device_id: string};
 }
 
+/** Represents the request that is made for requesting device info. */
+declare interface DeviceInfoRequest {
+  chrome_device_id: string;
+}
+
+/** Represents the HTTP response with device info. */
+declare interface DeviceInfoResponse {
+  assigned_user?: string;
+  assignment_date?: Date;
+  current_ou?: string;
+  damaged?: boolean;
+  damaged_reason?: string;
+  device_model?: string;
+  due_date?: Date;
+  enrolled?: boolean;
+  guest_enabled?: boolean;
+  guest_permitted?: boolean;
+  last_heartbeat?: Date;
+  last_known_healthy?: Date;
+  locked?: boolean;
+  lost?: boolean;
+  mark_pending_return_date?: Date;
+  max_extend_date?: Date;
+  ou_changed_date?: Date;
+  return_date?: Date;
+}
+
 /** Represents the loan extension for the HTTP request. */
 declare interface ExtendRequest {
   device: {chrome_device_id: string};
@@ -77,6 +104,11 @@ declare interface LoanRequest {
 
 /** Represents the return request */
 declare interface ReturnRequest {
+  chrome_device_id: string;
+}
+
+/** Represents the request that is made for resuming a loan. */
+declare interface ResumeLoanRequest {
   chrome_device_id: string;
 }
 
