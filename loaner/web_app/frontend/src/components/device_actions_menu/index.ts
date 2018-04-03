@@ -22,23 +22,21 @@ import {LoaderModule} from '../../../../../shared/components/loader';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
 import {Dialog, DialogsModule} from '../../services/dialog';
-import {DeviceActionsMenuModule} from '../device_actions_menu';
 
-import {DeviceDetails} from './device_details';
+import {DeviceActionsMenu} from './device_actions_menu';
 
-export * from './device_details';
+export * from './device_actions_menu';
 
 @NgModule({
   declarations: [
-    DeviceDetails,
+    DeviceActionsMenu,
   ],
   exports: [
-    DeviceDetails,
+    DeviceActionsMenu,
   ],
   imports: [
     BrowserModule,
     DamagedModule,
-    DeviceActionsMenuModule,
     DialogsModule,
     ExtendModule,
     GuestModeModule,
@@ -50,5 +48,5 @@ export * from './device_details';
     Dialog,
   ],
 })
-export class DeviceDetailsModule {
+export class DeviceActionsMenuModule {
 }

@@ -71,35 +71,12 @@
       <ng-container cdkColumnDef="icons">
           <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
           <mat-cell *cdkCellDef="let device">
-            <button mat-icon-button
-                    (focus)="pauseLoading=true;"
-                    (blur)="pauseLoading=false;">
-              <mat-icon matTooltip="More"
-                       matTooltipPosition="above"
-                       class="icon-more"
-                       [matMenuTriggerFor]="actionsMenu"
-                       (click)="$event.stopPropagation(); pauseLoading=true;">
-                more_vert
-              </mat-icon>
-            </button>
-            <mat-menu #actionsMenu="matMenu" class="actions-menu" (closed)="pauseLoading=false;">
-              <button [disabled]="!device.assignedUser"
-                      (click)="extendDevice(device)" mat-menu-item>
-                <mat-icon>update</mat-icon>Extend</button>
-              <button [disabled]="device.pendingReturn" (click)="onReturned(device)"
-                      class="button-return" mat-menu-item>
-                <mat-icon>exit_to_app</mat-icon>Return</button>
-              <button [disabled]="device.guestAllowed && device.guestEnabled"
-                      (click)="enableGuestMode(device)" class="button-guest"
-                      mat-menu-item>
-                <mat-icon>account_circle</mat-icon>Enable guest</button>
-              <button [disabled]="device.damaged"
-                      (click)="onDamaged(device)" mat-menu-item>
-                <mat-icon>build</mat-icon>Mark as damaged</button>
-              <button [disabled]="device.lost"
-                      (click)="onLost(device)" mat-menu-item>
-                <mat-icon>gps_off</mat-icon>Mark as lost</button>
-            </mat-menu>
+    <loaner-device-actions-menu (focus)="pauseLoading=true;"
+                                (blur)="pauseLoading=false;"
+                                (click)="$event.stopPropagation(); pauseLoading=true;"
+                                [device]="device"
+                                (loading)="loading=$event">
+    </loaner-device-actions-menu>
           </mat-cell>
       </ng-container>
 

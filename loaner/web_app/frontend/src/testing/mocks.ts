@@ -116,6 +116,7 @@ export const TEST_DEVICE_1 = new Device({
   last_update: 1499202031707,
   due_date: 1499202031707,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
 });
 
 export const TEST_DEVICE_2 = new Device({
@@ -127,6 +128,8 @@ export const TEST_DEVICE_2 = new Device({
   last_update: 1499202031707,
   due_date: 1499202031707,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
+
 });
 
 export const TEST_DEVICE_WITH_ASSET_TAG = new Device({
@@ -138,6 +141,8 @@ export const TEST_DEVICE_WITH_ASSET_TAG = new Device({
   last_update: 1499202031707,
   due_date: 1499202031707,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
+
 });
 
 export const TEST_DEVICE_WITHOUT_ASSET_TAG = new Device({
@@ -149,6 +154,7 @@ export const TEST_DEVICE_WITHOUT_ASSET_TAG = new Device({
   last_update: 1499202031707,
   due_date: 1499202031707,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
 });
 
 export const TEST_DEVICE_MARKED_FOR_RETURN = new Device({
@@ -171,6 +177,7 @@ export const TEST_DEVICE_NOT_MARKED_FOR_RETURN = new Device({
   last_update: 1499202031707,
   due_date: 1499202031707,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
 });
 
 export const TEST_DEVICE_UNASSIGNED = new Device({
@@ -190,6 +197,7 @@ export const TEST_DEVICE_ASSIGNED = new Device({
   last_update: 1499202031707,
   due_date: 1499202031707,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
 });
 
 export const TEST_DEVICE_LOST = new Device({
@@ -235,6 +243,7 @@ export const TEST_DEVICE_OVERDUE = new Device({
   last_update: 1499202031707,
   due_date: 0,
   current_ou: 'ROOT',
+  max_extend_date: 1499400000000,
 });
 
 export class DeviceServiceMock {

@@ -110,38 +110,4 @@ describe('DeviceDetails', () => {
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent).toContain('Status');
   });
-
-  it('should call openRemoveDeviceDialog when button is clicked.',
-     () => {
-     });
-
-  it('should call unenroll if the confirmation returns true', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'unenroll');
-    const dialog: Dialog = TestBed.get(Dialog);
-    spyOn(dialog, 'confirm').and.returnValue(of(true));
-    fakeAsync(() => {
-      deviceDetails.openRemoveDeviceDialog();
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(deviceService.unenroll).toHaveBeenCalled();
-    });
-  });
-
-  it('should NOT call unenroll if the confirmation returns false', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'unenroll');
-    const dialog: Dialog = TestBed.get(Dialog);
-    spyOn(dialog, 'confirm').and.returnValue(of(false));
-    fakeAsync(() => {
-      deviceDetails.openRemoveDeviceDialog();
-      tick(120);
-      flushMicrotasks();
-      tick(120);
-      fixture.detectChanges();
-      expect(deviceService.unenroll).not.toHaveBeenCalled();
-    });
-  });
 });

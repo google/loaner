@@ -8,33 +8,11 @@
     </button>
     <span>Serial No: {{device.serialNumber}} </span>
     <div fxFlex></div>
-    <button mat-icon-button>
-      <mat-icon matTooltip="More"
-               matTooltipPosition="above"
-               class="icon-more"
-               [matMenuTriggerFor]="actionsMenu">
-        more_vert
-      </mat-icon>
-    </button>
-    <mat-menu #actionsMenu="matMenu" class="actions-menu">
-      <button [disabled]="!device.assignedUser"
-              (click)="extendDevice(device)" mat-menu-item>
-        <mat-icon>update</mat-icon>Extend</button>
-      <button [disabled]="device.pendingReturn" (click)="onReturned(device)"
-              class="button-return" mat-menu-item>
-         <mat-icon>exit_to_app</mat-icon>Return</button>
-      <button [disabled]="device.guestAllowed && device.guestEnabled"
-              (click)="enableGuestMode(device)" class="button-guest"
-              mat-menu-item>
-        <mat-icon>account_circle</mat-icon>Enable guest</button>
-      <button [disabled]="device.damaged"
-              (click)="onDamaged(device)" mat-menu-item>
-        <mat-icon>build</mat-icon>Mark as damaged</button>
-      <button [disabled]="device.lost" (click)="onLost(device)" mat-menu-item>
-        <mat-icon>gps_off</mat-icon>Mark as lost</button>
-      <button (click)="openRemoveDeviceDialog()" class="remove-device" mat-menu-item>
-        <mat-icon>phonelink_off</mat-icon>Unenroll</button>
-    </mat-menu>
+    <loaner-device-actions-menu [device]="device"
+                                (loading)="loading=$event"
+                                (refreshDevice)="refreshDevice($event)"
+                                (unenrolled)="back()">
+    </loaner-device-actions-menu>
   </mat-card-title>
   <mat-card-content>
       <mat-list>

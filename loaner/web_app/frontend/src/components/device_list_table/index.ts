@@ -23,6 +23,7 @@ import {LoaderModule} from '../../../../../shared/components/loader';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
 import {DeviceActionBoxModule} from '../device_action_box';
+import {DeviceActionsMenuModule} from '../device_actions_menu';
 import {DeviceButtonsModule} from '../device_buttons';
 
 import {DeviceData} from './device_data';
@@ -41,6 +42,7 @@ export * from './device_list_table';
     BrowserModule,
     DamagedModule,
     DeviceActionBoxModule,
+    DeviceActionsMenuModule,
     DeviceButtonsModule,
     GuestModeModule,
     ExtendModule,

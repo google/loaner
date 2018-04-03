@@ -97,7 +97,7 @@ describe('DeviceListTableComponent', () => {
   it('should pause loading when the row menu trigger is in focus', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    const element = compiled.querySelector('.mat-icon-button');
+    const element = compiled.querySelector('loaner-device-actions-menu');
     element.dispatchEvent(new Event('focus'));
     expect(deviceListTable.pauseLoading).toBe(true);
     element.dispatchEvent(new Event('blur'));
