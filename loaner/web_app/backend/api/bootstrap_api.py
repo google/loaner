@@ -16,7 +16,8 @@
 
 from protorpc import message_types
 
-from loaner.web_app.backend.api import loaner_endpoints
+from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import bootstrap_message
 from loaner.web_app.backend.lib import bootstrap
@@ -26,13 +27,13 @@ from loaner.web_app.backend.lib import bootstrap
 class BootstrapApi(root_api.Service):
   """Bootstrap API service class."""
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       bootstrap_message.RunBootstrapRequest,
       bootstrap_message.BootstrapStatusResponse,
       name='run',
       path='run',
       http_method='POST',
-      permission='bootstrap')
+      permission=permissions.Permissions.BOOTSTRAP)
   def run(self, request):
     """Runs request for the Bootstrap API."""
     self.check_xsrf_token(self.request_state)
@@ -50,13 +51,13 @@ class BootstrapApi(root_api.Service):
           bootstrap_message.BootstrapTask(name=name))
     return response_message
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       message_types.VoidMessage,
       bootstrap_message.BootstrapStatusResponse,
       name='get_status',
       path='get_status',
       http_method='GET',
-      permission='bootstrap')
+      permission=permissions.Permissions.BOOTSTRAP)
   def get_status(self, request):
     """Gets general bootstrap status, and task status if not yet completed."""
     self.check_xsrf_token(self.request_state)

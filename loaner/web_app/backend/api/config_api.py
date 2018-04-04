@@ -19,7 +19,8 @@ from protorpc import message_types
 import endpoints
 
 from loaner.web_app import config_defaults
-from loaner.web_app.backend.api import loaner_endpoints
+from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import config_message
 from loaner.web_app.backend.models import config_model
@@ -32,13 +33,13 @@ _FIELD_MISSING_MSG = 'Please double-check you provided all necessary fields.'
 class ConfigAPI(root_api.Service):
   """Endpoints API service class for Config config resource."""
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       config_message.GetConfigRequest,
       config_message.ConfigResponse,
       name='get',
       path='get',
       http_method='GET',
-      permission='get_config')
+      permission=permissions.Permissions.GET_CONFIG)
   def get_config(self, request):
     """Lists the given setting's value."""
     self.check_xsrf_token(self.request_state)
@@ -63,13 +64,13 @@ class ConfigAPI(root_api.Service):
       response_message = config_message.ConfigResponse(list_value=setting_value)
     return response_message
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       message_types.VoidMessage,
       config_message.ListConfigsResponse,
       name='list',
       path='list',
       http_method='GET',
-      permission='list_configs')
+      permission=permissions.Permissions.LIST_CONFIGS)
   def list_configs(self, request):
     """Get a list of all config values."""
     self.check_xsrf_token(self.request_state)
@@ -92,13 +93,13 @@ class ConfigAPI(root_api.Service):
             name=setting, list_value=setting_value))
     return config_message.ListConfigsResponse(configs=response_message)
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       config_message.UpdateConfigRequest,
       message_types.VoidMessage,
       name='update',
       path='update',
       http_method='POST',
-      permission='update_config')
+      permission=permissions.Permissions.UPDATE_CONFIG)
   def update_config(self, request):
     """Updates a given config value."""
     self.check_xsrf_token(self.request_state)

@@ -20,16 +20,31 @@ load(
 loaner_appengine_library(
     name = "api",
     deps = [
+        ":auth",
         ":bootstrap_api",
         ":chrome_api",
         ":config_api",
         ":datastore_api",
         ":device_api",
-        ":loaner_endpoints",
+        ":permissions",
         ":root_api",
         ":shelf_api",
         ":survey_api",
         ":user_api",
+    ],
+)
+
+loaner_appengine_library(
+    name = "auth",
+    srcs = [
+        "auth.py",
+    ],
+    deps = [
+        ":permissions",
+        "//loaner/web_app:constants",
+        "//loaner/web_app/backend/lib:user",
+        "//loaner/web_app/backend/lib:xsrf",
+        "//loaner/web_app/backend/models:user_model",
     ],
 )
 
@@ -39,7 +54,8 @@ loaner_appengine_library(
         "bootstrap_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         "//loaner/web_app/backend/api/messages:bootstrap_message",
         "//loaner/web_app/backend/lib:bootstrap",
@@ -52,8 +68,9 @@ loaner_appengine_library(
         "chrome_api.py",
     ],
     deps = [
+        ":auth",
         ":device_api",
-        ":loaner_endpoints",
+        ":permissions",
         ":root_api",
         "//loaner/web_app/backend/api/messages:chrome_message",
         "//loaner/web_app/backend/clients:directory",
@@ -69,7 +86,8 @@ loaner_appengine_library(
         "config_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         "//loaner/web_app:config_defaults",
         "//loaner/web_app/backend/api/messages:config_message",
@@ -84,7 +102,8 @@ loaner_appengine_library(
         "datastore_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         "//loaner/web_app/backend/api/messages:datastore_message",
         "//loaner/web_app/backend/lib:datastore_yaml",
@@ -97,16 +116,22 @@ loaner_appengine_library(
         "device_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         ":shelf_api",
         "//loaner/web_app/backend/api/messages:device_message",
-        "//loaner/web_app/backend/auth:permissions",
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:device_model",
-        "//loaner/web_app/backend/models:user_model",
         "@endpoints_archive//:endpoints",
+    ],
+)
+
+loaner_appengine_library(
+    name = "permissions",
+    srcs = [
+        "permissions.py",
     ],
 )
 
@@ -123,23 +148,13 @@ loaner_appengine_library(
 )
 
 loaner_appengine_library(
-    name = "loaner_endpoints",
-    srcs = [
-        "loaner_endpoints.py",
-    ],
-    deps = [
-        "//loaner/web_app/backend/auth:permissions",
-        "@endpoints_archive//:endpoints",
-    ],
-)
-
-loaner_appengine_library(
     name = "shelf_api",
     srcs = [
         "shelf_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/api/messages:shelf_message",
@@ -157,7 +172,8 @@ loaner_appengine_library(
         "survey_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         "//loaner/web_app/backend/api/messages:survey_messages",
         "//loaner/web_app/backend/models:config_model",
@@ -172,7 +188,8 @@ loaner_appengine_library(
         "user_api.py",
     ],
     deps = [
-        ":loaner_endpoints",
+        ":auth",
+        ":permissions",
         ":root_api",
         "//loaner/web_app/backend/api/messages:user_message",
         "//loaner/web_app/backend/lib:user",
@@ -184,6 +201,24 @@ loaner_appengine_library(
 # ==============================================================================
 # Tests
 # ==============================================================================
+
+loaner_appengine_test(
+    name = "auth_test",
+    srcs = [
+        "auth_test.py",
+    ],
+    deps = [
+        ":auth",
+        ":permissions",
+        ":root_api",
+        "//loaner/web_app:constants",
+        "//loaner/web_app/backend/lib:xsrf",
+        "//loaner/web_app/backend/models:user_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@endpoints_archive//:endpoints",
+        "@mock_archive//:mock",
+    ],
+)
 
 loaner_appengine_test(
     name = "bootstrap_api_test",
@@ -261,23 +296,6 @@ loaner_appengine_test(
 )
 
 loaner_appengine_test(
-    name = "loaner_endpoints_test",
-    srcs = [
-        "loaner_endpoints_test.py",
-    ],
-    deps = [
-        ":loaner_endpoints",
-        "//loaner/web_app/backend/api:root_api",
-        "//loaner/web_app/backend/auth:permissions",
-        "//loaner/web_app/backend/lib:xsrf",
-        "//loaner/web_app/backend/models:user_model",
-        "//loaner/web_app/backend/testing:loanertest",
-        "@endpoints_archive//:endpoints",
-        "@mock_archive//:mock",
-    ],
-)
-
-loaner_appengine_test(
     name = "root_api_test",
     srcs = [
         "root_api_test.py",
@@ -333,10 +351,11 @@ loaner_appengine_test(
         "user_api_test.py",
     ],
     deps = [
+        ":auth",
+        ":permissions",
         ":root_api",
         ":user_api",
         "//loaner/web_app/backend/api/messages:user_message",
-        "//loaner/web_app/backend/auth:permissions",
         "//loaner/web_app/backend/models:user_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@mock_archive//:mock",
@@ -346,12 +365,12 @@ loaner_appengine_test(
 test_suite(
     name = "all_tests",
     tests = [
+        ":auth_test",
         ":bootstrap_api_test",
         ":chrome_api_test",
         ":config_api_test",
         ":datastore_api_test",
         ":device_api_test",
-        ":loaner_endpoints_test",
         ":root_api_test",
         ":shelf_api_test",
         ":survey_api_test",

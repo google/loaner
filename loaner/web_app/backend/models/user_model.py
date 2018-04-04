@@ -37,7 +37,6 @@ class User(ndb.Model):
     Returns:
       The user model for the current user.
     """
-
     user = cls.get_or_insert(email)
     if not user.roles:
       user.update_user(roles=['user'])

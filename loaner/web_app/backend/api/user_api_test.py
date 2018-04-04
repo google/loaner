@@ -21,7 +21,6 @@ from protorpc import message_types
 from loaner.web_app.backend.api import root_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import user_api
 from loaner.web_app.backend.api.messages import user_message
-from loaner.web_app.backend.auth import permissions
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -39,15 +38,15 @@ class UserApiTest(loanertest.EndpointsTestCase):
     self.addCleanup(self.patcher_build.stop)
     user_model.User.get_user(
         email=loanertest.TECHNICAL_ADMIN_EMAIL,
-        opt_roles=[permissions.TECHNICAL_ADMIN_ROLE.name])
+        opt_roles=['technical-admin'])
     user_model.User.get_user(
         email=loanertest.OPERATIONAL_ADMIN_EMAIL,
-        opt_roles=[permissions.OPERATIONAL_ADMIN_ROLE.name])
+        opt_roles=['operational-admin'])
     user_model.User.get_user(
         email=loanertest.TECHNICIAN_EMAIL,
-        opt_roles=[permissions.TECHNICIAN_ROLE.name]).put()
+        opt_roles=['technician']).put()
     user_model.User.get_user(
-        email=loanertest.USER_EMAIL, opt_roles=[permissions.USER_ROLE.name])
+        email=loanertest.USER_EMAIL, opt_roles=['user'])
     self.users_list = [
         loanertest.TECHNICAL_ADMIN_EMAIL, loanertest.OPERATIONAL_ADMIN_EMAIL,
         loanertest.TECHNICIAN_EMAIL, loanertest.USER_EMAIL,
@@ -73,14 +72,14 @@ class UserApiTest(loanertest.EndpointsTestCase):
     response = self.service.get(request)
 
     self.assertEqual(response.email, loanertest.TECHNICAL_ADMIN_EMAIL)
-    self.assertTrue(permissions.TECHNICAL_ADMIN_ROLE.name in response.roles)
+    self.assertIn('technical-admin', response.roles)
 
   def test_get_roles(self):
     self.login_endpoints_user()
     response = self.service.get_role(message_types.VoidMessage())
 
     self.assertEqual(response.email, loanertest.USER_EMAIL)
-    self.assertEqual(response.roles, [permissions.USER_ROLE.name])
+    self.assertEqual(response.roles, ['user'])
 
 
 if __name__ == '__main__':

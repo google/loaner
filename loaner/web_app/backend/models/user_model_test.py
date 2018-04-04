@@ -14,7 +14,6 @@
 
 """Tests for backend.models.user_model."""
 
-from loaner.web_app.backend.auth import permissions
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -37,18 +36,16 @@ class UserModelTest(loanertest.EndpointsTestCase):
     # get_user will create new user model.
     user = user_model.User.get_user(email=loanertest.SUPER_ADMIN_EMAIL)
     self.assertEqual(user.key.id(), loanertest.SUPER_ADMIN_EMAIL)
-    # make sure role is set as user by default
-    self.assertEqual(user.roles, [permissions.USER_ROLE.name])
+    # make sure role is set to assignee by default
+    self.assertEqual(user.roles, ['user'])
 
     # get user will create a new user model with an admin role.
     opt_roles = [
-        permissions.OPERATIONAL_ADMIN_ROLE.name,
-        permissions.TECHNICAL_ADMIN_ROLE.name,
-        permissions.TECHNICIAN_ROLE.name,
+        'operational-admin', 'technical-admin', 'technician',
     ]
     user = user_model.User.get_user(
         email=loanertest.TECHNICAL_ADMIN_EMAIL, opt_roles=opt_roles)
-    opt_roles.append(permissions.USER_ROLE.name)
+    opt_roles.append('user')
     self.assertEqual(user.key.id(), loanertest.TECHNICAL_ADMIN_EMAIL)
     # make sure there is more than the default role
     for role in user.roles:
@@ -61,11 +58,9 @@ class UserModelTest(loanertest.EndpointsTestCase):
         email=loanertest.TECHNICAL_ADMIN_EMAIL)
     user = user_model.User.get_user(
         loanertest.TECHNICAL_ADMIN_EMAIL,
-        opt_roles=[permissions.TECHNICAL_ADMIN_ROLE.name])
+        opt_roles=['technical-admin'])
     self.assertItemsEqual(
-        [permissions.USER_ROLE.name, permissions.TECHNICAL_ADMIN_ROLE.name,
-         permissions.OPERATIONAL_ADMIN_ROLE.name,
-         permissions.TECHNICIAN_ROLE.name],
+        ['user', 'technical-admin', 'operational-admin', 'technician'],
         user.roles)
 
 

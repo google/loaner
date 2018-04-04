@@ -21,7 +21,6 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app/backend/actions",
         "//loaner/web_app/backend/api",
-        "//loaner/web_app/backend/auth",
         "//loaner/web_app/backend/clients",
         "//loaner/web_app/backend/common",
         "//loaner/web_app/backend/handlers",
@@ -39,7 +38,6 @@ test_suite(
     tests = [
         "//loaner/web_app/backend/actions:all_tests",
         "//loaner/web_app/backend/api:all_tests",
-        "//loaner/web_app/backend/auth:all_tests",
         "//loaner/web_app/backend/clients:all_tests",
         "//loaner/web_app/backend/handlers:all_tests",
         "//loaner/web_app/backend/lib:all_tests",

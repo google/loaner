@@ -105,7 +105,6 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app:constants",
-        "//loaner/web_app/backend/auth:permissions",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/models:user_model",
     ],
@@ -230,7 +229,6 @@ loaner_appengine_test(
     ],
     deps = [
         ":sync_users",
-        "//loaner/web_app/backend/auth:permissions",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/models:user_model",
         "//loaner/web_app/backend/testing:loanertest",

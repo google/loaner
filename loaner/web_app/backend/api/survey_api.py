@@ -18,7 +18,8 @@ from protorpc import message_types
 
 import endpoints
 
-from loaner.web_app.backend.api import loaner_endpoints
+from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import survey_messages
 from loaner.web_app.backend.lib import user as user_lib
@@ -34,13 +35,13 @@ _NO_QUESTION_FOR_TYPE_MSG = (
 class SurveyApi(root_api.Service):
   """This class is for the Survey API."""
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       survey_messages.Question,
       message_types.VoidMessage,
       name='create',
       path='create',
       http_method='POST',
-      permission='create_survey')
+      permission=permissions.Permissions.CREATE_SURVEY)
   def create(self, request):
     """Create a new survey question and insert instance into datastore."""
     self.check_xsrf_token(self.request_state)
@@ -66,13 +67,12 @@ class SurveyApi(root_api.Service):
 
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       survey_messages.QuestionRequest,
       survey_messages.Question,
       name='request',
       path='request',
-      http_method='GET',
-      user_auth_only=True)
+      http_method='GET')
   def request(self, request):
     """Request a survey by type and present that survey to a Chrome App user."""
     question = survey_models.Question.get_random(
@@ -82,13 +82,12 @@ class SurveyApi(root_api.Service):
           _NO_QUESTION_FOR_TYPE_MSG % request.question_type)
     return _build_survey_messages(question)
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       survey_messages.QuestionSubmission,
       message_types.VoidMessage,
       name='submit',
       path='submit',
-      http_method='POST',
-      user_auth_only=True)
+      http_method='POST')
   def submit(self, request):
     """Submit a response to a survey question."""
     user_email = user_lib.get_user_email()
@@ -99,13 +98,13 @@ class SurveyApi(root_api.Service):
         more_info_text=request.more_info_text)
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       survey_messages.ListQuestionsRequest,
       survey_messages.QuestionList,
       name='list',
       path='list',
       http_method='GET',
-      permission='list_surveys')
+      permission=permissions.Permissions.LIST_SURVEYS)
   def list(self, request):
     """List survey questions."""
     cursor = None
@@ -127,13 +126,13 @@ class SurveyApi(root_api.Service):
       response.more = more
     return response
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       survey_messages.PatchQuestionRequest,
       message_types.VoidMessage,
       name='patch',
       path='patch',
       http_method='POST',
-      permission='patch_survey')
+      permission=permissions.Permissions.PATCH_SURVEY)
   def patch(self, request):
     """Patch a given survey question."""
     self.check_xsrf_token(self.request_state)

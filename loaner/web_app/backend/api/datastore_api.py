@@ -16,7 +16,8 @@
 
 from protorpc import message_types
 
-from loaner.web_app.backend.api import loaner_endpoints
+from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import datastore_message
 from loaner.web_app.backend.lib import datastore_yaml
@@ -26,13 +27,13 @@ from loaner.web_app.backend.lib import datastore_yaml
 class DatastoreApi(root_api.Service):
   """Datastore API service class."""
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       datastore_message.ImportYamlRequest,
       message_types.VoidMessage,
       name='import',
       path='import',
       http_method='POST',
-      permission='datastore_import')
+      permission=permissions.Permissions.DATASTORE_IMPORT)
   def datastore_import(self, request):
     """Datastore import request for the Datastore API."""
     self.check_xsrf_token(self.request_state)

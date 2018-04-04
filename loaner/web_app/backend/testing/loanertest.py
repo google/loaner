@@ -26,14 +26,13 @@ from absl.testing import absltest
 import endpoints
 
 from loaner.web_app import constants
-from loaner.web_app.backend.auth import permissions
 from loaner.web_app.backend.lib import action_loader
 from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import user_model
 
 USER_DOMAIN = constants.APP_DOMAIN
 USER_EMAIL = 'user@{}'.format(USER_DOMAIN)
-SUPER_ADMIN_EMAIL = 'daredevil@{}'.format(USER_DOMAIN)
+SUPER_ADMIN_EMAIL = 'super_admin@{}'.format(USER_DOMAIN)
 TECHNICAL_ADMIN_EMAIL = 'technical-admin@{}'.format(USER_DOMAIN)
 OPERATIONAL_ADMIN_EMAIL = 'operational-admin@{}'.format(USER_DOMAIN)
 TECHNICIAN_EMAIL = 'technician@{}'.format(USER_DOMAIN)
@@ -156,10 +155,10 @@ class EndpointsTestCase(TestCase):
     user_model.User.get_user(
         email=email,
         opt_roles=[
-            permissions.TECHNICAL_ADMIN_ROLE.name,
-            permissions.OPERATIONAL_ADMIN_ROLE.name,
-            permissions.TECHNICIAN_ROLE.name,
-            permissions.USER_ROLE.name
+            'technical-admin',
+            'operational-admin',
+            'technician',
+            'user'
         ])
 
 

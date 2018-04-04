@@ -20,23 +20,24 @@ from protorpc import message_types
 
 import endpoints
 
-from loaner.web_app.backend.api import loaner_endpoints
+from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
 from loaner.web_app.backend.api.messages import device_message
-from loaner.web_app.backend.auth import permissions
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
-from loaner.web_app.backend.models import user_model
 
 _NO_DEVICE_MSG = (
     'Device could not be found using device_identifier "%s".')
 _NO_IDENTIFIERS_MSG = 'No identifier supplied to find device.'
 _BAD_URLKEY_MSG = 'No device found because the URL-safe key was invalid: %s'
-_ASSIGNMENT_MISMATCH = (
+_ASSIGNMENT_MISMATCH_MSG = (
     'Unable to perform this action. Device is currently assigned to another '
     'user.')
+_LIST_DEVICES_USER_MISMATCH_MSG = (
+    'Unable to perform this action because you do not have permission.')
 _SHELF_NOT_FOUND_MSG = (
     "Unable to find a shelf for the given device's shelf: %s")
 
@@ -45,32 +46,33 @@ _SHELF_NOT_FOUND_MSG = (
 class DeviceApi(root_api.Service):
   """This class is for the Device API."""
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='enroll',
       path='enroll',
       http_method='POST',
-      permission='enroll_device')
+      permission=permissions.Permissions.ENROLL_DEVICE)
   def enroll(self, request):
     """Enrolls a device in the program."""
     self.check_xsrf_token(self.request_state)
+    user_email = user_lib.get_user_email()
     try:
       device_model.Device.enroll(
           asset_tag=request.asset_tag,
           serial_number=request.serial_number,
-          user_email=user_lib.get_user_email())
+          user_email=user_email)
     except device_model.DeviceCreationError as error:
       raise endpoints.BadRequestException(str(error))
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='unenroll',
       path='unenroll',
       http_method='POST',
-      permission='unenroll_device')
+      permission=permissions.Permissions.UNENROLL_DEVICE)
   def unenroll(self, request):
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
@@ -81,13 +83,13 @@ class DeviceApi(root_api.Service):
       raise endpoints.BadRequestException(str(error))
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='auditable',
       path='auditable',
       http_method='POST',
-      permission='device_audit')
+      permission=permissions.Permissions.DEVICE_AUDIT)
   def device_audit_check(self, request):
     """Runs prechecks on a device to see if it can be audited."""
     self.check_xsrf_token(self.request_state)
@@ -100,13 +102,13 @@ class DeviceApi(root_api.Service):
       raise endpoints.BadRequestException(str(err))
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       device_message.Device,
       name='get',
       path='get',
       http_method='POST',
-      permission='get_device')
+      permission=permissions.Permissions.GET_DEVICE)
   def get_device(self, request):
     """Gets a device using any identifier in device_message.DeviceRequest."""
     device = _get_device(request)
@@ -133,13 +135,13 @@ class DeviceApi(root_api.Service):
         guest_permitted=guest_permitted)
     return device
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.Device,
       device_message.ListDevicesResponse,
       name='list',
       path='list',
       http_method='POST',
-      permission='list_devices')
+      permission=permissions.Permissions.LIST_DEVICES)
   def list_devices(self, request):
     """Lists all devices based on any device attribute."""
     self.check_xsrf_token(self.request_state)
@@ -181,15 +183,17 @@ class DeviceApi(root_api.Service):
           page_token=next_cursor.urlsafe())
     return device_message.ListDevicesResponse(devices=device_messages)
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       message_types.VoidMessage,
       device_message.ListUserDeviceResponse,
       name='user_devices',
       path='user_devices',
       http_method='POST',
-      permission='list_user_devices')
-  def list_user_devices(self, request):
+      permission=permissions.Permissions.LIST_USER_DEVICES,
+      allow_assignee=True)
+  def list_user_devices(self, request, roles_permitted=None):
     """Lists all devices assigned to the user."""
+    del roles_permitted  # Unused, as this is only for assignees.
     self.check_xsrf_token(self.request_state)
     user = user_lib.get_user_email()
     device_messages = []
@@ -213,19 +217,21 @@ class DeviceApi(root_api.Service):
               guest_permitted=guest_permitted))
     return device_message.ListUserDeviceResponse(devices=device_messages)
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='enable_guest_mode',
       path='enable_guest_mode',
       http_method='POST',
-      user_auth_only=True)
-  def enable_guest_mode(self, request):
+      permission=permissions.Permissions.ENABLE_GUEST_MODE,
+      allow_assignee=True)
+  def enable_guest_mode(self, request, roles_permitted=None):
     """Enables Guest Mode for a given device."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
-    _confirm_user_action(user_email, device)
+    if roles_permitted == ['user']:
+      _confirm_assignee_action(user_email, device)
     try:
       device.enable_guest_mode(user_email)
     except device_model.EnableGuestError as err:
@@ -237,19 +243,21 @@ class DeviceApi(root_api.Service):
     else:
       return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.ExtendLoanRequest,
       message_types.VoidMessage,
       name='extend_loan',
       path='extend_loan',
       http_method='POST',
-      user_auth_only=True)
-  def extend_loan(self, request):
+      permission=permissions.Permissions.EXTEND_LOAN,
+      allow_assignee=True)
+  def extend_loan(self, request, roles_permitted=None):
     """Extend the current loan for a given Chrome device."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request.device)
     user_email = user_lib.get_user_email()
-    _confirm_user_action(user_email, device)
+    if roles_permitted == ['user']:
+      _confirm_assignee_action(user_email, device)
     try:
       device.loan_extend(
           extend_date_time=request.extend_date,
@@ -260,71 +268,79 @@ class DeviceApi(root_api.Service):
     except device_model.UnassignedDeviceError as err:
       raise endpoints.UnauthorizedException(str(err))
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DamagedRequest,
       message_types.VoidMessage,
       name='mark_damaged',
       path='mark_damaged',
       http_method='POST',
-      user_auth_only=True)
-  def mark_damaged(self, request):
+      permission=permissions.Permissions.MARK_DAMAGED,
+      allow_assignee=True)
+  def mark_damaged(self, request, roles_permitted=None):
     """Mark that a device is damaged."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request.device)
     user_email = user_lib.get_user_email()
-    _confirm_user_action(user_email, device)
+    if roles_permitted == ['user']:
+      _confirm_assignee_action(user_email, device)
     device.mark_damaged(
         user_email=user_email,
         damaged_reason=request.damaged_reason)
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='mark_lost',
       path='mark_lost',
       http_method='POST',
-      user_auth_only=True)
-  def mark_lost(self, request):
-    """Mark that a device is lost."""
+      permission=permissions.Permissions.MARK_LOST,
+      allow_assignee=True)
+  def mark_lost(self, request, roles_permitted=None):
+    """Mark that a device is damaged."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
-    _confirm_user_action(user_email, device)
-    device.mark_lost(user_email=user_lib.get_user_email())
+    if roles_permitted == ['user']:
+      _confirm_assignee_action(user_email, device)
+    device.mark_lost(user_email=user_email)
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='mark_pending_return',
       path='mark_pending_return',
       http_method='POST',
-      user_auth_only=True)
-  def mark_pending_return(self, request):
+      permission=permissions.Permissions.MARK_PENDING_RETURN,
+      allow_assignee=True)
+  def mark_pending_return(self, request, roles_permitted=None):
     """Mark that a device is pending return."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
-    _confirm_user_action(user_email, device)
+    if roles_permitted == ['user']:
+      _confirm_assignee_action(user_email, device)
     try:
       device.mark_pending_return(user_email=user_email)
     except device_model.UnassignedDeviceError as err:
       raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='resume_loan',
       path='resume_loan',
       http_method='POST',
-      user_auth_only=True)
-  def resume_loan(self, request):
+      permission=permissions.Permissions.RESUME_LOAN,
+      allow_assignee=True)
+  def resume_loan(self, request, roles_permitted=None):
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
-    _confirm_user_action(user_email, device)
+    if roles_permitted == ['user']:
+      _confirm_assignee_action(user_email, device)
     device.resume_loan(user_email=user_email)
     return message_types.VoidMessage()
 
@@ -349,7 +365,6 @@ def _build_device_message(
   Returns:
     A device_message.Device ProtoRPC message.
   """
-
   message = device_message.Device(
       serial_number=device.serial_number,
       asset_tag=device.asset_tag,
@@ -447,7 +462,7 @@ def _get_identifier_from_request(device_request):
     The name of the usable device identifier as a string.
 
   Raises:
-    endpoints.BadRequestError: if there are no identifiers in the DeviceRequest.
+    endpoints.BadRequestException: if there are no identifiers in DeviceRequest.
   """
   for device_identifier in [
       'asset_tag', 'chrome_device_id', 'serial_number', 'urlkey',
@@ -494,7 +509,7 @@ def _get_device(device_request):
   return device
 
 
-def _confirm_user_action(user_email, device):
+def _confirm_assignee_action(user_email, device):
   """Checks that the user is allowed to perform the action.
 
   Args:
@@ -502,12 +517,10 @@ def _confirm_user_action(user_email, device):
     device: device_model.Device, the device used for checking the assigned user.
 
   Raises:
-    endpoints.UnauthorizedException when the assigned user does not match.
+    endpoints.UnauthorizedException: when the assigned user does not match.
   """
-  user = user_model.User.get_user(user_email)
-  if (user.roles == [permissions.USER_ROLE.name] and
-      device.assigned_user != user_email):
-    raise endpoints.UnauthorizedException(_ASSIGNMENT_MISMATCH)
+  if device.assigned_user != user_email:
+    raise endpoints.UnauthorizedException(_ASSIGNMENT_MISMATCH_MSG)
 
 
 def get_loan_data(device):

@@ -258,7 +258,6 @@ loaner_appengine_test(
     ],
     deps = [
         ":user_model",
-        "//loaner/web_app/backend/auth:permissions",
         "//loaner/web_app/backend/testing:loanertest",
     ],
 )

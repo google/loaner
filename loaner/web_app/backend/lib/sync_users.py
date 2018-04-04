@@ -17,7 +17,6 @@
 import logging
 
 from loaner.web_app import constants
-from loaner.web_app.backend.auth import permissions
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.models import user_model
 
@@ -48,25 +47,25 @@ def sync_user_roles():
 
   ndb_technical_admin_users = (
       user_model.User.query(user_model.User.roles.IN(
-          [permissions.TECHNICAL_ADMIN_ROLE.name])).fetch(keys_only=True))
+          ['technical-admin'])).fetch(keys_only=True))
   ndb_operational_admin_users = (
       user_model.User.query(user_model.User.roles.IN(
-          [permissions.OPERATIONAL_ADMIN_ROLE.name])).fetch(keys_only=True))
+          ['operational-admin'])).fetch(keys_only=True))
   ndb_technician_users = (
       user_model.User.query(user_model.User.roles.IN(
-          [permissions.TECHNICIAN_ROLE.name])).fetch(keys_only=True))
+          ['technician'])).fetch(keys_only=True))
   _add_or_remove_user_roles(
       users_keys=ndb_technical_admin_users,
       group_users=technical_admin_users_from_group,
-      role=permissions.TECHNICAL_ADMIN_ROLE.name)
+      role='technical-admin')
   _add_or_remove_user_roles(
       users_keys=ndb_operational_admin_users,
       group_users=operational_admin_users_from_group,
-      role=permissions.OPERATIONAL_ADMIN_ROLE.name)
+      role='operational-admin')
   _add_or_remove_user_roles(
       users_keys=ndb_technician_users,
       group_users=technician_users_from_group,
-      role=permissions.TECHNICIAN_ROLE.name)
+      role='technician')
 
 
 def _get_users_directory(group_email, client):

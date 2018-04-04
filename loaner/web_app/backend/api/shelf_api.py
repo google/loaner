@@ -22,7 +22,8 @@ from google.appengine.api import datastore_errors
 
 import endpoints
 
-from loaner.web_app.backend.api import loaner_endpoints
+from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import shelf_message
 from loaner.web_app.backend.lib import user
@@ -42,13 +43,13 @@ _DEVICE_DOES_NOT_EXIST_MSG = (
 class ShelfApi(root_api.Service):
   """This class is for the Shelf API."""
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.EnrollShelfRequest,
       message_types.VoidMessage,
       name='enroll',
       path='enroll',
       http_method='POST',
-      permission='enroll_shelf')
+      permission=permissions.Permissions.ENROLL_SHELF)
   def enroll(self, request):
     """Enroll request for the Shelf API."""
     user_email = user.get_user_email()
@@ -69,13 +70,13 @@ class ShelfApi(root_api.Service):
 
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.GetShelfRequest,
       shelf_message.Shelf,
       name='get',
       path='get',
       http_method='POST',
-      permission='get_shelf')
+      permission=permissions.Permissions.GET_SHELF)
   def get(self, request):
     """Get a shelf based on location."""
     self.check_xsrf_token(self.request_state)
@@ -95,13 +96,13 @@ class ShelfApi(root_api.Service):
         last_audit_by=shelf_dict.get('last_audit_by'),
         enabled=shelf_dict.get('enabled'))
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.GetShelfRequest,
       message_types.VoidMessage,
       name='disable',
       path='disable',
       http_method='POST',
-      permission='disable_shelf')
+      permission=permissions.Permissions.DISABLE_SHELF)
   def disable(self, request):
     """Disable a shelf by its location."""
     self.check_xsrf_token(self.request_state)
@@ -111,13 +112,13 @@ class ShelfApi(root_api.Service):
 
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.GetShelfRequest,
       message_types.VoidMessage,
       name='enable',
       path='enable',
       http_method='POST',
-      permission='enable_shelf')
+      permission=permissions.Permissions.ENABLE_SHELF)
   def enable(self, request):
     """Enable a shelf based on its location."""
     self.check_xsrf_token(self.request_state)
@@ -127,13 +128,13 @@ class ShelfApi(root_api.Service):
 
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.UpdateShelfRequest,
       message_types.VoidMessage,
       name='update',
       path='update',
       http_method='POST',
-      permission='update_shelf')
+      permission=permissions.Permissions.UPDATE_SHELF)
   def update(self, request):
     """Get a shelf using location to update its properties."""
     self.check_xsrf_token(self.request_state)
@@ -144,13 +145,13 @@ class ShelfApi(root_api.Service):
 
     return message_types.VoidMessage()
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.Shelf,
       shelf_message.ListShelfResponse,
       name='list',
       path='list',
       http_method='POST',
-      permission='list_shelves')
+      permission=permissions.Permissions.LIST_SHELVES)
   def list_shelves(self, request):
     """List enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)
@@ -185,13 +186,13 @@ class ShelfApi(root_api.Service):
           page_token=next_cursor.urlsafe())
     return shelf_message.ListShelfResponse(shelves=shelf_messages)
 
-  @loaner_endpoints.authed_method(
+  @auth.method(
       shelf_message.ShelfAuditRequest,
       message_types.VoidMessage,
       name='audit',
       path='audit',
       http_method='POST',
-      permission='audit_shelf')
+      permission=permissions.Permissions.AUDIT_SHELF)
   def audit(self, request):
     """Performs an audit on a shelf based on location."""
     self.check_xsrf_token(self.request_state)
@@ -235,7 +236,7 @@ def get_shelf(location):
     Shelf object.
 
   Raises:
-    endpoints.BadRequestException when a shelf can not be found.
+    endpoints.NotFoundException when a shelf can not be found.
   """
   shelf = shelf_model.Shelf.get(location=location)
   if not shelf:

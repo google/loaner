@@ -38,7 +38,7 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app:constants",
-        "//loaner/web_app/backend/auth:permissions",
+        "//loaner/web_app/backend/api:auth",
         "//loaner/web_app/backend/lib:action_loader",
         "//loaner/web_app/backend/lib:events",
         "//loaner/web_app/backend/models:user_model",
