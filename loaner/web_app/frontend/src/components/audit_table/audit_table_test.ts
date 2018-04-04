@@ -16,8 +16,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angu
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Observable} from 'rxjs';
-import {of} from 'rxjs/observable/of';
+import {Observable, of} from 'rxjs';
 
 import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';
