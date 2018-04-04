@@ -80,8 +80,6 @@ class Service(remote.Service):
     """
     try:
       return ndb.Key(urlsafe=urlsafe_key)
-    # A urlsafe key decode can fail in a large number of ways, some of which are
-    # uncatchable in production (b/10609982).
     except Exception:  # pylint: disable=broad-except
       raise endpoints.BadRequestException(_CORRUPT_KEY_MSG)
 
