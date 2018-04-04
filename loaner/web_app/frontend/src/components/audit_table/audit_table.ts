@@ -14,9 +14,13 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+
+import {LoaderView} from '../../../../../shared/components/loader';
+
 import {Device} from '../../models/device';
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
+import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 
 /**
@@ -46,7 +50,7 @@ export interface DeviceToBeCheckedIn {
   templateUrl: 'audit_table.html',
 
 })
-export class AuditTable implements OnInit {
+export class AuditTable extends LoaderView implements OnInit {
   /** Status to be checked and displayed on the template */
   status = Status;
   /** List of devices that are in the pool to be checked in. */
@@ -56,13 +60,17 @@ export class AuditTable implements OnInit {
 
   constructor(
       private readonly deviceService: DeviceService,
-      private readonly route: ActivatedRoute, private readonly router: Router,
-      private readonly shelfService: ShelfService) {}
+      private readonly dialog: Dialog, private readonly route: ActivatedRoute,
+      private readonly router: Router,
+      private readonly shelfService: ShelfService) {
+    super(true);
+  }
 
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.shelfService.getShelf(params.id).subscribe(shelf => {
         this.shelf = shelf;
+        this.ready();
       });
     });
   }
@@ -157,7 +165,7 @@ export class AuditTable implements OnInit {
    *  in.
    */
   get isReadyForAudit() {
-    return !this.isEmpty && this.allDevicesReady;
+    return this.isEmpty || this.allDevicesReady;
   }
 
   /** Checks all devices states and makes sure all of the are on Status.READY */
@@ -173,8 +181,25 @@ export class AuditTable implements OnInit {
   audit() {
     const deviceIdList =
         this.devicesToBeCheckedIn.map(device => device.device.serialNumber);
+    this.waiting();
     this.shelfService.audit(this.shelf, deviceIdList).subscribe(() => {
       this.devicesToBeCheckedIn = [];
+      this.ready();
+    });
+  }
+
+  /** Performs an audit as empty on a shelf. */
+  auditAsEmpty() {
+    const dialogTitle = 'Audit shelf as empty';
+    const dialogContent = `Are you sure you want to audit the shelf: ${
+        this.shelf.location} as empty ? `;
+    this.dialog.confirm(dialogTitle, dialogContent).subscribe(result => {
+      if (result) {
+        this.waiting();
+        this.shelfService.audit(this.shelf).subscribe(() => {
+          this.ready();
+        });
+      }
     });
   }
 }

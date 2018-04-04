@@ -16,7 +16,10 @@ import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 
+import {LoaderModule} from '../../../../../shared/components/loader';
+
 import {MaterialModule} from '../../core/material_module';
+import {Dialog, DialogsModule} from '../../services/dialog';
 import {AuditTable} from './audit_table';
 
 export * from './audit_table';
@@ -30,8 +33,13 @@ export * from './audit_table';
   ],
   imports: [
     BrowserModule,
+    DialogsModule,
     FormsModule,
+    LoaderModule,
     MaterialModule,
+  ],
+  providers: [
+    Dialog,
   ],
 })
 export class AuditTableModule {

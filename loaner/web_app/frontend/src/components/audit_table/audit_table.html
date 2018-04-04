@@ -1,3 +1,4 @@
+<loaner-loader loaderType='bar' [loading]="loading"></loaner-loader>
 <mat-card class="loaner-table">
   <mat-card-title class="title">
     <button (click)="back()"
@@ -79,7 +80,7 @@
               color="primary"
               [disabled]="!isReadyForAudit"
               class="audit"
-              (click)="audit()">Audit</button>
+              (click)="isEmpty ? auditAsEmpty() : audit()">{{ isEmpty ? 'Audit Empty' : 'Audit' }}</button>
     </p>
   </mat-card-content>
 </mat-card>

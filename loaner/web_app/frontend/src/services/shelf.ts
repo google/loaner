@@ -85,13 +85,19 @@ export class ShelfService extends ApiService {
    * @param shelf Shelf that will be audited on this call.
    * @param deviceIdList List of device ids that will be added to the shelf.
    */
-  audit(shelf: Shelf, deviceIdList: string[]): Observable<void> {
+  audit(shelf: Shelf, deviceIdList: string[] = []): Observable<void> {
+    let snackBarMessage: string;
     const shelfMessage = shelf.toApiMessage();
     shelfMessage['device_identifiers'] = deviceIdList;
+    if (deviceIdList.length > 0) {
+      snackBarMessage = `Shelf ${shelf.name} audited with devices
+                          ${deviceIdList.toString().replace(/,/g, ', ')}.`;
+    } else {
+      snackBarMessage = `Shelf ${shelf.name} audited as empty.`;
+    }
 
     return this.post<void>('audit', shelfMessage).pipe(tap(() => {
-      this.snackBar.open(`Shelf ${shelf.name} audited with devices
-                          ${deviceIdList.toString().replace(/,/g, ', ')}.`);
+      this.snackBar.open(snackBarMessage);
     }));
   }
 }
