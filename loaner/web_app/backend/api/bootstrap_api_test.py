@@ -42,7 +42,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
   @mock.patch('__main__.bootstrap_api.root_api.Service.check_xsrf_token')
   def test_run(self, mock_xsrf_token, mock_runbootstrap):
     """Test bootstrap init."""
-    request = bootstrap_message.RunRequest()
+    request = bootstrap_message.RunBootstrapRequest()
 
     task1 = bootstrap_message.BootstrapTask(name='task1')
     task1.kwargs = [
@@ -56,9 +56,11 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     ]
     request.requested_tasks = [task1, task2]
 
-    self.service.run(request)
+    response = self.service.run(request)
     mock_runbootstrap.assert_called()
     mock_xsrf_token.assert_called_once()
+    self.assertListEqual(
+        ['task1', 'task2'], [task.name for task in response.tasks])
 
   @mock.patch(
       '__main__.bootstrap_api.bootstrap.constants.BOOTSTRAP_ENABLED', True)

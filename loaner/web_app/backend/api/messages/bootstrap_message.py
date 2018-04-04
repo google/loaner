@@ -48,8 +48,8 @@ class BootstrapTask(messages.Message):
   details = messages.StringField(6)
 
 
-class RunRequest(messages.Message):
-  """Bootstrap request ProtoRPC message.
+class RunBootstrapRequest(messages.Message):
+  """Bootstrap run request ProtoRPC message.
 
   Attributes:
     requested_tasks: BootstrapTask, A list of the requested tasks.
@@ -57,13 +57,13 @@ class RunRequest(messages.Message):
   requested_tasks = messages.MessageField(BootstrapTask, 1, repeated=True)
 
 
-class GetStatusResponse(messages.Message):
+class BootstrapStatusResponse(messages.Message):
   """Bootstrap status response ProtoRPC message.
 
   Attributes:
     enabled: bool, indicates if the bootstrap is enabled.
-    started: bool, indicated if the boostrap has been started.
-    completed: bool, indicated if the boostrap is completed.
+    started: bool, indicated if the bootstrap has been started.
+    completed: bool, indicated if the bootstrap is completed.
     tasks: BootstrapTask, A list of all of the tasks to be displayed.
   """
   enabled = messages.BooleanField(1)

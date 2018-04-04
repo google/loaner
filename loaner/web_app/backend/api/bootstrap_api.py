@@ -27,8 +27,8 @@ class BootstrapApi(root_api.Service):
   """Bootstrap API service class."""
 
   @loaner_endpoints.authed_method(
-      bootstrap_message.RunRequest,
-      message_types.VoidMessage,
+      bootstrap_message.RunBootstrapRequest,
+      bootstrap_message.BootstrapStatusResponse,
       name='run',
       path='run',
       http_method='POST',
@@ -44,11 +44,15 @@ class BootstrapApi(root_api.Service):
 
     bootstrap.run_bootstrap(requested_tasks)
 
-    return message_types.VoidMessage()
+    response_message = bootstrap_message.BootstrapStatusResponse()
+    for name in requested_tasks:
+      response_message.tasks.append(
+          bootstrap_message.BootstrapTask(name=name))
+    return response_message
 
   @loaner_endpoints.authed_method(
       message_types.VoidMessage,
-      bootstrap_message.GetStatusResponse,
+      bootstrap_message.BootstrapStatusResponse,
       name='get_status',
       path='get_status',
       http_method='GET',
@@ -56,7 +60,7 @@ class BootstrapApi(root_api.Service):
   def get_status(self, request):
     """Gets general bootstrap status, and task status if not yet completed."""
     self.check_xsrf_token(self.request_state)
-    response_message = bootstrap_message.GetStatusResponse()
+    response_message = bootstrap_message.BootstrapStatusResponse()
     response_message.enabled = bootstrap.is_bootstrap_enabled()
     response_message.started = bootstrap.is_bootstrap_started()
     response_message.completed = bootstrap.is_bootstrap_completed()
