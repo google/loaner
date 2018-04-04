@@ -15,7 +15,7 @@
 
 import {Component} from '@angular/core';
 
-import {PROGRAM_NAME} from '../../config';
+import {PROGRAM_NAME} from '../../../../../shared/config';
 
 @Component({
   host: {'class': 'mat-typography'},

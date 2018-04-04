@@ -225,9 +225,11 @@ references the `client_secret.json` file.
 Constants are variables you typically define once. For a constant to take
 effect, you must deploy a new version of the app. Constants can’t be configured
 in a running app. Instead, they must be set manually in
-`loaner/web_app/constants.py`.
+`loaner/web_app/constants.py` and `loaner/shared/config.ts`.
 
 Before you deploy GnG, the following constants must be configured:
+
+#### loaner/web_app/constants.py
 
 +   **`APP_DOMAIN`** is the Google domain in which you run G Suite with Chrome
     Enterprise. For example, if you arrange G Suite for the domain
@@ -286,6 +288,33 @@ versions to test deployments before promoting them to the production version.
     **WARNING:** Change this constant to `False` *after* you complete the
     initial bootstrap. Setting this constant to `False` will prevent unexpected
     bootstraps in the future (a bootstrap will cause data loss).
+
+#### shared/config.ts
+
++   **`PROD`** is the Google Cloud Project ID the production version of GnG
+    will run in. You need to replace the string 'prod-app-engine-project' with
+    the ID of your project. This is the same ID than used on ON_PROD line on
+    loaner/web_app/constants.py
+
++   **`WEB_APP_CLIENT_IDS`** is the OAuth2 Client ID you created previously that
+    the Web App frontend will use to authenticate to the production version of
+    GnG. This is the same ID than used on WEB_APP_CLIENT_ID line on
+    loaner/web_app/constants.py
+
+    *   (*optional*) If you are deploying a single instance of the application,
+        use that value for all fields. Otherwise, specify your separate prod, qa
+        and dev Client IDs.
+
++   **`STANDARD_ENDPOINTS`** is the Google Endpoints URL the frontend uses to
+    access your backend API. If necessary, update the `prod`, `qa` and `dev`
+    values.
+
+    *   You can find these URLs in the Google Cloud console by going to
+        App Engine > Versions and changing the service from the menu.
+
+    *   (*optional*) If you are deploying a single instance of the application,
+        use that value for all fields. Otherwise, specify your separate prod, qa
+        and dev endpoint URLs.
 
 ### (Optional) Customize GnG Settings
 

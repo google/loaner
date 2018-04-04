@@ -59,7 +59,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     response = self.service.run(request)
     mock_runbootstrap.assert_called()
     mock_xsrf_token.assert_called_once()
-    self.assertListEqual(
+    self.assertItemsEqual(
         ['task1', 'task2'], [task.name for task in response.tasks])
 
   @mock.patch(

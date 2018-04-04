@@ -239,19 +239,18 @@ App.
 
 With these requirements completed, edit the configuration file:
 
-1.  Open `chrome_app/src/app/config.ts` in an editor.
-1.  Near the bottom, under "`@Injectable()`" is class `APIService`:
-
-    *   In this service, you'll see a `chromeEndpoint` and a `standardEnpoint`
-        variable.
+1.  Open `shared/config.ts` in an editor.
+1.  Edit the endpoints URLs:
+    *   In this file, you'll see `CHROME_ENDPOINTS` and a `STANDARD_ENDPOINTS`
+        variables with `prod`, `qa` and `dev` values.
 
     *   Update these values with the endpoint URLs uploaded when deploying the
         backend. You can find these URLs in the Google Cloud console by going to
         App Engine > Versions and changing the service from the menu.
 
-    *   (*optional*) If you have a prod environment only, use that value for
-        both fields. Otherwise, specify your separate prod and dev endpoint
-        URLs.
+    *   (*optional*) If you are deploying a single instance of the application,
+        use that value for all fields. Otherwise, specify your separate prod, qa
+        and dev endpoint URLs.
 
 1.  Find the variable named `TROUBLESHOOTING_INFORMATION`:
 

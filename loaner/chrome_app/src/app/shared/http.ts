@@ -18,7 +18,7 @@
  */
 
 import {HeaderInit} from 'node-fetch';
-import {LOGGING} from '../config';
+import {LOGGING} from '../../../../shared/config';
 
 let accessToken: string;
 

@@ -70,8 +70,8 @@ export class AuthService {
   private initClient() {
     gapi['client']['init']({
       discoveryDocs: [
-        `${CONFIG.endpointsHostname}/_ah/api/discovery/v1/apis/${
-            CONFIG.apiName}/${CONFIG.apiVersion}/rest`,
+        `${CONFIG.endpointsHostname}/discovery/v1/apis/${CONFIG.apiName}/${
+            CONFIG.apiVersion}/rest`,
       ],
       clientId: CONFIG.gapiClientId,
       scope: CONFIG.scope.join(' ')
@@ -92,7 +92,6 @@ export class AuthService {
                 this.apiLoadedSubject.next(this.loaded);
                 this.apiLoadedSubject.complete();
               });
-
             },
             // tslint:disable-next-line:no-any Promise rejection is type any.
             (error: any) => {

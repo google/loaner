@@ -16,7 +16,7 @@
 
 import {take} from 'rxjs/operators';
 
-import {HEARTBEAT, PROGRAM_NAME} from '../config';
+import {HEARTBEAT, PROGRAM_NAME} from '../../../../shared/config';
 import {Storage} from '../shared/storage/storage';
 
 import * as Heartbeat from './heartbeat';

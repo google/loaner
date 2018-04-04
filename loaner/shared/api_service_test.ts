@@ -12,37 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {APIService} from './config';
+import * as config from './config';
 
 describe('APIService', () => {
-  let api: APIService;
-
-  const chromeEndpoint = {
-    dev: 'https://chrome-loaner-dev/_ah/api',
-    prod: 'https://chrome-loaner-prod/_ah/api',
-  };
-  const standardEndpoint = {
-    dev: 'https://endpoints-loaner-dev/_ah/api',
-    prod: 'https://endpoints-loaner-prod/_ah/api'
-  };
+  let api: config.APIService;
 
   beforeEach(() => {
-    api = new APIService();
-    api.chromeEndpoint = chromeEndpoint;
-    api.standardEndpoint = standardEndpoint;
+    api = new config.APIService();
   });
 
   it('should provide the correct link for chrome endpoint', () => {
-    api.devTrack = true;
-    expect(api.chrome()).toBe(chromeEndpoint.dev);
-    api.devTrack = false;
-    expect(api.chrome()).toBe(chromeEndpoint.prod);
+    expect(api.chrome()).toBe('http://localhost:8082/_ah/api');
   });
 
   it('should provide the correct link for standard endpoint', () => {
-    api.devTrack = true;
-    expect(api.endpoints()).toBe(standardEndpoint.dev);
-    api.devTrack = false;
-    expect(api.endpoints()).toBe(standardEndpoint.prod);
+    expect(api.endpoints()).toBe('http://localhost:8081/_ah/api');
   });
 });

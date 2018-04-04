@@ -19,7 +19,7 @@
 
 import {Observable} from 'rxjs';
 
-import {APIService, HEARTBEAT, LOGGING} from '../config';
+import {APIService, HEARTBEAT, LOGGING} from '../../../../shared/config';
 import * as DeviceIdentifier from '../shared/device_identifier';
 import * as Http from '../shared/http';
 

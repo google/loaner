@@ -15,7 +15,7 @@
 import {Component, Inject, Injectable} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 
-import {DEV_MODE, LOGGING} from '../../config';
+import {CHROME_DEV_MODE, LOGGING} from '../../../../../shared/config';
 import {Background} from '../background_service';
 
 /** Fail information for the user facing dialog */
@@ -89,7 +89,7 @@ application will now quit. If the issue persist contact your Administrator.`;
       this.openDialog(message, FailAction.Ignore);
     }
 
-    if (DEV_MODE && LOGGING) {
+    if (CHROME_DEV_MODE && LOGGING) {
       console.error(rawError);
     }
   }

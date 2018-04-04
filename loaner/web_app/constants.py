@@ -15,7 +15,6 @@
 """App constants to be set before deployment."""
 
 import os
-import jinja2
 
 from google.appengine.api import app_identity
 
@@ -140,10 +139,8 @@ else:
 PROJECT_ROOT = os.path.dirname(__file__)
 FRONTEND_ROOT = os.path.join(PROJECT_ROOT, 'frontend', 'src')
 ANGULAR_TEMPLATE = 'index.html'
+ANGULAR_TEMPLATE_PATH = os.path.join(FRONTEND_ROOT, ANGULAR_TEMPLATE)
 COMPILED_JS_PATH = os.path.join(FRONTEND_ROOT, 'application.js')
-JINJA_ENVIRONMENT = jinja2.Environment(
-    loader=jinja2.FileSystemLoader(os.path.normpath(FRONTEND_ROOT)),
-    extensions=['jinja2.ext.autoescape'])
 
 # The OAuth2 Client ID's that are allowed to access the Endpoints API's
 # configured in the endpoints.py and chrome.py files.

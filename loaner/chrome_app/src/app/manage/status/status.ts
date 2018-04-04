@@ -22,7 +22,7 @@ import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {LoaderView} from '../../../../../shared/components/loader';
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
-import {DEV_MODE, LOGGING} from '../../config';
+import {CHROME_DEV_MODE, LOGGING} from '../../../../../shared/config';
 import {Background} from '../../shared/background_service';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -154,7 +154,7 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.enableGuestMode().subscribe(
         response => {
           this.guestMode.finished();
-          if (DEV_MODE && LOGGING) {
+          if (CHROME_DEV_MODE && LOGGING) {
             console.info(response);
           }
           this.guestEnabled = true;
@@ -212,7 +212,7 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.resumeLoan().subscribe(
         response => {
           this.resumeService.finished();
-          if (DEV_MODE && LOGGING) {
+          if (CHROME_DEV_MODE && LOGGING) {
             console.info(response);
           }
           this.pendingReturn = false;

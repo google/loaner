@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// tslint:disable-next-line:no-any Window Config object defined on index.html
-const windowConfig = (window as any)['CONFIG'] || {};
+import {APIService, PROGRAM_NAME, WEB_APP_CLIENT_ID} from '../../../shared/config';
 
 export interface Roles {
   USER: string;
@@ -50,11 +49,11 @@ export interface Config {
 
 /** Default configuration for the application with dev default values. */
 export const CONFIG: Config = {
-  appName: windowConfig['appName'] || 'Grab n Go',
-  endpointsHostname: windowConfig['endpointsHostname'] || '',
+  appName: PROGRAM_NAME || 'Grab n Go',
+  endpointsHostname: new APIService().endpoints() || '',
   apiName: 'loaner',
   apiVersion: 'v1',
-  gapiClientId: windowConfig['gapiClientId'] || '',
+  gapiClientId: WEB_APP_CLIENT_ID || '',
   scope: ['email'],
   roles: applicationRoles,
 };

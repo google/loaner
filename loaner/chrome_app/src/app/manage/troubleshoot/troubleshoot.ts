@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Component} from '@angular/core';
-import {IT_CONTACT_EMAIL, IT_CONTACT_PHONE, IT_CONTACT_WEBSITE, TROUBLESHOOTING_INFORMATION} from '../../config';
+import {IT_CONTACT_EMAIL, IT_CONTACT_PHONE, IT_CONTACT_WEBSITE, TROUBLESHOOTING_INFORMATION} from '../../../../../shared/config';
 
 @Component({
   host: {

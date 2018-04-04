@@ -23,9 +23,9 @@ import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
-import {APIService, BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED,
-PROGRAM_NAME, TOOLBAR_ICON,
-TOOLBAR_ICON_ENABLED} from '../config';
+import {APIService, BACKGROUND_LOGO,
+BACKGROUND_LOGO_ENABLED, PROGRAM_NAME, TOOLBAR_ICON,
+TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {Background} from '../shared/background_service';
 import {ChromeAppPlatformLocation,} from '../shared/chrome_app_platform_location';
 import {FailAction, FailType, Failure, FailureModule} from '../shared/failure';

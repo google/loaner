@@ -25,8 +25,8 @@ import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} fro
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
 import {APIService, BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED,
-PROGRAM_NAME, DEV_MODE, LOGGING , TOOLBAR_ICON,
-TOOLBAR_ICON_ENABLED} from '../config';
+PROGRAM_NAME, CHROME_DEV_MODE, LOGGING , TOOLBAR_ICON,
+TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {Background} from '../shared/background_service';
 import {ChromeAppPlatformLocation} from '../shared/chrome_app_platform_location';
 import {FailAction, FailType, Failure, FailureModule} from '../shared/failure';
@@ -263,7 +263,7 @@ continue using the app as normal.`;
       this.loan.return().subscribe(
           res => {
             this.returnCompleted = true;
-            if (DEV_MODE && LOGGING) {
+            if (CHROME_DEV_MODE && LOGGING) {
               console.info(res);
             }
           },

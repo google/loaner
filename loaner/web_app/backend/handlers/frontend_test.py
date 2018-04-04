@@ -16,7 +16,6 @@
 
 import mock
 
-from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
 from loaner.web_app.backend.handlers import frontend
 from loaner.web_app.backend.lib import bootstrap  # pylint: disable=unused-import
@@ -51,6 +50,10 @@ class FrontendHandlerTestComplete(handlertest.HandlerTestCase):
     self.assertEqual(response.content_type, 'text/html')
     self.mock_redirect.assert_not_called()
 
+  def test_load_javascript(self):
+    response = self.testapp.get(r'/application.js')
+    self.assertEqual(response.status_int, 200)
+    self.assertEqual(response.content_type, 'application/javascript')
 
 
 class FrontendHandlerTestIncomplete(handlertest.HandlerTestCase):
@@ -138,8 +141,6 @@ class FrontendHandlerTestChangeBootstrapStatus(handlertest.HandlerTestCase):
     self.assertEqual(response2.status_int, 200)
     self.assertEqual(response2.content_type, 'text/html')
     self.mock_redirect.assert_not_called()
-
-
 
 
 if __name__ == '__main__':

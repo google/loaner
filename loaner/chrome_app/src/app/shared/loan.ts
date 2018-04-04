@@ -16,7 +16,7 @@ import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 
-import {APIService} from '../config';
+import {APIService} from '../../../../shared/config';
 
 import * as DeviceIdentifier from './device_identifier';
 

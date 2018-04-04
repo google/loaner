@@ -18,7 +18,6 @@ import logging
 import os
 import re
 
-import mock
 import webapp2
 
 from loaner.web_app import constants
@@ -28,13 +27,11 @@ from loaner.web_app.backend.lib import sync_users
 if os.environ.get('TEST_WORKSPACE') == 'gng':
   # The following mocks are here to stub out the npm compiled frontend since
   # Bazel cannot easily build an npm package during tests.
-  ANGULAR_TEMPLATE = mock.Mock()
-  ANGULAR_TEMPLATE.render.return_value = 'render_during_bazel_tests'
-  COMPILED_JS = 'compiled_js_during_bazel_tests'
+  _ANGULAR_TEMPLATE = 'angular bazel test template'
+  _COMPILED_JS = 'compiled_js_during_bazel_tests'
 else:
-  ANGULAR_TEMPLATE = constants.JINJA_ENVIRONMENT.get_template(
-      constants.ANGULAR_TEMPLATE)
-  COMPILED_JS = open(constants.COMPILED_JS_PATH, 'r').read()
+  _ANGULAR_TEMPLATE = open(constants.ANGULAR_TEMPLATE_PATH, 'r').read()
+  _COMPILED_JS = open(constants.COMPILED_JS_PATH, 'r').read()
 BOOTSTRAP_URL = '/bootstrap'
 
 
@@ -69,16 +66,12 @@ class FrontendHandler(webapp2.RequestHandler):
     """Writes Angular Frontend to the response and sets the right content type.
     """
     self.response.headers['Content-Type'] = 'text/html'
-    self.response.write(
-        ANGULAR_TEMPLATE.render(
-            APP_NAME=constants.APP_NAME,
-            WEB_APP_CLIENT_ID=constants.WEB_APP_CLIENT_ID,
-            ENDPOINTS_HOSTNAME=constants.ENDPOINTS_HOSTNAME))
+    self.response.write(_ANGULAR_TEMPLATE)
 
   def _serve_frontend_javascript(self):
     """Determines if the javascript to be served is the GAE compiled or dev."""
     self.response.headers['Content-Type'] = 'application/javascript'
-    self.response.body_file.write(COMPILED_JS)
+    self.response.body_file.write(_COMPILED_JS)
 
   def _sync_roles_if_necessary(self):
     """Determines if user roles need to be synced before starting bootstrap."""

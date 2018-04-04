@@ -16,7 +16,7 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
-import {PROGRAM_NAME} from '../config';
+import {PROGRAM_NAME} from '../../../../shared/config';
 import {Background, BackgroundMock} from '../shared/background_service';
 
 import {AppModule, AppRoot} from './app';

@@ -28,8 +28,8 @@ export abstract class ApiService {
   /** API Endpoint that will be overwritten by the child classes. */
   abstract apiEndpoint: string;
   /** The location and origin URL that will compose the base url for the API. */
-  private LOCATION = `${CONFIG.endpointsHostname}/_ah/api/${CONFIG.apiName}/${
-      CONFIG.apiVersion}/`;
+  private LOCATION =
+      `${CONFIG.endpointsHostname}/${CONFIG.apiName}/${CONFIG.apiVersion}/`;
 
   constructor(
       protected readonly snackBar: LoanerSnackBar,

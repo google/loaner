@@ -13,7 +13,7 @@
 // limitations under the License.
 
 
-import {DEV_DEVICE_ID, DEV_MODE, TESTING} from '../config';
+import {CHROME_DEV_MODE, DEV_DEVICE_ID, TESTING} from '../../../../shared/config';
 
 /** Get the unique enterprise ID from the chrome device. */
 export function id(): Promise<string|undefined> {
@@ -28,7 +28,7 @@ export function id(): Promise<string|undefined> {
         resolve(undefined);
       }
     } catch (error) {
-      if (DEV_MODE || TESTING) {
+      if (CHROME_DEV_MODE || TESTING) {
         resolve(DEV_DEVICE_ID);
       } else {
         reject(error);
