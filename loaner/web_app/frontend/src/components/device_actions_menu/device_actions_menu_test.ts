@@ -17,7 +17,7 @@ import {ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {of} from 'rxjs/observable/of';
+import {of} from 'rxjs';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
