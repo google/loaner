@@ -47,6 +47,11 @@ describe('DeviceInfoCardComponent', () => {
   const params = new BehaviorSubject<Params>({
     id: TEST_DEVICE_2.serialNumber,
   });
+  // Month array for testing devices.
+  const monthNames = [
+    'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
+    'September', 'October', 'November', 'December'
+  ];
 
   // tslint:disable:no-any Jasmine returns any for the nativeElement
   const getCorrectButton = (compiled: any, buttonText: string) => {
@@ -117,7 +122,13 @@ describe('DeviceInfoCardComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const tabGroupText = compiled.querySelector('.mat-tab-body').textContent;
-    const dateStringToExpect = 'July 4, 2017';
+    const dueDate = {
+      month: TEST_DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getMonth(),
+      day: TEST_DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getDate(),
+      year: TEST_DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getFullYear(),
+    };
+    const dateStringToExpect =
+        `${monthNames[dueDate.month]} ${dueDate.day}, ${dueDate.year}`;
     expect(tabGroupText).toContain(dateStringToExpect);
   });
 
