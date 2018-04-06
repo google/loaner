@@ -16,18 +16,27 @@
 
 import datetime
 import inspect
+import logging
 import pickle
+import string
 
 from protorpc import messages
 
+from google.appengine.api import search
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 
 from loaner.web_app.backend.lib import utils
 
+_PUT_DOC_ERR_MSG = 'Error putting a document (%s) into the index (%s).'
+_REMOVE_DOC_ERR_MSG = 'Error removing document with id: %s'
+
 
 class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
   """Base model class for the loaner project."""
+
+  _INDEX_NAME = None
+  _SEARCH_ASCII = frozenset(set(string.printable) - set(string.whitespace))
 
   def stream_to_bq(self, user, summary, timestamp=None):
     """Creates a task to stream an update to BigQuery.
@@ -59,6 +68,70 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
       The entity as a dictionary with only JSON-friendly values.
     """
     return _sanitize_dict(self.to_dict())
+
+  def maintain_search_index(self):
+    """Maintains the status of an entity in the search index."""
+    raise NotImplementedError
+
+  def is_valid_doc_id(self, doc_id):
+    """Validates the doc id.
+
+    Args:
+      doc_id: str, the document id to validate.
+
+    Returns:
+      True if the id is valid, False if it is not.
+    """
+    for char in doc_id:
+      if char not in self._SEARCH_ASCII:
+        return False
+    return not doc_id.startswith('!') and not doc_id.startswith('__')
+
+  @classmethod
+  def get_index(cls):
+    """Returns the search Index for a given model."""
+    return search.Index(name=cls._INDEX_NAME)
+
+  @classmethod
+  def add_doc_to_index(cls, doc):
+    """Adds a doc to a particular index.
+
+    Args:
+      doc: search.Document, the document to add to the class' index.
+    """
+    index = cls.get_index()
+    try:
+      index.put(doc)
+    except search.PutError as err:
+      result = err.results[0]
+      if result.code == search.OperationResult.TRANSIENT_ERROR:
+        index.put(doc)
+    except search.Error as err:
+      logging.error(_PUT_DOC_ERR_MSG, doc, index)
+
+  @classmethod
+  def get_doc_by_id(cls, doc_id):
+    """Retrieves a document within an index by id.
+
+    Args:
+      doc_id: str, the document id to retrieve.
+
+    Returns:
+      The document associated with the provided id.
+    """
+    return cls.get_index().get(doc_id=doc_id)
+
+  @classmethod
+  def remove_doc_by_id(cls, doc_id):
+    """Removes a particular doc from the relevant index given it's id.
+
+    Args:
+      doc_id: str, the document id to be removed.
+    """
+    try:
+      cls.get_index().delete(doc_id)
+    except search.DeleteError:
+      logging.error(_REMOVE_DOC_ERR_MSG, doc_id)
 
 
 def _sanitize_dict(entity_dict):

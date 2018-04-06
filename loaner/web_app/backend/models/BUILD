@@ -144,6 +144,7 @@ loaner_appengine_test(
         ":base_model",
         ":shelf_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )
