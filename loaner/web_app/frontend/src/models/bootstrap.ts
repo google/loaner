@@ -16,6 +16,7 @@
 export declare interface Status {
   enabled: boolean;
   completed: boolean;
+  started: boolean;
   tasks: Task[];
 }
 

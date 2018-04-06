@@ -50,16 +50,15 @@ describe('BootstrapComponent', () => {
     expect(bootstrap).toBeDefined();
   });
 
-  it('should render each task on the page', () => {
+  it('should show each task after the bootstrap button is clicked', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
+    spyOn(bootstrapService, 'run').and.returnValue(of({
       tasks: [
         {name: 'task1'},
         {name: 'task2'},
         {name: 'task3'},
       ]
     }));
-    bootstrapService.run();
     bootstrap.bootstrapApplication();
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -75,11 +74,12 @@ describe('BootstrapComponent', () => {
         {name: 'task1', success: true, timestamp: (new Date().valueOf())}
       ]
     }));
-    bootstrapService.run();
-    bootstrap.bootstrapApplication();
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.textContent).toContain('check');
+    fakeAsync(() => {
+      bootstrap.bootstrapApplication();
+      fixture.detectChanges();
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.textContent).toContain('check');
+    });
   });
 
   it('should mark failed task with an error icon', () => {
@@ -89,21 +89,22 @@ describe('BootstrapComponent', () => {
         {name: 'task1', success: false, timestamp: (new Date().valueOf())},
       ]
     }));
-    bootstrapService.run();
-    bootstrap.bootstrapApplication();
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.textContent).toContain('error');
+    fakeAsync(() => {
+      bootstrap.bootstrapApplication();
+      fixture.detectChanges();
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.textContent).toContain('error');
+    });
   });
 
   it('should call bootstrap run service once bootstrapApplication is called.',
      () => {
        const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
        spyOn(bootstrapService, 'run');
-
-       bootstrap.bootstrapApplication();
-
-       expect(bootstrapService.run).toHaveBeenCalled();
+       fakeAsync(() => {
+         bootstrap.bootstrapApplication();
+         expect(bootstrapService.run).toHaveBeenCalled();
+       });
      });
 
   it('should provide details about failed tasks', () => {
@@ -119,11 +120,12 @@ describe('BootstrapComponent', () => {
         },
       ]
     }));
-    bootstrapService.run();
-    bootstrap.bootstrapApplication();
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.textContent).toContain(failureDetails);
+    fakeAsync(() => {
+      bootstrap.bootstrapApplication();
+      fixture.detectChanges();
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.textContent).toContain(failureDetails);
+    });
   });
 
   it('should show the task description when possible', () => {
@@ -134,10 +136,11 @@ describe('BootstrapComponent', () => {
         {name: 'task1', description: taskDescription},
       ]
     }));
-    bootstrapService.run();
-    bootstrap.bootstrapApplication();
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.textContent).toContain(taskDescription);
+    fakeAsync(() => {
+      bootstrap.bootstrapApplication();
+      fixture.detectChanges();
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.textContent).toContain(taskDescription);
+    });
   });
 });

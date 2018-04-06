@@ -38,6 +38,8 @@ export class Bootstrap implements OnInit, OnDestroy {
   inProgress = false;
   /** This will be populated with the bootstrap status from the backend. */
   bootstrapStatus: bootstrap.Status;
+  /** This gets flipped on ngInit depending on whether bootstrap is enabled. */
+  bootstrapEnabled: boolean;
 
   constructor(
       private readonly bootstrapService: BootstrapService,
@@ -45,8 +47,9 @@ export class Bootstrap implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.inProgress = true;
-    this.bootstrapService.getStatus().subscribe(status => {
-      this.bootstrapStatus = status;
+    this.bootstrapService.getStatus().subscribe((status: bootstrap.Status) => {
+      this.bootstrapEnabled = status.enabled;
+      this.bootstrapStarted = status.started;
       this.inProgress = false;
     });
   }
@@ -56,7 +59,9 @@ export class Bootstrap implements OnInit, OnDestroy {
     this.inProgress = true;
     const tasksToRun = this.bootstrapStatus &&
         this.bootstrapStatus.tasks.filter(task => !task.success);
-    this.bootstrapService.run(tasksToRun);
+    this.bootstrapService.run(tasksToRun).subscribe(status => {
+      this.bootstrapStatus = status;
+    });
 
     const repeater = interval(5000)
                          .pipe(
@@ -67,7 +72,8 @@ export class Bootstrap implements OnInit, OnDestroy {
                            this.bootstrapStatus = status;
 
                            if (this.bootstrapStatus.completed ||
-                               this.bootstrapTasksFinished) {
+                               this.bootstrapTasksFinished ||
+                               this.failedTasks) {
                              this.inProgress = false;
                              repeater.unsubscribe();
                            }
@@ -83,7 +89,7 @@ export class Bootstrap implements OnInit, OnDestroy {
   }
 
   get isEnabled(): boolean {
-    return this.bootstrapStatus && this.bootstrapStatus.enabled;
+    return this.bootstrapEnabled;
   }
 
   get bootstrapTasksFinished(): boolean {

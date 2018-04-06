@@ -26,10 +26,10 @@ export class BootstrapService extends ApiService {
   /** Implements ApiService's apiEndpoint requirement. */
   apiEndpoint = 'bootstrap';
 
-  run(tasks?: bootstrap.Task[]) {
-    this.post('run', tasks).subscribe(() => {
+  run(tasks?: bootstrap.Task[]): Observable<bootstrap.Status> {
+    return this.post('run', tasks).pipe(tap(() => {
       this.snackBar.open(`Setup requested.`);
-    });
+    })) as Observable<bootstrap.Status>;
   }
 
   /**

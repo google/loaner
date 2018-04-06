@@ -15,6 +15,7 @@
 import {BehaviorSubject, Observable, of} from 'rxjs';
 
 import {CONFIG} from '../app.config';
+import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
 import {Device} from '../models/device';
 import {Shelf} from '../models/shelf';
@@ -96,9 +97,9 @@ export class ShelfServiceMock {
 
 export class BootstrapServiceMock {
   run() {
-    return new Observable(observer => {
-      observer.next(undefined);
-    });
+    return of(
+        {'started': true, 'enabled': true, 'completed': false, 'tasks': []} as
+        bootstrap.Status);
   }
   getStatus() {
     return new Observable(observer => {

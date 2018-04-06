@@ -13,9 +13,6 @@
         <mat-expansion-panel *ngFor="let task of bootstrapStatus.tasks"
                              [hideToggle]="!(task.timestamp && task.details)">
           <mat-expansion-panel-header>
-            <mat-panel-title>
-              {{task.name || task.description}}
-            </mat-panel-title>
             <mat-panel-description>
               {{task.description || task.name}}
               <mat-icon *ngIf="bootstrapStarted && !task.success && !task.timestamp">
