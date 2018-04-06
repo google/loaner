@@ -39,14 +39,19 @@ class BootstrapTest(loanertest.TestCase):
     mock_defer.return_value = 'fake-task'
     self.assertFalse(config_model.Config.get(
         'bootstrap_started'))
-    bootstrap.run_bootstrap({
+    run_status_dict = bootstrap.run_bootstrap({
         'bootstrap_bq_history': {},
-        'bootstrap_chrome_ous': {},
         'bootstrap_datastore_yaml': {
             'yaml_input': 'fake-yaml'
         }
     })
-    self.assertEqual(len(mock_defer.mock_calls), 3)
+    self.assertDictEqual(
+        run_status_dict,
+        {'bootstrap_bq_history':
+             bootstrap._TASK_DESCRIPTIONS['bootstrap_bq_history'],
+         'bootstrap_datastore_yaml':
+             bootstrap._TASK_DESCRIPTIONS['bootstrap_datastore_yaml']})
+    self.assertEqual(len(mock_defer.mock_calls), 2)
     self.assertTrue(config_model.Config.get(
         'bootstrap_started'))
 
@@ -57,7 +62,8 @@ class BootstrapTest(loanertest.TestCase):
     mock_defer.return_value = 'fake-task'
     self.assertFalse(config_model.Config.get(
         'bootstrap_started'))
-    bootstrap.run_bootstrap()
+    run_status_dict = bootstrap.run_bootstrap()
+    self.assertDictEqual(run_status_dict, bootstrap._TASK_DESCRIPTIONS)
     self.assertEqual(len(mock_defer.mock_calls), 3)
     self.assertTrue(config_model.Config.get(
         'bootstrap_started'))
@@ -77,8 +83,9 @@ class BootstrapTest(loanertest.TestCase):
     bootstrap.bootstrap_datastore_yaml(user_email='foo')
     expected_model = bootstrap_status_model.BootstrapStatus.get_by_id(
         'bootstrap_datastore_yaml')
-    self.assertTrue(bootstrap.bootstrap_datastore_yaml.__doc__.startswith(
-        expected_model.description))
+    self.assertEqual(
+        expected_model.description,
+        bootstrap._TASK_DESCRIPTIONS['bootstrap_datastore_yaml'])
     self.assertTrue(expected_model.success)
     self.assertTrue(expected_model.timestamp < datetime.datetime.utcnow())
 

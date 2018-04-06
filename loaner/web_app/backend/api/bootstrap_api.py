@@ -43,12 +43,12 @@ class BootstrapApi(root_api.Service):
       for kwarg in task.kwargs:
         requested_tasks[task.name][kwarg.name] = kwarg.value
 
-    bootstrap.run_bootstrap(requested_tasks)
+    run_status_dict = bootstrap.run_bootstrap(requested_tasks)
 
     response_message = bootstrap_message.BootstrapStatusResponse()
-    for name in requested_tasks:
+    for name, description in run_status_dict.iteritems():
       response_message.tasks.append(
-          bootstrap_message.BootstrapTask(name=name))
+          bootstrap_message.BootstrapTask(name=name, description=description))
     return response_message
 
   @auth.method(

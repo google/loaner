@@ -19,7 +19,6 @@ import functools
 import inspect
 import logging
 import os
-import re
 import sys
 
 from google.appengine.ext import deferred
@@ -33,6 +32,11 @@ from loaner.web_app.backend.models import bootstrap_status_model
 from loaner.web_app.backend.models import config_model
 
 _ORG_UNIT_EXISTS_MSG = 'Org unit %s already exists, so cannot create.'
+_TASK_DESCRIPTIONS = {
+    'bootstrap_datastore_yaml': 'Importing datastore YAML file',
+    'bootstrap_chrome_ous': 'Creating Chrome OUs in Directory',
+    'bootstrap_bq_history': 'Configuring datastore history tables in BigQuery'
+}
 
 
 class Error(Exception):
@@ -63,11 +67,8 @@ def managed_task(task_function):
   def wrapper(*args, **kwargs):
     status_entity = bootstrap_status_model.BootstrapStatus.get_or_insert(
         task_function.__name__)
-    docstring_first_line = re.search('^.*', task_function.__doc__)
-    if docstring_first_line:
-      status_entity.description = docstring_first_line.group(0)
-    else:
-      status_entity.description = task_function.__name__
+    status_entity.description = _TASK_DESCRIPTIONS.get(
+        task_function.__name__, task_function.__name__)
     status_entity.timestamp = datetime.datetime.utcnow()
     try:
       task_function(*args, **kwargs)
@@ -169,13 +170,17 @@ def _run_function_as_task(all_functions_list, function_name, kwargs=None):
   return deferred.defer(function, **kwargs)
 
 
-def run_bootstrap(requested_functions=None):
+def run_bootstrap(requested_tasks=None):
   """Run one or more bootstrap functions.
 
   Args:
-    requested_functions: dict, wherein the keys are function names and the
+    requested_tasks: dict, wherein the keys are function names and the
         values are keyword arg dicts. If no functions are passed, runs all
         bootstrap functions with no specific kwargs.
+
+  Returns:
+    A dictionary of started tasks, with the task names as keys and the values
+    being task descriptions as found in _TASK_DESCRIPTIONS.
 
   Raises:
     BootstrapError: If bootstrap is not enabled for this app.
@@ -189,14 +194,20 @@ def run_bootstrap(requested_functions=None):
 
   all_bootstrap = get_all_bootstrap_functions()
 
-  if not requested_functions:
+  run_status_dict = {}
+  if requested_tasks:
+    for function_name, kwargs in requested_tasks.iteritems():
+      _run_function_as_task(all_bootstrap, function_name, kwargs)
+      run_status_dict[function_name] = _TASK_DESCRIPTIONS.get(
+          function_name, function_name)
+  else:
     logging.debug('Running all functions as no specific function was passed.')
     for function_name in all_bootstrap:
       _run_function_as_task(all_bootstrap, function_name)
-    return
+      run_status_dict[function_name] = _TASK_DESCRIPTIONS.get(
+          function_name, function_name)
 
-  for function_name, kwargs in requested_functions.iteritems():
-    _run_function_as_task(all_bootstrap, function_name, kwargs)
+  return run_status_dict
 
 
 def is_bootstrap_completed():
@@ -235,7 +246,8 @@ def is_bootstrap_enabled():
 def get_bootstrap_task_status():
   """Gets the status of all bootstrap tasks.
 
-  Additionally this sets overall completion status if all tasks were successful.
+  Additionally this sets the overall completion status if all tasks were
+  successful.
 
   Returns:
     Dictionary with task names as the keys and values being sub-dictionaries
