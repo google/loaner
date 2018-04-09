@@ -22,10 +22,10 @@ Additionally, use the web app to reach the same self-management interface.
 ## Audit a Shelf
 
 1.  Go to the **Shelves** page.
-2.  Find the shelf to audit.
-3.  Click **Audit Shelf**.
-4.  Enter the device serial number next to **Serial number**.
-5.  Click **Add device** to check the device into the shelf.
+1.  Find the shelf to audit.
+1.  Click **Audit Shelf**.
+1.  Enter the device serial number next to **Serial number**.
+1.  Click **Add device** to check the device into the shelf.
 
 ## Add a Shelf
 
