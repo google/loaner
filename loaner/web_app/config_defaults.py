@@ -16,12 +16,6 @@
 
 
 DEFAULTS = {
-    # bootstrap_[started|completed]: bool, Both False by default, changed to
-    # True in datastore once the bootstrap process is started or completed
-    # respectively.
-    'bootstrap_started': False,
-    'bootstrap_completed': False,
-
     # allow_guest_mode: bool, Whether an organization allows loaners to enable
     # guest mode.
     'allow_guest_mode': True,
@@ -108,4 +102,19 @@ DEFAULTS = {
     # return_grace_period: int, The grace period between marking a device as
     # pending return and the next heartbeat in minutes.
     'return_grace_period': 15,
+
+    # ==============DO NOT EDIT PAST THIS LINE==================
+    # All below configurations are used by the app to keep track of state.
+    # Adjusting these manually might break things.
+
+    # bootstrap_[started|completed]: bool, Both False by default, changed to
+    # True in datastore once the bootstrap process is started or completed
+    # respectively.
+    'bootstrap_started': False,
+    'bootstrap_completed': False,
+
+    # datastore_version: int, the "version" of the database models. Any breaking
+    # model change will increment this number. Used to track migrations between
+    # versions.
+    'datastore_version': 1,
 }
