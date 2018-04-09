@@ -15,8 +15,7 @@ def loaner_appengine_library(name, srcs=None, deps=[], data=[], testonly=0):
       name=name, srcs=srcs, deps=deps, data=data, testonly=testonly
   )
 
-def loaner_appengine_test(
-    name, srcs, deps=[], data=[], size="medium"):
+def loaner_appengine_test(name, srcs, deps=[], data=[], size="medium"):
   """Custom App Engine test for the Grab n Go Loaner Application."""
   py_appengine_test(
       name=name, srcs=srcs, deps=deps, data=data, size=size,

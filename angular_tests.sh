@@ -5,5 +5,6 @@
 
 set -ex
 
+cd loaner
 npm install
 npm run test:once
