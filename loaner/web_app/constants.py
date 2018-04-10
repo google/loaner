@@ -196,3 +196,7 @@ BIGQUERY_SURVEY_TABLE = 'Question'
 DEFAULT_ACTING_USER = 'Loaner Role'
 
 TEMPLATE_LOADER = template_model.TemplateLoader()
+
+# Search constants.
+DEVICE_INDEX_NAME = 'device_index'
+SHELF_INDEX_NAME = 'shelf_index'

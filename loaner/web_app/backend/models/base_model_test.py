@@ -14,6 +14,8 @@
 
 """Tests for backend.models.base_model."""
 
+import datetime
+
 from absl.testing import parameterized
 import mock
 
@@ -23,6 +25,11 @@ from google.appengine.ext import ndb
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
+
+
+class Test(base_model.BaseModel):
+  """A test class used for this testing module."""
+  text_field = ndb.StringProperty()
 
 
 class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
@@ -151,6 +158,82 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     base_model.BaseModel.remove_doc_by_id('test_id')
     mock_logging.error.assert_called_once_with(
         base_model._REMOVE_DOC_ERR_MSG, 'test_id')
+
+  def test_to_seach_fields(self):
+    # Test list field generation.
+    search_fields = base_model.BaseModel._to_search_fields(
+        'list_field', ['item_1', 'item_2'])
+    expected_fields = [
+        search.TextField(name='list_field', value='item_1'),
+        search.TextField(name='list_field', value='item_2')]
+    self.assertEqual(expected_fields, search_fields)
+
+    # Test ndb.Key field generation.
+    test_key = ndb.Key('Test', 1)
+    search_field = base_model.BaseModel._to_search_fields(
+        'key_field', test_key)
+    expected_field = [search.AtomField(
+        name='key_field', value=test_key.urlsafe())]
+    self.assertEqual(expected_field, search_field)
+
+    # Test datetime field generation.
+    search_field = base_model.BaseModel._to_search_fields(
+        'datetime_field', datetime.datetime(year=2017, month=1, day=5))
+    expected_field = [search.DateField(
+        name='datetime_field',
+        value=datetime.datetime(year=2017, month=1, day=5))]
+    self.assertEqual(expected_field, search_field)
+
+    # Test boolean field generation.
+    search_field = base_model.BaseModel._to_search_fields('bool_field', True)
+    expected_field = [search.AtomField(
+        name='bool_field', value='True')]
+    self.assertEqual(expected_field, search_field)
+
+    # Test geopt field generation.
+    search_field = base_model.BaseModel._to_search_fields(
+        'geopt_field', ndb.GeoPt('52.37, 4.88'))
+    expected_field = [search.GeoField(
+        name='geopt_field', value=search.GeoPoint(52.37, 4.88))]
+    self.assertEqual(expected_field, search_field)
+
+  @mock.patch.object(
+      base_model.BaseModel, '_to_search_fields', auto_spec=True)
+  def test_get_document_fields(self, mock_to_search_fields):
+    test_model = Test(text_field='item_1')
+    expected_result = [search.TextField(name='text_field', value='item_1')]
+    mock_to_search_fields.side_effect = [expected_result]
+    document_fields = test_model._get_document_fields()
+    self.assertCountEqual(expected_result, document_fields)
+
+  @mock.patch.object(
+      base_model.BaseModel, '_get_document_fields', auto_spec=True)
+  @mock.patch.object(
+      base_model.BaseModel, 'is_valid_doc_id', return_value=True,
+      auto_spec=True)
+  def test_to_document(self, mock_is_valid_doc_id, mock_get_document_fields):
+    test_model = Test(id='fake')
+    fields = [search.AtomField(name='text_field', value='12345ABC')]
+    mock_get_document_fields.return_value = fields
+    test_document = search.Document(doc_id=test_model.key.id(), fields=fields)
+    result = test_model.to_document()
+    self.assertEqual(result, test_document)
+
+  @mock.patch.object(
+      base_model.BaseModel, 'is_valid_doc_id', return_value=False,
+      auto_spec=True)
+  def test_to_document_doc_id_none(self, mock_is_valid_doc_id):
+    test_model = Test(id='fake')
+    result = test_model.to_document()
+    self.assertIsNone(result.doc_id)
+
+  @mock.patch.object(
+      base_model.BaseModel, '_get_document_fields', return_value=False,
+      auto_spec=True)
+  def test_to_document_error(self, mock_get_document_fields):
+    test_model = Test(id='fake')
+    with self.assertRaises(base_model.DocumentCreationError):
+      test_model.to_document()
 
 
 if __name__ == '__main__':
