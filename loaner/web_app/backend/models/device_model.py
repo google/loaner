@@ -96,7 +96,7 @@ class UnassignedDeviceError(Error):
   """Raised when a device is not assigned during an assignment error."""
 
 
-ReturnDates = collections.namedtuple('ReturnDates', ['min', 'max', 'default'])
+ReturnDates = collections.namedtuple('ReturnDates', ['max', 'default'])
 
 
 class Reminder(base_model.BaseModel):
@@ -421,7 +421,7 @@ class Device(base_model.BaseModel):
         keys_only=keys_only, page_size=page_size, start_cursor=next_cursor)
 
   def calculate_return_dates(self):
-    """Calculates minimum, maximum, and default return dates for a loan.
+    """Calculates maximum and default return dates for a loan.
 
     Returns:
       A ReturnDates NamedTuple of datetimes.
@@ -434,17 +434,13 @@ class Device(base_model.BaseModel):
       raise ReturnDatesCalculationError(_NOT_ASSIGNED_MSG)
     loan_duration = config_model.Config.get(
         'loan_duration')
-    min_loan_duration = config_model.Config.get(
-        'minimum_loan_duration')
     max_loan_duration = config_model.Config.get(
         'maximum_loan_duration')
-    min_loan_date = self.assignment_date + datetime.timedelta(
-        days=min_loan_duration)
     default_date = self.assignment_date + datetime.timedelta(days=loan_duration)
     max_loan_date = self.assignment_date + datetime.timedelta(
         days=max_loan_duration)
 
-    return ReturnDates(min_loan_date, max_loan_date, default_date)
+    return ReturnDates(max_loan_date, default_date)
 
   def lock(self, user_email):
     """Disables a device via the Directory API.
@@ -557,8 +553,7 @@ class Device(base_model.BaseModel):
     if extend_date < datetime.date.today():
       raise ExtendError('Extension date cannot be in the past.')
     return_dates = self.calculate_return_dates()
-    if (return_dates.min.date() <= extend_date) and (
-        extend_date <= return_dates.max.date()):
+    if extend_date <= return_dates.max.date():
       self.due_date = datetime.datetime.combine(
           extend_date, return_dates.default.time())
     else:

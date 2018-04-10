@@ -326,8 +326,6 @@ settings without deploying a new version of GnG:
 
 +   **allow_guest_mode**: Allow users to use guest mode on loaner devices.
 +   **loan_duration**: The number of days to assign a device.
-+   **minimum_loan_duration**: The minimum number of days a loaner can be
-    loaned.
 +   **maximum_loan_duration**: The maximum number of days a loaner can be
     loaned.
 +   **loan_duration_email**: Send a duration email to the user.

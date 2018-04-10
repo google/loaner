@@ -369,13 +369,11 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.test_device.assigned_user = loanertest.USER_EMAIL
     self.test_device.assignment_date = now
     config_model.Config.set('loan_duration', 3)
-    config_model.Config.set('minimum_loan_duration', 1)
     config_model.Config.set('maximum_loan_duration', 14)
 
     dates = self.test_device.calculate_return_dates()
 
     self.assertIsInstance(dates, device_model.ReturnDates)
-    self.assertEqual(dates.min, now + datetime.timedelta(days=1))
     self.assertEqual(dates.default, now + datetime.timedelta(days=3))
     self.assertEqual(dates.max, now + datetime.timedelta(days=14))
 
@@ -468,7 +466,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     config_model.Config.set('loan_duration', 3)
-    config_model.Config.set('minimum_loan_duration', 1)
     config_model.Config.set('maximum_loan_duration', 14)
     requested_extension = datetime.datetime(year=2017, month=1, day=5)
 
@@ -490,7 +487,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     config_model.Config.set('loan_duration', 3)
-    config_model.Config.set('minimum_loan_duration', 1)
     config_model.Config.set('maximum_loan_duration', 14)
     requested_extension = datetime.datetime(year=2016, month=1, day=1)
 
@@ -504,7 +500,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     config_model.Config.set('loan_duration', 3)
-    config_model.Config.set('minimum_loan_duration', 1)
     config_model.Config.set('maximum_loan_duration', 14)
     requested_extension = datetime.datetime(year=2017, month=3, day=1)
 

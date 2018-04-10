@@ -23,9 +23,6 @@ DEFAULTS = {
     # loan_duration: int, Number of days to assign a loan by default.
     'loan_duration': 3,
 
-    # minimum_loan_duration: int, Minimum days for which a loaner can be loaned.
-    'minimum_loan_duration': 1,
-
     # maximum_loan_duration: int, Maximum days for which a loaner can be loaned.
     'maximum_loan_duration': 14,
 

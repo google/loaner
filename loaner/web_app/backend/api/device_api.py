@@ -540,7 +540,8 @@ def get_loan_data(device):
   guest_permitted = None
   if device.is_assigned:
     guest_enabled = device.guest_enabled
-    _, max_extend_date_time, _ = device.calculate_return_dates()
+    max_extend_date_time, default_date = device.calculate_return_dates()
+    del default_date  # Unused.
     max_extend_date = datetime.datetime.combine(
         max_extend_date_time.date(), datetime.datetime.min.time())
     due_date = datetime.datetime.combine(
