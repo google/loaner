@@ -46,6 +46,7 @@ describe('StatusComponent', () => {
   let app: StatusComponent;
   let fixture: ComponentFixture<StatusComponent>;
   let loan: Loan;
+  let statusService: StatusService;
 
   // Mock response of loan info
   const testLoanInfo: LoanResponse = {
@@ -103,6 +104,7 @@ describe('StatusComponent', () => {
 
   beforeEach(() => {
     loan = TestBed.get(Loan);
+    statusService = TestBed.get(StatusService);
     fixture = TestBed.createComponent(StatusComponent);
     app = fixture.debugElement.componentInstance;
     app.ready();
@@ -143,5 +145,16 @@ describe('StatusComponent', () => {
     app.dueDate = new Date(2017, 3, 3, 0, 0, 0, 0);
     app.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
     expect(app.canExtend()).toBeFalsy();
+  });
+
+  it('sets the given name to John', () => {
+    let retrievedName: string;
+    statusService.setGivenNameInChromeStorage(testLoanInfo.given_name);
+    statusService.getGivenNameFromChromeStorage().subscribe(
+        val => retrievedName = val);
+    fixture.detectChanges();
+    // tslint:disable-next-line:no-unnecessary-type-assertion Value is defined
+    // above.
+    expect(retrievedName!).toEqual(testLoanInfo.given_name);
   });
 });

@@ -121,16 +121,16 @@ export class StatusComponent extends LoaderView implements OnInit {
 
   /** Gets the given name of a user and calls for setting initial loan info. */
   getGivenName() {
-    this.status.getGivenNameFromChromeStorage()
-        .then(name => {
+    this.status.getGivenNameFromChromeStorage().subscribe(
+        name => {
           if (name) {
             this.userDisplayName = name;
             this.setLoanInfo(false);
           } else {
             this.setLoanInfo(true);
           }
-        })
-        .catch(error => {
+        },
+        error => {
           // Error only occurs when givenName can't be found in local storage.
           this.setLoanInfo(true);
         });

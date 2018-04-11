@@ -15,6 +15,7 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 import {APIService} from '../../../../shared/config';
 
@@ -24,56 +25,35 @@ import * as DeviceIdentifier from './device_identifier';
 export class Loan {
   constructor(private api: APIService, private http: HttpClient) {}
 
+  chromeUrl = `${this.api.chrome()}/loaner/v1/chrome`;
+  endpointsDeviceUrl = `${this.api.endpoints()}/loaner/v1/device`;
+
   /**
    * Request to extend the loan return date.
    * @param newDate Date in Python DateTime formatting, sent as a string.
    */
   extend(newDate: string): Observable<boolean> {
-    return new Observable((observer) => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.endpoints();
-        const extendUrl = `${API}/loaner/v1/device/extend_loan`;
-        const request: ExtendRequest = {
-          device: {chrome_device_id: deviceId},
-          extend_date: newDate,
-        };
-
-        this.http.post(extendUrl, request)
-            .subscribe(
-                () => {
-                  observer.next(true);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: ExtendRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        device: {chrome_device_id: deviceId},
+        extend_date: newDate,
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/extend_loan`;
+      return this.http.post<boolean>(apiUrl, request);
+    }));
   }
 
-  /**
-   * Mark device as returned on the backend.
-   */
+  /** Mark device as returned on the backend. */
   return(): Observable<boolean> {
-    return new Observable((observer) => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.endpoints();
-        const returnUrl = `${API}/loaner/v1/device/mark_pending_return`;
-        const request: ReturnRequest = {
-          chrome_device_id: deviceId,
-        };
-
-        this.http.post(returnUrl, request)
-            .subscribe(
-                () => {
-                  observer.next(true);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: ReturnRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        chrome_device_id: deviceId,
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/mark_pending_return`;
+      return this.http.post<boolean>(apiUrl, request);
+    }));
   }
 
   /**
@@ -81,26 +61,15 @@ export class Loan {
    * @param damagedReason Optional reason for what's damaged on the device.
    */
   damaged(damagedReason?: string): Observable<boolean> {
-    return new Observable((observer) => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.endpoints();
-        const damagedUrl = `${API}/loaner/v1/device/mark_damaged`;
-        const request: DamagedReasonRequest = {
-          damaged_reason: damagedReason,
-          device: {chrome_device_id: deviceId},
-        };
-
-        this.http.post(damagedUrl, request)
-            .subscribe(
-                () => {
-                  observer.next(true);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: DamagedReasonRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        damaged_reason: damagedReason,
+        device: {chrome_device_id: deviceId},
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/mark_damaged`;
+      return this.http.post<boolean>(apiUrl, request);
+    }));
   }
 
   /**
@@ -108,101 +77,52 @@ export class Loan {
    * @param givenName Represents if it should retrieve the given name.
    */
   getLoan(givenName?: boolean): Observable<LoanResponse> {
-    return new Observable((observer) => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.chrome();
-        const loanUrl = `${API}/loaner/v1/chrome/loan`;
-
-        const request: LoanRequest = {
-          device_id: deviceId,
-          need_name: givenName,
-        };
-
-        this.http.post<LoanResponse>(loanUrl, request)
-            .subscribe(
-                (response) => {
-                  observer.next(response);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: LoanRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        device_id: deviceId,
+        need_name: givenName,
+      };
+      const apiUrl = `${this.chromeUrl}/loan`;
+      return this.http.post<LoanResponse>(apiUrl, request);
+    }));
   }
 
-  /**
-   * Enable guest mode for the loan.
-   */
+  /** Enable guest mode for the loan. */
   enableGuestMode(): Observable<boolean> {
-    return new Observable((observer) => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.endpoints();
-        const guestUrl = `${API}/loaner/v1/device/enable_guest_mode`;
-        const request: GuestModeRequest = {
-          chrome_device_id: deviceId,
-        };
-
-        this.http.post(guestUrl, request)
-            .subscribe(
-                () => {
-                  observer.next(true);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: GuestModeRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        chrome_device_id: deviceId,
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/enable_guest_mode`;
+      return this.http.post<boolean>(apiUrl, request);
+    }));
   }
 
-  /**
-   * Resumes the loan and removes the pending return status.
-   */
+  /** Resumes the loan and removes the pending return status. */
   resumeLoan(): Observable<boolean> {
-    return new Observable(observer => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.endpoints();
-        const resumeLoanUrl = `${API}/loaner/v1/device/resume_loan`;
-        const request: ResumeLoanRequest = {
-          chrome_device_id: deviceId,
-        };
-
-        this.http.post(resumeLoanUrl, request)
-            .subscribe(
-                () => {
-                  observer.next(true);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: ResumeLoanRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        chrome_device_id: deviceId,
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/resume_loan`;
+      return this.http.post<boolean>(apiUrl, request);
+    }));
   }
 
   /**
    * Gets the device info and some additional loan info.
    */
   getDevice(): Observable<DeviceInfoResponse> {
-    return new Observable(observer => {
-      DeviceIdentifier.id().then((deviceId: string) => {
-        const API = this.api.endpoints();
-        const getDeviceUrl = `${API}/loaner/v1/device/get`;
-        const request: DeviceInfoRequest = {
-          chrome_device_id: deviceId,
-        };
-
-        this.http.post<DeviceInfoResponse>(getDeviceUrl, request)
-            .subscribe(
-                response => {
-                  observer.next(response);
-                },
-
-                (error: HttpErrorResponse) => {
-                  observer.error(error);
-                });
-      });
-    });
+    let request: DeviceInfoRequest;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        chrome_device_id: deviceId,
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/get`;
+      return this.http.post<DeviceInfoResponse>(apiUrl, request);
+    }));
   }
 }

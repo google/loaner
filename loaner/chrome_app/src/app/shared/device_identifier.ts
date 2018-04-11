@@ -13,26 +13,25 @@
 // limitations under the License.
 
 
+import {Observable, of, throwError} from 'rxjs';
+
 import {CHROME_DEV_MODE, DEV_DEVICE_ID, TESTING} from '../../../../shared/config';
 
-/** Get the unique enterprise ID from the chrome device. */
-export function id(): Promise<string|undefined> {
-  return new Promise((resolve, reject) => {
-    try {
-      const deviceAttributes = chrome.enterprise.deviceAttributes;
-      if (deviceAttributes) {
-        deviceAttributes.getDirectoryDeviceId((deviceId: string) => {
-          resolve(deviceId);
-        });
-      } else {
-        resolve(undefined);
-      }
-    } catch (error) {
-      if (CHROME_DEV_MODE || TESTING) {
-        resolve(DEV_DEVICE_ID);
-      } else {
-        reject(error);
-      }
-    }
+export function id(): Observable<string> {
+  if (CHROME_DEV_MODE || TESTING) {
+    return of(DEV_DEVICE_ID);
+  }
+
+  const deviceAttributes = chrome.enterprise.deviceAttributes;
+
+  if (!deviceAttributes) {
+    return throwError(`This application was not force installed by an OU. Please
+contact your administrator`);
+  }
+
+  return new Observable(observer => {
+    deviceAttributes.getDirectoryDeviceId(deviceId => {
+      observer.next(deviceId);
+    });
   });
 }

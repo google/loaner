@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {Injectable} from '@angular/core';
-import {take} from 'rxjs/operators';
+import {Observable, of, throwError} from 'rxjs';
+import {catchError, take} from 'rxjs/operators';
 
 import {Storage} from '../../shared/storage/storage';
 
@@ -35,18 +36,11 @@ export class StatusService {
   /**
    * Gets the given name to be displayed for a user on a loaner.
    */
-  getGivenNameFromChromeStorage(): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this.storage.local.get('givenName')
-          .pipe(take(1))
-          .subscribe((givenName) => {
-            if (givenName) {
-              resolve(givenName);
-            } else {
-              reject(new Error('Unable to onbtain a given name'));
-            }
-          });
-    });
+  getGivenNameFromChromeStorage(): Observable<string> {
+    return this.storage.local.get('givenName')
+        .pipe(
+            take(1),
+            catchError(() => throwError('Unable to obtain a given name')));
   }
 }
 
@@ -55,25 +49,20 @@ export class StatusService {
  */
 @Injectable()
 export class StatusServiceMock extends StatusService {
+  name: string;
   /**
    * Sets the given name to be displayed for a user on a loaner.
    * @param name string represents the name to store in Chrome Storage.
    */
   setGivenNameInChromeStorage(name: string) {
+    this.name = name;
     console.info(`Setting givenName to ${name}`);
   }
 
   /**
    * Gets the given name to be displayed for a user on a loaner.
    */
-  getGivenNameFromChromeStorage(): Promise<string> {
-    const name = 'Michael';
-    return new Promise((resolve, reject) => {
-      if (name) {
-        resolve(name);
-      } else {
-        reject(new Error('Unable to obtain a given name.'));
-      }
-    });
+  getGivenNameFromChromeStorage(): Observable<string> {
+    return of(this.name);
   }
 }

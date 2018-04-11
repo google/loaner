@@ -14,7 +14,8 @@
 
 /// <reference types="chrome/chrome-app" />
 
-import {take} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {switchMap, take, tap} from 'rxjs/operators';
 
 import {HEARTBEAT, PROGRAM_NAME} from '../../../../shared/config';
 import {Storage} from '../shared/storage/storage';
@@ -71,7 +72,7 @@ chrome.runtime.onStartup.addListener(() => {
  * Launches the GnG Management application.
  */
 function launchManage() {
-  checkEnrollmentStatus().then((status) => {
+  checkEnrollmentStatus().subscribe(status => {
     if (status) {
       const options: ChromeWindowOptions = {
         bounds: {
@@ -90,7 +91,7 @@ function launchManage() {
  * Launches the GnG Offboarding flow.
  */
 function launchOffboardingFlow() {
-  checkEnrollmentStatus().then((status) => {
+  checkEnrollmentStatus().subscribe(status => {
     if (status) {
       const options: ChromeWindowOptions = {
         bounds: {
@@ -109,14 +110,14 @@ function launchOffboardingFlow() {
  * Relaunches the Onboarding flow if onboarding is not completed.
  */
 function relaunchOnboarding() {
-  checkOnboardingStatus().then(
-      (status) => {
+  checkOnboardingStatus().subscribe(
+      status => {
         const internetStatus = checkInternetConnectivity();
         if (status === 'incomplete' && internetStatus) {
           launchOnboardingFlow();
         }
       },
-      (error) => {
+      error => {
         console.error(error);
       });
 }
@@ -147,7 +148,7 @@ function launchOnboardingFlow() {
  * If the computer is online, launch the onboarding flow.
  */
 function reportOnline() {
-  checkOnboardingStatus().then((status) => {
+  checkOnboardingStatus().subscribe(status => {
     if (status === 'incomplete') {
       launchOnboardingFlow();
     }
@@ -228,34 +229,27 @@ chrome.runtime.onMessage.addListener(
 /**
  * Checks the current onboarding status by querying local storage.
  */
-function checkOnboardingStatus(): Promise<string> {
+function checkOnboardingStatus(): Observable<string> {
   const storage = new Storage();
-
-  return new Promise((resolve, reject) => {
-    storage.local.get('onboardingStatus').pipe(take(1)).subscribe((status) => {
-      if (status) {
-        resolve(status);
-      } else {
-        reject('Unable to obtain onboarding status value.');
-      }
-    });
-  });
+  return storage.local.get('onboardingStatus')
+      .pipe(take(1), tap(status => {
+              if (!status) {
+                throw new Error('Unable to obtain onboarding status value.');
+              }
+            }));
 }
 
 /**
  * Checks the current enrollment status by querying local storage.
  */
-function checkEnrollmentStatus(): Promise<string> {
+function checkEnrollmentStatus(): Observable<string> {
   const storage = new Storage();
-  return new Promise((resolve, reject) => {
-    storage.local.get('loanerEnrollment').pipe(take(1)).subscribe((status) => {
-      if (status) {
-        resolve(status);
-      } else {
-        reject('Unable to obtain enrollment status value.');
-      }
-    });
-  });
+  return storage.local.get('loanerEnrollment')
+      .pipe(take(1), tap(status => {
+              if (!status) {
+                throw new Error('Unable to obtain enrollment status value.');
+              }
+            }));
 }
 
 /** Check for internet connectivity. */
@@ -286,17 +280,17 @@ function disableHeartbeat() {
 /**
  * Checks to see if the heartbeat exists.
  */
-function checkForHeartbeatAlarm(): Promise<boolean> {
-  return new Promise((resolve, reject) => {
+function checkForHeartbeatAlarm(): Observable<boolean> {
+  return new Observable(observer => {
     chrome.alarms.get(HEARTBEAT.name, (result) => {
       if (result) {
         // To prevent duplicate or missing listeners, we destory and re-create
         // the listener for the heartbeat.
         Heartbeat.removeHeartbeatListener();
         Heartbeat.setHeartbeatAlarmListener();
-        resolve(true);
+        observer.next(true);
       } else {
-        resolve(false);
+        observer.next(false);
       }
     });
   });
@@ -308,31 +302,36 @@ function checkForHeartbeatAlarm(): Promise<boolean> {
  */
 function onboardUser() {
   const storage = new Storage();
-  Heartbeat.sendHeartbeat().then(
-      (device) => {
-        if (device.is_enrolled) {
-          checkForHeartbeatAlarm()
-              .then((response) => {
-                if (!response) {
-                  enableHeartbeat();
-                }
-              })
-              .then(() => {
-                storage.local.set('loanerEnrollment', true);
-                if (device.start_assignment) {
-                  launchOnboardingFlow();
-                  // If online, report online.
-                  window.addEventListener('online', reportOnline);
-                  storage.local.set('onboardingStatus', 'incomplete');
-                } else {
-                  storage.local.set('onboardingStatus', 'complete');
-                }
-              });
-        } else {
-          disableApp();
-        }
-      },
-      (error) => {
-        console.error(error);
-      });
+  let device: HeartbeatResponse;
+  Heartbeat.sendHeartbeat()
+      .pipe(switchMap(deviceInfo => {
+        // Take the device info received from sendHeartbeat and populate device.
+        device = deviceInfo;
+        return checkForHeartbeatAlarm();
+      }))
+      .subscribe(
+          response => {
+            // Check if device is enrolled.
+            if (device.is_enrolled) {
+              if (!response) {
+                enableHeartbeat();
+              }
+              storage.local.set('loanerEnrollment', true);
+              if (device.start_assignment) {
+                launchOnboardingFlow();
+                // If online, report online.
+                window.addEventListener('online', reportOnline);
+                storage.local.set('onboardingStatus', 'incomplete');
+              } else {
+                storage.local.set('onboardingStatus', 'complete');
+              }
+              // If the device isn't enrolled in the program, disable the app
+              // locally.
+            } else {
+              disableApp();
+            }
+          },
+          error => {
+            console.error(error);
+          });
 }

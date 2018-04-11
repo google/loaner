@@ -17,7 +17,8 @@
  * the device heartbeat.
  */
 
-import {Observable} from 'rxjs';
+import {from, Observable, of, throwError} from 'rxjs';
+import {catchError, switchMap} from 'rxjs/operators';
 
 import {APIService, HEARTBEAT, LOGGING} from '../../../../shared/config';
 import * as DeviceIdentifier from '../shared/device_identifier';
@@ -43,24 +44,18 @@ export function disableHeartbeat() {
 /**
  * Send the heartbeat request to the API endpoint.
  */
-export function sendHeartbeat(): Promise<HeartbeatResponse> {
-  return new Promise((resolve, reject) => {
-    DeviceIdentifier.id().then((DEVICE_ID: string) => {
-      const apiService = new APIService();
-      const API = apiService.chrome();
-      const url = `${API}${HEARTBEAT.url}${DEVICE_ID}`;
-      Http.get(url).then(
-          (res: HeartbeatResponse) => {
-            resolve(res);
-            if (LOGGING) {
-              console.info(`Heartbeat response: ${res}`);
-            }
-          },
-          (error: string) => {
-            console.error(`Device ID Failed: ${error}`);
-          });
-    });
-  });
+export function sendHeartbeat(): Observable<HeartbeatResponse> {
+  const apiService = new APIService();
+  const heartbeatUrl = `${apiService.chrome()}${HEARTBEAT.url}`;
+  return DeviceIdentifier.id().pipe(
+      switchMap(deviceId => from(Http.get(`${heartbeatUrl}${deviceId}`))),
+      switchMap((res: HeartbeatResponse) => {
+        if (LOGGING) {
+          console.info(`Heartbeat response: ${res}`);
+        }
+        return of(res);
+      }),
+      catchError(error => throwError(`Device ID Failed: ${error}`)));
 }
 
 /**
@@ -76,7 +71,7 @@ export function setHeartbeatAlarmListener() {
  */
 function createHeartbeatListener(alarm: chrome.alarms.Alarm) {
   if (alarm.name === HEARTBEAT.name && navigator.onLine) {
-    sendHeartbeat();
+    sendHeartbeat().subscribe();
     if (LOGGING) {
       console.info(`Heartbeat sent`);
     }
