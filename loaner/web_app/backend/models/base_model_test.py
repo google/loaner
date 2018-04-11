@@ -30,6 +30,7 @@ from loaner.web_app.backend.testing import loanertest
 class Test(base_model.BaseModel):
   """A test class used for this testing module."""
   text_field = ndb.StringProperty()
+  _INDEX_NAME = 'TestIndex'
 
 
 class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
@@ -71,61 +72,71 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
         entity_dict['test_structuredprop']['test_subdatetime'], int)
     self.assertIsInstance(entity_dict['test_repeatedprop'], list)
 
-  def test_maintain_search_index_failure(self):
-    with self.assertRaises(NotImplementedError):
-      test_model = base_model.BaseModel()
-      test_model.maintain_search_index()
+  @mock.patch.object(base_model.BaseModel, 'to_document', auto_spec=True)
+  @mock.patch.object(base_model.BaseModel, 'add_docs_to_index', auto_spec=True)
+  def test_index_entities_for_search(
+      self, mock_add_docs_to_index, mock_to_document):
+    base_model.search.MAXIMUM_DOCUMENTS_PER_PUT_REQUEST = 1
+    entity_1 = Test(text_field='item_1').put()
+    entity_2 = Test(text_field='item_2').put()
+    documents = [
+        search.Document(
+            doc_id=entity_1.get().key.urlsafe(),
+            fields=[search.TextField(name='text_field', value='item_1')]),
+        search.Document(
+            doc_id=entity_2.get().key.urlsafe(),
+            fields=[search.TextField(name='text_field', value='item_2')]),]
+    mock_to_document.side_effect = documents
+    Test.index_entities_for_search()
+    assert mock_add_docs_to_index.call_count == 2
 
-  @parameterized.parameters(
-      ('thisIsAValidDocId',),
-      ('1234AlsoValid',),
-      ('Also_Valid_a123',))
-  def test_is_valid_doc_id(self, doc_id):
-    test_model = base_model.BaseModel()
-    self.assertTrue(test_model.is_valid_doc_id(doc_id))
-
-  @parameterized.parameters(
-      ('!InvalidDocId',),
-      ('__InvalidDocId',),
-      ('invalid-doc id',))
-  def test_invalid_doc_ids(self, doc_id):
-    test_model = base_model.BaseModel()
-    self.assertFalse(test_model.is_valid_doc_id(doc_id))
+  @mock.patch.object(base_model, 'logging', auto_spec=True)
+  @mock.patch.object(base_model.BaseModel, 'to_document', auto_spec=True)
+  def test_index_entities_for_search_error(
+      self, mock_to_document, mock_logging):
+    entity = Test(text_field='item_1').put()
+    mock_to_document.side_effect = base_model.DocumentCreationError
+    Test.index_entities_for_search()
+    mock_logging.error.assert_called_once_with(
+        base_model._CREATE_DOC_ERR_MSG, entity)
 
   def test_get_index(self):
     base_model.BaseModel._INDEX_NAME = None
     with self.assertRaises(ValueError):
       base_model.BaseModel.get_index()
 
-  def test_add_doc_to_index(self):
+  def test_add_docs_to_index(self):
     base_model.BaseModel._INDEX_NAME = 'test'
     test_index = base_model.BaseModel.get_index()
-    base_model.BaseModel.add_doc_to_index(search.Document(
+    base_model.BaseModel.add_docs_to_index([search.Document(
         doc_id='test_id', fields=[
-            search.TextField(name='field_one', value='value_one')]))
+            search.TextField(name='field_one', value='value_one')])])
     self.assertIsInstance(
         test_index.get_range(
             start_id='test_id', limit=1, include_start_object=True)[0],
         search.Document)
 
   @mock.patch.object(search.Index, 'put', auto_spec=True)
-  def test_add_doc_to_index_put_error(self, mock_put):
+  def test_add_docs_to_index_put_error(self, mock_put):
     mock_put.side_effect = [
         search.PutError(message='Fail!', results=[
             search.PutResult(code=search.OperationResult.TRANSIENT_ERROR)]),
         None]
-    base_model.BaseModel.add_doc_to_index(search.Document(
+    base_model.BaseModel.add_docs_to_index([search.Document(
         doc_id='test_id', fields=[
-            search.TextField(name='field_one', value='value_one')]))
+            search.TextField(name='field_one', value='value_one')])])
     assert mock_put.call_count == 2
 
+  @parameterized.parameters(
+      (search.Error(),),
+      (base_model.apiproxy_errors.OverQuotaError,))
   @mock.patch.object(base_model, 'logging', auto_spec=True)
   @mock.patch.object(search.Index, 'put', auto_spec=True)
-  def test_add_doc_to_index_error(self, mock_put, mock_logging):
-    mock_put.side_effect = search.Error()
-    base_model.BaseModel.add_doc_to_index(search.Document(
+  def test_add_docs_to_index_error(self, mock_error, mock_put, mock_logging):
+    mock_put.side_effect = mock_error
+    base_model.BaseModel.add_docs_to_index([search.Document(
         doc_id='test_id', fields=[
-            search.TextField(name='field_one', value='value_one')]))
+            search.TextField(name='field_one', value='value_one')])])
     assert mock_put.call_count == 1
     assert mock_logging.error.call_count == 1
 
@@ -208,24 +219,14 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
 
   @mock.patch.object(
       base_model.BaseModel, '_get_document_fields', auto_spec=True)
-  @mock.patch.object(
-      base_model.BaseModel, 'is_valid_doc_id', return_value=True,
-      auto_spec=True)
-  def test_to_document(self, mock_is_valid_doc_id, mock_get_document_fields):
+  def test_to_document(self, mock_get_document_fields):
     test_model = Test(id='fake')
     fields = [search.AtomField(name='text_field', value='12345ABC')]
     mock_get_document_fields.return_value = fields
-    test_document = search.Document(doc_id=test_model.key.id(), fields=fields)
+    test_document = search.Document(
+        doc_id=test_model.key.urlsafe(), fields=fields)
     result = test_model.to_document()
     self.assertEqual(result, test_document)
-
-  @mock.patch.object(
-      base_model.BaseModel, 'is_valid_doc_id', return_value=False,
-      auto_spec=True)
-  def test_to_document_doc_id_none(self, mock_is_valid_doc_id):
-    test_model = Test(id='fake')
-    result = test_model.to_document()
-    self.assertIsNone(result.doc_id)
 
   @mock.patch.object(
       base_model.BaseModel, '_get_document_fields', return_value=False,

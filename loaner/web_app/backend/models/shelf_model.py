@@ -77,6 +77,8 @@ class Shelf(base_model.BaseModel):
   last_audit_time = ndb.DateTimeProperty()
   last_audit_by = ndb.StringProperty()
 
+  _INDEX_NAME = constants.SHELF_INDEX_NAME
+
   @property
   def name(self):
     return self.friendly_name or self.location
@@ -99,6 +101,12 @@ class Shelf(base_model.BaseModel):
     return datetime.datetime.utcnow() < (
         self.last_audit_time + datetime.timedelta(
             hours=config_model.Config.get('audit_interval')))
+
+  def _post_put_hook(self, future):
+    """Overrides the _post_put_hook method."""
+    del future  # Unused.
+    index = Shelf.get_index()
+    index.put(self.to_document())
 
   @classmethod
   def enroll(

@@ -19,6 +19,7 @@ import datetime
 import freezegun
 import mock
 
+from google.appengine.api import search
 from google.appengine.ext import ndb
 
 from loaner.web_app import constants
@@ -44,6 +45,9 @@ class ShelfModelTest(loanertest.EndpointsTestCase):
 
   def tearDown(self):
     super(ShelfModelTest, self).tearDown()
+
+  def test_get_search_index(self):
+    self.assertIsInstance(shelf_model.Shelf.get_index(), search.Index)
 
   def create_shelf_list(self):
     """Convenience function to create extra shelves to test listing."""
@@ -80,7 +84,9 @@ class ShelfModelTest(loanertest.EndpointsTestCase):
       retrieved_shelf = shelf_model.Shelf.get_by_id(shelf_key.id())
       self.assertTrue(retrieved_shelf.audited)
 
-  def test_name(self):
+  @mock.patch.object(shelf_model.Shelf, 'get_index', auto_spec=True)
+  @mock.patch.object(shelf_model.Shelf, 'to_document', auto_spec=True)
+  def test_name(self, mock_to_document, mock_get_index):
     """Test the name property."""
     # Name is friendly name.
     self.assertEqual(self.test_shelf.name, self.original_friendly_name)
@@ -88,6 +94,8 @@ class ShelfModelTest(loanertest.EndpointsTestCase):
     # Name is location.
     self.test_shelf.friendly_name = None
     shelf_key = self.test_shelf.put()
+    assert mock_to_document.call_count == 1
+    assert mock_get_index.call_count == 1
     retrieved_shelf = shelf_model.Shelf.get_by_id(shelf_key.id())
     self.assertEqual(retrieved_shelf.name, self.original_location)
 

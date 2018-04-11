@@ -25,11 +25,13 @@ from protorpc import messages
 from google.appengine.api import search
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from google.appengine.runtime import apiproxy_errors
 
 from loaner.web_app.backend.lib import utils
 
 _PUT_DOC_ERR_MSG = 'Error putting a document (%s) into the index (%s).'
 _REMOVE_DOC_ERR_MSG = 'Error removing document with id: %s'
+_CREATE_DOC_ERR_MSG = 'Unable to create document for %s.'
 
 
 class Error(Exception):
@@ -77,23 +79,26 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     """
     return _sanitize_dict(self.to_dict())
 
-  def maintain_search_index(self):
-    """Maintains the status of an entity in the search index."""
-    raise NotImplementedError
-
-  def is_valid_doc_id(self, doc_id):
-    """Validates the doc id.
-
-    Args:
-      doc_id: str, the document id to validate.
-
-    Returns:
-      True if the id is valid, False if it is not.
-    """
-    for char in doc_id:
-      if char not in self._SEARCH_ASCII:
-        return False
-    return not doc_id.startswith('!') and not doc_id.startswith('__')
+  @classmethod
+  def index_entities_for_search(cls):
+    """Indexes all entities of a model for search."""
+    page_size = search.MAXIMUM_DOCUMENTS_PER_PUT_REQUEST
+    entities, next_cursor, additional_results = (
+        cls.query().fetch_page(page_size=page_size, start_cursor=None))
+    while True:
+      search_documents = []
+      for entity in entities:
+        try:
+          search_documents.append(entity.to_document())
+        except DocumentCreationError:
+          logging.error(_CREATE_DOC_ERR_MSG, entity.key)
+      cls.add_docs_to_index(search_documents)
+      if additional_results:
+        entities, next_cursor, additional_results = (
+            cls.query().fetch_page(
+                page_size=page_size, start_cursor=next_cursor))
+      else:
+        break
 
   @classmethod
   def get_index(cls):
@@ -101,21 +106,22 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     return search.Index(name=cls._INDEX_NAME)
 
   @classmethod
-  def add_doc_to_index(cls, doc):
-    """Adds a doc to a particular index.
+  def add_docs_to_index(cls, documents):
+    """Adds a list of documents to a particular index.
 
     Args:
-      doc: search.Document, the document to add to the class' index.
+      documents: a list of search.Documents to add to the class' index.
     """
     index = cls.get_index()
-    try:
-      index.put(doc)
-    except search.PutError as err:
-      result = err.results[0]
-      if result.code == search.OperationResult.TRANSIENT_ERROR:
+    for doc in documents:
+      try:
         index.put(doc)
-    except search.Error as err:
-      logging.error(_PUT_DOC_ERR_MSG, doc, index)
+      except search.PutError as err:
+        result = err.results[0]
+        if result.code == search.OperationResult.TRANSIENT_ERROR:
+          index.put(doc)
+      except (search.Error, apiproxy_errors.OverQuotaError):
+        logging.error(_PUT_DOC_ERR_MSG, doc, index)
 
   @classmethod
   def get_doc_by_id(cls, doc_id):
@@ -204,12 +210,9 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
       DocumentCreationError: when unable to create a document for the
           model.
     """
-    doc_id = None
-    if self.is_valid_doc_id(self.key.id()):
-      doc_id = self.key.id()
     try:
       return search.Document(
-          doc_id=doc_id,
+          doc_id=str(self.key.urlsafe()),
           fields=self._get_document_fields())
 
     except (TypeError, ValueError) as e:

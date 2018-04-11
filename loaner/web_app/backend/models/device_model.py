@@ -163,6 +163,8 @@ class Device(base_model.BaseModel):
   next_reminder = ndb.StructuredProperty(Reminder)
   return_date = ndb.DateTimeProperty()
 
+  _INDEX_NAME = constants.DEVICE_INDEX_NAME
+
   @property
   def is_assigned(self):
     return bool(self.assigned_user)
@@ -181,6 +183,12 @@ class Device(base_model.BaseModel):
   @property
   def guest_enabled(self):
     return self.current_ou == constants.ORG_UNIT_DICT['GUEST']
+
+  def _post_put_hook(self, future):
+    """Overrides the _post_put_hook method."""
+    del future  # Unused.
+    index = Device.get_index()
+    index.put(self.to_document())
 
   @classmethod
   def list_by_user(cls, user):

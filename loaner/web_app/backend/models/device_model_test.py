@@ -19,6 +19,8 @@ import datetime
 import freezegun
 import mock
 
+from google.appengine.api import search
+
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.models import config_model
@@ -53,6 +55,9 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.device = device_model.Device.get(serial_number='12321')
     self.device2 = device_model.Device.get(serial_number='67890')
     self.device3 = device_model.Device.get(serial_number='Void')
+
+  def test_get_search_index(self):
+    self.assertIsInstance(device_model.Device.get_index(), search.Index)
 
   def enroll_test_device(self, device_to_enroll):
     self.patcher_directory = mock.patch(
@@ -126,10 +131,14 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
             '2346777', ou, err_message)):
       device_model.Device.enroll('2346777', loanertest.USER_EMAIL)
 
+  @mock.patch.object(device_model.Device, 'get_index', auto_spec=True)
+  @mock.patch.object(device_model.Device, 'to_document', auto_spec=True)
   @mock.patch('__main__.device_model.logging.info')
   @mock.patch(
       '__main__.device_model.directory.DirectoryApiClient', autospec=True)
-  def test_enroll_unenrolled_device(self, mock_directoryclass, mock_logging):
+  def test_enroll_unenrolled_device(
+      self, mock_directoryclass, mock_logging, mock_to_document,
+      mock_get_index):
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.move_chrome_device_org_unit.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -139,6 +148,9 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     device.serial_number = '123ABC'
     device.chrome_device_id = 'unique_id'
     device.put()
+
+    assert mock_get_index.call_count == 1
+    assert mock_to_document.call_count == 1
 
     device = device_model.Device.enroll('123ABC', loanertest.USER_EMAIL)
 
