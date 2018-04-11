@@ -15,7 +15,7 @@
 import {Component, Inject, Injectable} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 
-import {CHROME_DEV_MODE, LOGGING} from '../../../../../shared/config';
+import {CHROME_DEV_MODE, FAILURE_MESSAGE, LOGGING} from '../../../../../shared/config';
 import {Background} from '../background_service';
 
 /** Fail information for the user facing dialog */
@@ -82,9 +82,7 @@ export class Failure {
       rawError?: {}) {
     this.errorCount += 1;
     if (this.errorCount > this.TOLERABLE_ERROR_COUNT) {
-      const quitMessage = `Since this has failed a couple of times the
-application will now quit. If the issue persist contact your Administrator.`;
-      this.openDialog(quitMessage, failAction);
+      this.openDialog(FAILURE_MESSAGE, failAction);
     } else {
       this.openDialog(message, FailAction.Ignore);
     }

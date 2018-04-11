@@ -110,20 +110,20 @@ export const HEARTBEAT: HeartbeatConfiguration = {
 };
 
 
-/**
- * IT contact information and text. Leave values blank if not needed
- * and they won't be populated on the Manage/Troubleshoot page.
- */
-/** Text to be placed on the Manage/Troubleshoot page */
+/** Text to be placed on the Manage/Troubleshoot page. */
 export const TROUBLESHOOTING_INFORMATION =
 'Contact your IT department for assistance.';
-/** Phone number of IT; Placed on Manage/Troubleshoot page */
+/** Phone number of IT; Placed on Manage/Troubleshoot page. */
 export const IT_CONTACT_PHONE = '555 55 555';
-/** Website of IT; Placed on Manage/Troubleshoot page */
+/** Website of IT; Placed on Manage/Troubleshoot page. */
 export const IT_CONTACT_WEBSITE =
 'https://support.google.com';
-/** Email of IT; Placed on Manage/troubleshoot page */
+/** Email of IT; Placed on Manage/troubleshoot page. */
 export const IT_CONTACT_EMAIL = '';
+/** Failure message after 3 failure prompts occur. */
+export const FAILURE_MESSAGE = `Since this has failed a couple of times the
+application will now quit. If the issue persists contact your
+administrator.`;
 
 /** This allows a background for the app to be set. */
 export const BACKGROUND_LOGO_ENABLED = true;
