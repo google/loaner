@@ -147,8 +147,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     except search.DeleteError:
       logging.error(_REMOVE_DOC_ERR_MSG, doc_id)
 
-  @classmethod
-  def _to_search_fields(cls, key, value):
+  def _to_search_fields(self, key, value):
     """Converts an ndb.Property into a search document field.
 
     Args:
@@ -165,7 +164,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     if isinstance(value, list):
       search_fields = []
       for val in value:
-        search_fields.extend(cls._to_search_fields(key, val))
+        search_fields.extend(self._to_search_fields(key, val))
       return search_fields
 
     if isinstance(value, ndb.Key):

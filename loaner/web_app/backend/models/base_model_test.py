@@ -33,6 +33,23 @@ class Test(base_model.BaseModel):
   _INDEX_NAME = 'TestIndex'
 
 
+class TestSubEntity(base_model.BaseModel):
+  """A test class used for TestEntity structured property."""
+  test_substring = ndb.StringProperty()
+  test_subdatetime = ndb.DateTimeProperty(auto_now_add=True)
+
+
+class TestEntity(base_model.BaseModel):
+  """A test class used to create test entities of all ndb properties."""
+  test_string = ndb.StringProperty()
+  test_datetime = ndb.DateTimeProperty(auto_now_add=True)
+  test_keyproperty = ndb.KeyProperty()
+  test_geopt = ndb.GeoPtProperty()
+  test_structuredprop = ndb.StructuredProperty(TestSubEntity)
+  test_repeatedprop = ndb.StringProperty(repeated=True)
+  test_bool = ndb.BooleanProperty()
+
+
 class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
   """Tests for BaseModel class."""
 
@@ -47,18 +64,6 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     assert mock_taskqueue.add.called
 
   def test_to_json_dict(self):
-    class TestSubEntity(base_model.BaseModel):
-      test_substring = ndb.StringProperty()
-      test_subdatetime = ndb.DateTimeProperty(auto_now_add=True)
-
-    class TestEntity(base_model.BaseModel):
-      test_string = ndb.StringProperty()
-      test_datetime = ndb.DateTimeProperty(auto_now_add=True)
-      test_keyproperty = ndb.KeyProperty()
-      test_geopt = ndb.GeoPtProperty()
-      test_structuredprop = ndb.StructuredProperty(TestSubEntity)
-      test_repeatedprop = ndb.StringProperty(repeated=True)
-
     entity = TestEntity(test_string='Hello', test_geopt=ndb.GeoPt(50, 100))
     entity.test_structuredprop = TestSubEntity(test_substring='foo')
     entity.put()
@@ -172,40 +177,41 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
 
   def test_to_seach_fields(self):
     # Test list field generation.
-    search_fields = base_model.BaseModel._to_search_fields(
-        'list_field', ['item_1', 'item_2'])
+    entity = TestEntity(test_repeatedprop=['item_1', 'item_2'])
+    search_fields = entity._to_search_fields(
+        'test_repeatedprop', ['item_1', 'item_2'])
     expected_fields = [
-        search.TextField(name='list_field', value='item_1'),
-        search.TextField(name='list_field', value='item_2')]
+        search.TextField(name='test_repeatedprop', value='item_1'),
+        search.TextField(name='test_repeatedprop', value='item_2')]
     self.assertEqual(expected_fields, search_fields)
 
     # Test ndb.Key field generation.
     test_key = ndb.Key('Test', 1)
-    search_field = base_model.BaseModel._to_search_fields(
-        'key_field', test_key)
+    entity = TestEntity(test_keyproperty=test_key)
+    search_field = entity._to_search_fields('test_keyproperty', test_key)
     expected_field = [search.AtomField(
-        name='key_field', value=test_key.urlsafe())]
+        name='test_keyproperty', value=test_key.urlsafe())]
     self.assertEqual(expected_field, search_field)
 
     # Test datetime field generation.
-    search_field = base_model.BaseModel._to_search_fields(
-        'datetime_field', datetime.datetime(year=2017, month=1, day=5))
-    expected_field = [search.DateField(
-        name='datetime_field',
-        value=datetime.datetime(year=2017, month=1, day=5))]
+    date = datetime.datetime(year=2017, month=1, day=5)
+    entity = TestEntity(test_datetime=date)
+    search_field = entity._to_search_fields('test_datetime', date)
+    expected_field = [search.DateField(name='test_datetime', value=date)]
     self.assertEqual(expected_field, search_field)
 
     # Test boolean field generation.
-    search_field = base_model.BaseModel._to_search_fields('bool_field', True)
-    expected_field = [search.AtomField(
-        name='bool_field', value='True')]
+    entity = TestEntity(test_bool=True)
+    search_field = entity._to_search_fields('test_bool', True)
+    expected_field = [search.AtomField(name='test_bool', value='True')]
     self.assertEqual(expected_field, search_field)
 
     # Test geopt field generation.
-    search_field = base_model.BaseModel._to_search_fields(
-        'geopt_field', ndb.GeoPt('52.37, 4.88'))
+    geopt = ndb.GeoPt('52.37, 4.88')
+    entity = TestEntity(test_geopt=geopt)
+    search_field = entity._to_search_fields('test_geopt', geopt)
     expected_field = [search.GeoField(
-        name='geopt_field', value=search.GeoPoint(52.37, 4.88))]
+        name='test_geopt', value=search.GeoPoint(52.37, 4.88))]
     self.assertEqual(expected_field, search_field)
 
   @mock.patch.object(
