@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A model representing a web app frontend user."""
+"""A model representing a Grab n Go user."""
 
 from google.appengine.ext import ndb
 
@@ -21,18 +21,17 @@ class User(ndb.Model):
   """Datastore model representing a user.
 
   Attributes:
-    landing_page: str, The default landing page for a user.
     roles: list, A list of roles the user belongs to.
   """
   roles = ndb.StringProperty(repeated=True)
 
   @classmethod
   def get_user(cls, email, opt_roles=None):
-    """Retrieves the user model, creating a new model if necessary.
+    """Retrieves the user model, creating a new entity if necessary.
 
     Args:
       email: str, The user's email.
-      opt_roles: list, Optional list of roles for a new user.
+      opt_roles: list|str|, Optional list of roles for a new user.
 
     Returns:
       The user model for the current user.

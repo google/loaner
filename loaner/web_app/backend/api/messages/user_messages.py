@@ -17,34 +17,12 @@
 from protorpc import messages
 
 
-class UsersRoleResponse(messages.Message):
-  """UsersRoleResponse response for ProtoRPC message.
+class UserResponse(messages.Message):
+  """UserResponse response for ProtoRPC message.
 
   Attributes:
     email: str, The user email to be displayed.
-    roles: list, The roles of the user to be displayed.
+    roles: list|str|, The roles of the user to be displayed.
   """
   email = messages.StringField(1)
   roles = messages.StringField(2, repeated=True)
-
-
-class ListUsersRoleResponse(messages.Message):
-  """ListUsersRoleResponse response for ProtoRPC message.
-
-  Attributes:
-    users: UsersRoleResponse, A list of users to be displayed.
-    page_token: str, A page token to query next page results.
-    more: bool, If there are more results to be displayed.
-  """
-  users = messages.MessageField(UsersRoleResponse, 1, repeated=True)
-  page_token = messages.StringField(2)
-  more = messages.BooleanField(3)
-
-
-class GetUserRequest(messages.Message):
-  """GetUserRequest request ProtoRPC message.
-
-  Attributes:
-    email: str, The email of the user to fetch.
-  """
-  email = messages.StringField(1)

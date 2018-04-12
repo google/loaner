@@ -36,7 +36,7 @@ class UserModelTest(loanertest.EndpointsTestCase):
     # get_user will create new user model.
     user = user_model.User.get_user(email=loanertest.SUPER_ADMIN_EMAIL)
     self.assertEqual(user.key.id(), loanertest.SUPER_ADMIN_EMAIL)
-    # make sure role is set to assignee by default
+    # make sure role is set to user by default.
     self.assertEqual(user.roles, ['user'])
 
     # get user will create a new user model with an admin role.
@@ -47,9 +47,8 @@ class UserModelTest(loanertest.EndpointsTestCase):
         email=loanertest.TECHNICAL_ADMIN_EMAIL, opt_roles=opt_roles)
     opt_roles.append('user')
     self.assertEqual(user.key.id(), loanertest.TECHNICAL_ADMIN_EMAIL)
-    # make sure there is more than the default role
-    for role in user.roles:
-      self.assertTrue(role in opt_roles)
+    # make sure there is more than the default role.
+    self.assertCountEqual(user.roles, opt_roles)
 
   def test_get_user_no_duplicates(self):
     # Test to make sure that the second call to get_user does not add a
@@ -59,7 +58,7 @@ class UserModelTest(loanertest.EndpointsTestCase):
     user = user_model.User.get_user(
         loanertest.TECHNICAL_ADMIN_EMAIL,
         opt_roles=['technical-admin'])
-    self.assertItemsEqual(
+    self.assertCountEqual(
         ['user', 'technical-admin', 'operational-admin', 'technician'],
         user.roles)
 

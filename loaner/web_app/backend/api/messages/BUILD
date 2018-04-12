@@ -69,8 +69,8 @@ loaner_appengine_library(
 )
 
 loaner_appengine_library(
-    name = "user_message",
+    name = "user_messages",
     srcs = [
-        "user_message.py",
+        "user_messages.py",
     ],
 )

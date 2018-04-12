@@ -51,8 +51,8 @@ export class UserService extends ApiService {
    * @param shouldNotify If whether the user should be notified case the API
    *  call fails. Defaults to true.
    */
-  getRole(shouldNotify = true): Observable<User> {
-    return this.get<User>('get_role', {}, shouldNotify)
+  getUser(shouldNotify = true): Observable<User> {
+    return this.get<User>('get', {}, shouldNotify)
         .pipe(map(response => new User(response)));
   }
 
@@ -87,7 +87,7 @@ export class UserService extends ApiService {
           this.user = new User();
           this.user.email = user.getBasicProfile().getEmail();
           this.user.givenName = user.getBasicProfile().getGivenName();
-          return this.getRole();
+          return this.getUser();
         }),
         switchMap(user => {
           this.user.roles = user.roles;

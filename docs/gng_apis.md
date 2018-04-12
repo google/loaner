@@ -888,38 +888,16 @@ API endpoint that handles requests related to users.
 
 ##### get
 
-Get a user object using the user's email.
+Get a user object using the logged in user's credential.
 
-| Requests                        | Attributes                           |
-| :------------------------------ | :----------------------------------- |
-| GetUserRequest request ProtoRPC | email: str, The email of the user to |
-| message.                        | fetch.                               |
-
-| Returns                        | Attributes                                  |
-| :----------------------------- | :------------------------------------------ |
-| UsersRoleResponse response for | email: str, The user email to be displayed. |
-| ProtoRPC message.              |                                             |
-|                                | recorded_time: datetime, The recorded time  |
-|                                | for the user object.                        |
-|                                | roles: list, The roles of the user to be    |
-|                                | displayed.                                  |
-
-##### get_role
-
-Gets the roles for the caller of the API.
-
-Requests                  | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
-
-Requests message_types.VoidMessage
+| Requests                  | Attributes
+| :------------------------ | :---------
+| message_types.VoidMessage | None
 
 | Returns                        | Attributes                                  |
 | :----------------------------- | :------------------------------------------ |
-| UsersRoleResponse response for | email: str, The user email to be displayed. |
+| UserResponse response for      | email: str, The user email to be displayed. |
 | ProtoRPC message.              |                                             |
-|                                | recorded_time: datetime, The recorded time  |
-|                                | for the user object.                        |
 |                                | roles: list, The roles of the user to be    |
 |                                | displayed.                                  |
 

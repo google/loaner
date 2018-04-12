@@ -14,72 +14,47 @@
 
 """Tests for backend.api.user_api."""
 
-import mock
+from absl.testing import parameterized
 
 from protorpc import message_types
 
-from loaner.web_app.backend.api import root_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import user_api
-from loaner.web_app.backend.api.messages import user_message
+from loaner.web_app.backend.api.messages import user_messages
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class UserApiTest(loanertest.EndpointsTestCase):
+class UserApiTest(loanertest.EndpointsTestCase, parameterized.TestCase):
 
   def setUp(self):
     super(UserApiTest, self).setUp()
     self.service = user_api.UserApi()
-    self.login_admin_endpoints_user()
-
-    self.patcher_build = mock.patch(
-        '__main__.root_api.Service.check_xsrf_token')
-    self.mock_build = self.patcher_build.start()
-    self.addCleanup(self.patcher_build.stop)
-    user_model.User.get_user(
-        email=loanertest.TECHNICAL_ADMIN_EMAIL,
-        opt_roles=['technical-admin'])
-    user_model.User.get_user(
-        email=loanertest.OPERATIONAL_ADMIN_EMAIL,
-        opt_roles=['operational-admin'])
-    user_model.User.get_user(
-        email=loanertest.TECHNICIAN_EMAIL,
-        opt_roles=['technician']).put()
-    user_model.User.get_user(
-        email=loanertest.USER_EMAIL, opt_roles=['user'])
-    self.users_list = [
-        loanertest.TECHNICAL_ADMIN_EMAIL, loanertest.OPERATIONAL_ADMIN_EMAIL,
-        loanertest.TECHNICIAN_EMAIL, loanertest.USER_EMAIL,
-        loanertest.SUPER_ADMIN_EMAIL]
-    self.admin_list = [
-        loanertest.TECHNICAL_ADMIN_EMAIL, loanertest.SUPER_ADMIN_EMAIL]
 
   def tearDown(self):
     super(UserApiTest, self).tearDown()
     self.service = None
 
-  def test_get_no_email_provided(self):
-    request = user_message.GetUserRequest()
-    self.assertRaisesRegexp(
-        user_api.endpoints.BadRequestException,
-        user_api._USER_EMAIL_PROVIDED_MSG,
-        self.service.get,
-        request)
-
-  def test_get_email_provided(self):
-    request = user_message.GetUserRequest(
-        email=loanertest.TECHNICAL_ADMIN_EMAIL)
-    response = self.service.get(request)
-
-    self.assertEqual(response.email, loanertest.TECHNICAL_ADMIN_EMAIL)
-    self.assertIn('technical-admin', response.roles)
-
-  def test_get_roles(self):
-    self.login_endpoints_user()
-    response = self.service.get_role(message_types.VoidMessage())
-
-    self.assertEqual(response.email, loanertest.USER_EMAIL)
-    self.assertEqual(response.roles, ['user'])
+  @parameterized.parameters(
+      {'test_email': loanertest.USER_EMAIL, 'test_roles': ['user'],},
+      {'test_email': loanertest.TECHNICIAN_EMAIL, 'test_roles': [
+          'technician', 'user'],},
+      {'test_email': loanertest.OPERATIONAL_ADMIN_EMAIL, 'test_roles': [
+          'operational-admin', 'user'],},
+      {'test_email': loanertest.TECHNICAL_ADMIN_EMAIL, 'test_roles': [
+          'technical-admin', 'user'],},
+      {'test_email': loanertest.SUPER_ADMIN_EMAIL, 'test_roles': [
+          'technical-admin', 'operational-admin', 'technician', 'user'],},)
+  def test_get(self, test_email, test_roles):
+    """Test that a get returns the expected user message from the datastore."""
+    self.login_endpoints_user(test_email)
+    test_user_key = user_model.User(id=test_email, roles=test_roles).put()
+    test_user = test_user_key.get()
+    request = message_types.VoidMessage()
+    expected_response = user_messages.UserResponse(
+        email=test_user.key.id(), roles=test_user.roles)
+    actual_response = self.service.get(request)
+    self.assertEqual(actual_response.email, expected_response.email)
+    self.assertCountEqual(actual_response.roles, expected_response.roles)
 
 
 if __name__ == '__main__':
