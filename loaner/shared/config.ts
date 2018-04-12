@@ -151,7 +151,7 @@ export class APIService {
   private apiPath = '/_ah/api';
 
   constructor() {
-    if (ON_PROD) {
+    if (ON_PROD || (!IS_FRONTEND && !CHROME_DEV_MODE)) {
       this.devTrack = false;
       this.chromeEndpoint = CHROME_ENDPOINTS.prod;
       this.standardEndpoint = STANDARD_ENDPOINTS.prod;

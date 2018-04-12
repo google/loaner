@@ -22,10 +22,12 @@ describe('APIService', () => {
   });
 
   it('should provide the correct link for chrome endpoint', () => {
-    expect(api.chrome()).toBe('http://localhost:8082/_ah/api');
+    expect(api.chrome())
+        .toBe('https://chrome-dot-prod-app-engine-project.appspot.com/_ah/api');
   });
 
   it('should provide the correct link for standard endpoint', () => {
-    expect(api.endpoints()).toBe('http://localhost:8081/_ah/api');
+    expect(api.endpoints())
+        .toBe('https://endpoints-dot-prod-app-engine-project.appspot.com/_ah/api');
   });
 });
