@@ -95,6 +95,13 @@ function makeRequest(
 
                       if (response.status === 204) {
                         resolve(undefined);
+                      } else if (
+                          response.status === 403 || response.status === 404 ||
+                          response.status === 503) {
+                        // Since the heartbeat uses this, we check for these
+                        // statuses to allow it to keep trying to make a
+                        // successful heartbeat.
+                        reject(response.status);
                       } else {
                         resolve(response.json());
                       }

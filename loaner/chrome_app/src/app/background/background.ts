@@ -311,27 +311,85 @@ function onboardUser() {
       }))
       .subscribe(
           response => {
-            // Check if device is enrolled.
-            if (device.is_enrolled) {
-              if (!response) {
-                enableHeartbeat();
-              }
-              storage.local.set('loanerEnrollment', true);
-              if (device.start_assignment) {
-                launchOnboardingFlow();
-                // If online, report online.
-                window.addEventListener('online', reportOnline);
-                storage.local.set('onboardingStatus', 'incomplete');
-              } else {
-                storage.local.set('onboardingStatus', 'complete');
-              }
-              // If the device isn't enrolled in the program, disable the app
-              // locally.
-            } else {
-              disableApp();
-            }
+            onboarding(device.is_enrolled, device.start_assignment, response);
           },
           error => {
+            // Checks for the existence of the keep trying alarm.
+            chrome.alarms.get('KEEP_TRYING', result => {
+              if (result) {
+                // Clears the KEEP_TRYING alarms if they exist.
+                chrome.alarms.onAlarm.removeListener(keepTrying);
+                chrome.alarms.clear('KEEP_TRYING');
+              }
+              // Creates the alarm.
+              createKeepTryingAlarm();
+            });
             console.error(error);
           });
+}
+
+/**
+ * Used to check onboarding criteria. If a device is part of the program, it
+ * launches the onboarding flow.
+ */
+function onboarding(
+    isEnrolled: boolean, startAssignment: boolean, heartbeatExists: boolean) {
+  if (isEnrolled) {
+    const storage = new Storage();
+    if (!heartbeatExists) {
+      enableHeartbeat();
+    }
+    storage.local.set('loanerEnrollment', true);
+    if (startAssignment) {
+      launchOnboardingFlow();
+      // If online, report online.
+      window.addEventListener('online', reportOnline);
+      storage.local.set('onboardingStatus', 'incomplete');
+    } else {
+      storage.local.set('onboardingStatus', 'complete');
+    }
+    // If the device isn't enrolled in the program, disable the app
+    // locally.
+  } else {
+    disableApp();
+  }
+}
+
+/**
+ * Creates the alarm to keep trying to check if a device is enrolled and
+ * assignable. Also generates the event listener for the alarm.
+ */
+function createKeepTryingAlarm() {
+  chrome.alarms.create('KEEP_TRYING', {
+    'periodInMinutes': 1,
+  });
+  chrome.alarms.onAlarm.addListener(keepTrying);
+}
+
+/**
+ * Keeps trying to make a successful initial heartbeat. Used by the alarms
+ * event listener.
+ */
+function keepTrying(alarm: chrome.alarms.Alarm) {
+  let device: HeartbeatResponse;
+  if (alarm.name === 'KEEP_TRYING') {
+    Heartbeat.sendHeartbeat()
+        .pipe(switchMap(deviceInfo => {
+          // Take the device info received from sendHeartbeat and populate
+          // device.
+          device = deviceInfo;
+          return checkForHeartbeatAlarm();
+        }))
+        .subscribe(
+            response => {
+              // Kicks off the onboarding process once again and then proceeds
+              // to kill this alarm.
+              onboarding(device.is_enrolled, device.start_assignment, response);
+              chrome.alarms.onAlarm.removeListener(keepTrying);
+              chrome.alarms.clear('KEEP_TRYING');
+            },
+            error => {
+              console.error(error);
+            });
+  }
 }

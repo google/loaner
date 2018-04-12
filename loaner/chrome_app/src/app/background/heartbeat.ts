@@ -55,7 +55,7 @@ export function sendHeartbeat(): Observable<HeartbeatResponse> {
         }
         return of(res);
       }),
-      catchError(error => throwError(`Device ID Failed: ${error}`)));
+      catchError(error => throwError(`The heartbeat failed: ${error}`)));
 }
 
 /**
