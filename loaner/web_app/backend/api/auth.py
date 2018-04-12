@@ -125,7 +125,7 @@ def _check_auth(permission, allow_assignee):
       try:
         user_email = user_lib.get_user_email()
       except user_lib.UserNotFound as err:
-        raise endpoints.NotFoundException(str(err))
+        raise endpoints.UnauthorizedException(str(err))
       _forbid_non_domain_users(user_email)
 
       roles_permitted = []

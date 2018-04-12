@@ -107,14 +107,14 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
     # Test no user logged in.
     constants.ON_GAE = True
     user = None
-    with self.assertRaises(endpoints.NotFoundException):
+    with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as('api_for_any_authenticated_user', user=user)
 
-    with self.assertRaises(endpoints.NotFoundException):
+    with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as(
           api_name='api_for_assignee_or_admins', user=user)
 
-    with self.assertRaises(endpoints.NotFoundException):
+    with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as(
           api_name='api_for_admins_only', user=user)
 
