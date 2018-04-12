@@ -26,7 +26,7 @@ from loaner.web_app import constants
 from loaner.web_app.backend.api import device_api
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_message
-from loaner.web_app.backend.api.messages import shelf_message
+from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -279,10 +279,12 @@ class DeviceApiTest(loanertest.EndpointsTestCase):
     # Test for shelf location as filter.
     mock_model_list_devices.return_value = ([self.device], None, False)
     mock_get_shelf.return_value = self.shelf
-    message = shelf_message.Shelf(location=self.shelf.location)
+    shelf_request_message = shelf_messages.ShelfRequest(
+        location=self.shelf.location)
+    message = shelf_messages.Shelf(shelf_request=shelf_request_message)
     request = device_message.Device(shelf=message)
     response = self.service.list_devices(request)
-    mock_get_shelf.assert_called_once_with(location=self.shelf.location)
+    mock_get_shelf.assert_called_once_with(shelf_request_message)
     self.assertEqual(
         response.devices[0].serial_number, self.device.serial_number)
 

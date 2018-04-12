@@ -13,6 +13,14 @@
 // limitations under the License.
 
 /**
+ * Interface with fields for a shelf request.
+ */
+export declare interface ShelfRequestParams {
+  location?: string;
+  urlsafe_key?: string;
+}
+
+/**
  * Interface with fields that come from our shelf API.
  */
 export declare interface ShelfApiParams {
@@ -26,7 +34,7 @@ export declare interface ShelfApiParams {
   last_audit_by?: string;
   responsible_for_audit?: string;
   device_identifiers?: string[];
-  current_location?: string;
+  shelf_request?: ShelfRequestParams;
 }
 
 export class Shelf {
@@ -48,6 +56,8 @@ export class Shelf {
   lastAuditBy = '';
   /** The group responsible for auditing the shelf. */
   responsibleForAudit = '';
+  /** The representation of a shelf request. */
+  shelfRequest: ShelfRequestParams;
 
   /**
    * Property for the shelf name, which is preferred to be it's friendly
@@ -70,6 +80,7 @@ export class Shelf {
     this.lastAuditBy = shelf.last_audit_by || this.lastAuditBy;
     this.responsibleForAudit =
         shelf.responsible_for_audit || this.responsibleForAudit;
+    this.shelfRequest = shelf.shelf_request || this.shelfRequest;
   }
 
   /** Translates the Shelf model object to the API message. */
@@ -84,6 +95,7 @@ export class Shelf {
       location: this.location,
       responsible_for_audit: this.responsibleForAudit,
       capacity: this.capacity,
+      shelf_request: this.shelfRequest,
     };
   }
 }

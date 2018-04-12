@@ -25,7 +25,7 @@ import endpoints
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import shelf_message
+from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import user
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -38,13 +38,12 @@ _DEVICE_DOES_NOT_EXIST_MSG = (
     'number has been entered.')
 
 
-
 @root_api.ROOT_API.api_class(resource_name='shelf', path='shelf')
 class ShelfApi(root_api.Service):
   """This class is for the Shelf API."""
 
   @auth.method(
-      shelf_message.EnrollShelfRequest,
+      shelf_messages.EnrollShelfRequest,
       message_types.VoidMessage,
       name='enroll',
       path='enroll',
@@ -71,8 +70,8 @@ class ShelfApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      shelf_message.GetShelfRequest,
-      shelf_message.Shelf,
+      shelf_messages.ShelfRequest,
+      shelf_messages.Shelf,
       name='get',
       path='get',
       http_method='POST',
@@ -80,24 +79,16 @@ class ShelfApi(root_api.Service):
   def get(self, request):
     """Get a shelf based on location."""
     self.check_xsrf_token(self.request_state)
-    shelf = get_shelf(location=request.location)
+    shelf = get_shelf(request)
     shelf_dict = self.to_dict(shelf, shelf_model.Shelf)
-
-    return shelf_message.Shelf(
-        location=shelf_dict.get('location'),
-        capacity=shelf_dict.get('capacity'),
-        friendly_name=shelf_dict.get('friendly_name'),
-        latitude=shelf_dict.get('lat_long.lat'),
-        longitude=shelf_dict.get('lat_long.lon'),
-        altitude=shelf_dict.get('altitude'),
-        audit_requested=shelf_dict.get('audit_requested'),
-        responsible_for_audit=shelf_dict.get('responsible_for_audit'),
-        last_audit_time=shelf_dict.get('last_audit_time'),
-        last_audit_by=shelf_dict.get('last_audit_by'),
-        enabled=shelf_dict.get('enabled'))
+    response = _build_shelf_message(shelf_dict)
+    response.shelf_request = shelf_messages.ShelfRequest()
+    response.shelf_request.urlsafe_key = shelf.key.urlsafe()
+    response.shelf_request.location = shelf.location
+    return response
 
   @auth.method(
-      shelf_message.GetShelfRequest,
+      shelf_messages.ShelfRequest,
       message_types.VoidMessage,
       name='disable',
       path='disable',
@@ -107,29 +98,13 @@ class ShelfApi(root_api.Service):
     """Disable a shelf by its location."""
     self.check_xsrf_token(self.request_state)
     user_email = user.get_user_email()
-    shelf = get_shelf(location=request.location)
+    shelf = get_shelf(request)
     shelf.disable(user_email)
 
     return message_types.VoidMessage()
 
   @auth.method(
-      shelf_message.GetShelfRequest,
-      message_types.VoidMessage,
-      name='enable',
-      path='enable',
-      http_method='POST',
-      permission=permissions.Permissions.ENABLE_SHELF)
-  def enable(self, request):
-    """Enable a shelf based on its location."""
-    self.check_xsrf_token(self.request_state)
-    user_email = user.get_user_email()
-    shelf = get_shelf(location=request.location)
-    shelf.enable(user_email)
-
-    return message_types.VoidMessage()
-
-  @auth.method(
-      shelf_message.UpdateShelfRequest,
+      shelf_messages.UpdateShelfRequest,
       message_types.VoidMessage,
       name='update',
       path='update',
@@ -139,15 +114,14 @@ class ShelfApi(root_api.Service):
     """Get a shelf using location to update its properties."""
     self.check_xsrf_token(self.request_state)
     user_email = user.get_user_email()
-    shelf = get_shelf(location=request.current_location)
+    shelf = get_shelf(request.shelf_request)
     kwargs = self.to_dict(request, shelf_model.Shelf)
     shelf.edit(user_email=user_email, **kwargs)
-
     return message_types.VoidMessage()
 
   @auth.method(
-      shelf_message.Shelf,
-      shelf_message.ListShelfResponse,
+      shelf_messages.Shelf,
+      shelf_messages.ListShelfResponse,
       name='list',
       path='list',
       http_method='POST',
@@ -162,32 +136,23 @@ class ShelfApi(root_api.Service):
 
     shelves, next_cursor, additional_results = shelf_model.Shelf.list_shelves(
         next_cursor=cursor, **filters)
-    shelf_messages = []
+    messages = []
     for shelf in shelves:
       shelf_dict = self.to_dict(shelf, shelf_model.Shelf)
-      shelf_messages.append(shelf_message.Shelf(
-          enabled=shelf_dict.get('enabled'),
-          friendly_name=shelf_dict.get('friendly_name'),
-          location=shelf_dict.get('location'),
-          latitude=shelf_dict.get('latitude'),
-          longitude=shelf_dict.get('longitude'),
-          altitude=shelf_dict.get('altitude'),
-          capacity=shelf_dict.get('capacity'),
-          audit_notification_enabled=shelf_dict.get(
-              'audit_notification_enabled'),
-          audit_requested=shelf_dict.get('audit_requested'),
-          responsible_for_audit=shelf_dict.get('responsible_for_audit'),
-          last_audit_time=shelf_dict.get('last_audit_time'),
-          last_audit_by=shelf_dict.get('last_audit_by')))
+      message = _build_shelf_message(shelf_dict)
+      message.shelf_request = shelf_messages.ShelfRequest()
+      message.shelf_request.urlsafe_key = shelf.key.urlsafe()
+      message.shelf_request.location = shelf.location
+      messages.append(message)
     if next_cursor or additional_results:
-      return shelf_message.ListShelfResponse(
-          shelves=shelf_messages,
+      return shelf_messages.ListShelfResponse(
+          shelves=messages,
           additional_results=additional_results,
           page_token=next_cursor.urlsafe())
-    return shelf_message.ListShelfResponse(shelves=shelf_messages)
+    return shelf_messages.ListShelfResponse(shelves=messages)
 
   @auth.method(
-      shelf_message.ShelfAuditRequest,
+      shelf_messages.ShelfAuditRequest,
       message_types.VoidMessage,
       name='audit',
       path='audit',
@@ -196,7 +161,7 @@ class ShelfApi(root_api.Service):
   def audit(self, request):
     """Performs an audit on a shelf based on location."""
     self.check_xsrf_token(self.request_state)
-    shelf = get_shelf(location=request.location)
+    shelf = get_shelf(request.shelf_request)
     user_email = user.get_user_email()
     devices_on_shelf = []
     devices_retrieved_on_shelf, next_cursor, more = (
@@ -209,7 +174,7 @@ class ShelfApi(root_api.Service):
         raise endpoints.NotFoundException(
             _DEVICE_DOES_NOT_EXIST_MSG % device_identifier)
       if device.shelf:
-        if device.shelf.get().location is shelf.location:
+        if device.shelf == shelf.key:
           devices_on_shelf.append(device.key)
           logging.info('Device %s is already on shelf.', device.serial_number)
           continue
@@ -226,11 +191,37 @@ class ShelfApi(root_api.Service):
     return message_types.VoidMessage()
 
 
-def get_shelf(location):
+def _build_shelf_message(shelf_dict):
+  """Builds and returns a shelf message from a dictionary.
+
+  Args:
+    shelf_dict: dict, the dictionary to convert into a
+        shelf_messages.Shelf message.
+
+  Returns:
+    A shelf_messages.Shelf message.
+  """
+  return shelf_messages.Shelf(
+      enabled=shelf_dict.get('enabled'),
+      friendly_name=shelf_dict.get('friendly_name'),
+      location=shelf_dict.get('location'),
+      latitude=shelf_dict.get('latitude'),
+      longitude=shelf_dict.get('longitude'),
+      altitude=shelf_dict.get('altitude'),
+      capacity=shelf_dict.get('capacity'),
+      audit_notification_enabled=shelf_dict.get('audit_notification_enabled'),
+      audit_requested=shelf_dict.get('audit_requested'),
+      responsible_for_audit=shelf_dict.get('responsible_for_audit'),
+      last_audit_time=shelf_dict.get('last_audit_time'),
+      last_audit_by=shelf_dict.get('last_audit_by'),
+  )
+
+
+def get_shelf(request):
   """Gets a shelf using the location.
 
   Args:
-    location: str, the location for a shelf.
+    request: shelf_messages.ShelfRequest, the request message for a shelf.
 
   Returns:
     Shelf object.
@@ -238,9 +229,11 @@ def get_shelf(location):
   Raises:
     endpoints.NotFoundException when a shelf can not be found.
   """
-  shelf = shelf_model.Shelf.get(location=location)
+  if request.urlsafe_key:
+    shelf = root_api.get_ndb_key(request.urlsafe_key).get()
+  else:
+    shelf = shelf_model.Shelf.get(location=request.location)
   if not shelf:
     raise endpoints.NotFoundException(
-        _SHELF_DOES_NOT_EXIST_MSG % location)
+        _SHELF_DOES_NOT_EXIST_MSG % request.location)
   return shelf
-

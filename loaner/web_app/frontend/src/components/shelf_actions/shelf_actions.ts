@@ -35,8 +35,6 @@ export class ShelfActionsCard implements OnInit {
   shelf = new Shelf();
   /** A bool indicating of a shelf already exists. */
   editing: boolean;
-  /** A string that stores the current location of a shelf to be edited. */
-  currentLocation: string;
   /** List of possible teams that are responsible for a shelf. */
   responsiblesForAuditList: string[];
   /** Controls the capacity input for validation. */
@@ -58,7 +56,6 @@ export class ShelfActionsCard implements OnInit {
             this.backToShelves();
           }
           this.shelf = shelf;
-          this.currentLocation = shelf.location;
           this.editing = true;
         });
       } else {
@@ -85,7 +82,7 @@ export class ShelfActionsCard implements OnInit {
    * template.
    */
   update() {
-    this.shelfService.update(this.currentLocation, this.shelf);
+    this.shelfService.update(this.shelf);
     this.backToShelfDetails();
   }
 

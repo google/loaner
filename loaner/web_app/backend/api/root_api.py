@@ -66,23 +66,6 @@ class Service(remote.Service):
         dictionary[key] = value
     return dictionary
 
-  def get_ndb_key(self, urlsafe_key):
-    """Builds an ndb.Key from a urlsafe key.
-
-    Args:
-      urlsafe_key: A urlsafe ndb.Key to cast into an ndb.Key.
-
-    Returns:
-      ndb.Key instance.
-
-    Raises:
-      endpoints.BadRequestException: if the creation of the ndb.Key fails.
-    """
-    try:
-      return ndb.Key(urlsafe=urlsafe_key)
-    except Exception:  # pylint: disable=broad-except
-      raise endpoints.BadRequestException(_CORRUPT_KEY_MSG)
-
   def get_datastore_cursor(self, urlsafe_cursor):
     """Builds a datastore.Cursor from a urlsafe cursor.
 
@@ -102,6 +85,24 @@ class Service(remote.Service):
       raise endpoints.BadRequestException(_MALFORMED_PAGE_TOKEN_MSG)
 
 
+def get_ndb_key(urlsafe_key):
+  """Builds an ndb.Key from a urlsafe key.
+
+  Args:
+    urlsafe_key: str, A urlsafe ndb.Key to cast into an ndb.Key.
+
+  Returns:
+    An ndb.Key instance.
+
+  Raises:
+    endpoints.BadRequestException: if the creation of the ndb.Key fails.
+  """
+  try:
+    return ndb.Key(urlsafe=urlsafe_key)
+  except Exception:  # pylint: disable=broad-except
+    raise endpoints.BadRequestException(_CORRUPT_KEY_MSG)
+
+
 ROOT_API = endpoints.api(
     allowed_client_ids=constants.ALLOWED_CLIENT_IDS,
     auth_level=endpoints.AUTH_LEVEL.REQUIRED,
@@ -110,3 +111,4 @@ ROOT_API = endpoints.api(
     scopes=constants.ROOT_SCOPES,
     title='Loaner API',
     version='v1')
+

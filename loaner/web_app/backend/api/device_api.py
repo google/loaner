@@ -25,6 +25,7 @@ from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
 from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
@@ -149,8 +150,8 @@ class DeviceApi(root_api.Service):
     if request.page_token:
       cursor = self.get_datastore_cursor(urlsafe_cursor=request.page_token)
     list_device_filters = self.to_dict(request, device_model.Device)
-    if request.shelf and request.shelf.location:
-      shelf = shelf_api.get_shelf(location=request.shelf.location)
+    if request.shelf:
+      shelf = shelf_api.get_shelf(request.shelf.shelf_request)
       list_device_filters['shelf'] = shelf.key
     devices, next_cursor, additional_results = (
         device_model.Device.list_devices(
@@ -353,7 +354,7 @@ def _build_device_message(
   Args:
     device: device_model.Device, an instance of device used to populate the
         ProtoRPC message.
-    shelf_message: ProtoRPC message containing a shelf_message.Shelf.
+    shelf_message: ProtoRPC message containing a shelf_messages.Shelf.
     last_reminder_message: ProtoRPC message containing a
         device_message.Reminder.
     next_reminder_message: ProtoRPC message containing a
@@ -434,22 +435,25 @@ def _build_reminder_messages(device):
 
 
 def _build_shelf_message(shelf):
-  """Builds a shelf_message.Shelf ProtoRPC message.
+  """Builds a shelf_messages.Shelf ProtoRPC message.
 
   Args:
     shelf: shelf_model.Shelf, the shelf from datastore.
 
   Returns:
-    A shelf_message.Shelf ProtoRPC message for the given shelf.
+    A shelf_messages.Shelf ProtoRPC message for the given shelf.
   """
-  return device_message.shelf_message.Shelf(
+  shelf_request = shelf_messages.ShelfRequest(
+      location=shelf.location, urlsafe_key=shelf.key.urlsafe())
+  return shelf_messages.Shelf(
       location=shelf.location, capacity=shelf.capacity,
       friendly_name=shelf.friendly_name, latitude=shelf.lat_long.lat,
       longitude=shelf.lat_long.lon, altitude=shelf.altitude,
       audit_requested=shelf.audit_requested,
       responsible_for_audit=shelf.responsible_for_audit,
       last_audit_time=shelf.last_audit_time,
-      last_audit_by=shelf.last_audit_by, enabled=shelf.enabled)
+      last_audit_by=shelf.last_audit_by, enabled=shelf.enabled,
+      shelf_request=shelf_request)
 
 
 def _get_identifier_from_request(device_request):

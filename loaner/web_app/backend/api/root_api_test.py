@@ -21,7 +21,7 @@ from protorpc import message_types
 import endpoints
 
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import shelf_message
+from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import xsrf
 from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
@@ -57,7 +57,7 @@ class RootServiceTest(loanertest.EndpointsTestCase):
           self.service.do_something, request)
 
   def test_to_dict(self):
-    message = shelf_message.Shelf(
+    message = shelf_messages.Shelf(
         location='NY', capacity=50, friendly_name='The_Big_Apple',
         audit_requested=False, responsible_for_audit='daredevils',
         last_audit_by=loanertest.USER_EMAIL, enabled=True)
@@ -73,7 +73,7 @@ class RootServiceTest(loanertest.EndpointsTestCase):
     with self.assertRaisesRegexp(
         endpoints.BadRequestException,
         root_api._CORRUPT_KEY_MSG):
-      self.root_api_service.get_ndb_key('corruptKey')
+      root_api.get_ndb_key('corruptKey')
 
   def test_get_datastore_cursor_not_found(self):
     """Test the get of a datastore.Cursor, raises endpoints.BadRequestException.

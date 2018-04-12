@@ -91,7 +91,8 @@ class SurveyApi(root_api.Service):
   def submit(self, request):
     """Submit a response to a survey question."""
     user_email = user_lib.get_user_email()
-    question = self.get_ndb_key(urlsafe_key=request.question_urlsafe_key).get()
+    question = root_api.get_ndb_key(
+        urlsafe_key=request.question_urlsafe_key).get()
     question.submit(
         acting_user=user_email,
         selected_answer=request.selected_answer,
@@ -136,7 +137,7 @@ class SurveyApi(root_api.Service):
   def patch(self, request):
     """Patch a given survey question."""
     self.check_xsrf_token(self.request_state)
-    question = self.get_ndb_key(
+    question = root_api.get_ndb_key(
         urlsafe_key=request.question_urlsafe_key).get()
     answers = []
     for answer in request.answers:

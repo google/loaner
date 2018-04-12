@@ -18,6 +18,18 @@ from protorpc import message_types
 from protorpc import messages
 
 
+class ShelfRequest(messages.Message):
+  """Get or disable Shelf Request ProtoRPC message.
+
+  Attributes:
+    location: str, The location of the shelf.
+    urlsafe_key: str, The urlsafe representation of the ndb.Key for the
+        requested shelf.
+  """
+  location = messages.StringField(1)
+  urlsafe_key = messages.StringField(2)
+
+
 class Shelf(messages.Message):
   """Shelf ProtoRPC message.
 
@@ -37,6 +49,8 @@ class Shelf(messages.Message):
     last_audit_by: str, Indicates the last user to audit the shelf.
     page_token: str, a page token to query next page results.
     page_size: int, the number of results to query for and display.
+    shelf_request: ShelfRequest, A message containing the unique identifier to
+        be used to retrieve the shelf.
   """
   enabled = messages.BooleanField(1)
   friendly_name = messages.StringField(2)
@@ -52,6 +66,7 @@ class Shelf(messages.Message):
   last_audit_by = messages.StringField(12)
   page_token = messages.StringField(13)
   page_size = messages.IntegerField(14)
+  shelf_request = messages.MessageField(ShelfRequest, 15)
 
 
 class EnrollShelfRequest(messages.Message):
@@ -82,6 +97,8 @@ class UpdateShelfRequest(messages.Message):
   """UpdateShelfRequest ProtoRPC message.
 
   Attributes:
+    shelf_request: ShelfRequest, A message containing the unique identifier to
+        be used to retrieve the shelf.
     current_location: str, The current location of the shelf being requested.
     friendly_name: str, The friendly name of the shelf.
     location: str, The location of the shelf.
@@ -89,22 +106,13 @@ class UpdateShelfRequest(messages.Message):
     longitude: float, A geographical point represented by floating-point.
     altitude: float, Indicates the floor.
   """
-  current_location = messages.StringField(1)
+  shelf_request = messages.MessageField(ShelfRequest, 1)
   friendly_name = messages.StringField(2)
   location = messages.StringField(3)
   capacity = messages.IntegerField(4)
   latitude = messages.FloatField(5)
   longitude = messages.FloatField(6)
   altitude = messages.FloatField(7)
-
-
-class GetShelfRequest(messages.Message):
-  """Get or disable Shelf Request ProtoRPC message.
-
-  Attributes:
-    location: str, The location of the shelf.
-  """
-  location = messages.StringField(1, required=True)
 
 
 class ListShelfResponse(messages.Message):
@@ -125,9 +133,10 @@ class ShelfAuditRequest(messages.Message):
   """ShelfAuditRequest ProtoRPC message.
 
   Attributes:
-    location: str, The location of the shelf.
+    shelf_request: ShelfRequest, A message containing the unique identifier to
+        be used to retrieve the shelf.
     device_identifiers: list, A list of device serial numbers to perform a
         device audit on.
   """
-  location = messages.StringField(1)
+  shelf_request = messages.MessageField(ShelfRequest, 1)
   device_identifiers = messages.StringField(2, repeated=True)

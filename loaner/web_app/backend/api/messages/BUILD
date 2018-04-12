@@ -17,9 +17,9 @@ load(
 # ==============================================================================
 
 loaner_appengine_library(
-    name = "shelf_message",
+    name = "shelf_messages",
     srcs = [
-        "shelf_message.py",
+        "shelf_messages.py",
     ],
 )
 
@@ -57,7 +57,7 @@ loaner_appengine_library(
         "device_message.py",
     ],
     deps = [
-        ":shelf_message",
+        ":shelf_messages",
     ],
 )
 

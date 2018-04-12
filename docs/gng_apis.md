@@ -447,8 +447,8 @@ Lists all devices based on any device attribute.
 |                          | for return.                                       |
 |                          | last_know_healthy: datetime, The date to indicate |
 |                          | the last known healthy status.                    |
-|                          | shelf: ndb.key, The shelf key the device is       |
-|                          | placed on.                                        |
+|                          | shelf: shelf_messages.Shelf, The shelf the device |
+|                          | is placed on.                                     |
 |                          | assigned_user: str, The email of the user who is  |
 |                          | assigned to the device.                           |
 |                          | assignment_date: datetime, The date the device    |
@@ -619,10 +619,11 @@ message_types.VoidMessage | None
 
 Get a shelf based on location.
 
-| Requests                     | Attributes                                |
-| :--------------------------- | :---------------------------------------- |
-| Get or disable Shelf Request | location: str, The location of the shelf. |
-| ProtoRPC message.            |                                           |
+| Requests                     | Attributes                                    |
+| :--------------------------- | :----------------------------------------     |
+| ShelfRequest                 | location: str, The location of the shelf.     |
+|                              | urlsafe_key: str, The urlsafe representation  |
+|                              | of a ndb.Key.                                 |
 
 | Returns                 | Attributes                                         |
 | :---------------------- | :------------------------------------------------- |
@@ -652,28 +653,19 @@ Get a shelf based on location.
 |                         | results.                                           |
 |                         | page_size: int, The number of results to query for |
 |                         | and display.                                       |
+|                         | shelf_request: ShelfRequest, A message containing  |
+|                         | the unique identifiers to be used when retrieving a|
+|                         | shelf.                                             |
 
 ##### disable
 
 Disable a shelf by its location.
 
-| Requests                     | Attributes                                |
-| :--------------------------- | :---------------------------------------- |
-| Get or disable Shelf Request | location: str, The location of the shelf. |
-| ProtoRPC message.            |                                           |
-
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
-
-##### enable
-
-Enable a shelf based on its location.
-
-| Requests                     | Attributes                                |
-| :--------------------------- | :---------------------------------------- |
-| Get or disable Shelf Request | location: str, The location of the shelf. |
-| ProtoRPC message.            |                                           |
+| Requests                     | Attributes                                    |
+| :--------------------------- | :----------------------------------------     |
+| ShelfRequest                 | location: str, The location of the shelf.     |
+|                              | urlsafe_key: str, The urlsafe representation  |
+|                              | of a ndb.Key.                                 |
 
 Returns                   | Attributes
 :------------------------ | :---------
@@ -685,9 +677,9 @@ Get a shelf using location to update its properties.
 
 | Requests                             | Attributes                            |
 | :----------------------------------- | :------------------------------------ |
-| UpdateShelfRequest ProtoRPC message. | current_location: str, The current    |
-|                                      | location of the shelf being           |
-|                                      | requested.                            |
+| UpdateShelfRequest ProtoRPC message. | shelf_request: ShelfRequest, A message|
+|                                      | containing the unique identifiers to  |
+|                                      | be used when retrieving a shelf.      |
 |                                      | friendly_name: str, The friendly name |
 |                                      | of the shelf.                         |
 |                                      | location: str, The location of the    |
@@ -748,13 +740,14 @@ List enabled or all shelves based on any shelf attribute.
 
 Performs an audit on a shelf based on location.
 
-| Requests                            | Attributes                          |
-| :---------------------------------- | :---------------------------------- |
-| ShelfAuditRequest ProtoRPC message. | location: str, The location of the  |
-|                                     | shelf.                              |
-|                                     | device_identifiers: list, A list of |
-|                                     | device serial numbers to perform a  |
-|                                     | device audit on.                    |
+| Requests                            | Attributes                             |
+| :---------------------------------- | :------------------------------------- |
+| ShelfAuditRequest ProtoRPC message. | shelf_request: ShelfRequest, A message |
+|                                     | containing the unique identifiers to   |
+|                                     | be used when retrieving a shelf.       |
+|                                     | device_identifiers: list, A list of    |
+|                                     | device serial numbers to perform a     |
+|                                     | device audit on.                       |
 
 Returns                   | Attributes
 :------------------------ | :---------

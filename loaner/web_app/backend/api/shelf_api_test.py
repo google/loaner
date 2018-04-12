@@ -14,6 +14,8 @@
 
 """Tests for backend.api.shelf_api."""
 
+import datetime
+
 import mock
 
 from protorpc import message_types
@@ -22,7 +24,7 @@ import endpoints
 
 from loaner.web_app.backend.api import root_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import shelf_api
-from loaner.web_app.backend.api.messages import shelf_message
+from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model  # pylint: disable=unused-import
 from loaner.web_app.backend.testing import loanertest
@@ -103,7 +105,7 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
   @mock.patch('__main__.shelf_model.Shelf.enroll')
   def test_enroll(self, mock_enroll, mock_xsrf_token):
     """Test Enroll with mock methods."""
-    request = shelf_message.EnrollShelfRequest(
+    request = shelf_messages.EnrollShelfRequest(
         location='nyc', capacity=100, friendly_name='test', latitude=12.5,
         longitude=12.5, altitude=2.0, responsible_for_audit='precise')
     response = self.service.enroll(request)
@@ -111,50 +113,38 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
     self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_enroll_bad_request(self):
-    request = shelf_message.EnrollShelfRequest(capacity=10)
+    request = shelf_messages.EnrollShelfRequest(capacity=10)
     with self.assertRaisesRegexp(
         shelf_api.endpoints.BadRequestException,
         'Entity has uninitialized properties'):
       self.service.enroll(request)
-    request = shelf_message.EnrollShelfRequest(
+    request = shelf_messages.EnrollShelfRequest(
         location='nyc', capacity=10, latitude=12.5)
     with self.assertRaisesRegexp(
         shelf_api.endpoints.BadRequestException,
         shelf_model._LAT_LONG_MSG):
       self.service.enroll(request)
 
-  def test_get(self):
-    shelf = shelf_model.Shelf.get(location='MTV')
-    self.assertEqual(shelf.capacity, 20)
-
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   def test_get_by_location(self, mock_xsrf_token):
-    request = shelf_message.GetShelfRequest(location='NYC')
+    request = shelf_messages.ShelfRequest(location='NYC')
     response = self.service.get(request)
     mock_xsrf_token.assert_called_once()
     self.assertEqual(self.shelf.location, response.location)
     self.assertEqual(self.shelf.friendly_name, response.friendly_name)
 
   def test_disable_by_location(self):
-    request = shelf_message.GetShelfRequest(location='NYC')
+    request = shelf_messages.ShelfRequest(location='NYC')
     self.assertTrue(self.shelf.enabled)
     response = self.service.disable(request)
     self.assertFalse(self.shelf.enabled)
     self.assertIsInstance(response, message_types.VoidMessage)
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
-  def test_enable_by_location(self, mock_xsrf_token):
-    request = shelf_message.GetShelfRequest(location='SVL')
-    self.assertFalse(self.disabled_shelf.enabled)
-    response = self.service.enable(request)
-    mock_xsrf_token.assert_called_once()
-    self.assertTrue(self.disabled_shelf.enabled)
-    self.assertIsInstance(response, message_types.VoidMessage)
-
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
   def test_update_using_location(self, mock_xsrf_token):
-    request = shelf_message.UpdateShelfRequest(
-        current_location='NYC', location='NYC-9th')
+    request = shelf_messages.UpdateShelfRequest(
+        shelf_request=shelf_messages.ShelfRequest(location='NYC'),
+        location='NYC-9th')
     response = self.service.update(request)
     mock_xsrf_token.assert_called_once()
     self.assertEqual(self.shelf.location, 'NYC-9th')
@@ -164,20 +154,20 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   def test_list_shelves(self, mock_xsrf_token):
-    request = shelf_message.Shelf(enabled=True)
+    request = shelf_messages.Shelf(enabled=True)
     response = self.service.list_shelves(request)
     mock_xsrf_token.assert_called_once()
     self.assertEqual(3, len(response.shelves))
 
   def test_list_shelves_with_page_token(self):
-    request = shelf_message.Shelf(enabled=True, page_size=1)
+    request = shelf_messages.Shelf(enabled=True, page_size=1)
     response = self.service.list_shelves(request)
     response_shelves = []
     while response.page_token or response.additional_results:
       for shelf in response.shelves:
         self.assertTrue(shelf.location in self.shelf_locations)
         response_shelves.append(shelf)
-      request = shelf_message.Shelf(
+      request = shelf_messages.Shelf(
           enabled=True, page_size=1, page_token=response.page_token)
       response = self.service.list_shelves(request)
     self.assertEqual(len(response_shelves), 3)
@@ -185,8 +175,9 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   @mock.patch('__main__.shelf_api.logging.info')
   def test_audit_using_shelf_location(self, mock_logging, mock_xsrf_token):
-    request = shelf_message.ShelfAuditRequest(
-        location='NYC', device_identifiers=self.device_identifiers)
+    request = shelf_messages.ShelfAuditRequest(
+        shelf_request=shelf_messages.ShelfRequest(location='NYC'),
+        device_identifiers=self.device_identifiers)
     response = self.service.audit(request)
     mock_xsrf_token.assert_called_once()
     mock_logging.assert_called()
@@ -198,8 +189,9 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
     self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_audit_invlid_device(self):
-    request = shelf_message.ShelfAuditRequest(
-        location='NYC', device_identifiers=['Invalid'])
+    request = shelf_messages.ShelfAuditRequest(
+        shelf_request=shelf_messages.ShelfRequest(location='NYC'),
+        device_identifiers=['Invalid'])
     with self.assertRaisesRegexp(
         endpoints.NotFoundException,
         shelf_api._DEVICE_DOES_NOT_EXIST_MSG % 'Invalid'):
@@ -208,8 +200,8 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
   def test_audit_unable_to_move_to_shelf(self):
     self.shelf.capacity = len(device_model.Device.list_devices(
         shelf=self.shelf.key))
-    request = shelf_message.ShelfAuditRequest(
-        location=self.shelf.location,
+    request = shelf_messages.ShelfAuditRequest(
+        shelf_request=shelf_messages.ShelfRequest(location=self.shelf.location),
         device_identifiers=self.device_identifiers)
     with self.assertRaises(endpoints.BadRequestException):
       self.service.audit(request)
@@ -225,25 +217,50 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
         [self.device2.get().key, self.device3.get().key,
          self.device4.get().key], None, False)
     mock_get_shelf.return_value = self.shelf
-    request = shelf_message.ShelfAuditRequest(
-        location=self.shelf.location,
+    request = shelf_messages.ShelfAuditRequest(
+        shelf_request=shelf_messages.ShelfRequest(location=self.shelf.location),
         device_identifiers=[self.device3.get().serial_number])
     self.service.audit(request)
     self.assertEqual(self.device3.get().shelf, self.shelf.key)
     self.assertEqual(self.device2.get().shelf, None)
     self.assertEqual(self.device4.get().shelf, None)
 
+  def test_build_shelf_message(self):
+    """Test building a shelf message from a shelf dictionary."""
+    now = datetime.datetime.utcnow()
+    test_data = {
+        'enabled': True, 'friendly_name': 'New York', 'location': 'NYC',
+        'latitude': 40.04, 'longitude': 50.05, 'altitude': 10.01,
+        'capacity': 10, 'audit_notification_enabled': False,
+        'audit_requested': True, 'responsible_for_audit': 'me',
+        'last_audit_time': now, 'last_audit_by': 'you'}
+    expected_response = shelf_messages.Shelf(
+        enabled=True, friendly_name='New York', location='NYC',
+        latitude=40.04, longitude=50.05, altitude=10.01, capacity=10,
+        audit_notification_enabled=False, audit_requested=True,
+        responsible_for_audit='me', last_audit_time=now, last_audit_by='you')
+    response = shelf_api._build_shelf_message(test_data)
+    self.assertEqual(response, expected_response)
+
+  def test_get_shelf_urlsafe_key(self):
+    """Test getting a shelf using the urlsafe key."""
+    request = shelf_messages.ShelfRequest(urlsafe_key=self.shelf.key.urlsafe())
+    shelf = shelf_api.get_shelf(request)
+    self.assertEqual(shelf, self.shelf)
+
   def test_get_shelf_using_location(self):
-    location = self.shelf.location
-    shelf = shelf_api.get_shelf(location=location)
+    """Test getting a shelf using the location."""
+    request = shelf_messages.ShelfRequest(location=self.shelf.location)
+    shelf = shelf_api.get_shelf(request)
     self.assertEqual(shelf, self.shelf)
 
   def test_get_shelf_using_location_error(self):
-    location = 'Not_Valid'
+    """Test getting a shelf with an invalid location."""
+    request = shelf_messages.ShelfRequest(location='Not_Valid')
     with self.assertRaisesRegexp(
         endpoints.NotFoundException,
-        shelf_api._SHELF_DOES_NOT_EXIST_MSG % location):
-      shelf_api.get_shelf(location=location)
+        shelf_api._SHELF_DOES_NOT_EXIST_MSG % request.location):
+      shelf_api.get_shelf(request)
 
 
 if __name__ == '__main__':

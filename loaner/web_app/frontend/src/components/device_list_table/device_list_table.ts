@@ -107,8 +107,14 @@ export class DeviceListTable extends LoaderView implements OnInit {
                 if (this.pauseLoading) return NEVER;
                 this.loading = true;
                 if (this.shelf) {
-                  return this.deviceData.refresh(
-                      {shelf: {location: this.shelf.location}});
+                  return this.deviceData.refresh({
+                    shelf: {
+                      shelf_request: {
+                        location: this.shelf.shelfRequest.location,
+                        urlsafe_key: this.shelf.shelfRequest.urlsafe_key
+                      }
+                    }
+                  });
                 } else {
                   return this.deviceData.refresh();
                 }

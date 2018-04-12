@@ -42,20 +42,18 @@ export class ShelfService extends ApiService {
    */
   create(newShelf: Shelf) {
     this.post('enroll', newShelf.toApiMessage()).subscribe(res => {
-      this.snackBar.open(`Shelf ${newShelf.location} created.`);
+      this.snackBar.open(`Shelf ${newShelf.name} created.`);
     });
   }
 
   /**
    * Update a particular shelf calling the backend.
    * @param newShelf New shelf information.
-   * @param oldLocation Old shelf location to retrive old shelf info.
    */
-  update(oldLocation: string, newShelf: Shelf) {
+  update(newShelf: Shelf) {
     const shelfToBeUpdated = newShelf.toApiMessage();
-    shelfToBeUpdated['current_location'] = oldLocation;
     this.post('update', shelfToBeUpdated).subscribe(() => {
-      this.snackBar.open(`Shelf ${oldLocation} updated.`);
+      this.snackBar.open(`Shelf ${newShelf.name} updated.`);
     });
   }
 
@@ -65,7 +63,7 @@ export class ShelfService extends ApiService {
    */
   disable(shelf: Shelf) {
     this.post('disable', shelf.toApiMessage()).subscribe(res => {
-      this.snackBar.open(`Shelf ${shelf.location} disabled.`);
+      this.snackBar.open(`Shelf ${shelf.name} disabled.`);
     });
   }
 

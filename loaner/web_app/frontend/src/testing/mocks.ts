@@ -18,7 +18,7 @@ import {CONFIG} from '../app.config';
 import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
 import {Device} from '../models/device';
-import {Shelf} from '../models/shelf';
+import {Shelf, ShelfRequestParams} from '../models/shelf';
 import {User} from '../models/user';
 
 
@@ -30,6 +30,10 @@ export class ShelfServiceMock {
       last_audit_by: 'user',
       capacity: 10,
       last_audit_time: 1499202031707,
+      shelf_request: {
+        location: 'Location 1',
+        urlsafe_key: 'urlsafekey1',
+      }
     }),
     new Shelf({
       friendly_name: 'Friendly name 2',
@@ -37,6 +41,10 @@ export class ShelfServiceMock {
       last_audit_by: 'user',
       capacity: 10,
       last_audit_time: 1499202031707,
+      shelf_request: {
+        location: 'Location 2',
+        urlsafe_key: 'urlsafekey2',
+      }
     }),
     new Shelf({
       friendly_name: 'Friendly name 3',
@@ -44,6 +52,10 @@ export class ShelfServiceMock {
       last_audit_by: 'user',
       capacity: 10,
       last_audit_time: 1499202031707,
+      shelf_request: {
+        location: 'Location 3',
+        urlsafe_key: 'urlsafekey3',
+      }
     }),
     new Shelf({
       friendly_name: 'Friendly name 4',
@@ -51,6 +63,10 @@ export class ShelfServiceMock {
       last_audit_by: 'user',
       capacity: 10,
       last_audit_time: 1499202031707,
+      shelf_request: {
+        location: 'Location 4',
+        urlsafe_key: 'urlsafekey4',
+      }
     }),
     new Shelf({
       friendly_name: 'Friendly name 5',
@@ -58,6 +74,10 @@ export class ShelfServiceMock {
       last_audit_by: 'user',
       capacity: 10,
       last_audit_time: 1499202031707,
+      shelf_request: {
+        location: 'Location 5',
+        urlsafe_key: 'urlsafekey5',
+      }
     }),
   ]);
   create() {
@@ -380,11 +400,17 @@ export class UserServiceMock {
   }
 }
 
+export const TEST_SHELF_REQUEST: ShelfRequestParams = {
+  location: 'FAKE LOCATION',
+  urlsafe_key: 'FAKE_URLSAFE_KEY',
+};
+
 export const TEST_SHELF = new Shelf({
   friendly_name: 'FAKE SHELF',
   location: 'FAKE LOCATION',
   capacity: 5,
   responsible_for_audit: 'me',
+  shelf_request: TEST_SHELF_REQUEST,
 });
 
 export class ActivatedRouteMock {

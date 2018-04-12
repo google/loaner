@@ -17,7 +17,7 @@
 from protorpc import message_types
 from protorpc import messages
 
-from loaner.web_app.backend.api.messages import shelf_message
+from loaner.web_app.backend.api.messages import shelf_messages
 
 
 class Reminder(messages.Message):
@@ -61,7 +61,7 @@ class Device(messages.Message):
     due_date: datetime, The date that device is due for return.
     last_know_healthy: datetime, The date to indicate the last known healthy
         status.
-    shelf: ndb.key, The shelf key the device is placed on.
+    shelf: shelf_messages.Shelf, The message for a shelf.
     assigned_user: str, The email of the user who is assigned to the device.
     assignment_date: datetime, The date the device was assigned to a user.
     current_ou: str, The current organizational unit the device belongs to.
@@ -90,7 +90,7 @@ class Device(messages.Message):
   device_model = messages.StringField(4)
   due_date = message_types.DateTimeField(5)
   last_known_healthy = message_types.DateTimeField(6)
-  shelf = messages.MessageField(shelf_message.Shelf, 7)
+  shelf = messages.MessageField(shelf_messages.Shelf, 7)
   assigned_user = messages.StringField(8)
   assignment_date = message_types.DateTimeField(9)
   current_ou = messages.StringField(10)

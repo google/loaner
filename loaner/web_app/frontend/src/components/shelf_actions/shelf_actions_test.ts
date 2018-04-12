@@ -159,11 +159,9 @@ describe('ShelfActionsComponent', () => {
     fixture.detectChanges();
 
     componentInstance.shelf = TEST_SHELF;
-    componentInstance.currentLocation = TEST_SHELF.location;
     componentInstance.editing = true;
     componentInstance.update();
-    expect(shelfService.update)
-        .toHaveBeenCalledWith(TEST_SHELF.location, TEST_SHELF);
+    expect(shelfService.update).toHaveBeenCalledWith(TEST_SHELF);
     expect(componentInstance.shelf.name).toBe('FAKE SHELF');
   });
 });
