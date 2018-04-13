@@ -148,6 +148,7 @@ describe('DeviceInfoCardComponent', () => {
       TEST_DEVICE_1,
       TEST_DEVICE_2,
     ]));
+    params.next({id: TEST_DEVICE_2.assetTag});
     fixture.detectChanges();
     let compiled = fixture.debugElement.nativeElement;
     let selectedTab =
@@ -155,7 +156,7 @@ describe('DeviceInfoCardComponent', () => {
             .textContent;
     expect(selectedTab).toContain(TEST_DEVICE_2.assetTag);
 
-    params.next({id: TEST_DEVICE_1.serialNumber});
+    params.next({id: TEST_DEVICE_1.assetTag});
     deviceInfoCard.ngOnInit();
     fixture.detectChanges();
     compiled = fixture.debugElement.nativeElement;

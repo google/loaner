@@ -123,8 +123,8 @@ export class DeviceDataSource extends DataSource<{}> {
       let propertyB: Date|string = '';
 
       switch (this.sort.active) {
-        case 'serialNumber':
-          [propertyA, propertyB] = [a.serialNumber, b.serialNumber];
+        case 'id':
+          [propertyA, propertyB] = [a.id, b.id];
           break;
         case 'returnDate':
           [propertyA, propertyB] = [a.dueDate, b.dueDate];

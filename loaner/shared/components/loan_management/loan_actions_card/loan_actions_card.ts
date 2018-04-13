@@ -53,7 +53,6 @@ export class LoanActionsCardComponent {
   @Input() additionalManagementText = '';
   @Input() pendingReturn = false;
   @Input() dueDate: Date;
-  @Input() assetTag = '';
-  @Input() serialNumber = '';
+  @Input() deviceId = '';
   @Input() oneOfMany = false;
 }

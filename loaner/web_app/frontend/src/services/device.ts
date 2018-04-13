@@ -179,7 +179,7 @@ export class DeviceService extends ApiService {
    */
   enroll(newDevice: Device) {
     return this.post<void>('enroll', newDevice.toApiMessage()).pipe(tap(() => {
-      this.snackBar.open(`Device ${newDevice.serialNumber} enrolled.`);
+      this.snackBar.open(`Device ${newDevice.id} enrolled.`);
     }));
   }
 
@@ -191,8 +191,7 @@ export class DeviceService extends ApiService {
   unenroll(deviceToBeUnenrolled: Device): Observable<void> {
     return this.post<void>('unenroll', deviceToBeUnenrolled.toApiMessage())
         .pipe(tap(() => {
-          this.snackBar.open(
-              `Device ${deviceToBeUnenrolled.serialNumber} removed.`);
+          this.snackBar.open(`Device ${deviceToBeUnenrolled.id} removed.`);
         }));
   }
 }

@@ -18,7 +18,6 @@ import {ActivatedRoute} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import {Observable, of} from 'rxjs';
 
-import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
@@ -79,7 +78,7 @@ describe('AuditTableComponent', () => {
     expect(inputContainer).toBeTruthy();
     expect(inputContainer.querySelector('input[matInput]')
                .getAttribute('placeholder'))
-        .toBe('Serial Number');
+        .toBe('Identifier');
   });
 
   it('has a audit empty button at beginning', () => {
@@ -87,20 +86,13 @@ describe('AuditTableComponent', () => {
     const compiled = fixture.debugElement.nativeElement;
     const auditEmptyButton = compiled.querySelector('button.audit');
     expect(auditEmptyButton).toBeTruthy();
-    expect(auditEmptyButton.textContent).toBe('Audit Empty');
+    expect(auditEmptyButton.textContent).toContain('Audit Empty');
   });
 
   it('enables audit button with only READY elements in the list', () => {
     auditTable.devicesToBeCheckedIn = [
       {
-        device: new Device({
-          asset_tag: '321653',
-          device_model: 'chromebook',
-          serial_number: '321653',
-          pending_return: false,
-          assigned_on_date: 1499202031707,
-          last_update: 1499202031707,
-        }),
+        deviceId: '321653',
         status: Status.READY,
       },
     ];
@@ -114,25 +106,11 @@ describe('AuditTableComponent', () => {
   it('disables audit button with ERROR elements only in the list', () => {
     auditTable.devicesToBeCheckedIn = [
       {
-        device: new Device({
-          asset_tag: '321653',
-          device_model: 'chromebook',
-          serial_number: '321653',
-          pending_return: false,
-          assigned_on_date: 1499202031707,
-          last_update: 1499202031707,
-        }),
+        deviceId: '321653',
         status: Status.READY,
       },
       {
-        device: new Device({
-          asset_tag: '321653',
-          device_model: 'chromebook',
-          serial_number: '321653',
-          pending_return: false,
-          assigned_on_date: 1499202031707,
-          last_update: 1499202031707,
-        }),
+        deviceId: '321653',
         status: Status.ERROR,
       },
     ];
@@ -146,14 +124,7 @@ describe('AuditTableComponent', () => {
   it('calls shelf service when audit button is clicked', () => {
     auditTable.devicesToBeCheckedIn = [
       {
-        device: new Device({
-          asset_tag: '1',
-          device_model: 'chromebook',
-          serial_number: '321653',
-          pending_return: false,
-          assigned_on_date: 1499202031707,
-          last_update: 1499202031707,
-        }),
+        deviceId: '321653',
         status: Status.READY,
       },
     ];
@@ -187,7 +158,6 @@ describe('AuditTableComponent', () => {
     const matCard = compiled.querySelector('.mat-card');
     const matCardContent = matCard.querySelector('.mat-card-content');
     const auditEmptyButton = compiled.querySelector('button.audit');
-    console.log(auditEmptyButton);
     const shelfService = TestBed.get(ShelfService);
     spyOn(shelfService, 'audit').and.callThrough();
 
@@ -222,8 +192,7 @@ describe('AuditTableComponent', () => {
     addButton.dispatchEvent(new Event('click'));
 
     expect(auditTable.devicesToBeCheckedIn.length).toBe(1);
-    expect(auditTable.devicesToBeCheckedIn[0].device.serialNumber)
-        .toBe('123123');
+    expect(auditTable.devicesToBeCheckedIn[0].deviceId).toBe('123123');
 
     fixture.detectChanges();
     expect(matCardContent.querySelectorAll('.mat-list > .mat-list-item').length)
@@ -244,8 +213,7 @@ describe('AuditTableComponent', () => {
     }));
 
     expect(auditTable.devicesToBeCheckedIn.length).toBe(1);
-    expect(auditTable.devicesToBeCheckedIn[0].device.serialNumber)
-        .toBe('123123');
+    expect(auditTable.devicesToBeCheckedIn[0].deviceId).toBe('123123');
 
     fixture.detectChanges();
     expect(matCardContent.querySelectorAll('.mat-list > .mat-list-item').length)
@@ -255,25 +223,11 @@ describe('AuditTableComponent', () => {
   it('decrement devicesToBeChecked when "Close" button is clicked.', () => {
     auditTable.devicesToBeCheckedIn = [
       {
-        device: new Device({
-          asset_tag: '321653',
-          device_model: 'chromebook',
-          serial_number: '321653',
-          pending_return: false,
-          assigned_on_date: 1499202031707,
-          last_update: 1499202031707,
-        }),
+        deviceId: '321653',
         status: Status.READY,
       },
       {
-        device: new Device({
-          asset_tag: '156854168',
-          device_model: 'chromebook',
-          serial_number: '156854168',
-          pending_return: false,
-          assigned_on_date: 1499202031707,
-          last_update: 1499202031707,
-        }),
+        deviceId: '156854168',
         status: Status.READY,
       },
     ];
@@ -301,7 +255,7 @@ describe('AuditTableComponent', () => {
     const matCardContent = matCard.querySelector('.mat-card-content');
 
     auditTable.devicesToBeCheckedIn = [{
-      device: new Device({asset_tag: '12123'}),
+      deviceId: '12123',
       status: Status.READY,
     }];
 
@@ -322,7 +276,7 @@ describe('AuditTableComponent', () => {
     const matCardContent = matCard.querySelector('.mat-card-content');
 
     auditTable.devicesToBeCheckedIn = [{
-      device: new Device({asset_tag: '12123'}),
+      deviceId: '12123',
       status: Status.ERROR,
     }];
 

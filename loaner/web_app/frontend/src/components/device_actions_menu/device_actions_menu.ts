@@ -41,9 +41,11 @@ export class DeviceActionsMenu {
   constructor(
       private readonly damagedService: Damaged,
       private readonly deviceService: DeviceService,
-      private readonly dialog: Dialog, private readonly extendService: Extend,
+      private readonly dialog: Dialog,
+      private readonly extendService: Extend,
       private readonly guestModeService: GuestMode,
-      private readonly lostService: Lost) {}
+      private readonly lostService: Lost,
+  ) {}
 
   /** Dialog for removing a device. */
   openRemoveDeviceDialog() {
@@ -70,11 +72,10 @@ export class DeviceActionsMenu {
   enableGuestMode(device: Device) {
     this.guestModeService.openDialog();
     this.guestModeService.onGuestModeEnabled
-        .pipe(switchMap(
-            () => this.deviceService.enableGuestMode(device.serialNumber)))
+        .pipe(switchMap(() => this.deviceService.enableGuestMode(device.id)))
         .subscribe(() => {
           this.guestModeService.finished();
-          this.refreshDevice.emit(device.serialNumber);
+          this.refreshDevice.emit(device.id);
         });
   }
 
@@ -88,13 +89,13 @@ export class DeviceActionsMenu {
     this.extendService.onExtended
         .pipe(switchMap(newDate => {
           temporaryNewDate = newDate;
-          return this.deviceService.extend(newDate, device.serialNumber);
+          return this.deviceService.extend(newDate, device.id);
         }))
         .subscribe(
             () => {
               this.extendService.finished(new Date(temporaryNewDate));
               temporaryNewDate = '';
-              this.refreshDevice.emit(device.serialNumber);
+              this.refreshDevice.emit(device.id);
             },
             () => {
               this.extendService.close();
@@ -106,10 +107,10 @@ export class DeviceActionsMenu {
    * @param device The device to take action on.
    */
   onReturned(device: Device) {
-    this.deviceService.returnDevice(device.serialNumber).subscribe(() => {
+    this.deviceService.returnDevice(device.id).subscribe(() => {
       device.pendingReturn = true;
     });
-    this.refreshDevice.emit(device.serialNumber);
+    this.refreshDevice.emit(device.id);
   }
 
   /**
@@ -120,12 +121,12 @@ export class DeviceActionsMenu {
     this.damagedService.openDialog();
     this.damagedService.onDamaged
         .pipe(switchMap(
-            damagedReason => this.deviceService.markAsDamaged(
-                device.serialNumber, damagedReason)))
+            damagedReason =>
+                this.deviceService.markAsDamaged(device.id, damagedReason)))
         .subscribe(
             () => {
               this.damagedService.finished();
-              this.refreshDevice.emit(device.serialNumber);
+              this.refreshDevice.emit(device.id);
             },
             () => {
               this.damagedService.close();
@@ -139,12 +140,11 @@ export class DeviceActionsMenu {
   onLost(device: Device) {
     this.lostService.openDialog();
     this.lostService.onLost
-        .pipe(
-            switchMap(() => this.deviceService.markAsLost(device.serialNumber)))
+        .pipe(switchMap(() => this.deviceService.markAsLost(device.id)))
         .subscribe(
             () => {
               this.lostService.finished();
-              this.refreshDevice.emit(device.serialNumber);
+              this.refreshDevice.emit(device.id);
             },
             () => {
               this.lostService.close();

@@ -81,7 +81,7 @@
 
       <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *cdkRowDef="let device; columns: displayedColumns;"
-              routerLink="/device/{{device.serialNumber}}"
+              routerLink="/device/{{device.id}}"
                (focus)="pauseLoading=true;"
                (blur)="pauseLoading=false;">
       </mat-row>

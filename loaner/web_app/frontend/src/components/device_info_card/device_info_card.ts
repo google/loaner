@@ -67,14 +67,14 @@ export class DeviceInfoCard implements OnInit {
         }))
         .subscribe(userDevices => {
           this.loanedDevices = userDevices.sort((a, b) => {
-            if (!a.lastHeartbeat || !b.lastHeartbeat) return 0;
-            return b.lastHeartbeat.getTime() - a.lastHeartbeat.getTime();
+            if (!a.id || !b.id) return 0;
+            return Number(b.id) - Number(a.id);
           });
 
           this.route.params.subscribe((params) => {
             if (params.id) {
               this.selectedTab = this.loanedDevices.findIndex(
-                  device => device.serialNumber === params.id);
+                  device => device.id === params.id);
             }
           });
         });
@@ -85,7 +85,7 @@ export class DeviceInfoCard implements OnInit {
    * @param device The device to take action on.
    */
   onGuestModeEnabled(device: Device) {
-    this.deviceService.enableGuestMode(device.serialNumber).subscribe(() => {
+    this.deviceService.enableGuestMode(device.id).subscribe(() => {
       this.guestModeService.finished();
       device.guestEnabled = true;
     });
@@ -100,7 +100,7 @@ export class DeviceInfoCard implements OnInit {
    */
   onExtended(device: Device, formattedNewDueDate: string) {
     const newReturnDate = moment(formattedNewDueDate).toDate();
-    this.deviceService.extend(formattedNewDueDate, device.serialNumber)
+    this.deviceService.extend(formattedNewDueDate, device.id)
         .subscribe(
             () => {
               this.extendService.finished(newReturnDate);
@@ -117,7 +117,7 @@ export class DeviceInfoCard implements OnInit {
    * @param device The device to take action on.
    */
   onReturned(device: Device) {
-    this.deviceService.returnDevice(device.serialNumber).subscribe(() => {
+    this.deviceService.returnDevice(device.id).subscribe(() => {
       device.pendingReturn = true;
     });
   }
@@ -129,7 +129,7 @@ export class DeviceInfoCard implements OnInit {
    * @param damagedReason The reason why this device is being marked as damaged.
    */
   onDamaged(device: Device, damagedReason: string) {
-    this.deviceService.markAsDamaged(device.serialNumber, damagedReason)
+    this.deviceService.markAsDamaged(device.id, damagedReason)
         .subscribe(
             () => {
               this.damagedService.finished();
@@ -145,19 +145,18 @@ export class DeviceInfoCard implements OnInit {
    * @param device The device to take action on.
    */
   onLost(device: Device) {
-    this.deviceService.markAsLost(device.serialNumber)
-        .subscribe(
-            () => {
-              this.lostService.finished();
-            },
-            () => {
-              this.lostService.close();
-            });
+    this.deviceService.markAsLost(device.id).subscribe(
+        () => {
+          this.lostService.finished();
+        },
+        () => {
+          this.lostService.close();
+        });
   }
 
   /** Calls the deviceService to resume the loan. */
   onLoanResumed(device: Device) {
-    this.deviceService.resumeLoan(device.serialNumber).subscribe(() => {
+    this.deviceService.resumeLoan(device.id).subscribe(() => {
       this.resumeService.finished();
       device.pendingReturn = false;
     });

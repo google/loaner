@@ -7,7 +7,7 @@
       <ng-container *ngIf="pendingReturn">
         This device
         <ng-container *ngIf="oneOfMany">
-          ({{ assetTag ? 'asset tag' : 'serial number' }} {{ assetTag ? assetTag : serialNumber }})
+            {{deviceId}}
         </ng-container>
         is marked as being returned. If you would like to resume your loan,
         please click the button below.
@@ -15,7 +15,7 @@
       <ng-container *ngIf="dueDate && !pendingReturn">
         <p>
           Please return this device
-          ({{ assetTag ? 'asset tag' : 'serial number'}} {{assetTag ? assetTag : serialNumber }})
+          {{deviceId}}
           by:
         </p>
         <span class="mat-title">{{ dueDate | date: 'fullDate' }}</span>

@@ -8,7 +8,7 @@
     <mat-table #table [dataSource]="dataSource">
       <ng-container cdkColumnDef="identifier">
         <mat-header-cell *cdkHeaderCellDef> Identifier </mat-header-cell>
-        <mat-cell *cdkCellDef="let row"> {{row.serialNumber}} </mat-cell>
+        <mat-cell *cdkCellDef="let row"> {{row.id}} </mat-cell>
       </ng-container>
 
       <ng-container cdkColumnDef="assignedOnDate">

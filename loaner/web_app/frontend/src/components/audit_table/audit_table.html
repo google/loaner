@@ -18,7 +18,7 @@
     <mat-form-field>
       <input matInput
             (keyup.enter)="addDevice(currentInput)"
-            placeholder="Serial Number"
+            placeholder="Identifier"
             #currentInput>
     </mat-form-field>
     <button class="add-to-audit-list-button"
@@ -34,7 +34,7 @@
   <mat-card-content>
     <mat-list *ngIf="!isEmpty">
       <mat-list-item *ngFor="let device of devicesToBeCheckedIn">
-        <span>{{device.device.serialNumber}}</span>
+        <span>{{device.deviceId}}</span>
         <span fxFlex></span>
         <mat-progress-spinner *ngIf="device.status == status.IN_PROGRESS"
                               [diameter]="24" [strokeWidth]="24 / 10"
@@ -58,7 +58,9 @@
                     class="status error">
             error
           </mat-icon>
-          <span class="cdk-visually-hidden">Error auditing device: {{device.message}}</span>
+          <span class="cdk-visually-hidden">
+            Error auditing device: {{device.message}}
+          </span>
         </div>
 
         <!-- Remove device from audit button -->
@@ -80,7 +82,9 @@
               color="primary"
               [disabled]="!isReadyForAudit"
               class="audit"
-              (click)="isEmpty ? auditAsEmpty() : audit()">{{ isEmpty ? 'Audit Empty' : 'Audit' }}</button>
+              (click)="isEmpty ? auditAsEmpty() : audit()">
+        {{ isEmpty ? 'Audit Empty' : 'Audit' }}
+      </button>
     </p>
   </mat-card-content>
 </mat-card>

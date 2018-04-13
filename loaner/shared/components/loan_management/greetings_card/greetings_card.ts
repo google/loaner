@@ -25,8 +25,6 @@ import {Component, Input} from '@angular/core';
 export class GreetingsCardComponent {
   @Input() dueDate: Date;
   @Input() userDisplayName: string;
-  @Input() assetTag: string;
-  @Input() serialNumber: string;
   @Input() numberOfAssignedDevices = 1;
   @Input() pendingReturn = false;
 }

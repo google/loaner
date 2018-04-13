@@ -13,8 +13,7 @@
           <div fxLayout="column" fxLayoutAlign="center center">
             <loaner-loan-actions-card [pendingReturn]="device.pendingReturn"
                                       [dueDate]="device.dueDate"
-                                      [serialNumber]="device.serialNumber"
-                                      [assetTag]="device.assetTag"
+                                      [deviceId]="device.id"
                                       [oneOfMany]="loanedDevices.length > 1">
               <loan-button extendButton
                            [canExtend]="device.canExtend"

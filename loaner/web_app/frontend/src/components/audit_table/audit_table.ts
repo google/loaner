@@ -17,7 +17,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 
 import {LoaderView} from '../../../../../shared/components/loader';
 
-import {Device} from '../../models/device';
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
@@ -38,7 +37,7 @@ export enum Status {
  * error/success message, if any.
  */
 export interface DeviceToBeCheckedIn {
-  device: Device;
+  deviceId: string;
   status: Status;
   message?: string;
 }
@@ -60,9 +59,11 @@ export class AuditTable extends LoaderView implements OnInit {
 
   constructor(
       private readonly deviceService: DeviceService,
-      private readonly dialog: Dialog, private readonly route: ActivatedRoute,
+      private readonly dialog: Dialog,
+      private readonly route: ActivatedRoute,
       private readonly router: Router,
-      private readonly shelfService: ShelfService) {
+      private readonly shelfService: ShelfService,
+  ) {
     super(true);
   }
 
@@ -97,9 +98,7 @@ export class AuditTable extends LoaderView implements OnInit {
     let deviceToBeCheckedIn: DeviceToBeCheckedIn;
     if (deviceId) {
       deviceToBeCheckedIn = {
-        device: new Device({
-          serial_number: deviceId,
-        }),
+        deviceId,
         status: Status.IN_PROGRESS,
       };
 
@@ -138,8 +137,7 @@ export class AuditTable extends LoaderView implements OnInit {
    */
   private updateDeviceInList(deviceToBeCheckedIn: DeviceToBeCheckedIn) {
     const deviceToBeRemoved = this.devicesToBeCheckedIn.find(
-        device => device.device.serialNumber ===
-            deviceToBeCheckedIn.device.serialNumber);
+        device => device.deviceId === deviceToBeCheckedIn.deviceId);
     const index = this.devicesToBeCheckedIn.indexOf(deviceToBeRemoved);
     if (index !== -1) {
       this.devicesToBeCheckedIn[index] = deviceToBeCheckedIn;
@@ -180,7 +178,7 @@ export class AuditTable extends LoaderView implements OnInit {
   /** Performs the shelf audit with all devices that are in the current pool. */
   audit() {
     const deviceIdList =
-        this.devicesToBeCheckedIn.map(device => device.device.serialNumber);
+        this.devicesToBeCheckedIn.map(device => device.deviceId);
     this.waiting();
     this.shelfService.audit(this.shelf, deviceIdList).subscribe(() => {
       this.devicesToBeCheckedIn = [];
