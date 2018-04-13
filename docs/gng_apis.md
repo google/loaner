@@ -206,7 +206,7 @@ message_types.VoidMessage | None
 
 ### Chrome_api
 
-The entry point for the GnG Loaners Chrome app.
+The entry point for the GnG Loaners Chrome App.
 
 #### Methods
 

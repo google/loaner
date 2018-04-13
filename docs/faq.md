@@ -12,12 +12,12 @@ differences:
     enabled temporarily after you log in).
 *   Devices cannot be reset or wiped manually.
 *   Developer mode is disabled.
-*   You get the GnG Chrome OS App after you log in (use this to manage your
+*   You get the Grab n Go Chrome App after you log in (use this to manage your
     loaner).
 
 ## How do I enable Guest mode?
 
-After you complete the onboarding instructions in the Grab n Go Chrome OS App
+After you complete the onboarding instructions in the Grab n Go Chrome App
 (available after you log into a GnG device), the option to enable guest mode
 appears on the GnG landing page. You can also access GnG any time during your
 loan from your loaner Chromebook to enable guest mode.
