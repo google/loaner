@@ -16,9 +16,12 @@
 
 import datetime
 
+from absl.testing import parameterized
+
 import freezegun
 import mock
 
+from google.appengine.api import datastore_errors
 from google.appengine.api import search
 from google.appengine.ext import ndb
 
@@ -28,7 +31,7 @@ from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class ShelfModelTest(loanertest.EndpointsTestCase):
+class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   """Tests for the Shelf class."""
 
   def setUp(self):
@@ -48,6 +51,13 @@ class ShelfModelTest(loanertest.EndpointsTestCase):
 
   def test_get_search_index(self):
     self.assertIsInstance(shelf_model.Shelf.get_index(), search.Index)
+
+  @parameterized.parameters((-1,), (0,))
+  def test_validate_capacity(self, capacity):
+    """Test that validate capacity raises db.BadValueError for less than 1."""
+    with self.assertRaisesWithLiteralMatch(
+        datastore_errors.BadValueError, shelf_model._NEGATIVE_CAPACITY_MSG):
+      shelf_model._validate_capacity('capacity', capacity)
 
   def create_shelf_list(self):
     """Convenience function to create extra shelves to test listing."""
@@ -177,14 +187,6 @@ class ShelfModelTest(loanertest.EndpointsTestCase):
         shelf_model._ENROLL_MSG % reactivated_shelf.name)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=reactivated_shelf)
-
-  def test_enroll_less_than_one_capacity(self):
-    """Test that enroll requires non-zero capacity, raises EnrollmentError."""
-    with self.assertRaisesRegexp(
-        shelf_model.EnrollmentError,
-        shelf_model._NEGATIVE_CAPACITY_MSG):
-      shelf_model.Shelf.enroll(
-          loanertest.USER_EMAIL, self.original_location, 0)
 
   def test_enroll_latitude_no_longitude(self):
     """Test that enroll requires both lat and long, raises EnrollmentError."""

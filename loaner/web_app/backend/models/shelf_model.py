@@ -17,6 +17,7 @@
 import datetime
 import logging
 
+from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
 
 from loaner.web_app import constants
@@ -45,6 +46,21 @@ class EnrollmentError(Error):
   """Raised when shelf enrollment fails."""
 
 
+def _validate_capacity(prop_name, value):
+  """Validate that the capacity is greater than 0.
+
+  Args:
+    prop_name: str, the name of the property to validate.
+    value: int, the value of the property to validate.
+
+  Raises:
+    datastore_errors.BadValueError: when the value provided is less than 1.
+  """
+  del prop_name  # Unused.
+  if value < 1:
+    raise datastore_errors.BadValueError(_NEGATIVE_CAPACITY_MSG)
+
+
 class Shelf(base_model.BaseModel):
   """Model representing a shelf.
 
@@ -69,7 +85,7 @@ class Shelf(base_model.BaseModel):
   location = ndb.StringProperty(required=True)
   lat_long = ndb.GeoPtProperty()
   altitude = ndb.FloatProperty()
-  capacity = ndb.IntegerProperty(required=True)
+  capacity = ndb.IntegerProperty(required=True, validator=_validate_capacity)
   audit_interval_override = ndb.IntegerProperty()
   audit_notification_enabled = ndb.BooleanProperty()
   audit_requested = ndb.BooleanProperty(default=False)
@@ -145,8 +161,6 @@ class Shelf(base_model.BaseModel):
     """
     if bool(latitude) ^ bool(longitude):
       raise EnrollmentError(_LAT_LONG_MSG)
-    if capacity < 1:
-      raise EnrollmentError(_NEGATIVE_CAPACITY_MSG)
 
     shelf = cls.get(location=location, friendly_name=friendly_name)
     if shelf:
