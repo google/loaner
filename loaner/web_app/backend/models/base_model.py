@@ -42,10 +42,15 @@ class DocumentCreationError(Error):
   """Raised when search document creation of a model fails."""
 
 
+class SearchQueryError(Error):
+  """Raised when attempting to search the index fails."""
+
+
 class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
   """Base model class for the loaner project."""
 
   _INDEX_NAME = None
+  _SEARCH_PARAMETERS = None
   _SEARCH_ASCII = frozenset(set(string.printable) - set(string.whitespace))
 
   def stream_to_bq(self, user, summary, timestamp=None):
@@ -216,6 +221,70 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
 
     except (TypeError, ValueError) as e:
       raise DocumentCreationError(e)
+
+  @classmethod
+  def search(
+      cls, query_string='', query_limit=20, cursor=None, sort_options=None,
+      returned_fields=None):
+    """Searches for documents that match a given query string.
+
+    Args:
+      query_string: str, the query to match against documents in the index
+      query_limit: int, the limit on number of documents to return in results.
+      cursor: search.Cursor, a cursor describing where to get the next set of
+          results, or to provide next cursors in SearchResults.
+      sort_options: search.SortOptions, an object specifying a multi-dimensional
+          sort over search results.
+      returned_fields: list|str|, an iterable of names of fields to return in
+          search results.
+
+    Returns:
+      A SearchResults object containing a list of documents matched by the
+          query.
+    """
+    index = cls.get_index()
+    try:
+      cursor = search.Cursor(web_safe_string=cursor)
+    except ValueError:
+      cursor = search.Cursor()
+
+    try:
+      query = search.Query(
+          query_string=cls.format_query(query_string),
+          options=search.QueryOptions(
+              cursor=cursor, sort_options=sort_options,
+              returned_fields=returned_fields),
+      )
+    except search.QueryError:
+      return search.SearchResults(number_found=0)
+
+    return index.search(query)
+
+  @classmethod
+  def format_query(cls, query_string):
+    """Constructs a query based on the query string and search_parameters.
+
+    Takes a query and matches it against the search parameters to see if a
+    refined query can be built. For example, if the query string is "s:1234AB4"
+    this method will construct a query that is "serial_number:1234AB4".
+
+    Args:
+      query_string: str, the original query string.
+
+    Returns:
+      A formatted query.
+    """
+    try:
+      query_key, query_value = query_string.split(':')
+    except ValueError:
+      return query_string
+
+    try:
+      expected_parameter = cls._SEARCH_PARAMETERS[query_key]
+    except KeyError:
+      return query_string
+
+    return ':'.join((expected_parameter, query_value))
 
 
 def _sanitize_dict(entity_dict):

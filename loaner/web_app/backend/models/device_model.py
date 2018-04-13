@@ -164,6 +164,14 @@ class Device(base_model.BaseModel):
   return_date = ndb.DateTimeProperty()
 
   _INDEX_NAME = constants.DEVICE_INDEX_NAME
+  _SEARCH_PARAMETERS = {
+      'a': 'asset_tag',
+      'at': 'asset_tag',
+      's': 'serial_number',
+      'sn': 'serial_number',
+      'u': 'assigned_user',
+      'au': 'assigned_user'
+  }
 
   @property
   def is_assigned(self):

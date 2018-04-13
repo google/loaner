@@ -242,6 +242,52 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     with self.assertRaises(base_model.DocumentCreationError):
       test_model.to_document()
 
+  def test_search(self):
+    index = Test.get_index()
+    test_doc = search.Document(
+        doc_id='test_doc_id_1',
+        fields=[search.TextField(name='text_field', value='item1')])
+    not_used_doc = search.Document(
+        doc_id='test_doc_id_2',
+        fields=[search.TextField(name='text_field', value='notused')])
+    index.put(test_doc)
+    index.put(not_used_doc)
+    actual_search_result = Test.search(query_string='item1')
+    self.assertEqual(actual_search_result.number_found, 1)
+    self.assertEqual(actual_search_result.results[0].doc_id, 'test_doc_id_1')
+
+    no_search_results = Test.search(query_string='does_not_exist')
+    self.assertEqual(no_search_results.number_found, 0)
+
+  @mock.patch.object(search, 'Query', auto_spec=True)
+  def test_search_query_error(self, mock_query):
+    mock_query.side_effect = search.QueryError
+    search_result = Test.search(query_string='item1')
+    self.assertIsInstance(search_result, search.SearchResults)
+
+  @mock.patch.object(search, 'Cursor', auto_spec=True)
+  def test_search_cursor_error(self, mock_cursor):
+    mock_cursor.side_effect = ValueError
+    with self.assertRaises(ValueError):
+      Test.search(query_string='item1')
+
+  @parameterized.parameters(
+      ('a:123456', 'asset_tag:123456',),
+      ('at:123456', 'asset_tag:123456',),
+      ('s:123456ABC', 'serial_number:123456ABC',),
+      ('sn:123456ABC', 'serial_number:123456ABC',),
+      ('u:user', 'assigned_user:user',),
+      ('au:user', 'assigned_user:user',),
+      ('j:not_in_params', 'j:not_in_params',),  # Not within the search params.
+      ('123456', '123456',))  # Query string does not need formatting.
+  def test_format_query(self, test_query_string, expected_query_string):
+    Test._SEARCH_PARAMETERS = {
+        'a': 'asset_tag', 'at': 'asset_tag', 's': 'serial_number',
+        'sn': 'serial_number', 'u': 'assigned_user', 'au': 'assigned_user'}
+
+    formatted_query_string = Test.format_query(test_query_string)
+    self.assertEqual(expected_query_string, formatted_query_string)
+
 
 if __name__ == '__main__':
   loanertest.main()

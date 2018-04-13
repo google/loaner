@@ -78,6 +78,11 @@ class Shelf(base_model.BaseModel):
   last_audit_by = ndb.StringProperty()
 
   _INDEX_NAME = constants.SHELF_INDEX_NAME
+  _SEARCH_PARAMETERS = {
+      'l': 'location',
+      'f': 'friendly_name',
+      'fn': 'friendly_name',
+  }
 
   @property
   def name(self):
