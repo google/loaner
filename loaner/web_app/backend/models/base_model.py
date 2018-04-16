@@ -17,6 +17,7 @@
 import datetime
 import inspect
 import logging
+import numbers
 import pickle
 import string
 
@@ -181,14 +182,16 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     if isinstance(value, bool):
       return [search.AtomField(name=key, value=str(value))]
 
-    if isinstance(value, int) and not isinstance(value, bool):
+    if isinstance(value, numbers.Number) and not isinstance(value, bool):
       return [search.NumberField(name=key, value=value)]
 
     if isinstance(value, ndb.GeoPt):
       return [search.GeoField(
           name=key, value=search.GeoPoint(value.lat, value.lon))]
 
-    return [search.TextField(name=key, value=unicode(value))]
+    return [
+        search.TextField(name=key, value=unicode(value)),
+        search.AtomField(name=key, value=unicode(value))]
 
   def _get_document_fields(self):
     """Enumerates search document fields from entity properties.
@@ -252,7 +255,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
       query = search.Query(
           query_string=cls.format_query(query_string),
           options=search.QueryOptions(
-              cursor=cursor, sort_options=sort_options,
+              cursor=cursor, limit=query_limit, sort_options=sort_options,
               returned_fields=returned_fields),
       )
     except search.QueryError:
@@ -278,6 +281,8 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
       query_key, query_value = query_string.split(':')
     except ValueError:
       return query_string
+    except AttributeError:
+      return ''
 
     try:
       expected_parameter = cls._SEARCH_PARAMETERS[query_key]

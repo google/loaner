@@ -65,7 +65,7 @@ class Shelf(messages.Message):
   last_audit_time = message_types.DateTimeField(11)
   last_audit_by = messages.StringField(12)
   page_token = messages.StringField(13)
-  page_size = messages.IntegerField(14)
+  page_size = messages.IntegerField(14, default=20)
   shelf_request = messages.MessageField(ShelfRequest, 15)
 
 

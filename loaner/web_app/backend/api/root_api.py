@@ -14,6 +14,9 @@
 
 """Root API for loaner.example.com implemented using Google Endpoints."""
 
+import logging
+
+from protorpc import messages
 from protorpc import remote
 
 from google.appengine.api import datastore_errors
@@ -65,6 +68,73 @@ class Service(remote.Service):
       if value is not None and value != []:  # pylint: disable=g-explicit-bool-comparison
         dictionary[key] = value
     return dictionary
+
+  def to_query(self, entity, model_class):
+    """Builds a valid query of properties of an NDB model.
+
+    Args:
+      entity: An instance of an NDB Model or a ProtoRPC message.
+      model_class: NDB model to use for iterating its properties.
+
+    Returns:
+      A valid formatted query.
+    """
+    query = None
+    for key in model_class._properties:  # pylint: disable=protected-access
+      value = getattr(entity, key, None)
+      if value is not None and value != []:  # pylint: disable=g-explicit-bool-comparison
+        format_query = ':'.join((key, str(value)))
+        try:
+          query = ' '.join((query, format_query))
+        except TypeError:
+          query = format_query
+    return query
+
+  def document_to_message(self, message, document):
+    """Builds a search document into an protorpc message.
+
+    Args:
+      message: messages.Message, a protorpc.messages message to build.
+      document: search.ScoredDocument, A document from a search result.
+
+    Returns:
+      A constructed protorpc message.
+    """
+    for field in document.fields:
+      try:
+        setattr(message, field.name, field.value)
+      except messages.ValidationError:
+        if field.value == 'True':
+          setattr(message, field.name, True)
+        elif field.value == 'False':
+          setattr(message, field.name, False)
+        elif isinstance(field.value, float):
+          setattr(message, field.name, int(field.value))
+      except AttributeError:
+        if field.name == 'lat_long':
+          setattr(message, 'latitude', field.value.latitude)
+          setattr(message, 'longitude', field.value.longitude)
+        else:
+          logging.error('Unable to map %s to any attribute.', field.name)
+
+    return message
+
+  def get_search_cursor(self, search_results):
+    """Converts the web_safe_string from search results into a cursor.
+
+    Args:
+      search_results: search.SearchResults, the results from a search query.
+
+    Returns:
+      A tuple consisting of a search.Cursor or None and a boolean for whether or
+          not more results exist.
+    """
+    try:
+      cursor = search_results.cursor.web_safe_string
+    except AttributeError:
+      cursor = None
+
+    return cursor, bool(cursor)
 
   def get_datastore_cursor(self, urlsafe_cursor):
     """Builds a datastore.Cursor from a urlsafe cursor.

@@ -161,15 +161,16 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
 
   def test_list_shelves_with_page_token(self):
     request = shelf_messages.Shelf(enabled=True, page_size=1)
-    response = self.service.list_shelves(request)
     response_shelves = []
-    while response.page_token or response.additional_results:
+    while True:
+      response = self.service.list_shelves(request)
       for shelf in response.shelves:
         self.assertTrue(shelf.location in self.shelf_locations)
         response_shelves.append(shelf)
       request = shelf_messages.Shelf(
           enabled=True, page_size=1, page_token=response.page_token)
-      response = self.service.list_shelves(request)
+      if not response.additional_results:
+        break
     self.assertEqual(len(response_shelves), 3)
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')

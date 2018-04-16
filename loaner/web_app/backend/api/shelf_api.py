@@ -129,27 +129,25 @@ class ShelfApi(root_api.Service):
   def list_shelves(self, request):
     """List enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)
-    cursor = None
-    if request.page_token:
-      cursor = self.get_datastore_cursor(urlsafe_cursor=request.page_token)
-    filters = self.to_dict(request, shelf_model.Shelf)
+    query = self.to_query(request, shelf_model.Shelf)
 
-    shelves, next_cursor, additional_results = shelf_model.Shelf.list_shelves(
-        next_cursor=cursor, **filters)
-    messages = []
-    for shelf in shelves:
-      shelf_dict = self.to_dict(shelf, shelf_model.Shelf)
-      message = _build_shelf_message(shelf_dict)
+    search_results = shelf_model.Shelf.search(
+        query_string=query, query_limit=request.page_size,
+        cursor=request.page_token)
+    cursor, additional_results = self.get_search_cursor(search_results)
+
+    shelves_messages = []
+    for document in search_results.results:
+      message = self.document_to_message(shelf_messages.Shelf(), document)
       message.shelf_request = shelf_messages.ShelfRequest()
-      message.shelf_request.urlsafe_key = shelf.key.urlsafe()
-      message.shelf_request.location = shelf.location
-      messages.append(message)
-    if next_cursor or additional_results:
-      return shelf_messages.ListShelfResponse(
-          shelves=messages,
-          additional_results=additional_results,
-          page_token=next_cursor.urlsafe())
-    return shelf_messages.ListShelfResponse(shelves=messages)
+      message.shelf_request.urlsafe_key = document.doc_id
+      message.shelf_request.location = message.location
+      shelves_messages.append(message)
+
+    return shelf_messages.ListShelfResponse(
+        shelves=shelves_messages,
+        additional_results=additional_results,
+        page_token=cursor)
 
   @auth.method(
       shelf_messages.ShelfAuditRequest,

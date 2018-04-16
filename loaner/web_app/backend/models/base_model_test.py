@@ -182,7 +182,9 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
         'test_repeatedprop', ['item_1', 'item_2'])
     expected_fields = [
         search.TextField(name='test_repeatedprop', value='item_1'),
-        search.TextField(name='test_repeatedprop', value='item_2')]
+        search.AtomField(name='test_repeatedprop', value='item_1'),
+        search.TextField(name='test_repeatedprop', value='item_2'),
+        search.AtomField(name='test_repeatedprop', value='item_2')]
     self.assertEqual(expected_fields, search_fields)
 
     # Test ndb.Key field generation.
@@ -246,15 +248,19 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     index = Test.get_index()
     test_doc = search.Document(
         doc_id='test_doc_id_1',
-        fields=[search.TextField(name='text_field', value='item1')])
+        fields=[search.TextField(name='text_field', value='item 1')])
     not_used_doc = search.Document(
         doc_id='test_doc_id_2',
+        fields=[search.TextField(name='text_field', value='item 2')])
+    not_used_doc2 = search.Document(
+        doc_id='test_doc_id_3',
         fields=[search.TextField(name='text_field', value='notused')])
     index.put(test_doc)
     index.put(not_used_doc)
-    actual_search_result = Test.search(query_string='item1')
-    self.assertEqual(actual_search_result.number_found, 1)
-    self.assertEqual(actual_search_result.results[0].doc_id, 'test_doc_id_1')
+    index.put(not_used_doc2)
+    actual_search_result = Test.search(query_string='item', query_limit=1)
+    self.assertEqual(actual_search_result.number_found, 2)
+    self.assertEqual(len(actual_search_result.results), 1)
 
     no_search_results = Test.search(query_string='does_not_exist')
     self.assertEqual(no_search_results.number_found, 0)
@@ -279,7 +285,8 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
       ('u:user', 'assigned_user:user',),
       ('au:user', 'assigned_user:user',),
       ('j:not_in_params', 'j:not_in_params',),  # Not within the search params.
-      ('123456', '123456',))  # Query string does not need formatting.
+      ('123456', '123456',),  # Query string does not need formatting.
+      (None, ''))  # None should return an empty string.
   def test_format_query(self, test_query_string, expected_query_string):
     Test._SEARCH_PARAMETERS = {
         'a': 'asset_tag', 'at': 'asset_tag', 's': 'serial_number',

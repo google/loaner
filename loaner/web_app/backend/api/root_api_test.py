@@ -14,9 +14,12 @@
 
 """Tests for backend.api.root_api."""
 
+from absl.testing import parameterized
 import mock
 
 from protorpc import message_types
+
+from google.appengine.api import search
 
 import endpoints
 
@@ -36,7 +39,7 @@ class FakeApi(root_api.Service):
     return message_types.VoidMessage()
 
 
-class RootServiceTest(loanertest.EndpointsTestCase):
+class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
 
   def setUp(self):
     super(RootServiceTest, self).setUp()
@@ -67,6 +70,60 @@ class RootServiceTest(loanertest.EndpointsTestCase):
         'last_audit_by': loanertest.USER_EMAIL, 'enabled': True}
     filters = self.root_api_service.to_dict(message, shelf_model.Shelf)
     self.assertEqual(filters, expected_dict)
+
+  @parameterized.parameters(
+      (shelf_messages.Shelf(location='NY', capacity=50),
+       'location:NY capacity:50',),
+      (shelf_messages.Shelf(location='NY', capacity=50, enabled=True),
+       'location:NY capacity:50 enabled:True',))
+  def test_to_qery(self, message, expected_query):
+    query = self.root_api_service.to_query(message, shelf_model.Shelf)
+    #  The query is split because ndb properties are unordered when called by
+    #  model_class._properties. This test would be flaky otherwise.
+    self.assertCountEqual(query.split(' '), expected_query.split(' '))
+
+  @mock.patch.object(root_api, 'logging', auto_spec=True)
+  def test_document_to_message(self, mock_logging):
+    test_search_document = search.ScoredDocument(
+        doc_id='test_doc_id',
+        fields=[
+            search.NumberField(name='capacity', value=20.0),
+            search.TextField(name='location', value='US MTV'),
+            search.AtomField(name='location', value='US-MTV'),
+            search.AtomField(name='enabled', value='True'),
+            search.GeoField(
+                name='lat_long', value=search.GeoPoint(52.37, 4.88)),
+            search.TextField(name='not_present', value='MTV')])
+    expected_message = shelf_messages.Shelf(
+        location='US-MTV', capacity=20, latitude=52.37, longitude=4.88)
+
+    response_message = self.root_api_service.document_to_message(
+        shelf_messages.Shelf(), test_search_document)
+    self.assertEqual(response_message.location, expected_message.location)
+    self.assertEqual(response_message.capacity, expected_message.capacity)
+    self.assertEqual(response_message.latitude, expected_message.latitude)
+    self.assertEqual(response_message.longitude, expected_message.longitude)
+    self.assertTrue(response_message.enabled)
+    assert mock_logging.error.call_count == 1
+
+  def test_get_search_cursor(self):
+    expected_cursor = 'False:ODUxODBhNTgyYTQ2ZmI0MDU'
+    test_search_result = search.SearchResults(
+        results=[search.ScoredDocument(
+            doc_id='test_doc_id',
+            fields=[search.NumberField(name=u'capacity', value=10.0)])],
+        number_found=3,
+        cursor=search.Cursor(web_safe_string=expected_cursor))
+    actual_cursor, actual_cursor_bool = (
+        self.root_api_service.get_search_cursor(test_search_result))
+    self.assertEqual(expected_cursor, actual_cursor)
+    self.assertTrue(actual_cursor_bool)
+
+  def test_get_search_cursor_search_result_none(self):
+    actual_cursor, actual_cursor_bool = (
+        self.root_api_service.get_search_cursor(None))
+    self.assertIsNone(actual_cursor)
+    self.assertFalse(actual_cursor_bool)
 
   def test_get_ndb_key_not_found(self):
     """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
