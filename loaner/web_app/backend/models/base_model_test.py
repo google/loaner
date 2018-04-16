@@ -175,6 +175,35 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     mock_logging.error.assert_called_once_with(
         base_model._REMOVE_DOC_ERR_MSG, 'test_id')
 
+  def test_clear_index(self):
+    test_index = Test.get_index()
+    test_index.put([
+        search.Document(
+            doc_id='test_id_one', fields=[
+                search.TextField(name='field_one', value='value_one')]),
+        search.Document(
+            doc_id='test_id_two', fields=[
+                search.AtomField(name='field_two', value='value_two')]),
+        search.Document(
+            doc_id='test_id_three', fields=[
+                search.NumberField(name='field_three', value=3)])])
+    # Ensure both docs were added to the index.
+    assert len(test_index.get_range(ids_only=True)) == 3
+    Test.clear_index()
+    # Ensure the index was cleared.
+    self.assertFalse(test_index.get_range(ids_only=True))
+
+  @mock.patch.object(base_model, 'logging', auto_spec=True)
+  @mock.patch.object(search.Index, 'delete', auto_spec=True)
+  @mock.patch.object(search.Index, 'get_range', auto_spec=True)
+  def test_clear_index_delete_error(
+      self, mock_range, mock_delete, mock_logging):
+    mock_range.return_value = [search.ScoredDocument(doc_id='unused_doc_id')]
+    mock_delete.side_effect = search.DeleteError(
+        message='Delete Fail!', results=[])
+    base_model.BaseModel.clear_index()
+    assert mock_logging.exception.call_count == 1
+
   def test_to_seach_fields(self):
     # Test list field generation.
     entity = TestEntity(test_repeatedprop=['item_1', 'item_2'])

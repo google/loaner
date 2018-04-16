@@ -153,6 +153,20 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     except search.DeleteError:
       logging.error(_REMOVE_DOC_ERR_MSG, doc_id)
 
+  @classmethod
+  def clear_index(cls):
+    """Clear the index of all documents."""
+    index = cls.get_index()
+    try:
+      while True:
+        doc_ids = [
+            document.doc_id for document in index.get_range(ids_only=True)]
+        if not doc_ids:
+          break
+        index.delete(doc_ids)
+    except search.DeleteError:
+      logging.exception('Error removing documents: ')
+
   def _to_search_fields(self, key, value):
     """Converts an ndb.Property into a search document field.
 
