@@ -82,9 +82,10 @@ USER_ROLE = _ROLE(
 ### Authentication Decorator
 
 Authentication for each API call is managed with a decorator, which can restrict
-a call based on two arguments, `user_auth_only` and `permission`. Setting
-`user_auth_only` to `true` will only run an authentication to confirm that the
-user calling the API is a valid G Suite domain user.
+an api method based on two optional arguments `permission` and
+`allow_assignees`. Setting `allow_assignees` to `true` will allow a user that is
+assigned to a particular device to take loan relevant actions on that device.
+If neither argument is provided any user of the app can call that api method.
 
 Setting an explicit permission will check that the user is in a role that has
 the permission set in the permissions file. Several examples are shown below.

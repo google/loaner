@@ -130,12 +130,12 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
     user = users.User(email=loanertest.USER_EMAIL)
     self.assertTrue(self.call_test_as('api_for_assignee_or_admins', user))
 
-    # Make sure user_auth_only is not executed since permission is set.
+    # Make sure api_for_admins_only forbids non-admins.
     user = users.User(email=loanertest.USER_EMAIL)
     with self.assertRaises(endpoints.ForbiddenException):
       self.call_test_as('api_for_admins_only', user)
 
-    # Test user_auth_only invalid domain.
+    # Test invalid domain.
     user = users.User(email='daredevil@fakedomain.com')
     with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as('api_for_admins_only', user)
