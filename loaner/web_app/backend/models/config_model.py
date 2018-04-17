@@ -19,7 +19,7 @@ from google.appengine.ext import ndb
 
 from loaner.web_app import config_defaults
 
-_CONFIG_NOT_FOUND_MSG = 'No such name %s exists in %s.'
+_CONFIG_NOT_FOUND_MSG = 'No such name "%s" exists in default configurations.'
 
 
 class Config(ndb.Model):
@@ -73,7 +73,7 @@ class Config(ndb.Model):
       elif name in config_defaults.DEFAULTS:
         return config_defaults.DEFAULTS[name]
 
-    raise KeyError(_CONFIG_NOT_FOUND_MSG % (name, config_defaults.DEFAULTS))
+    raise KeyError(_CONFIG_NOT_FOUND_MSG, name)
 
   @classmethod
   def set(cls, name, value):
@@ -88,7 +88,7 @@ class Config(ndb.Model):
     """
     if name not in config_defaults.DEFAULTS:
       raise KeyError(
-          _CONFIG_NOT_FOUND_MSG % (name, config_defaults.DEFAULTS))
+          _CONFIG_NOT_FOUND_MSG, name)
 
     if isinstance(value, basestring):
       stored_config = cls.get_or_insert(name)

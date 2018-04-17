@@ -83,7 +83,7 @@ class ConfigurationTest(
     self.assertIsNone(config_model.Config.get_by_id(config))
 
   def test_get_nonexistent(self):
-    with self.assertRaises(KeyError):
+    with self.assertRaisesRegexp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
       config_model.Config.get('does_not_exist')
 
   @parameterized.parameters(_create_config_parameters())
@@ -97,7 +97,7 @@ class ConfigurationTest(
     self.assertEqual(config, test_config[1])
 
   def test_set_nonexistent(self):
-    with self.assertRaises(KeyError):
+    with self.assertRaisesRegexp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
       config_model.Config.set('fake', 'does_not_exist')
 
 
