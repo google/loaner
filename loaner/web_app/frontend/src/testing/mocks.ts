@@ -340,10 +340,20 @@ export class DeviceServiceMock {
 }
 
 export class ConfigServiceMock {
-  getConfig(name: string, configType: config.ConfigType) {
-    return new Observable(observer => {
-      observer.next({});
-    });
+  getStringConfig(name: string) {
+    return of('');
+  }
+
+  getNumberConfig(name: string) {
+    return of(0);
+  }
+
+  getBooleanConfig(name: string) {
+    return of(false);
+  }
+
+  getListConfig(name: string) {
+    return of([]);
   }
 
   list() {}

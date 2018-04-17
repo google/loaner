@@ -28,13 +28,48 @@ export class ConfigService extends ApiService {
   apiEndpoint = 'config';
 
   /**
+   * Gets a string config from the backend.
+   * @param name Config name to be retrieved from the backend.
+   */
+  getStringConfig(name: string): Observable<string> {
+    return this.getConfig(name, config.ConfigType.STRING)
+        .pipe(map(response => response.string_value!));
+  }
+
+  /**
+   * Gets a number config from the backend.
+   * @param name Config name to be retrieved from the backend.
+   */
+  getNumberConfig(name: string): Observable<number> {
+    return this.getConfig(name, config.ConfigType.INTEGER)
+        .pipe(map(response => response.integer_value!));
+  }
+
+  /**
+   * Gets a boolean config from the backend.
+   * @param name Config name to be retrieved from the backend.
+   */
+  getBooleanConfig(name: string): Observable<boolean> {
+    return this.getConfig(name, config.ConfigType.BOOLEAN)
+        .pipe(map(response => response.boolean_value!));
+  }
+
+  /**
+   * Gets a list config from the backend.
+   * @param name Config name to be retrieved from the backend.
+   */
+  getListConfig(name: string): Observable<string[]> {
+    return this.getConfig(name, config.ConfigType.LIST)
+        .pipe(map(response => response.list_value!));
+  }
+
+  /**
    * Get specific config setting from the backend.
-   * @param name Setting id to be retrieved from the backend.
+   * @param name Config name to be retrieved from the backend.
    * @param configType The type of the requested setting that's being
    *     retrieved.
    */
-  getConfig(
-      name: string, configType: config.ConfigType):
+  private getConfig(name: string, configType: config.ConfigType):
       Observable<config.ConfigResponse> {
     const request: config.GetConfigRequest = {
       'name': name,

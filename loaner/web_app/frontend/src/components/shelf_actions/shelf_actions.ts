@@ -16,7 +16,6 @@ import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 
-import {ConfigResponse, ConfigType} from '../../models/config';
 import {Shelf} from '../../models/shelf';
 import {ConfigService} from '../../services/config';
 import {ShelfService} from '../../services/shelf';
@@ -62,10 +61,10 @@ export class ShelfActionsCard implements OnInit {
         this.editing = false;
       }
     });
-    this.configService.getConfig('responsible_for_audit', ConfigType.LIST)
+    this.configService.getListConfig('responsible_for_audit')
         .subscribe(
-            (response: ConfigResponse) => {
-              this.responsiblesForAuditList = response['list_value'] || [];
+            response => {
+              this.responsiblesForAuditList = response;
             },
         );
   }
