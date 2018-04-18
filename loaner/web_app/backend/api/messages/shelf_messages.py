@@ -51,6 +51,7 @@ class Shelf(messages.Message):
     page_size: int, the number of results to query for and display.
     shelf_request: ShelfRequest, A message containing the unique identifier to
         be used to retrieve the shelf.
+    query_string: str, a string query to conduct a search on an index.
   """
   enabled = messages.BooleanField(1)
   friendly_name = messages.StringField(2)
@@ -67,6 +68,7 @@ class Shelf(messages.Message):
   page_token = messages.StringField(13)
   page_size = messages.IntegerField(14, default=20)
   shelf_request = messages.MessageField(ShelfRequest, 15)
+  query_string = messages.StringField(16)
 
 
 class EnrollShelfRequest(messages.Message):

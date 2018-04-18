@@ -154,10 +154,10 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   def test_list_shelves(self, mock_xsrf_token):
-    request = shelf_messages.Shelf(enabled=True)
+    request = shelf_messages.Shelf(enabled=True, capacity=10)
     response = self.service.list_shelves(request)
     mock_xsrf_token.assert_called_once()
-    self.assertEqual(3, len(response.shelves))
+    self.assertEqual(2, len(response.shelves))
 
   def test_list_shelves_with_page_token(self):
     request = shelf_messages.Shelf(enabled=True, page_size=1)
@@ -172,6 +172,11 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
       if not response.additional_results:
         break
     self.assertEqual(len(response_shelves), 3)
+
+  def test_list_shelves_with_query_string(self):
+    request = shelf_messages.Shelf(query_string='enabled:True capacity:10')
+    response = self.service.list_shelves(request)
+    self.assertEqual(2, len(response.shelves))
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   @mock.patch('__main__.shelf_api.logging.info')

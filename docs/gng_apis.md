@@ -727,6 +727,11 @@ List enabled or all shelves based on any shelf attribute.
 |                         | results.                                           |
 |                         | page_size: int, The number of results to query for |
 |                         | and display.                                       |
+|                         | shelf_request: ShelfRequest, A message containing  |
+|                         | the unique identifier to be used to retrieve the   |
+|                         | shelf.                                             |
+|                         | query_string: str, a string query to conduct a     |
+|                         | search on an index.                                |
 
 | Returns                      | Attributes                                    |
 | :--------------------------- | :-------------------------------------------- |
