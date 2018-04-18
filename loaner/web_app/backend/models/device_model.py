@@ -18,6 +18,7 @@ import collections
 import datetime
 import logging
 
+from google.appengine.api import datastore_errors
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
@@ -42,6 +43,9 @@ _ALREADY_DISABLED_MSG = (
     'This device is alread disabled, correcting the local status: %s.')
 _UNASSIGNED_DEVICE = (
     'This action is not allowed because the device is not assigned.')
+_ASSET_TAGS_REQUIRED_MSG = (
+    'The administrator requires asset tags to be present when enrolling a '
+    'device but one was not provided.')
 
 
 class Error(Exception):
@@ -183,10 +187,7 @@ class Device(base_model.BaseModel):
 
   @property
   def identifier(self):
-    if config_model.Config.get('use_asset_tags'):
-      return self.asset_tag or self.serial_number
-    else:
-      return self.serial_number
+    return self.asset_tag or self.serial_number
 
   @property
   def guest_enabled(self):
@@ -227,8 +228,11 @@ class Device(base_model.BaseModel):
           directory API responds with incomplete information or if the device is
           not found in the directory API.
     """
+    if config_model.Config.get('use_asset_tags') and not asset_tag:
+      raise datastore_errors.BadValueError(_ASSET_TAGS_REQUIRED_MSG)
+
     directory_client = directory.DirectoryApiClient(user_email)
-    device = cls.get(serial_number=serial_number)
+    device = cls.get(asset_tag=asset_tag, serial_number=serial_number)
     now = datetime.datetime.utcnow()
     was_lost_or_locked = False
 

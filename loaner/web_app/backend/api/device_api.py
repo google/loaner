@@ -18,6 +18,8 @@ import datetime
 import logging
 from protorpc import message_types
 
+from google.appengine.api import datastore_errors
+
 import endpoints
 
 from loaner.web_app.backend.api import auth
@@ -63,7 +65,9 @@ class DeviceApi(root_api.Service):
           asset_tag=request.asset_tag,
           serial_number=request.serial_number,
           user_email=user_email)
-    except device_model.DeviceCreationError as error:
+    except (
+        datastore_errors.BadValueError,
+        device_model.DeviceCreationError) as error:
       raise endpoints.BadRequestException(str(error))
     return message_types.VoidMessage()
 

@@ -82,7 +82,7 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     #  model_class._properties. This test would be flaky otherwise.
     self.assertCountEqual(query.split(' '), expected_query.split(' '))
 
-  @mock.patch.object(root_api, 'logging', auto_spec=True)
+  @mock.patch.object(root_api, 'logging', autospec=True)
   def test_document_to_message(self, mock_logging):
     test_search_document = search.ScoredDocument(
         doc_id='test_doc_id',

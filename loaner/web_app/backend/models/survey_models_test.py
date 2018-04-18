@@ -205,43 +205,47 @@ class QuestionTest(loanertest.TestCase):
 
   @mock.patch(
       '__main__.survey_models.Question.stream_to_bq',
-      auto_spec=True)
+      autospec=True)
   def test_submit_survey_anonymously(self, mock_stbq):
     """Test the submission of a survey anonymously."""
     survey_models.config_model.Config.set('anonymous_surveys', True)
     self.question1.submit(
         selected_answer=self.answer1, acting_user=loanertest.USER_EMAIL)
+    self.question1.selected_answer = self.answer1
     mock_stbq.assert_called_with(
-        survey_models.constants.DEFAULT_ACTING_USER,
+        self.question1, survey_models.constants.DEFAULT_ACTING_USER,
         'Filing survey question response.')
 
-    mock_stbq.reset()
     self.question2.submit(
         selected_answer=self.answer2,
         acting_user=survey_models.constants.DEFAULT_ACTING_USER,
         more_info_text='More info!')
+    self.question2.selected_answer = self.answer2
     mock_stbq.assert_called_with(
-        survey_models.constants.DEFAULT_ACTING_USER,
+        self.question2, survey_models.constants.DEFAULT_ACTING_USER,
         'Filing survey question response.')
 
   @mock.patch(
       '__main__.survey_models.Question.stream_to_bq',
-      auto_spec=True)
+      autospec=True)
   def test_submit_survey(self, mock_stbq):
     """Test the submission of a question."""
     survey_models.config_model.Config.set('anonymous_surveys', False)
     self.question1.submit(
         selected_answer=self.answer1, acting_user=loanertest.USER_EMAIL)
+    self.question1.selected_answer = self.answer1
     mock_stbq.assert_called_with(
-        loanertest.USER_EMAIL, 'Filing survey question response.')
+        self.question1, loanertest.USER_EMAIL,
+        'Filing survey question response.')
 
-    mock_stbq.reset()
     self.question2.submit(
         selected_answer=self.answer2,
         acting_user=loanertest.USER_EMAIL,
         more_info_text='More info!')
+    self.question2.selected_answer = self.answer2
     mock_stbq.assert_called_with(
-        loanertest.USER_EMAIL, 'Filing survey question response.')
+        self.question2, loanertest.USER_EMAIL,
+        'Filing survey question response.')
 
 
 if __name__ == '__main__':

@@ -77,26 +77,24 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
         entity_dict['test_structuredprop']['test_subdatetime'], int)
     self.assertIsInstance(entity_dict['test_repeatedprop'], list)
 
-  @mock.patch.object(base_model.BaseModel, 'to_document', auto_spec=True)
-  @mock.patch.object(base_model.BaseModel, 'add_docs_to_index', auto_spec=True)
-  def test_index_entities_for_search(
-      self, mock_add_docs_to_index, mock_to_document):
+  @mock.patch.object(Test, 'to_document', autospec=True)
+  def test_index_entities_for_search(self, mock_to_document):
     base_model.search.MAXIMUM_DOCUMENTS_PER_PUT_REQUEST = 1
-    entity_1 = Test(text_field='item_1').put()
-    entity_2 = Test(text_field='item_2').put()
+    test_entity_1_key = Test(text_field='item_1').put()
+    test_entity_2_key = Test(text_field='item_2').put()
     documents = [
         search.Document(
-            doc_id=entity_1.get().key.urlsafe(),
+            doc_id=test_entity_1_key.urlsafe(),
             fields=[search.TextField(name='text_field', value='item_1')]),
         search.Document(
-            doc_id=entity_2.get().key.urlsafe(),
+            doc_id=test_entity_2_key.urlsafe(),
             fields=[search.TextField(name='text_field', value='item_2')]),]
     mock_to_document.side_effect = documents
     Test.index_entities_for_search()
-    assert mock_add_docs_to_index.call_count == 2
+    assert mock_to_document.call_count == 2
 
-  @mock.patch.object(base_model, 'logging', auto_spec=True)
-  @mock.patch.object(base_model.BaseModel, 'to_document', auto_spec=True)
+  @mock.patch.object(base_model, 'logging', autospec=True)
+  @mock.patch.object(base_model.BaseModel, 'to_document', autospec=True)
   def test_index_entities_for_search_error(
       self, mock_to_document, mock_logging):
     entity = Test(text_field='item_1').put()
@@ -121,7 +119,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
             start_id='test_id', limit=1, include_start_object=True)[0],
         search.Document)
 
-  @mock.patch.object(search.Index, 'put', auto_spec=True)
+  @mock.patch.object(search.Index, 'put', autospec=True)
   def test_add_docs_to_index_put_error(self, mock_put):
     mock_put.side_effect = [
         search.PutError(message='Fail!', results=[
@@ -135,8 +133,8 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
   @parameterized.parameters(
       (search.Error(),),
       (base_model.apiproxy_errors.OverQuotaError,))
-  @mock.patch.object(base_model, 'logging', auto_spec=True)
-  @mock.patch.object(search.Index, 'put', auto_spec=True)
+  @mock.patch.object(base_model, 'logging', autospec=True)
+  @mock.patch.object(search.Index, 'put', autospec=True)
   def test_add_docs_to_index_error(self, mock_error, mock_put, mock_logging):
     mock_put.side_effect = mock_error
     base_model.BaseModel.add_docs_to_index([search.Document(
@@ -166,8 +164,8 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     self.assertIsInstance(test_response, search.GetResponse)
     self.assertEqual(test_response.results, [])
 
-  @mock.patch.object(base_model, 'logging', auto_spec=True)
-  @mock.patch.object(search.Index, 'delete', auto_spec=True)
+  @mock.patch.object(base_model, 'logging', autospec=True)
+  @mock.patch.object(search.Index, 'delete', autospec=True)
   def test_remove_doc_by_id_delete_error(self, mock_delete, mock_logging):
     mock_delete.side_effect = search.DeleteError(
         message='Delete Fail!', results=[])
@@ -193,9 +191,9 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     # Ensure the index was cleared.
     self.assertFalse(test_index.get_range(ids_only=True))
 
-  @mock.patch.object(base_model, 'logging', auto_spec=True)
-  @mock.patch.object(search.Index, 'delete', auto_spec=True)
-  @mock.patch.object(search.Index, 'get_range', auto_spec=True)
+  @mock.patch.object(base_model, 'logging', autospec=True)
+  @mock.patch.object(search.Index, 'delete', autospec=True)
+  @mock.patch.object(search.Index, 'get_range', autospec=True)
   def test_clear_index_delete_error(
       self, mock_range, mock_delete, mock_logging):
     mock_range.return_value = [search.ScoredDocument(doc_id='unused_doc_id')]
@@ -246,7 +244,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     self.assertEqual(expected_field, search_field)
 
   @mock.patch.object(
-      base_model.BaseModel, '_to_search_fields', auto_spec=True)
+      base_model.BaseModel, '_to_search_fields', autospec=True)
   def test_get_document_fields(self, mock_to_search_fields):
     test_model = Test(text_field='item_1')
     expected_result = [search.TextField(name='text_field', value='item_1')]
@@ -255,7 +253,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     self.assertCountEqual(expected_result, document_fields)
 
   @mock.patch.object(
-      base_model.BaseModel, '_get_document_fields', auto_spec=True)
+      base_model.BaseModel, '_get_document_fields', autospec=True)
   def test_to_document(self, mock_get_document_fields):
     test_model = Test(id='fake')
     fields = [search.AtomField(name='text_field', value='12345ABC')]
@@ -267,7 +265,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
 
   @mock.patch.object(
       base_model.BaseModel, '_get_document_fields', return_value=False,
-      auto_spec=True)
+      autospec=True)
   def test_to_document_error(self, mock_get_document_fields):
     test_model = Test(id='fake')
     with self.assertRaises(base_model.DocumentCreationError):
@@ -294,13 +292,13 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     no_search_results = Test.search(query_string='does_not_exist')
     self.assertEqual(no_search_results.number_found, 0)
 
-  @mock.patch.object(search, 'Query', auto_spec=True)
+  @mock.patch.object(search, 'Query', autospec=True)
   def test_search_query_error(self, mock_query):
     mock_query.side_effect = search.QueryError
     search_result = Test.search(query_string='item1')
     self.assertIsInstance(search_result, search.SearchResults)
 
-  @mock.patch.object(search, 'Cursor', auto_spec=True)
+  @mock.patch.object(search, 'Cursor', autospec=True)
   def test_search_cursor_error(self, mock_cursor):
     mock_cursor.side_effect = ValueError
     with self.assertRaises(ValueError):

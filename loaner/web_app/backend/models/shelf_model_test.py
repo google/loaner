@@ -94,9 +94,8 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
       retrieved_shelf = shelf_model.Shelf.get_by_id(shelf_key.id())
       self.assertTrue(retrieved_shelf.audited)
 
-  @mock.patch.object(shelf_model.Shelf, 'get_index', auto_spec=True)
-  @mock.patch.object(shelf_model.Shelf, 'to_document', auto_spec=True)
-  def test_name(self, mock_to_document, mock_get_index):
+  @mock.patch.object(shelf_model.Shelf, 'to_document', autospec=True)
+  def test_name(self, mock_to_document):
     """Test the name property."""
     # Name is friendly name.
     self.assertEqual(self.test_shelf.name, self.original_friendly_name)
@@ -105,7 +104,6 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.test_shelf.friendly_name = None
     shelf_key = self.test_shelf.put()
     assert mock_to_document.call_count == 1
-    assert mock_get_index.call_count == 1
     retrieved_shelf = shelf_model.Shelf.get_by_id(shelf_key.id())
     self.assertEqual(retrieved_shelf.name, self.original_location)
 

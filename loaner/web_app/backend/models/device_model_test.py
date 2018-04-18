@@ -19,6 +19,7 @@ import datetime
 import freezegun
 import mock
 
+from google.appengine.api import datastore_errors
 from google.appengine.api import search
 
 from loaner.web_app import constants
@@ -59,6 +60,13 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
   def test_get_search_index(self):
     self.assertIsInstance(device_model.Device.get_index(), search.Index)
 
+  def test_validate_asset_tag_required_on_enroll(self):
+    config_model.Config.set('use_asset_tags', True)
+    with self.assertRaisesWithLiteralMatch(
+        datastore_errors.BadValueError, device_model._ASSET_TAGS_REQUIRED_MSG):
+      device_model.Device.enroll(
+          serial_number='test_serial', user_email=loanertest.USER_EMAIL)
+
   def enroll_test_device(self, device_to_enroll):
     self.patcher_directory = mock.patch(
         '__main__.device_model.directory.DirectoryApiClient')
@@ -75,25 +83,13 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
 
   def test_identifier(self):
 
-    # use_asset_tag disabled.
+    # Devices without an asset tag should return the serial number.
     self.device.asset_tag = None
-    config_model.Config.set('use_asset_tags', False)
     self.assertEqual(self.device.serial_number, self.device.identifier)
 
-    # use_asset_tag enabled, no asset tag.
-    self.device.asset_tag = None
-    config_model.Config.set('use_asset_tags', True)
-    self.assertEqual(self.device.serial_number, self.device.identifier)
-
-    # use_asset_tag enabled, with asset tag.
+    # Devices with an asset tag should return the asset tag.
     self.device.asset_tag = '123456'
-    config_model.Config.set('use_asset_tags', True)
     self.assertEqual(self.device.asset_tag, self.device.identifier)
-
-    # use_asset_tag disabled, with asset tag.
-    self.device.asset_tag = '123456'
-    config_model.Config.set('use_asset_tags', False)
-    self.assertEqual(self.device.serial_number, self.device.identifier)
 
   def test_enroll_new_device(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE1)
@@ -131,14 +127,12 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
             '2346777', ou, err_message)):
       device_model.Device.enroll('2346777', loanertest.USER_EMAIL)
 
-  @mock.patch.object(device_model.Device, 'get_index', auto_spec=True)
-  @mock.patch.object(device_model.Device, 'to_document', auto_spec=True)
+  @mock.patch.object(device_model.Device, 'to_document', autospec=True)
   @mock.patch('__main__.device_model.logging.info')
   @mock.patch(
       '__main__.device_model.directory.DirectoryApiClient', autospec=True)
   def test_enroll_unenrolled_device(
-      self, mock_directoryclass, mock_logging, mock_to_document,
-      mock_get_index):
+      self, mock_directoryclass, mock_logging, mock_to_document):
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.move_chrome_device_org_unit.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -149,7 +143,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     device.chrome_device_id = 'unique_id'
     device.put()
 
-    assert mock_get_index.call_count == 1
     assert mock_to_document.call_count == 1
 
     device = device_model.Device.enroll('123ABC', loanertest.USER_EMAIL)
@@ -254,7 +247,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     with self.assertRaisesRegexp(
         device_model.FailedToUnenrollError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
-            self.test_device.serial_number, unenroll_ou, err_message)):
+            self.test_device.identifier, unenroll_ou, err_message)):
       self.test_device.unenroll(loanertest.USER_EMAIL)
 
   def test_unenroll(self):
@@ -698,7 +691,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     with self.assertRaisesRegexp(
         device_model.UnableToMoveToDefaultOUError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
-            self.test_device.serial_number, constants.ORG_UNIT_DICT['DEFAULT'],
+            self.test_device.identifier, constants.ORG_UNIT_DICT['DEFAULT'],
             err_message)):
       self.test_device._disable_guest_mode(loanertest.USER_EMAIL)
 
@@ -714,7 +707,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     with self.assertRaisesRegexp(
         device_model.DeviceNotEnrolledError,
         device_model._DEVICE_NOT_ENROLLED_MSG % (
-            self.test_device.serial_number)):
+            self.test_device.identifier)):
       self.test_device.device_audit_check()
 
   def test_device_audit_check_device_is_damaged(self):
@@ -723,7 +716,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     with self.assertRaisesRegexp(
         device_model.UnableToMoveToShelfError,
         device_model._DEVICE_DAMAGED_MSG % (
-            self.test_device.serial_number)):
+            self.test_device.identifier)):
       self.test_device.device_audit_check()
 
   def test_place_device_on_shelf_is_not_active(self):

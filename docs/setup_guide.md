@@ -348,8 +348,8 @@ settings without deploying a new version of GnG:
 +   **sync_roles_query_size**: The number of users for whom to query and
     synchronize roles.
 +   **anonymous_surveys**: Record surveys anonymously (or not).
-+   **use_asset_tags**: To display device asset tags as user-facing identifiers,
-    set as True. Otherwise, set as False to display serial numbers.
++   **use_asset_tags**: To require asset tags when enrolling new devices, set as
+    True. Otherwise, set as False to only require serial numbers.
 +   **img_banner_**: The banner is a custom image used in the reminder emails
     sent to users. Use the URL of an image you have stored in your GCP Storage.
 +   **img_button_**: The button images is a custom image used for reminder

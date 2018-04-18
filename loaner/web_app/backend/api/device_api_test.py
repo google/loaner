@@ -16,9 +16,11 @@
 
 import datetime
 
+from absl.testing import parameterized
 import mock
 
 from protorpc import message_types
+from google.appengine.api import datastore_errors
 
 import endpoints
 
@@ -33,7 +35,7 @@ from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class DeviceApiTest(loanertest.EndpointsTestCase):
+class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   """Tests for the Device API."""
 
   def setUp(self):
@@ -92,7 +94,7 @@ class DeviceApiTest(loanertest.EndpointsTestCase):
 
   @mock.patch(
       '__main__.device_model.directory.DirectoryApiClient', autospec=True)
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(device_api.DeviceApi, 'check_xsrf_token', autospec=True)
   def test_enroll(self, mock_xsrf_token, mock_directoryclass):
     """Tests Enroll with mock methods."""
     mock_directoryclient = mock_directoryclass.return_value
@@ -111,36 +113,25 @@ class DeviceApiTest(loanertest.EndpointsTestCase):
     self.assertTrue(retrieved_device.enrolled)
     mock_xsrf_token.assert_called_once()
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
-  def test_enroll_error(self, mock_directoryclass):
-    err_message = 'Failed to move device'
-    mock_directoryclient = mock_directoryclass.return_value
-    mock_directoryclient.move_chrome_device_org_unit.side_effect = (
-        device_model.directory.DirectoryRPCError(err_message))
+  @parameterized.parameters(
+      (datastore_errors.BadValueError,),
+      (device_model.DeviceCreationError,)
+  )
+  @mock.patch.object(device_model, 'Device', autospec=True)
+  def test_enroll_error(self, test_error, mock_device_cls):
+    mock_device_cls.enroll.side_effect = test_error
     request = device_message.DeviceRequest(
         serial_number=self.unenrolled_device.serial_number)
-    ou = constants.ORG_UNIT_DICT.get('DEFAULT')
-    with self.assertRaisesRegexp(
-        endpoints.BadRequestException,
-        device_model._FAILED_TO_MOVE_DEVICE_MSG % (
-            self.unenrolled_device.serial_number, ou, err_message)):
+    with self.assertRaises(endpoints.BadRequestException):
       self.service.enroll(request)
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
-  def test_unenroll_error(self, mock_directoryclass):
-    err_message = 'Failed to move device'
-    mock_directoryclient = mock_directoryclass.return_value
-    mock_directoryclient.move_chrome_device_org_unit.side_effect = (
-        device_model.directory.DirectoryRPCError(err_message))
+  @mock.patch.object(device_model, 'Device', autospec=True)
+  def test_unenroll_error(self, mock_device_cls):
+    mock_device_cls.get.return_value.unenroll.side_effect = (
+        device_model.FailedToUnenrollError())
     request = device_message.DeviceRequest(
         serial_number=self.unenrolled_device.serial_number)
-    ou = config_model.Config.get('unenroll_ou')
-    with self.assertRaisesRegexp(
-        endpoints.BadRequestException,
-        device_model._FAILED_TO_MOVE_DEVICE_MSG % (
-            self.unenrolled_device.serial_number, ou, err_message)):
+    with self.assertRaises(endpoints.BadRequestException):
       self.service.unenroll(request)
 
   @mock.patch(
@@ -187,7 +178,7 @@ class DeviceApiTest(loanertest.EndpointsTestCase):
     self.device.enrolled = False
     with self.assertRaisesRegexp(
         device_api.endpoints.BadRequestException,
-        device_model._DEVICE_NOT_ENROLLED_MSG % self.device.serial_number):
+        device_model._DEVICE_NOT_ENROLLED_MSG % self.device.identifier):
       self.service.device_audit_check(request)
 
   def test_device_audit_check_device_damaged(self):
@@ -196,7 +187,7 @@ class DeviceApiTest(loanertest.EndpointsTestCase):
     self.device.damaged = True
     with self.assertRaisesRegexp(
         device_api.endpoints.BadRequestException,
-        device_model._DEVICE_DAMAGED_MSG %self.device.serial_number):
+        device_model._DEVICE_DAMAGED_MSG % self.device.identifier):
       self.service.device_audit_check(request)
 
   def test_get_device_not_enrolled(self):
