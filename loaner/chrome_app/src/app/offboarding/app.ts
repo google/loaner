@@ -24,8 +24,9 @@ import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
-import {APIService, BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED,
-PROGRAM_NAME, CHROME_DEV_MODE, LOGGING , TOOLBAR_ICON,
+import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED,
+ConfigService, PROGRAM_NAME,
+TOOLBAR_ICON,
 TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {Background} from '../shared/background_service';
 import {ChromeAppPlatformLocation} from '../shared/chrome_app_platform_location';
@@ -34,8 +35,6 @@ import {HttpModule} from '../shared/http/http_module';
 import {Loan} from '../shared/loan';
 
 import {MaterialModule} from './material_module';
-
-const apiService = new APIService();
 
 /**
  * Steps for the flow sequence.
@@ -117,9 +116,9 @@ device to your nearest shelf as soon as possible.`,
   };
 
   constructor(
-      private readonly bg: Background, private readonly failure: Failure,
-      private readonly loan: Loan, private readonly survey: Survey,
-      public readonly title: Title) {
+      private readonly bg: Background, private readonly config: ConfigService,
+      private readonly failure: Failure, private readonly loan: Loan,
+      private readonly survey: Survey, public readonly title: Title) {
     title.setTitle(`Return your ${PROGRAM_NAME} loaner`);
     this.survey.answer.subscribe(val => this.surveyAnswer = val);
     this.survey.surveySent.subscribe(val => this.surveySent = val);
@@ -263,7 +262,7 @@ continue using the app as normal.`;
       this.loan.return().subscribe(
           res => {
             this.returnCompleted = true;
-            if (CHROME_DEV_MODE && LOGGING) {
+            if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
               console.info(res);
             }
           },
@@ -296,14 +295,16 @@ rest.`;
   ],
   providers: [
     {provide: PlatformLocation, useClass: ChromeAppPlatformLocation},
-    APIService,
+    ConfigService,
     Survey,
     Loan,
     // useValue used in this provide since useFactory with parameters doesn't
     // work in AOT land.
     {
       provide: ApiConfig,
-      useValue: apiConfigFactory(apiService.endpoints(), apiService.chrome()),
+      useValue: apiConfigFactory(
+          new ConfigService().endpointsApiUrl,
+          new ConfigService().chromeApiUrl),
     },
   ],
 })

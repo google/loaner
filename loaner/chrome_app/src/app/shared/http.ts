@@ -18,9 +18,10 @@
  */
 
 import {HeaderInit} from 'node-fetch';
-import {LOGGING} from '../../../../shared/config';
+import {ConfigService} from '../../../../shared/config';
 
 let accessToken: string;
+const CONFIG = new ConfigService();
 
 export type HeaderInitTs26 = HeaderInit&string[][];
 
@@ -66,7 +67,7 @@ function makeRequest(
   return new Promise((resolve, reject) => {
     chrome.identity.getAuthToken(
         {interactive: false}, (newAccessToken: string) => {
-          if (LOGGING) {
+          if (CONFIG.LOGGING) {
             console.info(`Access token: ${newAccessToken}`);
           }
           accessToken = newAccessToken;

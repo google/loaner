@@ -22,7 +22,7 @@ import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {LoaderView} from '../../../../../shared/components/loader';
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
-import {CHROME_DEV_MODE, LOGGING} from '../../../../../shared/config';
+import {ConfigService} from '../../../../../shared/config';
 import {Background} from '../../shared/background_service';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -52,6 +52,7 @@ export class StatusComponent extends LoaderView implements OnInit {
 
   constructor(
       private readonly bg: Background,
+      private readonly config: ConfigService,
       private readonly damaged: Damaged,
       private readonly extend: Extend,
       private readonly failure: Failure,
@@ -154,7 +155,7 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.enableGuestMode().subscribe(
         response => {
           this.guestMode.finished();
-          if (CHROME_DEV_MODE && LOGGING) {
+          if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
             console.info(response);
           }
           this.guestEnabled = true;
@@ -201,7 +202,7 @@ export class StatusComponent extends LoaderView implements OnInit {
 
   /** Trigger the return flow. */
   onReturned() {
-    if (LOGGING) {
+    if (this.config.LOGGING) {
       console.info('Returning Device');
     }
     this.bg.openView('offboarding');
@@ -212,7 +213,7 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.resumeLoan().subscribe(
         response => {
           this.resumeService.finished();
-          if (CHROME_DEV_MODE && LOGGING) {
+          if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
             console.info(response);
           }
           this.pendingReturn = false;

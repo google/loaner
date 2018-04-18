@@ -14,12 +14,6 @@
 
 import {Injectable} from '@angular/core';
 
-/** Checks if wether a specific string is at the window.location.origin. */
-export function hasOrigin(origin: string) {
-  const re = new RegExp(origin, 'g');
-  return Boolean(window && window.location && window.location.origin.match(re));
-}
-
 export interface EnvironmentsVariable {
   local?: string;
   dev: string;
@@ -65,32 +59,79 @@ export const CHROME_ENDPOINTS: EnvironmentsVariable = {
 
 /** ######################################################################## */
 
-// Frontend specific variables
-export const ON_LOCAL = hasOrigin('localhost|127\.0\.0\.1');
-export const ON_DEV = hasOrigin(DEV);
-export const ON_QA = hasOrigin(QA);
-export const ON_PROD = hasOrigin(PROD);
-export const IS_FRONTEND = ON_LOCAL || ON_DEV || ON_QA || ON_PROD;
+/**
+ * Service for configuration values that are shared between the web app and
+ * chrome app.
+ */
+@Injectable()
+export class ConfigService {
+  // Frontend specific variables
+  webClientId: string;
+  ON_PROD = this.hasOrigin(PROD);
+  ON_DEV = this.hasOrigin(DEV);
+  ON_QA = this.hasOrigin(QA);
+  ON_LOCAL = this.hasOrigin('localhost|127\.0\.0\.1');
+  IS_FRONTEND = this.ON_LOCAL || this.ON_DEV || this.ON_QA || this.ON_PROD;
 
-let clientId: string;
-if (ON_PROD) {
-  clientId = WEB_APP_CLIENT_IDS.prod;
-} else if (ON_QA) {
-  clientId = WEB_APP_CLIENT_IDS.qa;
-} else {
-  clientId = WEB_APP_CLIENT_IDS.dev;
+  // Chrome App specific variables
+  CHROME_DEV_MODE = false;
+  DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
+  LOGGING = false;
+  TESTING = true;
+
+  // Shared variables
+  apiPath = '/_ah/api';
+  devTrack: boolean;
+  private standardEndpoint: string;
+  private chromeEndpoint: string;
+
+  constructor() {
+    this.calculateApiUrls();
+  }
+
+  /** Decides which API URLs should be used. */
+  calculateApiUrls() {
+    if ((!this.IS_FRONTEND && !this.CHROME_DEV_MODE) || this.ON_PROD) {
+      this.webClientId = WEB_APP_CLIENT_IDS.prod;
+      this.devTrack = false;
+      this.chromeEndpoint = CHROME_ENDPOINTS.prod;
+      this.standardEndpoint = STANDARD_ENDPOINTS.prod;
+    } else if (this.ON_QA) {
+      this.webClientId = WEB_APP_CLIENT_IDS.qa;
+      this.devTrack = false;
+      this.chromeEndpoint = CHROME_ENDPOINTS.qa;
+      this.standardEndpoint = STANDARD_ENDPOINTS.qa;
+    } else if ((!this.IS_FRONTEND && this.CHROME_DEV_MODE) || this.ON_DEV) {
+      this.webClientId = WEB_APP_CLIENT_IDS.dev;
+      this.chromeEndpoint = CHROME_ENDPOINTS.dev;
+      this.standardEndpoint = STANDARD_ENDPOINTS.dev;
+    } else {
+      this.webClientId = WEB_APP_CLIENT_IDS.dev;
+      this.standardEndpoint = 'http://localhost:8081';
+      this.chromeEndpoint = 'http://localhost:8082';
+    }
+  }
+
+  /** Checks wether a specific string is at the window.location.origin. */
+  private hasOrigin(origin: string): boolean {
+    const re = new RegExp(origin, 'g');
+    return Boolean(
+        window && window.location && window.location.origin.match(re));
+  }
+
+  /** Add's the proper suffix to the Chrome URL and returns the URL. */
+  get chromeApiUrl(): string {
+    return `${this.chromeEndpoint}${this.apiPath}`;
+  }
+
+  /** Add's the proper suffix to the Endpoints URL and returns the URL. */
+  get endpointsApiUrl(): string {
+    return `${this.standardEndpoint}${this.apiPath}`;
+  }
 }
-export const WEB_APP_CLIENT_ID = clientId;
 
 /** Name of your Grab n Go program. */
 export const PROGRAM_NAME = `Grab n Go`;
-
-// Chrome App specific variables
-/** Dev mode settings for testing purposes. */
-export const CHROME_DEV_MODE = false;
-export const DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
-export const LOGGING = false;
-export const TESTING = true;
 
 /** Interface for the heartbeat configuration parameters */
 export interface HeartbeatConfiguration {
@@ -139,40 +180,3 @@ export const TOOLBAR_ICON = {
   url: '../assets/icons/gng48.png',
   altText: 'GnG logo',
 };
-
-/**
- * Service that gives the URL for the appropriate API to make API calls.
- */
-@Injectable()
-export class APIService {
-  devTrack = true;
-  private chromeEndpoint: string;
-  private standardEndpoint: string;
-  private apiPath = '/_ah/api';
-
-  constructor() {
-    if (ON_PROD || (!IS_FRONTEND && !CHROME_DEV_MODE)) {
-      this.devTrack = false;
-      this.chromeEndpoint = CHROME_ENDPOINTS.prod;
-      this.standardEndpoint = STANDARD_ENDPOINTS.prod;
-    } else if (ON_QA) {
-      this.devTrack = false;
-      this.chromeEndpoint = CHROME_ENDPOINTS.qa;
-      this.standardEndpoint = STANDARD_ENDPOINTS.qa;
-    } else if ((!IS_FRONTEND && CHROME_DEV_MODE) || ON_DEV) {
-      this.chromeEndpoint = CHROME_ENDPOINTS.dev;
-      this.standardEndpoint = STANDARD_ENDPOINTS.dev;
-    } else {
-      this.standardEndpoint = 'http://localhost:8081';
-      this.chromeEndpoint = 'http://localhost:8082';
-    }
-  }
-
-  chrome(): string {
-    return `${this.chromeEndpoint}${this.apiPath}`;
-  }
-
-  endpoints(): string {
-    return `${this.standardEndpoint}${this.apiPath}`;
-  }
-}

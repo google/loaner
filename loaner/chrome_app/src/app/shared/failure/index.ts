@@ -17,6 +17,7 @@ import {NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
+import {ConfigService} from '../../../../../shared/config';
 import {Background} from '../background_service';
 
 import {Failure, FailureComponentDialog} from './failure';
@@ -32,6 +33,7 @@ import {MaterialModule} from './material_module';
   ],
   providers: [
     Background,
+    ConfigService,
     Failure,
   ],
 })

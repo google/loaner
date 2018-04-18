@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {APIService, PROGRAM_NAME, WEB_APP_CLIENT_ID} from '../../../shared/config';
+import {ConfigService, PROGRAM_NAME} from '../../../shared/config';
 
 export interface Roles {
   USER: string;
@@ -50,10 +50,10 @@ export interface Config {
 /** Default configuration for the application with dev default values. */
 export const CONFIG: Config = {
   appName: PROGRAM_NAME || 'Grab n Go',
-  endpointsHostname: new APIService().endpoints() || '',
+  endpointsHostname: new ConfigService().endpointsApiUrl || '',
   apiName: 'loaner',
   apiVersion: 'v1',
-  gapiClientId: WEB_APP_CLIENT_ID || '',
+  gapiClientId: new ConfigService().webClientId || '',
   scope: ['email'],
   roles: applicationRoles,
 };

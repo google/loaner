@@ -15,11 +15,12 @@
 
 import {Observable, of, throwError} from 'rxjs';
 
-import {CHROME_DEV_MODE, DEV_DEVICE_ID, TESTING} from '../../../../shared/config';
+import {ConfigService} from '../../../../shared/config';
 
+const CONFIG = new ConfigService();
 export function id(): Observable<string> {
-  if (CHROME_DEV_MODE || TESTING) {
-    return of(DEV_DEVICE_ID);
+  if (CONFIG.CHROME_DEV_MODE || CONFIG.TESTING) {
+    return of(CONFIG.DEV_DEVICE_ID);
   }
 
   const deviceAttributes = chrome.enterprise.deviceAttributes;

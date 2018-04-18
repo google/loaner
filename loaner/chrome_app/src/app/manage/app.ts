@@ -21,7 +21,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {DamagedModule} from '../../../../shared/components/damaged';
 import {ExtendModule} from '../../../../shared/components/extend';
 import {GuestModeModule} from '../../../../shared/components/guest';
-import {APIService, BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED} from '../../../../shared/config';
+import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, ConfigService} from '../../../../shared/config';
 import {ChromeAppPlatformLocation,} from '../shared/chrome_app_platform_location';
 import {HttpModule} from '../shared/http/http_module';
 
@@ -88,7 +88,7 @@ const APP_ROUTES: Routes = [
     TroubleshootModule,
   ],
   providers: [
-    APIService,
+    ConfigService,
     {provide: PlatformLocation, useClass: ChromeAppPlatformLocation},
   ],
 })

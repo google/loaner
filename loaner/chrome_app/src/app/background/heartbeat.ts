@@ -20,9 +20,11 @@
 import {from, Observable, of, throwError} from 'rxjs';
 import {catchError, switchMap} from 'rxjs/operators';
 
-import {APIService, HEARTBEAT, LOGGING} from '../../../../shared/config';
+import {ConfigService, HEARTBEAT} from '../../../../shared/config';
 import * as DeviceIdentifier from '../shared/device_identifier';
 import * as Http from '../shared/http';
+
+const CONFIG = new ConfigService();
 
 /**
  * Set the interval for the heartbeat
@@ -45,12 +47,11 @@ export function disableHeartbeat() {
  * Send the heartbeat request to the API endpoint.
  */
 export function sendHeartbeat(): Observable<HeartbeatResponse> {
-  const apiService = new APIService();
-  const heartbeatUrl = `${apiService.chrome()}${HEARTBEAT.url}`;
+  const heartbeatUrl = `${CONFIG.chromeApiUrl}${HEARTBEAT.url}`;
   return DeviceIdentifier.id().pipe(
       switchMap(deviceId => from(Http.get(`${heartbeatUrl}${deviceId}`))),
       switchMap((res: HeartbeatResponse) => {
-        if (LOGGING) {
+        if (CONFIG.LOGGING) {
           console.info(`Heartbeat response: ${res}`);
         }
         return of(res);
@@ -72,7 +73,7 @@ export function setHeartbeatAlarmListener() {
 function createHeartbeatListener(alarm: chrome.alarms.Alarm) {
   if (alarm.name === HEARTBEAT.name && navigator.onLine) {
     sendHeartbeat().subscribe();
-    if (LOGGING) {
+    if (CONFIG.LOGGING) {
       console.info(`Heartbeat sent`);
     }
   }

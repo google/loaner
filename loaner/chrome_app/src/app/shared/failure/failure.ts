@@ -15,7 +15,7 @@
 import {Component, Inject, Injectable} from '@angular/core';
 import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
 
-import {CHROME_DEV_MODE, FAILURE_MESSAGE, LOGGING} from '../../../../../shared/config';
+import {ConfigService, FAILURE_MESSAGE} from '../../../../../shared/config';
 import {Background} from '../background_service';
 
 /** Fail information for the user facing dialog */
@@ -67,7 +67,9 @@ export class Failure {
   readonly TOLERABLE_ERROR_COUNT = 2;
   errorCount = 0;
 
-  constructor(public dialog: MatDialog, private bg: Background) {}
+  constructor(
+      private readonly config: ConfigService, public dialog: MatDialog,
+      private bg: Background) {}
 
   /**
    * Register a failure/error and display a dialog to the user.
@@ -87,7 +89,7 @@ export class Failure {
       this.openDialog(message, FailAction.Ignore);
     }
 
-    if (CHROME_DEV_MODE && LOGGING) {
+    if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
       console.error(rawError);
     }
   }

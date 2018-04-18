@@ -28,7 +28,7 @@ import {LoaderModule} from '../../../../../shared/components/loader';
 import {GreetingsCardModule} from '../../../../../shared/components/loan_management/greetings_card';
 import {LoanActionsCardModule} from '../../../../../shared/components/loan_management/loan_actions_card';
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
-import {APIService} from '../../../../../shared/config';
+import {ConfigService} from '../../../../../shared/config';
 import {FocusModule} from '../../../../../shared/directives/focus/index';
 import {Background} from '../../shared/background_service';
 import {FailureModule} from '../../shared/failure';
@@ -81,7 +81,7 @@ describe('StatusComponent', () => {
             LoanActionsCardModule,
           ],
           providers: [
-            APIService,
+            ConfigService,
             Damaged,
             HttpClient,
             Extend,

@@ -12,22 +12,99 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import * as config from './config';
+import {Injectable} from '@angular/core';
+import {TestBed} from '@angular/core/testing';
+import {ConfigService} from './config';
 
-describe('APIService', () => {
-  let api: config.APIService;
+describe('ConfigService', () => {
+  let config: ConfigService;
 
   beforeEach(() => {
-    api = new config.APIService();
+    TestBed.configureTestingModule({
+      providers: [ConfigService],
+    });
+    config = TestBed.get(ConfigService);
   });
 
-  it('should provide the correct link for chrome endpoint', () => {
-    expect(api.chrome())
+  it('provides the correct link for chrome/endpoints apis if on prod', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = false;
+    config.ON_PROD = true;
+    config.IS_FRONTEND = true;
+    config.calculateApiUrls();
+    expect(config.chromeApiUrl)
         .toBe('https://chrome-dot-prod-app-engine-project.appspot.com/_ah/api');
-  });
-
-  it('should provide the correct link for standard endpoint', () => {
-    expect(api.endpoints())
+    expect(config.endpointsApiUrl)
         .toBe('https://endpoints-dot-prod-app-engine-project.appspot.com/_ah/api');
   });
+
+  it('provides the correct link for chrome/endpoints apis if on QA', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = true;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = true;
+    config.calculateApiUrls();
+    expect(config.chromeApiUrl)
+        .toBe('https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');
+    expect(config.endpointsApiUrl)
+        .toBe(
+            'https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
+  });
+
+  it('provides the correct link for chrome/endpoints apis if on dev', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = true;
+    config.ON_QA = false;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = true;
+    config.calculateApiUrls();
+    expect(config.chromeApiUrl)
+        .toBe('https://chrome-dot-dev-app-engine-project.appspot.com/_ah/api');
+    expect(config.endpointsApiUrl)
+        .toBe('https://endpoints-dot-dev-app-engine-project.appspot.com/_ah/api');
+  });
+
+  it('provides the correct link for chrome/endpoints apis if on localhost',
+     () => {
+       config.ON_LOCAL = true;
+       config.ON_DEV = false;
+       config.ON_QA = false;
+       config.ON_PROD = false;
+       config.IS_FRONTEND = true;
+       config.calculateApiUrls();
+       expect(config.chromeApiUrl).toBe('http://localhost:8082/_ah/api');
+       expect(config.endpointsApiUrl).toBe('http://localhost:8081/_ah/api');
+     });
+
+  it('provides the correct link for chrome/endpoints apis if the chrome app and on prod',
+     () => {
+       config.ON_LOCAL = true;
+       config.ON_DEV = false;
+       config.ON_QA = false;
+       config.ON_PROD = false;
+       config.IS_FRONTEND = false;
+       config.CHROME_DEV_MODE = false;
+       config.calculateApiUrls();
+       expect(config.chromeApiUrl)
+           .toBe('https://chrome-dot-prod-app-engine-project.appspot.com/_ah/api');
+       expect(config.endpointsApiUrl)
+           .toBe('https://endpoints-dot-prod-app-engine-project.appspot.com/_ah/api');
+     });
+
+  it('provides the correct link for chrome/endpoints apis if the chrome app and on dev',
+     () => {
+       config.ON_LOCAL = true;
+       config.ON_DEV = false;
+       config.ON_QA = false;
+       config.ON_PROD = false;
+       config.IS_FRONTEND = false;
+       config.CHROME_DEV_MODE = true;
+       config.calculateApiUrls();
+       expect(config.chromeApiUrl)
+           .toBe('https://chrome-dot-dev-app-engine-project.appspot.com/_ah/api');
+       expect(config.endpointsApiUrl)
+           .toBe('https://endpoints-dot-dev-app-engine-project.appspot.com/_ah/api');
+     });
 });

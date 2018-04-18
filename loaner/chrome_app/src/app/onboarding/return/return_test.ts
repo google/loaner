@@ -20,7 +20,7 @@ import {of} from 'rxjs';
 import * as moment from 'moment';
 
 import {LoaderModule} from '../../../../../shared/components/loader';
-import {APIService} from '../../../../../shared/config';
+import {ConfigService} from '../../../../../shared/config';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
 import {ReturnDateService} from '../../shared/return_date_service';
@@ -55,7 +55,7 @@ describe('ReturnComponent', () => {
             HttpClientTestingModule,
           ],
           providers: [
-            APIService,
+            ConfigService,
             HttpClient,
             Loan,
             ReturnDateService,

@@ -23,7 +23,7 @@ import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
-import {APIService, BACKGROUND_LOGO,
+import {BACKGROUND_LOGO, ConfigService,
 BACKGROUND_LOGO_ENABLED, PROGRAM_NAME, TOOLBAR_ICON,
 TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {Background} from '../shared/background_service';
@@ -35,8 +35,6 @@ import {ReturnDateService} from '../shared/return_date_service';
 import {MaterialModule} from './material_module';
 import {ReturnComponent, ReturnModule} from './return';
 import {WelcomeComponent, WelcomeModule} from './welcome';
-
-const apiService = new APIService();
 
 /** Steps for navigation. */
 const STEPS: Step[] = [
@@ -275,7 +273,7 @@ continue using the app as normal.`;
   ],
   providers: [
     {provide: PlatformLocation, useClass: ChromeAppPlatformLocation},
-    APIService,
+    ConfigService,
     Background,
     ReturnDateService,
     Survey,
@@ -283,7 +281,9 @@ continue using the app as normal.`;
     // work in AOT land.
     {
       provide: ApiConfig,
-      useValue: apiConfigFactory(apiService.endpoints(), apiService.chrome()),
+      useValue: apiConfigFactory(
+          new ConfigService().endpointsApiUrl,
+          new ConfigService().chromeApiUrl),
     },
   ],
 })

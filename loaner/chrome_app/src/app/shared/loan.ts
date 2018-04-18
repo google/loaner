@@ -17,16 +17,18 @@ import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
-import {APIService} from '../../../../shared/config';
+import {ConfigService} from '../../../../shared/config';
 
 import * as DeviceIdentifier from './device_identifier';
 
 @Injectable()
 export class Loan {
-  constructor(private api: APIService, private http: HttpClient) {}
+  constructor(
+      private readonly config: ConfigService,
+      private readonly http: HttpClient) {}
 
-  chromeUrl = `${this.api.chrome()}/loaner/v1/chrome`;
-  endpointsDeviceUrl = `${this.api.endpoints()}/loaner/v1/device`;
+  chromeUrl = `${this.config.chromeApiUrl}/loaner/v1/chrome`;
+  endpointsDeviceUrl = `${this.config.endpointsApiUrl}/loaner/v1/device`;
 
   /**
    * Request to extend the loan return date.
