@@ -479,6 +479,16 @@ Lists all devices based on any device attribute.
 |                          | results.                                          |
 |                          | page_size: int, The number of results to query    |
 |                          | for and display.                                  |
+|                          | max_extend_date: datetime, Indicates maximum      |
+|                          | extend date a device can have.                    |
+|                          | guest_enabled: bool, Indicates if guest mode has  |
+|                          | been already enabled.                             |
+|                          | guest_permitted: bool, Indicates if guest mode has|
+|                          | been allowed.                                     |
+|                          | return_date: datetime, The date of the default    |
+|                          | return date.                                      |
+|                          | query_string: str, a string query to conduct a    |
+|                          | search on an index.                               |
 
 | Returns                       | Attributes                                  |
 | :---------------------------- | :------------------------------------------ |

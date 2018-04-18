@@ -237,21 +237,14 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
           device_message.DeviceRequest(
               chrome_device_id=self.device.chrome_device_id))
 
-  def test_list_devices(self):
-    request = device_message.Device(enrolled=True)
+  @parameterized.parameters(
+      (device_message.Device(enrolled=True), 2,),
+      (device_message.Device(enrolled=True, current_ou='/'), 2,),
+      (device_message.Device(query_string='sn:6789'), 1,),
+      (device_message.Device(query_string='at:12345'), 1,))
+  def test_list_devices(self, request, response_length):
     response = self.service.list_devices(request)
-    self.assertEqual(2, len(response.devices))
-
-    # Test list_devices with current ou filter.
-    request = device_message.Device(enrolled=True, current_ou='/')
-    response = self.service.list_devices(request)
-    self.assertEqual(2, len(response.devices))
-
-    # Test list_devices with chrome_device_id filter.
-    request = device_message.Device(
-        enrolled=True, chrome_device_id='unique_id_2')
-    response = self.service.list_devices(request)
-    self.assertEqual(1, len(response.devices))
+    self.assertEqual(response_length, len(response.devices))
 
   def test_list_devices_with_filter_message(self):
     message = device_message.Device(
