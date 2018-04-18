@@ -134,10 +134,13 @@ class ShelfApi(root_api.Service):
     else:
       query = self.to_query(request, shelf_model.Shelf)
 
+    cursor = self.get_search_cursor(request.page_token)
     search_results = shelf_model.Shelf.search(
         query_string=query, query_limit=request.page_size,
-        cursor=request.page_token)
-    cursor, additional_results = self.get_search_cursor(search_results)
+        cursor=cursor)
+    new_search_cursor = None
+    if search_results.cursor:
+      new_search_cursor = search_results.cursor.web_safe_string
 
     shelves_messages = []
     for document in search_results.results:
@@ -149,8 +152,8 @@ class ShelfApi(root_api.Service):
 
     return shelf_messages.ListShelfResponse(
         shelves=shelves_messages,
-        additional_results=additional_results,
-        page_token=cursor)
+        additional_results=bool(new_search_cursor),
+        page_token=new_search_cursor)
 
   @auth.method(
       shelf_messages.ShelfAuditRequest,

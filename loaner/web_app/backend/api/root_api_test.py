@@ -107,23 +107,20 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     assert mock_logging.error.call_count == 1
 
   def test_get_search_cursor(self):
-    expected_cursor = 'False:ODUxODBhNTgyYTQ2ZmI0MDU'
-    test_search_result = search.SearchResults(
-        results=[search.ScoredDocument(
-            doc_id='test_doc_id',
-            fields=[search.NumberField(name=u'capacity', value=10.0)])],
-        number_found=3,
-        cursor=search.Cursor(web_safe_string=expected_cursor))
-    actual_cursor, actual_cursor_bool = (
-        self.root_api_service.get_search_cursor(test_search_result))
-    self.assertEqual(expected_cursor, actual_cursor)
-    self.assertTrue(actual_cursor_bool)
+    expected_cursor_web_safe_string = 'False:ODUxODBhNTgyYTQ2ZmI0MDU'
+    returned_cursor = (
+        self.root_api_service.get_search_cursor(
+            expected_cursor_web_safe_string))
+    self.assertEqual(
+        expected_cursor_web_safe_string, returned_cursor.web_safe_string)
 
-  def test_get_search_cursor_search_result_none(self):
-    actual_cursor, actual_cursor_bool = (
-        self.root_api_service.get_search_cursor(None))
-    self.assertIsNone(actual_cursor)
-    self.assertFalse(actual_cursor_bool)
+  @mock.patch.object(search, 'Cursor', autospec=True)
+  def test_get_search_cursor_error(self, mock_cursor):
+    mock_cursor.side_effect = ValueError
+    with self.assertRaisesWithLiteralMatch(
+        endpoints.BadRequestException,
+        root_api._CORRUPT_KEY_MSG):
+      self.root_api_service.get_search_cursor(None)
 
   def test_get_ndb_key_not_found(self):
     """Test the get of an ndb.Key, raises endpoints.BadRequestException."""

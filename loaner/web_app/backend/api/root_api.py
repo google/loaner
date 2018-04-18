@@ -20,6 +20,7 @@ from protorpc import messages
 from protorpc import remote
 
 from google.appengine.api import datastore_errors
+from google.appengine.api import search
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
@@ -119,22 +120,26 @@ class Service(remote.Service):
 
     return message
 
-  def get_search_cursor(self, search_results):
+  def get_search_cursor(self, web_safe_string):
     """Converts the web_safe_string from search results into a cursor.
 
     Args:
-      search_results: search.SearchResults, the results from a search query.
+      web_safe_string: str, the web_safe_string from a search query cursor.
 
     Returns:
       A tuple consisting of a search.Cursor or None and a boolean for whether or
           not more results exist.
+
+    Raises:
+      endpoints.BadRequestException: if the creation of the search.Cursor fails.
     """
     try:
-      cursor = search_results.cursor.web_safe_string
-    except AttributeError:
-      cursor = None
+      cursor = search.Cursor(
+          web_safe_string=web_safe_string)
+    except ValueError:
+      raise endpoints.BadRequestException(_CORRUPT_KEY_MSG)
 
-    return cursor, bool(cursor)
+    return cursor
 
   def get_datastore_cursor(self, urlsafe_cursor):
     """Builds a datastore.Cursor from a urlsafe cursor.

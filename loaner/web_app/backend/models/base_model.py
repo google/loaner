@@ -260,10 +260,6 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
           query.
     """
     index = cls.get_index()
-    try:
-      cursor = search.Cursor(web_safe_string=cursor)
-    except ValueError:
-      cursor = search.Cursor()
 
     try:
       query = search.Query(

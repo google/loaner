@@ -298,12 +298,6 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     search_result = Test.search(query_string='item1')
     self.assertIsInstance(search_result, search.SearchResults)
 
-  @mock.patch.object(search, 'Cursor', autospec=True)
-  def test_search_cursor_error(self, mock_cursor):
-    mock_cursor.side_effect = ValueError
-    with self.assertRaises(ValueError):
-      Test.search(query_string='item1')
-
   @parameterized.parameters(
       ('a:123456', 'asset_tag:123456',),
       ('at:123456', 'asset_tag:123456',),

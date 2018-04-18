@@ -263,12 +263,10 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(1, len(response.devices))
     self.assertEqual(response.devices[0].serial_number, '6789')
 
-  @mock.patch('__main__.device_model.Device.list_devices')
   @mock.patch('__main__.device_api.shelf_api.get_shelf')
   def test_list_devices_with_shelf_filter(
-      self, mock_get_shelf, mock_model_list_devices):
+      self, mock_get_shelf):
     # Test for shelf location as filter.
-    mock_model_list_devices.return_value = ([self.device], None, False)
     mock_get_shelf.return_value = self.shelf
     shelf_request_message = shelf_messages.ShelfRequest(
         location=self.shelf.location)
@@ -276,27 +274,28 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = device_message.Device(shelf=message)
     response = self.service.list_devices(request)
     mock_get_shelf.assert_called_once_with(shelf_request_message)
-    self.assertEqual(
-        response.devices[0].serial_number, self.device.serial_number)
+    self.assertEqual(len(response.devices), 2)
 
   def test_list_devices_with_page_token(self):
     request = device_message.Device(enrolled=True, page_size=1)
-    response = self.service.list_devices(request)
     response_devices = []
-    while response.page_token or response.additional_results:
+    while True:
+      response = self.service.list_devices(request)
       for device in response.devices:
         response_devices.append(device)
       request = device_message.Device(
           enrolled=True, page_size=1, page_token=response.page_token)
-      response = self.service.list_devices(request)
+      if not response.additional_results:
+        break
     self.assertEqual(2, len(response_devices))
 
-  def test_list_devices_with_malformed_page_token(self):
+  @mock.patch.object(
+      root_api.Service, 'to_query', return_value='enrolled:enrolled',
+      autospec=True)
+  def test_list_devices_with_malformed_page_token(self, mock_to_query):
     """Test list devices with a fake token, raises BadRequestException."""
     request = device_message.Device(page_token='malformedtoken')
-    with self.assertRaisesRegexp(
-        endpoints.BadRequestException,
-        root_api._MALFORMED_PAGE_TOKEN_MSG):
+    with self.assertRaises(endpoints.BadRequestException):
       self.service.list_devices(request)
 
   def test_list_devices_inactive_no_shelf(self):

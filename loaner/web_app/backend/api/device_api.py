@@ -150,43 +150,46 @@ class DeviceApi(root_api.Service):
   def list_devices(self, request):
     """Lists all devices based on any device attribute."""
     self.check_xsrf_token(self.request_state)
-    cursor = None
-    if request.page_token:
-      cursor = self.get_datastore_cursor(urlsafe_cursor=request.page_token)
-    list_device_filters = self.to_dict(request, device_model.Device)
+    shelf_query = ''
     if request.shelf:
-      shelf = shelf_api.get_shelf(request.shelf.shelf_request)
-      list_device_filters['shelf'] = shelf.key
-    devices, next_cursor, additional_results = (
-        device_model.Device.list_devices(
-            next_cursor=cursor, **list_device_filters))
-    device_messages = []
-    for device in devices:
-      if device.shelf:
-        shelf = device.shelf.get()
-        shelf_message = _build_shelf_message(shelf)
-      else:
-        shelf_message = None
-      last_reminder_message, next_reminder_message = (
-          _build_reminder_messages(device))
+      shelf_urlsafe_key = request.shelf.shelf_request.urlsafe_key
+      if not shelf_urlsafe_key:
+        shelf_urlsafe_key = shelf_api.get_shelf(
+            request.shelf.shelf_request).key.urlsafe()
+      request.shelf = None
+      shelf_query = ':'.join(('shelf', shelf_urlsafe_key))
+    query = self.to_query(request, device_model.Device)
+    try:
+      query = ' '.join((query, shelf_query))
+    except TypeError:
+      query = shelf_query
+
+    cursor = self.get_search_cursor(request.page_token)
+    search_results = device_model.Device.search(
+        query_string=query, query_limit=request.page_size,
+        cursor=cursor)
+    new_search_cursor = None
+    if search_results.cursor:
+      new_search_cursor = search_results.cursor.web_safe_string
+    messages = []
+    for document in search_results.results:
+      message = self.document_to_message(device_message.Device(), document)
+      device = _get_device(device_message.DeviceRequest(urlkey=document.doc_id))
       guest_enabled, max_extend_date, due_date, guest_permitted = (
           get_loan_data(device))
       del due_date  # Unused
-      device_messages.append(
-          _build_device_message(
-              device=device,
-              shelf_message=shelf_message,
-              last_reminder_message=last_reminder_message,
-              next_reminder_message=next_reminder_message,
-              guest_enabled=guest_enabled,
-              max_extend_date=max_extend_date,
-              guest_permitted=guest_permitted))
-    if next_cursor or additional_results:
-      return device_message.ListDevicesResponse(
-          devices=device_messages,
-          additional_results=additional_results,
-          page_token=next_cursor.urlsafe())
-    return device_message.ListDevicesResponse(devices=device_messages)
+      next_reminder, last_reminder = _build_reminder_messages(device)
+      message.guest_enabled = guest_enabled
+      message.max_extend_date = max_extend_date
+      message.guest_permitted = guest_permitted
+      message.next_reminder = next_reminder
+      message.last_reminder = last_reminder
+      messages.append(message)
+
+    return device_message.ListDevicesResponse(
+        devices=messages,
+        additional_results=bool(new_search_cursor),
+        page_token=new_search_cursor)
 
   @auth.method(
       message_types.VoidMessage,

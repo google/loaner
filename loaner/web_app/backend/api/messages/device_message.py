@@ -105,7 +105,7 @@ class Device(messages.Message):
   last_reminder = messages.MessageField(Reminder, 19)
   next_reminder = messages.MessageField(Reminder, 20)
   page_token = messages.StringField(21)
-  page_size = messages.IntegerField(22)
+  page_size = messages.IntegerField(22, default=20)
   max_extend_date = message_types.DateTimeField(23)
   guest_enabled = messages.BooleanField(24)
   guest_permitted = messages.BooleanField(25)
