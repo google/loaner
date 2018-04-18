@@ -21,7 +21,6 @@ import {finalize, switchMap} from 'rxjs/operators';
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
-import {LoaderView} from '../../../../../shared/components/loader';
 
 import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';
@@ -35,15 +34,13 @@ import {DeviceService} from '../../services/device';
   styleUrls: ['device_details.scss'],
   templateUrl: 'device_details.html',
 })
-export class DeviceDetails extends LoaderView implements OnInit {
+export class DeviceDetails implements OnInit {
   device = new Device();
 
   constructor(
       private readonly deviceService: DeviceService,
       private readonly location: Location,
-      private readonly route: ActivatedRoute) {
-    super(true);
-  }
+      private readonly route: ActivatedRoute) {}
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
@@ -56,10 +53,8 @@ export class DeviceDetails extends LoaderView implements OnInit {
    * @param deviceID the device identifier used to get the device.
    */
   refreshDevice(deviceId: string) {
-    this.waiting();
     this.deviceService.getDevice(deviceId).subscribe((device: Device) => {
       this.device = device;
-      this.ready();
     });
   }
 

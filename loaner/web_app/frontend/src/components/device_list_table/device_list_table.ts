@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ChangeDetectorRef, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
 import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, finalize, startWith, switchMap, takeUntil} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
-import {LoaderView} from '../../../../../shared/components/loader';
 import {Lost} from '../../../../../shared/components/lost';
 import {Device} from '../../models/device';
 import {Shelf} from '../../models/shelf';
@@ -42,7 +41,7 @@ import {DeviceDataSource} from './device_data_source';
   templateUrl: 'device_list_table.html',
 
 })
-export class DeviceListTable extends LoaderView implements OnInit {
+export class DeviceListTable implements OnInit {
   /** Title of the table to be displayed. */
   @Input() cardTitle = 'Device List';
   /** If whether the action buttons taken on each row should be displayed. */
@@ -76,12 +75,9 @@ export class DeviceListTable extends LoaderView implements OnInit {
       private readonly extendService: Extend,
       private readonly deviceData: DeviceData,
       private readonly deviceService: DeviceService,
-      private readonly changeDetectorReference: ChangeDetectorRef,
       private readonly route: ActivatedRoute,
       private readonly guestModeService: GuestMode,
-  ) {
-    super(false);
-  }
+  ) {}
 
   setDisplayColumns() {
     this.displayedColumns = [
@@ -105,7 +101,6 @@ export class DeviceListTable extends LoaderView implements OnInit {
     interval(5000)
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
                 if (this.pauseLoading) return NEVER;
-                this.loading = true;
                 if (this.shelf) {
                   return this.deviceData.refresh({
                     shelf: {
@@ -119,9 +114,7 @@ export class DeviceListTable extends LoaderView implements OnInit {
                   return this.deviceData.refresh();
                 }
               }))
-        .subscribe(() => {
-          this.loading = false;
-        });
+        .subscribe();
 
     this.route.params.subscribe((params) => {
       this.currentAction = '';
@@ -147,17 +140,8 @@ export class DeviceListTable extends LoaderView implements OnInit {
     this.onDestroy.next();
   }
 
-  /**
-   * This is needed due to a bug on the mat-table component that does not
-   * auto-detect the change cycle after the data source is rendered.
-   */
-  ngAfterViewChecked() {
-    this.changeDetectorReference.detectChanges();
-  }
-
   /** Callback that's called once the device-action-box emits a device event. */
   takeActionOnDevice(device: Device) {
-    this.waiting();
     let action: Observable<void>;
     switch (this.currentAction) {
       case Actions.ENROLL:
@@ -169,13 +153,6 @@ export class DeviceListTable extends LoaderView implements OnInit {
       default:
         throw new Error('Device action not recognized.');
     }
-    action
-        .pipe(
-            switchMap(() => this.deviceData.refresh()),
-            finalize(() => {
-              this.ready();
-            }),
-            )
-        .subscribe();
+    action.pipe(switchMap(() => this.deviceData.refresh())).subscribe();
   }
 }

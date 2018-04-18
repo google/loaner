@@ -1,4 +1,3 @@
-<loaner-loader loaderType='bar' [loading]="loading"></loaner-loader>
 <mat-card class="loaner-table">
   <mat-card-title>
     <button (click)="back()" class="button-back" mat-icon-button>
@@ -9,7 +8,6 @@
     <span>Serial No: {{device.serialNumber}} </span>
     <div fxFlex></div>
     <loaner-device-actions-menu [device]="device"
-                                (loading)="loading=$event"
                                 (refreshDevice)="refreshDevice($event)"
                                 (unenrolled)="back()">
     </loaner-device-actions-menu>

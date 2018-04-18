@@ -18,7 +18,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {DamagedModule} from '../../../../../shared/components/damaged';
 import {ExtendModule} from '../../../../../shared/components/extend';
 import {GuestModeModule} from '../../../../../shared/components/guest';
-import {LoaderModule} from '../../../../../shared/components/loader';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
 import {Dialog, DialogsModule} from '../../services/dialog';
@@ -40,7 +39,6 @@ export * from './device_actions_menu';
     DialogsModule,
     ExtendModule,
     GuestModeModule,
-    LoaderModule,
     LostModule,
     MaterialModule,
   ],

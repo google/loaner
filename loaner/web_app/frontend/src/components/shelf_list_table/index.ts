@@ -17,7 +17,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
 
 import {GuestModeModule} from '../../../../../shared/components/guest';
-import {LoaderModule} from '../../../../../shared/components/loader';
 import {MaterialModule} from '../../core/material_module';
 import {ShelfButtonsModule} from '../shelf_buttons';
 
@@ -39,7 +38,6 @@ export * from './shelf_list_table';
     MaterialModule,
     RouterModule,
     ShelfButtonsModule,
-    LoaderModule,
   ],
   providers: [ShelfData],
 })

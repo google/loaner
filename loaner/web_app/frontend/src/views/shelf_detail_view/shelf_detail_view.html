@@ -1,7 +1,3 @@
-<div *ngIf="!shelf">
-  <loaner-loader loaderType='spinner'></loaner-loader>
-</div>
-
 <div *ngIf="shelf">
   <loaner-shelf-details [shelf]="shelf"></loaner-shelf-details>
   <loaner-device-list-table cardTitle="Assigned Devices"

@@ -34,7 +34,6 @@ import {Dialog} from '../../services/dialog';
 })
 export class DeviceActionsMenu {
   @Input() device: Device;
-  @Output() loading = new EventEmitter<boolean>();
   @Output() refreshDevice = new EventEmitter<string>();
   @Output() unenrolled = new EventEmitter<void>();
 
@@ -53,14 +52,9 @@ export class DeviceActionsMenu {
     const dialogContent = 'Are you sure you want to remove this device?';
     this.dialog.confirm(dialogTitle, dialogContent).subscribe(result => {
       if (result) {
-        this.loading.emit(true);
-        this.deviceService.unenroll(this.device)
-            .pipe(finalize(() => {
-              this.loading.emit(false);
-            }))
-            .subscribe(() => {
-              this.unenrolled.emit();
-            });
+        this.deviceService.unenroll(this.device).subscribe(() => {
+          this.unenrolled.emit();
+        });
       }
     });
   }

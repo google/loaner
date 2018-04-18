@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest} from '@angular/common/http';
+import {HttpEvent, HttpHandler, HttpInterceptor, HttpRequest, HttpResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
-import {mergeMap} from 'rxjs/operators';
+import {Observable, throwError} from 'rxjs';
+import {catchError, mergeMap, tap} from 'rxjs/operators';
 
+import {LoaderService} from '../../../../shared/components/loader';
 import {CONFIG} from '../app.config';
 
 import {AuthService, Token} from './auth';
@@ -47,8 +48,12 @@ export class LoanerOAuthInterceptor implements HttpInterceptor {
   private authExpirationTime: number;
   private urlsToIntercept: string[];
   private excludedUrlsToIntercept: string[];
+  private counter = 0;
 
-  constructor(private readonly authService: AuthService) {
+  constructor(
+      private readonly authService: AuthService,
+      private readonly loaderService: LoaderService,
+  ) {
     this.urlsToIntercept = INTERCEPT_URLS;
     this.excludedUrlsToIntercept = EXCLUDED_INTERCEPT_URLS;
 
@@ -66,12 +71,27 @@ export class LoanerOAuthInterceptor implements HttpInterceptor {
   intercept(originalRequest: HttpRequest<{}>, next: HttpHandler):
       Observable<HttpEvent<{}>> {
     if (this.isInterceptableUrl(originalRequest.url)) {
+      this.counter++;
+      if (this.counter === 1) {
+        this.loaderService.pending.next(true);
+      }
+
       let request: HttpRequest<{}>;
       return this.prepareRequest(originalRequest)
-          .pipe(mergeMap((req: HttpRequest<{}>) => {
-            request = req;
-            return next.handle(request);
-          }));
+          .pipe(
+              mergeMap((req: HttpRequest<{}>) => {
+                request = req;
+                return next.handle(request);
+              }),
+              tap((event: HttpEvent<{}>) => {
+                if (event instanceof HttpResponse) {
+                  this.cancelLoader();
+                }
+              }),
+              catchError(e => {
+                this.cancelLoader();
+                return throwError(e);
+              }));
     } else {
       return next.handle(originalRequest);
     }
@@ -111,7 +131,8 @@ export class LoanerOAuthInterceptor implements HttpInterceptor {
         isOnExcludeList = true;
       }
     }
-    // If it is not an excluded URL then proceed checking for interceptable URLs
+    // If it is not an excluded URL then proceed checking for interceptable
+    // URLs
     if (!isOnExcludeList) {
       for (const allowed of this.urlsToIntercept) {
         if (allowed.search(url) || allowed === url) {
@@ -120,5 +141,12 @@ export class LoanerOAuthInterceptor implements HttpInterceptor {
       }
     }
     return false;
+  }
+
+  private cancelLoader() {
+    this.counter--;
+    if (this.counter === 0) {
+      this.loaderService.pending.next(false);
+    }
   }
 }

@@ -5,6 +5,10 @@
     </button>
     <span>{{title}}</span>
   </mat-toolbar>
+  <!--  App's main loader on the toolbar. This loader loads if anything is tried to be retrieved
+        from own application's endpoints. -->
+  <loaner-loader class="app-loader" loaderType="bar" [loading]="pending">
+  </loaner-loader>
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav #sidenav mode="over" class="loaner-sidenav">
       <mat-nav-list>
@@ -28,6 +32,7 @@
       </mat-nav-list>
     </mat-sidenav>
     <div class="loaner-body-content">
+      <!--  Spinning loader for when gapi auth is not loaded yet.  -->
       <loaner-loader [loading]="loading"></loaner-loader>
       <router-outlet></router-outlet>
     </div>

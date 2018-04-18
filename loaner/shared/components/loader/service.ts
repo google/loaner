@@ -12,32 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {NgModule} from '@angular/core';
-import {FormsModule} from '@angular/forms';
-import {BrowserModule} from '@angular/platform-browser';
+import {Injectable} from '@angular/core';
+import {Subject} from 'rxjs';
 
-import {MaterialModule} from '../../core/material_module';
-import {Dialog, DialogsModule} from '../../services/dialog';
-import {AuditTable} from './audit_table';
-
-export * from './audit_table';
-
-@NgModule({
-  declarations: [
-    AuditTable,
-  ],
-  exports: [
-    AuditTable,
-  ],
-  imports: [
-    BrowserModule,
-    DialogsModule,
-    FormsModule,
-    MaterialModule,
-  ],
-  providers: [
-    Dialog,
-  ],
-})
-export class AuditTableModule {
+/** Service that provides pending tasks from the backend. */
+@Injectable()
+export class LoaderService {
+  /** Subject that will be updated once there's a state change of loading. */
+  pending = new Subject<boolean>();
 }

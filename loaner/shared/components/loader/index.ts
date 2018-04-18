@@ -17,6 +17,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {MaterialModule} from '../../../web_app/frontend/src/core/material_module';
 
 import {Loader} from './loader';
+import {LoaderService} from './service';
 
 
 @NgModule({
@@ -30,9 +31,12 @@ import {Loader} from './loader';
   exports: [
     Loader,
   ],
-  providers: []
+  providers: [
+    LoaderService,
+  ]
 })
 export class LoaderModule {
 }
 
 export * from './loader';
+export * from './service';

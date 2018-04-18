@@ -19,7 +19,6 @@ import {RouterModule} from '@angular/router';
 import {DamagedModule} from '../../../../../shared/components/damaged';
 import {ExtendModule} from '../../../../../shared/components/extend';
 import {GuestModeModule} from '../../../../../shared/components/guest';
-import {LoaderModule} from '../../../../../shared/components/loader';
 import {LostModule} from '../../../../../shared/components/lost';
 import {MaterialModule} from '../../core/material_module';
 import {DeviceActionBoxModule} from '../device_action_box';
@@ -46,7 +45,6 @@ export * from './device_list_table';
     DeviceButtonsModule,
     GuestModeModule,
     ExtendModule,
-    LoaderModule,
     LostModule,
     MaterialModule,
     RouterModule,

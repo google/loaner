@@ -12,12 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ChangeDetectorRef, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material';
 import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
-
-import {LoaderView} from '../../../../../shared/components/loader';
 
 import {ShelfData} from './shelf_data';
 import {ShelfDataSource} from './shelf_data_source';
@@ -32,7 +30,7 @@ import {ShelfDataSource} from './shelf_data_source';
   styleUrls: ['shelf_list_table.scss'],
   templateUrl: 'shelf_list_table.html',
 })
-export class ShelfListTable extends LoaderView implements OnInit, OnDestroy {
+export class ShelfListTable implements OnInit, OnDestroy {
   /** Title of the table to be displayed. */
   @Input() cardTitle = 'Shelf List';
 
@@ -55,22 +53,14 @@ export class ShelfListTable extends LoaderView implements OnInit, OnDestroy {
   loading = true;
   pauseLoading = false;
 
-  constructor(
-      private shelfData: ShelfData,
-      private changeDetectorReference: ChangeDetectorRef) {
-    super(true);
-  }
+  constructor(private shelfData: ShelfData) {}
 
   ngOnInit() {
     interval(5000)
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
-                if (this.pauseLoading) return NEVER;
-                this.loading = true;
-                return this.shelfData.refresh();
+                return this.pauseLoading ? NEVER : this.shelfData.refresh();
               }))
-        .subscribe(() => {
-          this.loading = false;
-        });
+        .subscribe();
 
     this.dataSource = new ShelfDataSource(this.shelfData, this.sort);
 
@@ -84,13 +74,5 @@ export class ShelfListTable extends LoaderView implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.onDestroy.next();
-  }
-
-  /**
-   * This is needed due to a bug on the mat-table component that does not
-   * auto-detect the change cycle after the data source is rendered.
-   */
-  ngAfterViewChecked() {
-    this.changeDetectorReference.detectChanges();
   }
 }

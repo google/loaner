@@ -15,6 +15,8 @@
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {LoaderService} from '../../../shared/components/loader';
+
 import {AppComponent, NavigationItem} from './app';
 import {CONFIG} from './app.config';
 import {AppModule} from './app.module';
@@ -192,4 +194,27 @@ describe('AppComponent', () => {
     expect(sideNavListContent.split('TestItem_WithRouterLinkAndUrl').length - 1)
         .toBe(1);
   });
+
+  it('shows the loader when there\'s a pending task', fakeAsync(() => {
+       app.user = new User({
+         roles: [
+           CONFIG.roles.USER,
+           CONFIG.roles.TECHNICIAN,
+         ]
+       });
+
+       const loaderService = TestBed.get(LoaderService);
+       loaderService.pending.next(true);
+       fixture.detectChanges();
+
+       let compiled = fixture.debugElement.nativeElement;
+       let loader = compiled.querySelector('.app-loader > .mat-progress-bar');
+       expect(loader).toBeDefined();
+       loaderService.pending.next(false);
+       fixture.detectChanges();
+
+       compiled = fixture.debugElement.nativeElement;
+       loader = compiled.querySelector('.app-loader > .mat-progress-bar');
+       expect(loader).toBeNull();
+     }));
 });

@@ -16,7 +16,7 @@ import {Location} from '@angular/common';
 import {Component, NgZone, ViewEncapsulation} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 
-import {LoaderView} from '../../../shared/components/loader/loader';
+import {LoaderService, LoaderView} from '../../../shared/components/loader';
 
 import {CONFIG} from './app.config';
 import {User} from './models/user';
@@ -102,9 +102,11 @@ export class AppComponent extends LoaderView {
   readonly title = `${CONFIG.appName} Application`;
   readonly navigationItems: NavigationItem[] = NAVIGATION_ITEMS;
   user: User;
+  pending = false;
 
   constructor(
       readonly authService: AuthService,
+      readonly loaderService: LoaderService,
       readonly userService: UserService,
       readonly ngZone: NgZone,
       private readonly location: Location,
@@ -128,6 +130,10 @@ export class AppComponent extends LoaderView {
 
   ngOnInit() {
     this.titleService.setTitle(this.title);
+
+    this.loaderService.pending.subscribe(async pending => {
+      this.pending = await pending;
+    });
   }
 
   /*

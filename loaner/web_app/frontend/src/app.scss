@@ -5,6 +5,10 @@
   color: opacify($white, .07);
 };
 
+.app-loader {
+  margin-top: -5px;
+}
+
 .mat-sidenav.loaner-sidenav {
   min-width: 200px;
 };
