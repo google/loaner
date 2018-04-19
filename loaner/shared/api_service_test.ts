@@ -80,7 +80,7 @@ describe('ConfigService', () => {
 
   it('provides the correct link for chrome/endpoints apis if the chrome app and on prod',
      () => {
-       config.ON_LOCAL = true;
+       config.ON_LOCAL = false;
        config.ON_DEV = false;
        config.ON_QA = false;
        config.ON_PROD = false;
@@ -95,7 +95,7 @@ describe('ConfigService', () => {
 
   it('provides the correct link for chrome/endpoints apis if the chrome app and on dev',
      () => {
-       config.ON_LOCAL = true;
+       config.ON_LOCAL = false;
        config.ON_DEV = false;
        config.ON_QA = false;
        config.ON_PROD = false;
