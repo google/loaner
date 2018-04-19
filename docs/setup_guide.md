@@ -205,7 +205,7 @@ the contents of the file. A friendly name is suggested e.g.
 `client-secret.json`. Once the file has been relocated to this directory, the
 BUILD rule in `loaner/web_app/BUILD` named "loaner" must have a [data
 dependency](https://docs.bazel.build/versions/master/build-ref.html#data) that
-references the `client_secret.json` file.
+references the `client-secret.json` file.
 
 ```
     loaner_appengine_library(
