@@ -6,7 +6,7 @@
     <button mat-mini-fab color="primary" (click)="goBack()"
             [attr.aria-label]="navLabels.previous.aria"
             [matTooltip]="navLabels.previous.toolTip"
-            matTooltipPosition="above">
+            matTooltipPosition="right">
       <mat-icon>arrow_back</mat-icon>
     </button>
   </div>
@@ -16,7 +16,7 @@
             (click)="maxStepNumber != currentStepNumber ? goForward() : finishFlow()"
             [attr.aria-label]="maxStepNumber != currentStepNumber ? navLabels.next.aria : navLabels.done.aria"
             [matTooltip]="maxStepNumber != currentStepNumber ? navLabels.next.toolTip : navLabels.done.toolTip"
-            matTooltipPosition="above" [disabled]="!canProceed">
+            matTooltipPosition="left" [disabled]="!canProceed">
       <mat-icon>
         {{ (maxStepNumber != currentStepNumber ? 'arrow_forward' : 'done') }}
       </mat-icon>
