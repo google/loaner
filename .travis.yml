@@ -36,5 +36,9 @@ matrix:
       before_install:
         # Enabled Google Chrome Headless.
         - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
+      before_script:
+        # This is due to https://github.com/travis-ci/travis-ci/issues/9024
+        - "sudo chown root /opt/google/chrome/chrome-sandbox"
+        - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
       script:
         - ./angular_tests.sh
