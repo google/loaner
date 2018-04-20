@@ -14,9 +14,9 @@
 
     display: flex;
     background-color: mat-color($primary, 500);
-    font-size: 18px;
-    color: white;
-    padding: 0 12px;
+    font-size: 20px;
+    color: $white;
+    padding: 0 24px;
     margin-bottom: 0;
     min-height: 64px;
 
@@ -29,16 +29,22 @@
       margin-top: 10px;
       font-size: 12px;
 
+      /deep/ .mat-input-element {
+        // caret-color is actually correct and working as intended.
+        // scss-lint:disable PropertySpelling
+        caret-color: $white;
+      }
+
       /deep/ .mat-form-field-label {
-        color: white;
+        color: $white;
       }
 
       /deep/ .mat-form-field-underline {
-        background-color: white;
+        background-color: $white;
       }
 
       /deep/ .mat-form-field-ripple {
-        background-color: white;
+        background-color: $white;
       }
     }
 
@@ -46,17 +52,14 @@
 
   .mat-header-row {
     background-color: mat-color($primary, 300);
-    padding: 0 12px;
 
     .mat-header-cell {
-      color: white;
+      color: $white;
       font-size: 14px;
     }
   };
 
   .mat-row {
-    padding: 0 12px;
-
     &[ng-reflect-router-link] {
       color: inherit;
       text-decoration: none;
