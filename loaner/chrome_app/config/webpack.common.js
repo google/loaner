@@ -21,7 +21,6 @@ const helpers = require('./helpers');
 
 module.exports = {
   entry: {
-    'polyfills': './chrome_app/src/polyfills.ts',
     'manage': './chrome_app/src/app/manage/main.ts',
     'onboarding': './chrome_app/src/app/onboarding/main.ts',
     'offboarding': './chrome_app/src/app/offboarding/main.ts',
@@ -51,17 +50,17 @@ module.exports = {
         {}),
     new HtmlWebpackPlugin({
       filename: 'manage.html',
-      chunks: ['manage', 'polyfills'],
+      chunks: ['manage'],
       template: 'chrome_app/src/app/manage/manage.html'
     }),
     new HtmlWebpackPlugin({
       filename: 'onboarding.html',
-      chunks: ['onboarding', 'polyfills'],
+      chunks: ['onboarding'],
       template: 'chrome_app/src/app/onboarding/onboarding.html',
     }),
     new HtmlWebpackPlugin({
       filename: 'offboarding.html',
-      chunks: ['offboarding', 'polyfills'],
+      chunks: ['offboarding'],
       template: 'chrome_app/src/app/offboarding/offboarding.html',
     }),
     new CopyWebpackPlugin([
