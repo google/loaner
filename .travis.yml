@@ -1,5 +1,6 @@
 dist: trusty
 addons:
+  chrome: stable
   apt:
     sources:
       - google-chrome
@@ -21,18 +22,19 @@ matrix:
         - rm bazel_0.11.1-linux-x86_64.deb
       script:
         - ./backend_tests.sh $GROUP $TOTAL_GROUPS
+      env:
+        global:
+          - TOTAL_GROUPS=4
+        matrix:
+          - GROUP=0
+          - GROUP=1
+          - GROUP=2
+          - GROUP=3
     - language: node_js
       node_js:
         - "8.11.0"
+      before_install:
+        # Enabled Google Chrome Headless.
+        - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
       script:
         - ./angular_tests.sh
-
-
-env:
-  global:
-    - TOTAL_GROUPS=4
-  matrix:
-    - GROUP=0
-    - GROUP=1
-    - GROUP=2
-    - GROUP=3
