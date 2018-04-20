@@ -46,7 +46,7 @@ module.exports = {
             rootDir,
             'web_app',
             'frontend',
-            'src',
+            'src'
             ),
         {}),
     new CopyWebpackPlugin([{
