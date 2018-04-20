@@ -209,7 +209,10 @@ class Device(base_model.BaseModel):
     Returns:
       A query of devices assigned to the user.
     """
-    return cls.query(cls.assigned_user == user).fetch()
+    return cls.query(
+        ndb.AND(
+            cls.assigned_user == user,
+            cls.mark_pending_return_date == None)).fetch()  # pylint: disable=g-equals-none
 
   @classmethod
   def enroll(cls, serial_number, user_email, asset_tag=None):

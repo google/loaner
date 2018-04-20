@@ -119,6 +119,8 @@ export class DeviceInfoCard implements OnInit {
   onReturned(device: Device) {
     this.deviceService.returnDevice(device.id).subscribe(() => {
       device.pendingReturn = true;
+      this.loanedDevices =
+          this.loanedDevices.filter(device => !device.pendingReturn);
     });
   }
 

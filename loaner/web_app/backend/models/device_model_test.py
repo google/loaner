@@ -270,6 +270,17 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         [device.serial_number for device in devices],
         [self.device.serial_number, self.device2.serial_number])
 
+  def test_list_by_user_with_pending_return(self):
+    self.device.assigned_user = loanertest.SUPER_ADMIN_EMAIL
+    self.device.put()
+    self.device2.assigned_user = loanertest.SUPER_ADMIN_EMAIL
+    self.device2.mark_pending_return_date = datetime.datetime.utcnow()
+    self.device2.put()
+    devices = device_model.Device.list_by_user(loanertest.SUPER_ADMIN_EMAIL)
+    self.assertListEqual(
+        [device.serial_number for device in devices],
+        [self.device.serial_number])
+
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_create_unenrolled(self, mock_directoryclass):
     """Test creating an unenrolled device."""
