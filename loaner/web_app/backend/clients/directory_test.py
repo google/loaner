@@ -34,9 +34,9 @@ class DirectoryClientTest(loanertest.TestCase):
 
   def setUp(self):  # pylint: disable=arguments-differ
     super(DirectoryClientTest, self).setUp()
-    self.patcher_build = mock.patch('__main__.directory.build')
-    self.patcher_creds = mock.patch(
-        '__main__.directory.service_account.Credentials')
+    self.patcher_build = mock.patch.object(directory, 'build', autospec=True)
+    self.patcher_creds = mock.patch.object(
+        directory.service_account, 'Credentials', autospec=True)
     self.mock_build = self.patcher_build.start()
     self.mock_creds = self.patcher_creds.start()
     self.addCleanup(self.patcher_build.stop)
@@ -72,7 +72,7 @@ class DirectoryClientTest(loanertest.TestCase):
 
   def test_create_directory_api_client(self):
     directory.DirectoryApiClient(user_email=self.user_email)
-    assert self.mock_creds.from_service_account_file.called
+    self.assertEqual(self.mock_creds.from_service_account_file.call_count, 1)
 
   def test_create_directory_api_client_no_auth(self):
     with self.assertRaises(directory.UnauthorizedUserError):
@@ -104,8 +104,8 @@ class DirectoryClientTest(loanertest.TestCase):
     directory_client = directory.DirectoryApiClient(user_email=self.user_email)
     self.assertEqual(None, directory_client.get_chrome_device(self.device_id))
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_get_chrome_device_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_get_chrome_device_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -116,7 +116,7 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.get_chrome_device(self.device_id)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_get_chrome_device_by_serial(self):
     mock_chromeosdevices = mock.Mock()
@@ -138,8 +138,8 @@ class DirectoryClientTest(loanertest.TestCase):
         directory_client.get_chrome_device_by_serial(
             self.serial_number))
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_get_chrome_device_by_serial_rpc_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_get_chrome_device_by_serial_rpc_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -150,10 +150,10 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.get_chrome_device_by_serial(self.serial_number)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_get_chrome_device_by_serial_key_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_get_chrome_device_by_serial_key_error(self, mock_logging):
 
     self.mock_client.chromeosdevices.side_effect = KeyError
 
@@ -163,8 +163,7 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.get_chrome_device_by_serial(self.serial_number)
-      mock_log_error.assert_called_once_with(
-          directory._NO_DEVICE_MSG, self.serial_number)
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_get_org_unit(self):
     mock_orgunits = mock.Mock()
@@ -191,8 +190,8 @@ class DirectoryClientTest(loanertest.TestCase):
     directory_client = directory.DirectoryApiClient(user_email=self.user_email)
     self.assertEqual(None, directory_client.get_org_unit(self.org_unit_path))
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_get_org_unit_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_get_org_unit_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -203,10 +202,10 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.get_org_unit(self.org_unit_path)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
-  @mock.patch('__main__.directory.logging.info')
-  def test_insert_org_unit(self, mock_log_info):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_insert_org_unit(self, mock_logging):
     mock_orgunits = mock.Mock()
     self.mock_client.orgunits = mock_orgunits
 
@@ -223,10 +222,10 @@ class DirectoryClientTest(loanertest.TestCase):
             name=self.org_unit_name,
             parent_org_unit_path=self.parent_org_unit_path,
             description=self.org_unit_description))
-    self.assertEqual(2, mock_log_info.call_count)
+    self.assertEqual(2, mock_logging.info.call_count)
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_insert_org_unit_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_insert_org_unit_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -237,10 +236,10 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.insert_org_unit(self.org_unit_name)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
-  @mock.patch('__main__.directory.logging.info')
-  def test_move_chrome_device_org_unit(self, mock_log_info):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_move_chrome_device_org_unit(self, mock_logging):
     mock_chromeosdevices = mock.Mock()
     self.mock_client.chromeosdevices = mock_chromeosdevices
 
@@ -253,11 +252,11 @@ class DirectoryClientTest(loanertest.TestCase):
     directory_client = directory.DirectoryApiClient(user_email=self.user_email)
     directory_client.move_chrome_device_org_unit(
         self.device_id, self.org_unit_path)
-    mock_execute.assert_called_once()
-    self.assertEqual(2, mock_log_info.call_count)
+    self.assertEqual(mock_execute.call_count, 1)
+    self.assertEqual(2, mock_logging.info.call_count)
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_move_chrome_device_org_unit_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_move_chrome_device_org_unit_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -269,10 +268,10 @@ class DirectoryClientTest(loanertest.TestCase):
           user_email=self.user_email)
       directory_client.move_chrome_device_org_unit(
           self.device_id, self.org_unit_path)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
-  @mock.patch('__main__.directory.logging.info')
-  def test_disable_chrome_device(self, mock_log_info):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_disable_chrome_device(self, mock_logging):
     mock_chromeosdevices = mock.Mock()
     self.mock_client.chromeosdevices = mock_chromeosdevices
 
@@ -284,11 +283,11 @@ class DirectoryClientTest(loanertest.TestCase):
 
     directory_client = directory.DirectoryApiClient(user_email=self.user_email)
     directory_client.disable_chrome_device(self.device_id)
-    mock_execute.assert_called_once()
-    self.assertEqual(2, mock_log_info.call_count)
+    self.assertEqual(mock_execute.call_count, 1)
+    self.assertEqual(2, mock_logging.info.call_count)
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_disable_chrome_device_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_disable_chrome_device_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -299,7 +298,7 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.disable_chrome_device(self.device_id)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_disable_already_diabled_chrome_device_error(self):
 
@@ -313,8 +312,8 @@ class DirectoryClientTest(loanertest.TestCase):
           user_email=self.user_email)
       directory_client.disable_chrome_device(self.device_id)
 
-  @mock.patch('__main__.directory.logging.info')
-  def test_reenable_chrome_device(self, mock_log_info):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_reenable_chrome_device(self, mock_logging):
     mock_chromeosdevices = mock.Mock()
     self.mock_client.chromeosdevices = mock_chromeosdevices
 
@@ -326,11 +325,11 @@ class DirectoryClientTest(loanertest.TestCase):
 
     directory_client = directory.DirectoryApiClient(user_email=self.user_email)
     directory_client.reenable_chrome_device(self.device_id)
-    mock_execute.assert_called_once()
-    self.assertEqual(2, mock_log_info.call_count)
+    self.assertEqual(mock_execute.call_count, 1)
+    self.assertEqual(2, mock_logging.info.call_count)
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_reenable_chrome_device_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_reenable_chrome_device_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -341,7 +340,7 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.reenable_chrome_device(self.device_id)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_users_in_group(self):
     mock_members = mock.Mock()
@@ -359,8 +358,8 @@ class DirectoryClientTest(loanertest.TestCase):
     self.assertEqual(
         fake_members, directory_client.users_in_group(self.group_key))
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_users_in_group_url_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_users_in_group_url_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -371,7 +370,7 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.users_in_group(self.group_key)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_user_name(self):
     mock_users = mock.Mock()
@@ -390,8 +389,8 @@ class DirectoryClientTest(loanertest.TestCase):
         fake_given_name['name']['givenName'],
         directory_client.given_name(loanertest.USER_EMAIL))
 
-  @mock.patch('__main__.directory.logging.error')
-  def test_user_name_url_error(self, mock_log_error):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_user_name_url_error(self, mock_logging):
 
     def raise_error():
       raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
@@ -402,10 +401,10 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.given_name(loanertest.USER_EMAIL)
-      mock_log_error.assert_called_once_with('You lose')
+    self.assertEqual(mock_logging.error.call_count, 1)
 
-  @mock.patch('__main__.directory.logging.info')
-  def test_user_name_key_error(self, mock_log_info):
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_user_name_key_error(self, mock_logging):
 
     def raise_error():
       raise KeyError('No given name.')
@@ -416,7 +415,7 @@ class DirectoryClientTest(loanertest.TestCase):
       directory_client = directory.DirectoryApiClient(
           user_email=self.user_email)
       directory_client.given_name(loanertest.USER_EMAIL)
-      mock_log_info.assert_called_once()
+    self.assertEqual(mock_logging.info.call_count, 2)
 
 
 if __name__ == '__main__':

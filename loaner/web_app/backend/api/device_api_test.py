@@ -94,8 +94,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch(
       '__main__.device_model.directory.DirectoryApiClient', autospec=True)
-  @mock.patch.object(device_api.DeviceApi, 'check_xsrf_token', autospec=True)
-  def test_enroll(self, mock_xsrf_token, mock_directoryclass):
+  def test_enroll(self, mock_directoryclass):
     """Tests Enroll with mock methods."""
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.get_chrome_device.return_value = (
@@ -106,12 +105,14 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
     request = device_message.DeviceRequest(
         serial_number=self.unenrolled_device.serial_number)
-    response = self.service.enroll(request)
-    self.assertIsInstance(response, message_types.VoidMessage)
-    retrieved_device = device_model.Device.get(
-        serial_number=self.unenrolled_device.serial_number)
-    self.assertTrue(retrieved_device.enrolled)
-    mock_xsrf_token.assert_called_once()
+    with mock.patch.object(
+        self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
+      response = self.service.enroll(request)
+      self.assertIsInstance(response, message_types.VoidMessage)
+      retrieved_device = device_model.Device.get(
+          serial_number=self.unenrolled_device.serial_number)
+      self.assertTrue(retrieved_device.enrolled)
+      self.assertEqual(mock_xsrf_token.call_count, 1)
 
   @parameterized.parameters(
       (datastore_errors.BadValueError,),
@@ -149,7 +150,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertIsNone(self.device.assigned_user)
     self.assertIsNone(self.device.due_date)
     self.assertIsInstance(response, message_types.VoidMessage)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
   @mock.patch('__main__.device_model.Device.device_audit_check')
   def test_device_audit_check(self, mock_device_audit_check):
@@ -169,7 +170,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = device_message.DeviceRequest(
         unknown_identifier='12345')
     response = self.service.device_audit_check(request)
-    mock_device_audit_check.assert_called_once()
+    assert mock_device_audit_check.call_count == 1
     self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_device_audit_check_device_not_enrolled(self):
@@ -313,7 +314,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(
         response.devices[0].serial_number, self.device.serial_number)
     self.assertEqual(len(response.devices), 2)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     mock_list_by_user.assert_called_once_with(loanertest.USER_EMAIL)
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
@@ -328,14 +329,14 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     assert mock_enableguest.called
     mock_confirm_assignee_action.assert_called_once_with(
         loanertest.USER_EMAIL, self.device)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     mock_xsrf_token.reset_mock()
     mock_enableguest.reset_mock()
     self.service.enable_guest_mode(device_message.DeviceRequest(
         chrome_device_id=self.device.chrome_device_id))
     assert mock_enableguest.called
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     def guest_disabled_error(*args, **kwargs):
       del args, kwargs  # Unused.
@@ -382,7 +383,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         user_email=loanertest.USER_EMAIL, extend_date_time=tomorrow)
     mock_confirm_assignee_action.assert_called_once_with(
         loanertest.USER_EMAIL, self.device)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     mock_xsrf_token.reset_mock()
     mock_loanextend.reset_mock()
@@ -392,7 +393,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         extend_date=tomorrow))
     mock_loanextend.assert_called_once_with(
         user_email=loanertest.USER_EMAIL, extend_date_time=tomorrow)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     mock_loanextend.side_effect = device_model.ExtendError
     self.assertRaises(
@@ -427,7 +428,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         user_email=loanertest.USER_EMAIL, damaged_reason='Foo')
     mock_confirm_assignee_action.assert_called_once_with(
         loanertest.USER_EMAIL, self.device)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     mock_xsrf_token.reset_mock()
     mock_markdamaged.reset_mock()
@@ -435,7 +436,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         device=device_message.DeviceRequest(urlkey=self.device.key.urlsafe())))
     mock_markdamaged.assert_called_once_with(
         user_email=loanertest.USER_EMAIL, damaged_reason=None)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
   @mock.patch('__main__.device_model.Device.mark_lost')
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
@@ -444,7 +445,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         urlkey=self.device.key.urlsafe()))
     mock_marklost.assert_called_once_with(
         user_email=loanertest.SUPER_ADMIN_EMAIL)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
   @mock.patch('__main__.device_model.Device.mark_pending_return')
@@ -458,7 +459,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         user_email=loanertest.USER_EMAIL)
     mock_confirm_assignee_action.assert_called_once_with(
         loanertest.USER_EMAIL, self.device)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
   def test_mark_pending_return_unassigned(self):
     self.device.assigned_user = None
@@ -477,10 +478,10 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.login_endpoints_user()
     self.service.resume_loan(device_message.DeviceRequest(
         urlkey=self.device.key.urlsafe()))
-    mock_resume_loan.assert_called_once()
+    assert mock_resume_loan.call_count == 1
     mock_confirm_assignee_action.assert_called_once_with(
         loanertest.USER_EMAIL, self.device)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
   def test_get_device_errors(self):
     # No identifiers.

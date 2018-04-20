@@ -109,7 +109,7 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
         location='nyc', capacity=100, friendly_name='test', latitude=12.5,
         longitude=12.5, altitude=2.0, responsible_for_audit='precise')
     response = self.service.enroll(request)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_enroll_bad_request(self):
@@ -129,7 +129,7 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
   def test_get_by_location(self, mock_xsrf_token):
     request = shelf_messages.ShelfRequest(location='NYC')
     response = self.service.get(request)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     self.assertEqual(self.shelf.location, response.location)
     self.assertEqual(self.shelf.friendly_name, response.friendly_name)
 
@@ -146,7 +146,7 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
         shelf_request=shelf_messages.ShelfRequest(location='NYC'),
         location='NYC-9th')
     response = self.service.update(request)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     self.assertEqual(self.shelf.location, 'NYC-9th')
     shelf = shelf_model.Shelf.get(friendly_name='GnG')
     self.assertEqual(shelf.location, 'NYC-9th')
@@ -156,7 +156,7 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
   def test_list_shelves(self, mock_xsrf_token):
     request = shelf_messages.Shelf(enabled=True, capacity=10)
     response = self.service.list_shelves(request)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     self.assertEqual(2, len(response.shelves))
 
   def test_list_shelves_with_page_token(self):
@@ -185,7 +185,7 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
         shelf_request=shelf_messages.ShelfRequest(location='NYC'),
         device_identifiers=self.device_identifiers)
     response = self.service.audit(request)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     mock_logging.assert_called()
     for identifier in self.device_identifiers:
       datastore_device = device_model.Device.get(serial_number=identifier)

@@ -32,7 +32,8 @@ class BigQueryRowModelTest(loanertest.TestCase):
         friendly_name='Test', location='Here', capacity=16)
     test_shelf.put()
     self.test_shelf = test_shelf
-    mock_bigquery = mock.patch('__main__.bigquery_row_model.bigquery_client')
+    mock_bigquery = mock.patch.object(
+        bigquery_row_model, 'bigquery_client', autospec=True)
     self.addCleanup(mock_bigquery.stop)
     self.mock_bigquery = mock_bigquery.start()
     self.mock_bigquery_client = mock.Mock()

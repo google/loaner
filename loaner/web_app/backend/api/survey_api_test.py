@@ -122,12 +122,12 @@ class QuestionEndpointsTest(
     for message in messages:
       response = self.service.create(message)
       # Assert that the Question.create method was called.
-      mock_survey_create.assert_called_once()
+      assert mock_survey_create.call_count == 1
       mock_survey_create.reset_mock()
       # Assert that the response to the api method is a VoidMessage.
       self.assertEqual(response, message_types.VoidMessage())
       # Assert that the xsrf_token check was called.
-      mock_xsrf_token.assert_called_once()
+      assert mock_xsrf_token.call_count == 1
       mock_xsrf_token.reset_mock()
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
@@ -262,7 +262,7 @@ class QuestionEndpointsTest(
         question_urlsafe_key=question_key.urlsafe(),
         answers=[new_answer_message1, new_answer_message2])
     self.service.patch(request)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     # Ensure the new answer was created.
     self.assertEqual(2, len(question_key.get().answers))
 

@@ -77,7 +77,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
         entity_dict['test_structuredprop']['test_subdatetime'], int)
     self.assertIsInstance(entity_dict['test_repeatedprop'], list)
 
-  @mock.patch.object(Test, 'to_document', autospec=True)
+  @mock.patch.object(Test, 'to_document')
   def test_index_entities_for_search(self, mock_to_document):
     base_model.search.MAXIMUM_DOCUMENTS_PER_PUT_REQUEST = 1
     test_entity_1_key = Test(text_field='item_1').put()
@@ -119,7 +119,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
             start_id='test_id', limit=1, include_start_object=True)[0],
         search.Document)
 
-  @mock.patch.object(search.Index, 'put', autospec=True)
+  @mock.patch.object(search.Index, 'put')
   def test_add_docs_to_index_put_error(self, mock_put):
     mock_put.side_effect = [
         search.PutError(message='Fail!', results=[
@@ -134,7 +134,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
       (search.Error(),),
       (base_model.apiproxy_errors.OverQuotaError,))
   @mock.patch.object(base_model, 'logging', autospec=True)
-  @mock.patch.object(search.Index, 'put', autospec=True)
+  @mock.patch.object(search.Index, 'put')
   def test_add_docs_to_index_error(self, mock_error, mock_put, mock_logging):
     mock_put.side_effect = mock_error
     base_model.BaseModel.add_docs_to_index([search.Document(
@@ -243,8 +243,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
         name='test_geopt', value=search.GeoPoint(52.37, 4.88))]
     self.assertEqual(expected_field, search_field)
 
-  @mock.patch.object(
-      base_model.BaseModel, '_to_search_fields', autospec=True)
+  @mock.patch.object(base_model.BaseModel, '_to_search_fields')
   def test_get_document_fields(self, mock_to_search_fields):
     test_model = Test(text_field='item_1')
     expected_result = [search.TextField(name='text_field', value='item_1')]

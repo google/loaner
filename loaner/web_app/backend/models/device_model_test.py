@@ -21,6 +21,7 @@ import mock
 
 from google.appengine.api import datastore_errors
 from google.appengine.api import search
+from google.appengine.ext import deferred
 
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
@@ -68,8 +69,8 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
           serial_number='test_serial', user_email=loanertest.USER_EMAIL)
 
   def enroll_test_device(self, device_to_enroll):
-    self.patcher_directory = mock.patch(
-        '__main__.device_model.directory.DirectoryApiClient')
+    self.patcher_directory = mock.patch.object(
+        directory, 'DirectoryApiClient', autospec=True)
     self.mock_directoryclass = self.patcher_directory.start()
     self.addCleanup(self.patcher_directory.stop)
     self.mock_directoryclient = self.mock_directoryclass.return_value
@@ -79,7 +80,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.test_device = device_model.Device.enroll(
         '123ABC', loanertest.USER_EMAIL, '123456')
     if device_to_enroll.get('orgUnitPath') != default_ou:
-      self.mock_directoryclient.move_chrome_device_org_unit.assert_called()
+      assert self.mock_directoryclient.move_chrome_device_org_unit.called
 
   def test_identifier(self):
 
@@ -113,8 +114,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.testbed.mock_raiseevent.assert_any_call(
         'device_enroll', device=self.test_device)
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_new_device_error(self, mock_directoryclass):
     err_message = 'Failed to move device'
     mock_directoryclient = mock_directoryclass.return_value
@@ -128,9 +128,8 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
       device_model.Device.enroll('2346777', loanertest.USER_EMAIL)
 
   @mock.patch.object(device_model.Device, 'to_document', autospec=True)
-  @mock.patch('__main__.device_model.logging.info')
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(device_model, 'logging', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_unenrolled_device(
       self, mock_directoryclass, mock_logging, mock_to_document):
     mock_directoryclient = mock_directoryclass.return_value
@@ -143,19 +142,18 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     device.chrome_device_id = 'unique_id'
     device.put()
 
-    assert mock_to_document.call_count == 1
+    self.assertEqual(mock_to_document.call_count, 1)
 
     device = device_model.Device.enroll('123ABC', loanertest.USER_EMAIL)
 
-    self.assertEqual(2, mock_logging.call_count)
+    self.assertEqual(mock_logging.info.call_count, 2)
 
     retrieved_device = device_model.Device.get(serial_number='123ABC')
     self.assertTrue(retrieved_device.enrolled)
     self.testbed.mock_raiseevent.assert_any_call('device_enroll', device=device)
 
-  @mock.patch('__main__.device_model.logging.info')
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(device_model, 'logging', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_unenrolled_locked_device(
       self, mock_directoryclass, mock_logging):
     mock_directoryclient = mock_directoryclass.return_value
@@ -171,16 +169,15 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
 
     device = device_model.Device.enroll('123ABC', loanertest.USER_EMAIL)
 
-    self.assertEqual(3, mock_logging.call_count)
+    self.assertEqual(mock_logging.info.call_count, 3)
 
     retrieved_device = device_model.Device.get(serial_number='123ABC')
     self.assertTrue(retrieved_device.enrolled)
     self.testbed.mock_raiseevent.assert_any_call(
         'device_enroll_lost_or_locked', device=device)
 
-  @mock.patch('__main__.device_model.logging.info')
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(device_model, 'logging', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_unenrolled_lost_device(
       self, mock_directoryclass, mock_logging):
     mock_directoryclient = mock_directoryclass.return_value
@@ -196,15 +193,14 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
 
     device = device_model.Device.enroll('123ABC', loanertest.USER_EMAIL)
 
-    self.assertEqual(2, mock_logging.call_count)
+    self.assertEqual(mock_logging.info.call_count, 2)
 
     retrieved_device = device_model.Device.get(serial_number='123ABC')
     self.assertTrue(retrieved_device.enrolled)
     self.testbed.mock_raiseevent.assert_any_call(
         'device_enroll_lost_or_locked', device=device)
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_move_ou_error(self, mock_directoryclass):
     device = device_model.Device()
     device.enrolled = False
@@ -224,8 +220,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
             '5467FD', ou, err_message)):
       device_model.Device.enroll('5467FD', loanertest.USER_EMAIL)
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_no_device_error(self, mock_directoryclass):
     serial_number = '5467FD'
     mock_directoryclient = mock_directoryclass.return_value
@@ -240,7 +235,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
   def test_unenroll_error(self):
     err_message = 'Failed to move device'
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.mock_directoryclient.reset()
+    self.mock_directoryclient.reset_mock()
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
     unenroll_ou = config_model.Config.get('unenroll_ou')
@@ -275,8 +270,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         [device.serial_number for device in devices],
         [self.device.serial_number, self.device2.serial_number])
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_create_unenrolled(self, mock_directoryclass):
     """Test creating an unenrolled device."""
     mock_directoryclient = mock_directoryclass.return_value
@@ -296,8 +290,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         chrome_device_id=loanertest.TEST_DIR_DEVICE1[directory.DEVICE_ID])
     self.assertFalse(retrieved_device.enrolled)
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_create_unenrolled_incomplete_info(self, mock_directoryclass):
     """Test create unenrolled without all info, raises DeviceCreationError."""
     mock_directoryclient = mock_directoryclass.return_value
@@ -392,13 +385,13 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         device_model._NOT_ASSIGNED_MSG):
       self.test_device.calculate_return_dates()
 
-  @mock.patch('__main__.device_model.events.raise_event')
+  @mock.patch.object(device_model, 'events', autospec=True)
   def test_loan_assign(self, mock_events):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.shelf = self.shelf.key
     self.test_device.put()
 
-    mock_events.assert_called_once()
+    self.assertEqual(mock_events.raise_event.call_count, 1)
     mock_events.reset_mock()
 
     self.test_device.loan_assign(loanertest.SUPER_ADMIN_EMAIL)
@@ -413,14 +406,14 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         self.test_device.calculate_return_dates().default)
     self.assertIsNone(self.test_device.shelf)
 
-    mock_events.assert_called_once()
+    self.assertEqual(mock_events.raise_event.call_count, 2)
     mock_events.reset_mock()
 
     # Start new assignment
     self.test_device.loan_assign(loanertest.USER_EMAIL)
     retrieved_device = device_model.Device.get(serial_number='123ABC')
     self.assertEqual(retrieved_device.assigned_user, loanertest.USER_EMAIL)
-    self.assertEqual(2, mock_events.call_count)
+    self.assertEqual(mock_events.raise_event.call_count, 4)
 
   def test_resume_loan(self):
     """Test that a loan resumes when marked as pending return."""
@@ -429,7 +422,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.test_device.resume_loan(loanertest.USER_EMAIL)
     self.assertIsNone(self.test_device.mark_pending_return_date)
 
-  @mock.patch.object(device_model.Device, 'resume_loan')
+  @mock.patch.object(device_model.Device, 'resume_loan', autospec=True)
   def test_loan_resumes_if_late(self, mock_resume_loan):
     """Tests loan resumption within and outside the post-return grace period."""
     config_model.Config.set('return_grace_period', 15)
@@ -457,7 +450,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     # Heartbeat arrives a minute later, no dice.
     with freezegun.freeze_time(resume_time + beyond_grace_period):
       self.test_device.loan_resumes_if_late(loanertest.USER_EMAIL)
-      mock_resume_loan.assert_called_once()
+      assert mock_resume_loan.call_count == 1
 
   def test_loan_assign_unenrolled(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -514,7 +507,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
           device_model.ExtendError, self.test_device.loan_extend,
           'test@{}'.format(loanertest.USER_DOMAIN), requested_extension)
 
-  @mock.patch('__main__.device_model.Device.unlock')
+  @mock.patch.object(device_model.Device, 'unlock', autospec=True)
   def test_loan_return(self, mock_unlock):
     user_email = loanertest.USER_EMAIL
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -535,7 +528,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.assertFalse(retrieved_device.lost)
     self.assertIsNone(retrieved_device.last_reminder)
     self.assertIsNone(retrieved_device.next_reminder)
-    mock_unlock.assert_called_once_with(user_email)
+    self.assertEqual(mock_unlock.call_count, 1)
 
   def test_lock_and_unlock(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -552,13 +545,13 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         self.test_device.chrome_device_id)
     self.assertFalse(retrieved_device.locked)
 
-  @mock.patch.object(device_model, 'logging')
+  @mock.patch.object(device_model, 'logging', autospec=True)
   def test_already_locked_device(self, mock_logging):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.mock_directoryclient.disable_chrome_device.side_effect = (
         directory.DeviceAlreadyDisabledError)
     self.test_device.lock(loanertest.USER_EMAIL)
-    mock_logging.error.assert_called_once()
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_record_heartbeat(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -597,14 +590,15 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.assertTrue(self.test_device.damaged)
     self.assertEqual(self.test_device.damaged_reason, reason)
 
-  @mock.patch('__main__.device_model.Device.lock')
-  def test_mark_lost(self, mock_lock):
+  def test_mark_lost(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.test_device.mark_lost(user_email=loanertest.USER_EMAIL)
-    self.assertTrue(self.test_device.lost)
-    assert mock_lock.called
+    with mock.patch.object(
+        self.test_device, 'lock', autospec=True) as mock_lock:
+      self.test_device.mark_lost(user_email=loanertest.USER_EMAIL)
+      self.assertTrue(self.test_device.lost)
+      self.assertEqual(mock_lock.call_count, 1)
 
-  @mock.patch('__main__.device_model.deferred.defer')
+  @mock.patch.object(deferred, 'defer', autospec=True)
   def test_enable_guest_mode_allowed(self, mock_defer):
     now = datetime.datetime(year=2017, month=1, day=1)
     config_model.Config.set('allow_guest_mode', True)
@@ -652,7 +646,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.assigned_user = loanertest.USER_EMAIL
     self.test_device.put()
-    self.mock_directoryclient.reset()
+    self.mock_directoryclient.reset_mock()
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError('Guest move failed.'))
     config_model.Config.set('allow_guest_mode', True)
@@ -685,7 +679,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.test_device.assigned_user = loanertest.USER_EMAIL
     self.test_device.put()
     err_message = 'Failed to move device'
-    self.mock_directoryclient.reset()
+    self.mock_directoryclient.reset_mock()
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
     with self.assertRaisesRegexp(
@@ -697,7 +691,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
 
   def test_disable_guest_mode_no_change(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.mock_directoryclient.reset()
+    self.mock_directoryclient.reset_mock()
     self.test_device._disable_guest_mode(loanertest.USER_EMAIL)
     self.assertFalse(self.mock_directoryclient.called)
 
@@ -727,7 +721,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         device_model.UnableToMoveToShelfError, 'Unable to check device',
         self.test_device.move_to_shelf, self.shelf, loanertest.USER_EMAIL)
 
-  @mock.patch('__main__.device_model.logging.info')
+  @mock.patch.object(device_model, 'logging', autospec=True)
   def test_move_to_shelf(self, mock_logging):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     now = datetime.datetime(year=2017, month=1, day=1)
@@ -735,16 +729,18 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
       self.test_device.move_to_shelf(
           shelf=self.shelf, user_email=loanertest.USER_EMAIL)
       self.assertTrue(self.test_device.is_on_shelf)
-      self.assertEqual(2, mock_logging.call_count)
+      self.assertEqual(mock_logging.info.call_count, 2)
       self.assertEqual(now, self.test_device.last_known_healthy)
 
-  @mock.patch('__main__.device_model.Device.list_devices')
-  def test_move_to_shelf_over_capacity(self, mock_list_by_shelf):
-    self.shelf.capacity = 2
-    mock_list_by_shelf.return_value = [self.device, self.device2]
+  def test_move_to_shelf_over_capacity(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    with self.assertRaises(device_model.UnableToMoveToShelfError):
-      self.test_device.move_to_shelf(self.shelf, loanertest.USER_EMAIL)
+    self.shelf.capacity = 2
+    self.shelf.put()
+    with mock.patch.object(
+        device_model, 'Device', autospec=True) as mock_device:
+      mock_device.list_devices.return_value = [self.device, self.device2]
+      with self.assertRaises(device_model.UnableToMoveToShelfError):
+        self.test_device.move_to_shelf(self.shelf, loanertest.USER_EMAIL)
 
   def test_remove_from_shelf(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)

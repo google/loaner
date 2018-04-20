@@ -61,7 +61,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.run(request)
     mock_runbootstrap.assert_called()
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
     self.assertCountEqual(
         ['task1', 'task2'], [task.name for task in response.tasks])
     self.assertCountEqual(
@@ -105,7 +105,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     self.assertTrue(response.enabled)
     self.assertTrue(response.started)
     self.assertTrue(response.completed)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     mock_xsrf_token.reset_mock()
 
@@ -116,7 +116,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
     self.assertFalse(response.enabled)
     self.assertTrue(response.completed)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     mock_xsrf_token.reset_mock()
 
@@ -127,7 +127,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
     self.assertTrue(response.enabled)
     self.assertFalse(response.completed)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     task1_success = [
         task.success for task in response.tasks if task.name == 'task1'][0]
@@ -145,7 +145,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
     self.assertFalse(response.enabled)
     self.assertFalse(response.completed)
-    mock_xsrf_token.assert_called_once()
+    assert mock_xsrf_token.call_count == 1
 
     task1_success = [
         task.success for task in response.tasks if task.name == 'task1'][0]

@@ -38,7 +38,7 @@ class BigQueryClientTest(loanertest.TestCase):
 
   def setUp(self):
     super(BigQueryClientTest, self).setUp()
-    bq_patcher = mock.patch('__main__.bigquery_client.bigquery.Client')
+    bq_patcher = mock.patch.object(bigquery, 'Client', autospec=True)
     self.addCleanup(bq_patcher.stop)
     self.bq_mock = bq_patcher.start()
     self.dataset = mock.Mock()

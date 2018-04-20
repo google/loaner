@@ -89,7 +89,7 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
   def test_sync_user_roles(self, mock_directoryclass, mock_logging_info):
     del mock_directoryclass  # Unused.
     sync_users.sync_user_roles()
-    mock_logging_info.assert_called_once()
+    assert mock_logging_info.call_count == 1
 
   @mock.patch('__main__.sync_users.directory.DirectoryApiClient')
   def test_get_users_directory_check(self, mock_directoryclass):

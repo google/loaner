@@ -107,8 +107,8 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     retrieved_shelf = shelf_model.Shelf.get_by_id(shelf_key.id())
     self.assertEqual(retrieved_shelf.name, self.original_location)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_enroll_new_shelf(self, mock_logging, mock_stream):
     """Test enrolling a new shelf."""
     new_location = 'US-NYC2'
@@ -126,7 +126,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(new_shelf.lat_long, ndb.GeoPt(lat, lon))
     self.assertEqual(new_shelf.latitude, lat)
     self.assertEqual(new_shelf.longitude, lon)
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.name)
     mock_stream.assert_called_once_with(
         new_shelf, loanertest.USER_EMAIL,
@@ -134,8 +134,8 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=new_shelf)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_enroll_new_shelf_0_lat_long(self, mock_logging, mock_stream):
     """Test enrolling a new shelf."""
     new_location = 'US-NYC2'
@@ -153,7 +153,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(new_shelf.lat_long, ndb.GeoPt(lat, lon))
     self.assertEqual(new_shelf.latitude, lat)
     self.assertEqual(new_shelf.longitude, lon)
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.name)
     mock_stream.assert_called_once_with(
         new_shelf, loanertest.USER_EMAIL,
@@ -161,8 +161,8 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=new_shelf)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_enroll_shelf_exists(self, mock_logging, mock_stream):
     """Test enrolling an existing shelf reactivates the shelf."""
     new_capacity = 14
@@ -178,7 +178,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(self.test_shelf.key, reactivated_shelf.key)
     self.assertEqual(new_capacity, reactivated_shelf.capacity)
     self.assertEqual(reactivated_shelf.lat_long, ndb.GeoPt(lat, lon))
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._REACTIVATE_MSG, self.test_shelf.name)
     mock_stream.assert_called_once_with(
         reactivated_shelf, loanertest.USER_EMAIL,
@@ -239,7 +239,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
             location=self.original_location,
             friendly_name=self.original_friendly_name))
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   def test_edit(self, mock_stream):
     """Test that a shelf edit changes the appropriate properties."""
     new_capacity = 10
@@ -256,14 +256,14 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
         retrieved_shelf, loanertest.USER_EMAIL,
         shelf_model._EDIT_MSG % retrieved_shelf.name)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_audit(self, mock_logging, mock_stream):
     """Test that an audit updates the appropriate properties."""
     self.test_shelf.audit(loanertest.USER_EMAIL)
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.audit_requested)
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._AUDIT_MSG, self.test_shelf.name)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
@@ -271,21 +271,21 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_audited', shelf=self.test_shelf)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_request_audit(self, mock_logging, mock_stream):
     """Test that an audit request occurrs."""
     self.test_shelf.request_audit()
     retrieved_shelf = self.test_shelf.key.get()
     self.assertTrue(retrieved_shelf.audit_requested)
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._AUDIT_REQUEST_MSG, self.test_shelf.name)
     mock_stream.assert_called_once_with(
         self.test_shelf, constants.DEFAULT_ACTING_USER,
         shelf_model._AUDIT_REQUEST_MSG % self.test_shelf.name)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_enable(self, mock_logging, mock_stream):
     """Test the enabling of a shelf."""
     self.test_shelf.enabled = False
@@ -297,20 +297,20 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     retrieved_shelf = shelf_key.get()
     # Ensure that the shelf is now re-enabled
     self.assertTrue(retrieved_shelf.enabled)
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._ENABLE_MSG, self.test_shelf.name)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
         shelf_model._ENABLE_MSG % self.test_shelf.name)
 
-  @mock.patch('__main__.shelf_model.Shelf.stream_to_bq', autospec=True)
-  @mock.patch('__main__.shelf_model.logging.info', autospec=True)
+  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
+  @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_disable(self, mock_logging, mock_stream):
     """Test the disabling of a shelf."""
     self.test_shelf.disable(loanertest.USER_EMAIL)
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.enabled)
-    mock_logging.assert_called_once_with(
+    mock_logging.info.assert_called_once_with(
         shelf_model._DISABLE_MSG, self.test_shelf.name)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,

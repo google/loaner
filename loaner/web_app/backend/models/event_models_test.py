@@ -15,13 +15,13 @@
 """Tests for backend.models.event_models."""
 
 import datetime
-import logging  # pylint: disable=unused-import
+import logging
 import mock
 
 from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
 
-from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
+from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import event_models
 from loaner.web_app.backend.models import shelf_model
@@ -60,7 +60,7 @@ class CoreEventTest(loanertest.TestCase):
 class CustomEventTest(loanertest.TestCase):
   """Tests for CustomEvent class."""
 
-  @mock.patch('__main__.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def setup_devices(self, mock_directoryclass):
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.get_chrome_device_by_serial.side_effect = [
@@ -176,8 +176,8 @@ class CustomEventTest(loanertest.TestCase):
     self.assertEqual(
         len(query_components2['query'].filters._ConjunctionNode__nodes), 3)
 
-  @mock.patch('__main__.ndb.Query')
-  @mock.patch('__main__.logging.error')
+  @mock.patch.object(ndb, 'Query', autospec=True)
+  @mock.patch.object(logging, 'error', autospec=True)
   def test_get_matching_entities_bad_query(
       self, mock_logerror, mock_queryclass):
     """Tests with a bad query."""
