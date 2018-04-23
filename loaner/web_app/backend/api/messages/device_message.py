@@ -87,7 +87,7 @@ class Device(messages.Message):
   """
   serial_number = messages.StringField(1)
   asset_tag = messages.StringField(2)
-  enrolled = messages.BooleanField(3)
+  enrolled = messages.BooleanField(3, default=True)
   device_model = messages.StringField(4)
   due_date = message_types.DateTimeField(5)
   last_known_healthy = message_types.DateTimeField(6)

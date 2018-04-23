@@ -240,7 +240,8 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @parameterized.parameters(
       (device_message.Device(enrolled=True), 2,),
-      (device_message.Device(enrolled=True, current_ou='/'), 2,),
+      (device_message.Device(current_ou='/'), 2,),
+      (device_message.Device(enrolled=False), 1,),
       (device_message.Device(query_string='sn:6789'), 1,),
       (device_message.Device(query_string='at:12345'), 1,))
   def test_list_devices(self, request, response_length):

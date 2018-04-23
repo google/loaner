@@ -53,7 +53,7 @@ class Shelf(messages.Message):
         be used to retrieve the shelf.
     query_string: str, a string query to conduct a search on an index.
   """
-  enabled = messages.BooleanField(1)
+  enabled = messages.BooleanField(1, default=True)
   friendly_name = messages.StringField(2)
   location = messages.StringField(3)
   latitude = messages.FloatField(4)

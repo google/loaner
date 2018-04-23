@@ -73,9 +73,9 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
 
   @parameterized.parameters(
       (shelf_messages.Shelf(location='NY', capacity=50),
-       'location:NY capacity:50',),
-      (shelf_messages.Shelf(location='NY', capacity=50, enabled=True),
-       'location:NY capacity:50 enabled:True',))
+       'location:NY capacity:50 enabled:True',),
+      (shelf_messages.Shelf(location='NY', capacity=50, enabled=False),
+       'location:NY capacity:50 enabled:False',))
   def test_to_qery(self, message, expected_query):
     query = self.root_api_service.to_query(message, shelf_model.Shelf)
     #  The query is split because ndb properties are unordered when called by

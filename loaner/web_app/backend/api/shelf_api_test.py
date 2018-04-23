@@ -16,6 +16,7 @@
 
 import datetime
 
+from absl.testing import parameterized
 import mock
 
 from protorpc import message_types
@@ -30,7 +31,7 @@ from loaner.web_app.backend.models import shelf_model  # pylint: disable=unused-
 from loaner.web_app.backend.testing import loanertest
 
 
-class ShelfApiTest(loanertest.EndpointsTestCase):
+class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   """Test for the Shelf API."""
 
   def setUp(self):
@@ -152,12 +153,16 @@ class ShelfApiTest(loanertest.EndpointsTestCase):
     self.assertEqual(shelf.location, 'NYC-9th')
     self.assertIsInstance(response, message_types.VoidMessage)
 
+  @parameterized.parameters(
+      (shelf_messages.Shelf(capacity=10), 2,),
+      (shelf_messages.Shelf(enabled=False), 1,),
+      (shelf_messages.Shelf(query_string='enabled:True capacity:10'), 2,),
+      (shelf_messages.Shelf(query_string='enabled:False'), 1,))
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
-  def test_list_shelves(self, mock_xsrf_token):
-    request = shelf_messages.Shelf(enabled=True, capacity=10)
+  def test_list_shelves(self, request, response_length, mock_xsrf_token):
     response = self.service.list_shelves(request)
     assert mock_xsrf_token.call_count == 1
-    self.assertEqual(2, len(response.shelves))
+    self.assertEqual(response_length, len(response.shelves))
 
   def test_list_shelves_with_page_token(self):
     request = shelf_messages.Shelf(enabled=True, page_size=1)
