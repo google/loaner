@@ -1,3 +1,5 @@
+@import '../../app';
+
 .action-button {
   margin-bottom: 12px;
   margin-left: 12px;
@@ -27,3 +29,9 @@ loaner-greetings-card {
 .date-container {
   margin: 10px;
 }
+
+::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
+  background-color: mat-color($primary, 50);
+  opacity: 1;
+}
+

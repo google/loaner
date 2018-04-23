@@ -5,18 +5,12 @@
     </h1>
     <p class="card-description">
       <ng-container *ngIf="pendingReturn">
-        This device
-        <ng-container *ngIf="oneOfMany">
-            {{deviceId}}
-        </ng-container>
-        is marked as being returned. If you would like to resume your loan,
+        This device is marked as being returned. If you would like to resume your loan,
         please click the button below.
       </ng-container>
       <ng-container *ngIf="dueDate && !pendingReturn">
         <p>
-          Please return this device
-          {{deviceId}}
-          by:
+          Please return this device by:
         </p>
         <span class="mat-title">{{ dueDate | date: 'fullDate' }}</span>
       </ng-container>
