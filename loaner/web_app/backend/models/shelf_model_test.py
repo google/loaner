@@ -195,32 +195,6 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
           loanertest.USER_EMAIL, self.original_location, self.original_capacity,
           self.original_friendly_name, 40.6892534)
 
-  def test_list_shelves_no_filters_enabled(self):
-    """Test listing shelves that are enabled with no filters."""
-    self.create_shelf_list()
-    shelves = shelf_model.Shelf.list_shelves(enabled=True)
-    self.assertListEqual([self.test_shelf, self.shelf2], shelves[0])
-
-  def test_list_shelves_no_filters_disabled(self):
-    """Test listing shelves that are enabled with filters."""
-    self.create_shelf_list()
-    shelves = shelf_model.Shelf.list_shelves(enabled=False)
-    self.assertListEqual([self.shelf3, self.shelf4], shelves[0])
-
-  def test_list_shelves_with_filters_enabled(self):
-    """Test listing shelves that are disabled with no filters."""
-    self.create_shelf_list()
-    shelves = shelf_model.Shelf.list_shelves(
-        enabled=True, location=self.original_location)
-    self.assertListEqual([self.test_shelf], shelves[0])
-
-  def test_list_shelves_with_filters_disabled(self):
-    """Test listing shelves that are disabled with filters."""
-    self.create_shelf_list()
-    shelves = shelf_model.Shelf.list_shelves(
-        enabled=False, capacity=40)
-    self.assertListEqual([self.shelf4], shelves[0])
-
   def test_get_with_friendly_name(self):
     """Test the get method with a friendly_name provided."""
     self.assertEqual(

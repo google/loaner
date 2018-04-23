@@ -191,32 +191,6 @@ class Shelf(base_model.BaseModel):
     return shelf
 
   @classmethod
-  def list_shelves(
-      cls, enabled=True, page_size=100, next_cursor=None, **kwargs):
-    """Returns shelves with appropriate filtering.
-
-    Args:
-      enabled: bool, set True if only enabled shelves should be queried, else
-        False if only disabled.
-      page_size: int, the number of shelves to query for.
-      next_cursor: datastore_query.Cursor, set when next page of results need to
-        be queried.
-      **kwargs: in which each kwarg name is the name of a Shelf property by
-        which to filter the query, and its value is the filter value (str, int,
-        etc.).
-
-    Returns:
-      A list of shelves.
-    """
-    query = cls.query(cls.enabled == enabled)  # pylint: disable=g-explicit-bool-comparison
-    for filters, filter_values in kwargs.items():
-      if not isinstance(filter_values, (list, tuple)):
-        filter_values = (filter_values,)
-      for value in filter_values:
-        query = query.filter(ndb.GenericProperty(filters) == value)
-    return query.fetch_page(page_size=page_size, start_cursor=next_cursor)
-
-  @classmethod
   def get(cls, location=None, friendly_name=None):
     """Returns a shelf object.
 
