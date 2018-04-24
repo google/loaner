@@ -26,7 +26,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DeviceServiceMock, TEST_DEVICE_1} from '../../testing/mocks';
+import {DEVICE_1, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
@@ -37,7 +37,7 @@ import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
     </loaner-device-actions-menu>`,
 })
 class DummyComponent {
-  testDevice = TEST_DEVICE_1;
+  testDevice = DEVICE_1;
 }
 
 describe('DeviceActionsMenu', () => {
@@ -147,8 +147,7 @@ describe('DeviceActionsMenu', () => {
                        .query(By.css('.button-extend'));
     button.triggerEventHandler('click', null);
     fakeAsync(() => {
-      extendService.openDialog(
-          TEST_DEVICE_1.dueDate, TEST_DEVICE_1.maxExtendDate);
+      extendService.openDialog(DEVICE_1.dueDate, DEVICE_1.maxExtendDate);
       tick(500);
       flushMicrotasks();
       tick(500);

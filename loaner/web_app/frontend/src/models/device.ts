@@ -235,25 +235,27 @@ export class Device {
         color: DeviceChipColor.WARNING,
         status: DeviceChipStatus.LOST,
       });
+    } else {
+      if (this.pendingReturn) {
+        chipsToReturn.push({
+          icon: 'exit_to_app',
+          label: 'Pending return',
+          tooltip: 'This device is pending return.',
+          color: DeviceChipColor.ACCENT,
+          status: DeviceChipStatus.PENDING_RETURN,
+        });
+      }
+      if (this.damaged) {
+        chipsToReturn.push({
+          icon: 'build',
+          label: 'Damaged',
+          tooltip: 'This device is marked as damaged.',
+          color: DeviceChipColor.WARNING,
+          status: DeviceChipStatus.DAMAGED,
+        });
+      }
     }
-    if (this.pendingReturn) {
-      chipsToReturn.push({
-        icon: 'exit_to_app',
-        label: 'Pending return',
-        tooltip: 'This device is pending return.',
-        color: DeviceChipColor.ACCENT,
-        status: DeviceChipStatus.PENDING_RETURN,
-      });
-    }
-    if (this.damaged) {
-      chipsToReturn.push({
-        icon: 'build',
-        label: 'Damaged',
-        tooltip: 'This device is marked as damaged.',
-        color: DeviceChipColor.WARNING,
-        status: DeviceChipStatus.DAMAGED,
-      });
-    }
+
     return chipsToReturn;
   }
 }

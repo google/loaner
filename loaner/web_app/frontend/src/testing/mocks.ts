@@ -128,7 +128,7 @@ export class BootstrapServiceMock {
   }
 }
 
-export const TEST_DEVICE_1 = new Device({
+export const DEVICE_1 = new Device({
   asset_tag: 'device1',
   device_model: 'chromebook',
   serial_number: '321653',
@@ -140,7 +140,7 @@ export const TEST_DEVICE_1 = new Device({
   max_extend_date: 1499400000000,
 });
 
-export const TEST_DEVICE_2 = new Device({
+export const DEVICE_2 = new Device({
   asset_tag: 'device2',
   device_model: 'chromebook',
   serial_number: '236135',
@@ -153,7 +153,7 @@ export const TEST_DEVICE_2 = new Device({
 
 });
 
-export const TEST_DEVICE_WITH_ASSET_TAG = new Device({
+export const DEVICE_WITH_ASSET_TAG = new Device({
   asset_tag: 'abc',
   device_model: 'chromebook',
   serial_number: '777001',
@@ -166,7 +166,7 @@ export const TEST_DEVICE_WITH_ASSET_TAG = new Device({
 
 });
 
-export const TEST_DEVICE_WITHOUT_ASSET_TAG = new Device({
+export const DEVICE_WITHOUT_ASSET_TAG = new Device({
   asset_tag: '',
   device_model: 'chromebook',
   serial_number: '777002',
@@ -178,7 +178,7 @@ export const TEST_DEVICE_WITHOUT_ASSET_TAG = new Device({
   max_extend_date: 1499400000000,
 });
 
-export const TEST_DEVICE_MARKED_FOR_RETURN = new Device({
+export const DEVICE_MARKED_FOR_RETURN = new Device({
   asset_tag: '',
   device_model: 'chromebook',
   serial_number: '777003',
@@ -189,7 +189,7 @@ export const TEST_DEVICE_MARKED_FOR_RETURN = new Device({
   current_ou: 'ROOT',
 });
 
-export const TEST_DEVICE_NOT_MARKED_FOR_RETURN = new Device({
+export const DEVICE_NOT_MARKED_FOR_RETURN = new Device({
   asset_tag: '',
   device_model: 'chromebook',
   serial_number: '777004',
@@ -201,7 +201,7 @@ export const TEST_DEVICE_NOT_MARKED_FOR_RETURN = new Device({
   max_extend_date: 1499400000000,
 });
 
-export const TEST_DEVICE_UNASSIGNED = new Device({
+export const DEVICE_UNASSIGNED = new Device({
   device_model: 'chromebook',
   serial_number: '777005',
   pending_return: false,
@@ -209,7 +209,7 @@ export const TEST_DEVICE_UNASSIGNED = new Device({
   current_ou: 'ROOT',
 });
 
-export const TEST_DEVICE_ASSIGNED = new Device({
+export const DEVICE_ASSIGNED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777006',
@@ -221,7 +221,7 @@ export const TEST_DEVICE_ASSIGNED = new Device({
   max_extend_date: 1499400000000,
 });
 
-export const TEST_DEVICE_LOST = new Device({
+export const DEVICE_LOST = new Device({
   device_model: 'chromebook',
   serial_number: '777007',
   assigned_on_date: 1499202031707,
@@ -231,7 +231,7 @@ export const TEST_DEVICE_LOST = new Device({
   lost: true,
 });
 
-export const TEST_DEVICE_DAMAGED = new Device({
+export const DEVICE_DAMAGED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777008',
@@ -243,7 +243,7 @@ export const TEST_DEVICE_DAMAGED = new Device({
   damaged: true,
 });
 
-export const TEST_DEVICE_LOCKED = new Device({
+export const DEVICE_LOCKED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777009',
@@ -255,7 +255,7 @@ export const TEST_DEVICE_LOCKED = new Device({
   locked: true,
 });
 
-export const TEST_DEVICE_OVERDUE = new Device({
+export const DEVICE_OVERDUE = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777009',
@@ -267,11 +267,21 @@ export const TEST_DEVICE_OVERDUE = new Device({
   max_extend_date: 1499400000000,
 });
 
+export const DEVICE_LOST_AND_MORE = new Device({
+  device_model: 'chromebook',
+  serial_number: '777007',
+  assigned_on_date: 1499202031707,
+  last_update: 1499202031707,
+  due_date: 1499202031707,
+  current_ou: 'ROOT',
+  lost: true,
+  damaged: true,
+  pending_return: true,
+});
+
 export class DeviceServiceMock {
-  dataChange = new BehaviorSubject<Device[]>([
-    TEST_DEVICE_1, TEST_DEVICE_2, TEST_DEVICE_WITH_ASSET_TAG,
-    TEST_DEVICE_WITHOUT_ASSET_TAG
-  ]);
+  dataChange = new BehaviorSubject<Device[]>(
+      [DEVICE_1, DEVICE_2, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG]);
 
   create() {
     return;
@@ -294,7 +304,7 @@ export class DeviceServiceMock {
   }
 
   getDevice(deviceId: string): Observable<Device> {
-    return of (this.data[0]);
+    return of(this.data[0]);
   }
 
   checkReadyForAudit(deviceId: string): Observable<string> {
@@ -327,7 +337,7 @@ export class DeviceServiceMock {
   }
 
   enableGuestMode(id: string) {
-    return of (true);
+    return of(true);
   }
 
   enroll(newDevice: Device) {
@@ -369,11 +379,11 @@ export class AuthServiceMock {
   loaded = false;
 
   whenLoaded(): Observable<boolean> {
-    return of (true);
+    return of(true);
   }
 
   whenSignedIn(): Observable<boolean> {
-    return of (true);
+    return of(true);
   }
 
   updateSigninStatus(isSignedIn: boolean) {}
@@ -398,15 +408,15 @@ export class UserServiceMock {
   user = TEST_USER;
 
   getRole(): Observable<User> {
-    return of (this.user);
+    return of(this.user);
   }
 
   whenUserLoaded(): Observable<User> {
-    return of (this.user);
+    return of(this.user);
   }
 
   loadUser(): Observable<User> {
-    return of (this.user);
+    return of(this.user);
   }
 }
 
@@ -425,6 +435,6 @@ export const TEST_SHELF = new Shelf({
 
 export class ActivatedRouteMock {
   get params(): Observable<{[key: string]: {}}> {
-    return of ({id: 'Location 1'});
+    return of({id: 'Location 1'});
   }
 }

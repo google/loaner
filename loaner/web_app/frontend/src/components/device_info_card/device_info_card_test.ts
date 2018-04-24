@@ -29,7 +29,7 @@ import {Device} from '../../models/device';
 import {User} from '../../models/user';
 import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
-import {DeviceServiceMock, TEST_DEVICE_1, TEST_DEVICE_2, TEST_DEVICE_NOT_MARKED_FOR_RETURN, TEST_DEVICE_WITH_ASSET_TAG, TEST_DEVICE_WITHOUT_ASSET_TAG, TEST_USER, UserServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_2, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
 import {DeviceInfoCard, DeviceInfoCardModule} from '.';
 
@@ -45,7 +45,7 @@ describe('DeviceInfoCardComponent', () => {
   let testComponent: DummyComponent;
   let deviceInfoCard: DeviceInfoCard;
   const params = new BehaviorSubject<Params>({
-    id: TEST_DEVICE_2.serialNumber,
+    id: DEVICE_2.serialNumber,
   });
   // Month array for testing devices.
   const monthNames = [
@@ -102,9 +102,8 @@ describe('DeviceInfoCardComponent', () => {
     const compiled = fixture.debugElement.nativeElement;
     const tabListContent =
         compiled.querySelector('.mat-tab-header').textContent;
-    expect(tabListContent).toContain(TEST_DEVICE_WITH_ASSET_TAG.assetTag);
-    expect(tabListContent)
-        .toContain(TEST_DEVICE_WITHOUT_ASSET_TAG.serialNumber);
+    expect(tabListContent).toContain(DEVICE_WITH_ASSET_TAG.assetTag);
+    expect(tabListContent).toContain(DEVICE_WITHOUT_ASSET_TAG.serialNumber);
   });
 
   it('should display the username on the card.', () => {
@@ -118,14 +117,14 @@ describe('DeviceInfoCardComponent', () => {
   it('should show a due date if the device is not marked for return', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices')
-        .and.returnValue(of([TEST_DEVICE_NOT_MARKED_FOR_RETURN]));
+        .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const tabGroupText = compiled.querySelector('.mat-tab-body').textContent;
     const dueDate = {
-      month: TEST_DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getMonth(),
-      day: TEST_DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getDate(),
-      year: TEST_DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getFullYear(),
+      month: DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getMonth(),
+      day: DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getDate(),
+      year: DEVICE_NOT_MARKED_FOR_RETURN.dueDate.getFullYear(),
     };
     const dateStringToExpect =
         `${monthNames[dueDate.month]} ${dueDate.day}, ${dueDate.year}`;
@@ -145,23 +144,23 @@ describe('DeviceInfoCardComponent', () => {
   it('should select the correct tab when route is provided', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices').and.returnValue(of([
-      TEST_DEVICE_1,
-      TEST_DEVICE_2,
+      DEVICE_1,
+      DEVICE_2,
     ]));
-    params.next({id: TEST_DEVICE_2.assetTag});
+    params.next({id: DEVICE_2.assetTag});
     fixture.detectChanges();
     let compiled = fixture.debugElement.nativeElement;
     let selectedTab =
         compiled.querySelector('.mat-tab-label[aria-selected=true]')
             .textContent;
-    expect(selectedTab).toContain(TEST_DEVICE_2.assetTag);
+    expect(selectedTab).toContain(DEVICE_2.assetTag);
 
-    params.next({id: TEST_DEVICE_1.assetTag});
+    params.next({id: DEVICE_1.assetTag});
     deviceInfoCard.ngOnInit();
     fixture.detectChanges();
     compiled = fixture.debugElement.nativeElement;
     selectedTab = compiled.querySelector('.mat-tab-label[aria-selected=true]')
                       .textContent;
-    expect(selectedTab).toContain(TEST_DEVICE_1.assetTag);
+    expect(selectedTab).toContain(DEVICE_1.assetTag);
   });
 });
