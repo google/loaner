@@ -18,8 +18,12 @@ import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {of} from 'rxjs';
+
 import {Device} from '../../models/device';
+import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
+import {ConfigServiceMock} from '../../testing/mocks';
 
 import {DeviceActionBox, DeviceActionBoxModule} from '.';
 
@@ -40,6 +44,9 @@ class EnrollUnenrollComponentTest {
 describe('DeviceActionBox', () => {
   let fixture: ComponentFixture<EnrollUnenrollComponentTest>;
   let testComponent: EnrollUnenrollComponentTest;
+  let actionBox: DeviceActionBox;
+  let configService: ConfigService;
+  let configServiceSpy: jasmine.Spy;
 
   beforeEach(fakeAsync(() => {
     TestBed
@@ -50,7 +57,10 @@ describe('DeviceActionBox', () => {
             RouterTestingModule,
             BrowserAnimationsModule,
           ],
-          providers: [LoanerSnackBar],
+          providers: [
+            LoanerSnackBar,
+            {provide: ConfigService, useClass: ConfigServiceMock},
+          ],
         })
         .compileComponents();
 
@@ -58,88 +68,19 @@ describe('DeviceActionBox', () => {
 
     fixture = TestBed.createComponent(EnrollUnenrollComponentTest);
     testComponent = fixture.debugElement.componentInstance;
+    actionBox = fixture.debugElement.query(By.directive(DeviceActionBox))
+                    .componentInstance;
+
+    configService = TestBed.get(ConfigService);
+    configServiceSpy = spyOn(configService, 'getBooleanConfig');
+    configServiceSpy.and.returnValue(of(true));
   }));
 
   it('creates the EnrollUnenrollComponentTest', () => {
     expect(EnrollUnenrollComponentTest).toBeTruthy();
   });
 
-  it('renders the DeviceActionBox with serial number input', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const formField = compiled.querySelector('.mat-form-field.serial-number');
-    const input = formField.querySelector('input');
-
-    expect(actionBoxContent).toBeDefined();
-    expect(actionBoxContent.textContent).toContain('Serial number');
-    expect(formField).toBeDefined();
-    expect(formField.textContent).toContain('Serial number');
-    expect(input).toBeDefined();
-  });
-
-  it('renders the DeviceActionBox with asset tag input', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const formField = compiled.querySelector('.mat-form-field.asset-tag');
-    const input = formField.querySelector('input');
-
-    expect(actionBoxContent).toBeDefined();
-    expect(actionBoxContent.textContent).toContain('Asset tag');
-    expect(formField).toBeDefined();
-    expect(formField.textContent).toContain('Asset tag');
-    expect(input).toBeDefined();
-  });
-
-  it('renders the asset tag input as not required', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const formField = compiled.querySelector('.mat-form-field.asset-tag');
-    const input = formField.querySelector('input');
-
-    expect(input).toBeDefined();
-    expect(input.getAttribute('required')).toBeFalsy();
-  });
-
-  it('renders the DeviceActionBox with enroll action', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const deviceInput = actionBoxContent.querySelector('.mat-form-field');
-    const actionButton = actionBoxContent.querySelector('.action-button');
-
-    expect(actionBoxContent).toBeDefined();
-    expect(actionBoxContent.querySelector('h2').textContent)
-        .toContain('Add device');
-    expect(deviceInput).toBeDefined();
-    expect(deviceInput.textContent).toContain('Serial number');
-    expect(actionButton).toBeDefined();
-    expect(actionButton.getAttribute('disabled')).toBe('');
-  });
-
-  it('renders the DeviceActionBox with unenroll action', () => {
-    testComponent.action = 'unenroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const deviceInput = actionBoxContent.querySelector('.mat-form-field');
-    const actionButton = actionBoxContent.querySelector('.action-button');
-
-    expect(actionBoxContent).toBeDefined();
-    expect(actionBoxContent.querySelector('h2').textContent)
-        .toContain('Remove device');
-    expect(deviceInput).toBeDefined();
-    expect(deviceInput.textContent).toContain('Serial number');
-    expect(actionButton).toBeDefined();
-    expect(actionButton.getAttribute('disabled')).toBe('');
-  });
-
-  it('does not render the DeviceActionBox with an invalid action', () => {
+  it('does not render the action box with an invalid action', () => {
     testComponent.action = 'invalid';
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -147,59 +88,121 @@ describe('DeviceActionBox', () => {
     expect(compiled.querySelector('.action-box')).toBeNull();
   });
 
-  it('emits device event when action button is pressed', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const actionButton = actionBoxContent.querySelector('.action-button');
+  describe('with enroll action', () => {
+    beforeEach(() => {
+      testComponent.action = 'enroll';
+      fixture.detectChanges();
+    });
 
-    const actionBoxFixture =
-        fixture.debugElement.query(By.directive(DeviceActionBox));
-    const actionBox = actionBoxFixture.componentInstance;
+    it('renders the action box', () => {
+      const compiled = fixture.debugElement.nativeElement;
+      const actionBoxContent = compiled.querySelector('.action-box');
 
-    actionBox.device.serialNumber = '123123';
-    fixture.detectChanges();
+      expect(actionBoxContent).toBeDefined();
+      expect(actionBoxContent.querySelector('h2').textContent)
+          .toContain('Add device');
+    });
 
-    spyOn(testComponent, 'takeAction');
-    fixture.detectChanges();
+    it('renders serial number input', () => {
+      const compiled = fixture.debugElement.nativeElement;
+      const formField = compiled.querySelector('.mat-form-field.serial-number');
+      const input = formField.querySelector('input');
 
-    actionButton.dispatchEvent(new Event('click'));
+      expect(formField.textContent).toContain('Serial number');
+      expect(input).toBeDefined();
+      expect(input.getAttribute('required')).not.toBeNull();
+    });
 
-    expect(testComponent.takeAction).toHaveBeenCalled();
+    it('renders asset tag input if use_asset_tag is true', () => {
+      const compiled = fixture.debugElement.nativeElement;
+      const formField = compiled.querySelector('.mat-form-field.asset-tag');
+      const input = formField.querySelector('input');
+
+      expect(formField.textContent).toContain('Asset tag');
+      expect(input).toBeDefined();
+      expect(input.getAttribute('required')).not.toBeNull();
+    });
+
+    it('does not render asset tag input if use_asset_tag is false', () => {
+      configServiceSpy.and.returnValue(of(false));
+      actionBox.ngOnInit();
+      fixture.detectChanges();
+      const compiled = fixture.debugElement.nativeElement;
+      const formField = compiled.querySelector('.mat-form-field.asset-tag');
+
+      expect(formField).toBeNull();
+    });
+
+    it('only emits the device when button is pressed with asset tag', () => {
+      const compiled = fixture.debugElement.nativeElement;
+      const actionButton =
+          compiled.querySelector('.action-button') as HTMLElement;
+
+      spyOn(testComponent, 'takeAction');
+      actionBox.device.serialNumber = '123123';
+      fixture.detectChanges();
+
+      actionButton.click();
+
+      expect(testComponent.takeAction).not.toHaveBeenCalled();
+      actionBox.device.assetTag = 'asset';
+      fixture.detectChanges();
+
+      actionButton.click();
+
+      expect(testComponent.takeAction).toHaveBeenCalled();
+    });
+
+    it('enables submit button only with serial AND asset filled', () => {
+      actionBox.device.serialNumber = 'serial';
+      actionBox.device.assetTag = 'asset';
+      fixture.detectChanges();
+      const actionButton =
+          fixture.debugElement.nativeElement.querySelector('.action-button');
+      expect(actionButton.getAttribute('disabled')).toBeNull();
+    });
   });
 
-  it('disables the submit button while serial number is missing', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const actionButton = actionBoxContent.querySelector('.action-button');
+  describe('with unenroll action', () => {
+    beforeEach(() => {
+      testComponent.action = 'unenroll';
+      fixture.detectChanges();
+    });
 
-    const actionBoxFixture =
-        fixture.debugElement.query(By.directive(DeviceActionBox));
-    const actionBox = actionBoxFixture.componentInstance;
+    it('renders the action box', () => {
+      const compiled = fixture.debugElement.nativeElement;
+      const actionBoxContent = compiled.querySelector('.action-box');
 
-    actionBox.device.serialNumber = null;
-    fixture.detectChanges();
+      expect(actionBoxContent).toBeDefined();
+      expect(actionBoxContent.querySelector('h2').textContent)
+          .toContain('Remove device');
+    });
 
-    expect(actionButton.getAttribute('disabled')).toBeDefined();
-  });
+    it('only renders 1 input with placeholder depending on use_asset_tag',
+       () => {
+         let compiled = fixture.debugElement.nativeElement;
+         let formFields = compiled.querySelectorAll('.mat-form-field');
+         expect(formFields.length).toBe(1);
 
-  it('enables the submit button when serial number is filled', () => {
-    testComponent.action = 'enroll';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const actionBoxContent = compiled.querySelector('.action-box');
-    const actionButton = actionBoxContent.querySelector('.action-button');
+         let field = formFields[0];
+         let input = field.querySelector('input');
+         expect(field.textContent).toContain('Asset tag');
+         expect(input).toBeDefined();
+         expect(input.getAttribute('required')).not.toBeNull();
 
-    const actionBoxFixture =
-        fixture.debugElement.query(By.directive(DeviceActionBox));
-    const actionBox = actionBoxFixture.componentInstance;
+         configServiceSpy.and.returnValue(of(false));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
 
-    actionBox.device.serialNumber = '123123';
-    fixture.detectChanges();
+         compiled = fixture.debugElement.nativeElement;
+         formFields = compiled.querySelectorAll('.mat-form-field');
+         expect(formFields.length).toBe(1);
 
-    expect(actionButton.getAttribute('disabled')).toBeFalsy();
+         field = formFields[0];
+         input = field.querySelector('input');
+         expect(field.textContent).toContain('Serial Number');
+         expect(input).toBeDefined();
+         expect(input.getAttribute('required')).not.toBeNull();
+       });
   });
 });

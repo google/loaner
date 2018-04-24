@@ -15,10 +15,10 @@
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {ConfigService} from '../../services/config';
 import {DeviceService} from '../../services/device';
 import {ShelfService} from '../../services/shelf';
-import {ShelfServiceMock} from '../../testing/mocks';
-import {DeviceServiceMock} from '../../testing/mocks';
+import {ConfigServiceMock, DeviceServiceMock, ShelfServiceMock} from '../../testing/mocks';
 
 import {ShelfDetailView, ShelfDetailViewModule} from '.';
 
@@ -32,8 +32,9 @@ describe('ShelfDetailView', () => {
         .configureTestingModule({
           imports: [RouterTestingModule, ShelfDetailViewModule],
           providers: [
-            {provide: ShelfService, useClass: ShelfServiceMock},
+            {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
+            {provide: ShelfService, useClass: ShelfServiceMock},
           ],
         })
         .compileComponents();

@@ -12,12 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {animate, state, style, transition, trigger} from '@angular/animations';
-import {Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
+import {animate, AnimationEvent, state, style, transition, trigger} from '@angular/animations';
+import {AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild} from '@angular/core';
 import {NgForm} from '@angular/forms';
-import {Router} from '@angular/router';
+import {NavigationEnd, Router} from '@angular/router';
+import {fromEvent} from 'rxjs';
 
 import {Device} from '../../models/device';
+import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
 
 /** Possible actions that can be taken on devices in this component. */
@@ -39,7 +41,7 @@ export type ExpansionState = 'expanded'|'collapsed';
         'bodyExpansion',
         [
           state('collapsed', style({height: 0})),
-          state('expanded', style({height: '170px'})),
+          state('expanded', style({height: '210px'})),
           transition(
               '* => *',
               [
@@ -48,63 +50,105 @@ export type ExpansionState = 'expanded'|'collapsed';
         ]),
   ],
 })
-export class DeviceActionBox implements OnInit {
+export class DeviceActionBox implements OnInit, AfterViewInit {
   /** Actions that can be taken on devices and displayed on the template. */
   actions = Actions;
   /** Current action that wil be taken on the device. */
   @Input() action: Actions;
   /** Current state of the ActionBox component. */
-  state: ExpansionState = 'collapsed';
+  state: ExpansionState;
   /** Device model that will be added. */
   device = new Device();
+  /** If asset tag should be used on this instace of the app. */
+  useAssetTag = false;
 
-  @ViewChild('serialNumber') serialNumber: ElementRef;
+  @ViewChild('mainIdentifier') mainIdentifier: ElementRef;
+  @ViewChild('assetTag') assetTag: ElementRef;
   @ViewChild('actionForm') actionForm: NgForm;
 
-  /**
-   * Function callback that will receive the device that the action was taken.
-   */
+  /** Emits a device when an action is ready to be taken. */
   @Output() takeAction = new EventEmitter<Device>();
 
   constructor(
-      private router: Router, private readonly snackBar: LoanerSnackBar) {}
+      private readonly configService: ConfigService,
+      private router: Router,
+      private readonly snackBar: LoanerSnackBar,
+  ) {}
 
   ngOnInit() {
-    this.state = 'expanded';
-  }
+    this.configService.getBooleanConfig('use_asset_tags')
+        .subscribe(response => {
+          this.state = 'expanded';
+          this.useAssetTag = response;
+        });
 
-  ngOnChanges() {
-    if (this.serialNumber) {
-      this.setUpInput();
-    }
+    fromEvent<KeyboardEvent>(document, 'keyup').subscribe(event => {
+      if (event.key === 'Escape') {
+        this.collapse();
+      }
+    });
+
+    this.router.events.subscribe(event => {
+      if (event instanceof NavigationEnd) {
+        this.setUpInput();
+      }
+    });
   }
 
   ngAfterViewInit() {
     this.setUpInput();
   }
 
+  get mainIdentifierName() {
+    return this.useAssetTag ? 'Asset tag' : 'Serial Number';
+  }
+
   /** Emits the takeAction event with the current device on the component. */
   takeActionOnDevice() {
-    if (!this.device.serialNumber) {
-      this.serialNumber.nativeElement.focus();
-      this.snackBar.open('Serial Number is empty and it is required');
+    if (this.action === Actions.ENROLL) {
+      this.takeEnrollActions();
     } else {
-      this.takeAction.emit(this.device);
-      this.device = new Device();
-      this.actionForm.resetForm();
-      this.serialNumber.nativeElement.focus();
+      this.takeUnenrollActions();
     }
+  }
+
+  private takeEnrollActions() {
+    if (!this.device.serialNumber) {
+      this.mainIdentifier.nativeElement.focus();
+      this.snackBar.open('Serial Number is empty and it is required');
+    } else if (this.useAssetTag && !this.device.assetTag) {
+      this.assetTag.nativeElement.focus();
+      this.snackBar.open('Asset tag is empty and it is required');
+    } else {
+      this.emitDevice();
+    }
+  }
+
+  private takeUnenrollActions() {
+    if (!this.device.unknownIdentifier) {
+      this.mainIdentifier.nativeElement.focus();
+      this.snackBar.open(
+          `${this.mainIdentifierName} is empty and it is required`);
+    } else {
+      this.emitDevice();
+    }
+  }
+
+  private emitDevice() {
+    this.takeAction.emit(this.device);
+    this.device = new Device();
+    this.mainIdentifier.nativeElement.focus();
+    this.actionForm.resetForm();
   }
 
   /** Setup input field configuration */
   setUpInput() {
     if (this.actionForm) {
-      this.actionForm.form.markAsPristine();
-      this.actionForm.form.markAsUntouched();
       setTimeout(() => {
-        this.serialNumber.nativeElement.focus();
-        this.serialNumber.nativeElement.select();
+        this.mainIdentifier.nativeElement.focus();
+        this.mainIdentifier.nativeElement.select();
       }, 500);
+      this.actionForm.resetForm();
     }
   }
 
@@ -112,8 +156,8 @@ export class DeviceActionBox implements OnInit {
     this.state = 'collapsed';
   }
 
-  animationDone() {
-    if (this.state === 'collapsed') {
+  animationDone(event: AnimationEvent) {
+    if (event.toState === 'collapsed') {
       this.router.navigate(['devices']);
     }
   }

@@ -20,6 +20,7 @@ import {Shelf, ShelfApiParams} from './shelf';
 export declare interface DeviceApiParams {
   serial_number?: string;
   asset_tag?: string;
+  unknown_identifier?: string;
   damaged?: boolean;
   device_model?: string;
   last_update?: number;
@@ -64,6 +65,8 @@ export class Device {
   serialNumber = '';
   /** Asset tag of the device. */
   assetTag = '';
+  /** Asset tag of the device. */
+  unknownIdentifier: string;
   /** Computer model of the device. */
   deviceModel = '';
   /** When it was last updated on our application. */
@@ -142,7 +145,14 @@ export class Device {
    * Property to retrieve the asset tag or serial number, in that order.
    */
   get id(): string {
-    return this.assetTag || this.serialNumber;
+    return this.assetTag || this.serialNumber || this.unknownIdentifier;
+  }
+
+  /**
+   * Property to setting an ID when it's not known by the frontend upfront.
+   */
+  set id(value: string) {
+    this.unknownIdentifier = value;
   }
 
   /**
@@ -171,6 +181,7 @@ export class Device {
   toApiMessage(): DeviceApiParams {
     return {
       asset_tag: this.assetTag,
+      unknown_identifier: this.unknownIdentifier,
       assigned_on_date: this.assignedOnDate.getTime(),
       current_ou: this.currentOu,
       device_model: this.deviceModel,

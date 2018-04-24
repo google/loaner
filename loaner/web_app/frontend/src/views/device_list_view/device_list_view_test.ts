@@ -14,8 +14,10 @@
 
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
+
+import {ConfigService} from '../../services/config';
 import {DeviceService} from '../../services/device';
-import {DeviceServiceMock} from '../../testing/mocks';
+import {ConfigServiceMock, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceListView, DeviceListViewModule} from '.';
 
@@ -28,6 +30,7 @@ describe('DeviceListView', () => {
         .configureTestingModule({
           imports: [RouterTestingModule, DeviceListViewModule],
           providers: [
+            {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
           ],
         })
@@ -40,6 +43,6 @@ describe('DeviceListView', () => {
   }));
 
   it('should create the deviceListView', () => {
-       expect(deviceListView).toBeTruthy();
-     });
+    expect(deviceListView).toBeTruthy();
+  });
 });
