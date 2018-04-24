@@ -16,6 +16,8 @@ import {Component, OnInit} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 
+import {switchMap} from 'rxjs/operators';
+
 import {Shelf} from '../../models/shelf';
 import {ConfigService} from '../../services/config';
 import {ShelfService} from '../../services/shelf';
@@ -81,8 +83,12 @@ export class ShelfActionsCard implements OnInit {
    * template.
    */
   update() {
-    this.shelfService.update(this.shelf);
-    this.backToShelfDetails();
+    this.shelfService.update(this.shelf)
+        .pipe(switchMap(() => this.shelfService.getShelf(this.shelf.location)))
+        .subscribe(shelf => {
+          this.shelf = shelf;
+          this.backToShelfDetails();
+        });
   }
 
   /** Navigates to the shelves page.. */

@@ -16,6 +16,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/co
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
+import {of} from 'rxjs';
 
 import {ConfigService} from '../../services/config';
 import {ShelfService} from '../../services/shelf';
@@ -49,11 +50,11 @@ describe('ShelfActionsComponent', () => {
     componentInstance = fixture.debugElement.componentInstance;
   }));
 
-  it('should create the ShelfActionsCard', () => {
+  it('creates the ShelfActionsCard', () => {
     expect(componentInstance).toBeDefined();
   });
 
-  it('should render proper mat-card-title when editing a shelf', () => {
+  it('renders proper mat-card-title when editing a shelf', () => {
     componentInstance.editing = true;
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -61,14 +62,14 @@ describe('ShelfActionsComponent', () => {
         .toContain('Update shelf');
   });
 
-  it('should have a disabled create button at beginning', () => {
+  it('has a disabled create button at beginning', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const createButton = compiled.querySelector('button');
     expect(createButton).toBeTruthy();
   });
 
-  it('should have a Location named input', () => {
+  it('has a Location named input', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="location"]');
@@ -76,14 +77,14 @@ describe('ShelfActionsComponent', () => {
     expect(input.getAttribute('required')).toBe('');
   });
 
-  it('should have a Friendly Name named input', () => {
+  it('has a Friendly Name named input', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="name"]');
     expect(input).toBeTruthy();
   });
 
-  it('should have a Capacity named input', () => {
+  it('has a Capacity named input', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="capacity"]');
@@ -92,35 +93,35 @@ describe('ShelfActionsComponent', () => {
     expect(input.getAttribute('min')).toBe('1');
   });
 
-  it('should have a Latitude named input', () => {
+  it('has a Latitude named input', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="latitude"]');
     expect(input).toBeTruthy();
   });
 
-  it('should have a Longitude named input', () => {
+  it('has a Longitude named input', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="longitude"]');
     expect(input).toBeTruthy();
   });
 
-  it('should have a Altitude named input', () => {
+  it('has a Altitude named input', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="altitude"]');
     expect(input).toBeTruthy();
   });
 
-  it('should have a Responsible for Audit select', () => {
+  it('has a Responsible for Audit select', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const input = compiled.querySelector('input[name="altitude"]');
     expect(input).toBeTruthy();
   });
 
-  it('should call the shelf api when creating a shelf', () => {
+  it('calls the shelf api when creating a shelf', () => {
     const shelfService: ShelfService = TestBed.get(ShelfService);
     spyOn(shelfService, 'create');
 
@@ -134,7 +135,7 @@ describe('ShelfActionsComponent', () => {
     expect(componentInstance.shelf.name).toBe('');
   });
 
-  it('should load a shelf with populated properties when updating.', () => {
+  it('loads a shelf with populated properties when updating.', () => {
     componentInstance.editing = true;
 
     fixture.detectChanges();
@@ -152,16 +153,17 @@ describe('ShelfActionsComponent', () => {
     expect(input.getAttribute('ng-reflect-model')).toBe('10');
   });
 
-  it('should call shelf api update when updating a shelf.', () => {
+  it('calls shelf api update and get new value when updating a shelf.', () => {
     const shelfService: ShelfService = TestBed.get(ShelfService);
-    spyOn(shelfService, 'update');
-
-    fixture.detectChanges();
+    spyOn(shelfService, 'update').and.returnValue(of([TEST_SHELF]));
+    spyOn(shelfService, 'getShelf').and.returnValue(of([TEST_SHELF]));
 
     componentInstance.shelf = TEST_SHELF;
     componentInstance.editing = true;
     componentInstance.update();
+
+    fixture.detectChanges();
     expect(shelfService.update).toHaveBeenCalledWith(TEST_SHELF);
-    expect(componentInstance.shelf.name).toBe('FAKE SHELF');
+    expect(shelfService.getShelf).toHaveBeenCalledWith('Location 1');
   });
 });

@@ -52,9 +52,9 @@ export class ShelfService extends ApiService {
    */
   update(newShelf: Shelf) {
     const shelfToBeUpdated = newShelf.toApiMessage();
-    this.post('update', shelfToBeUpdated).subscribe(() => {
+    return this.post('update', shelfToBeUpdated).pipe(tap(() => {
       this.snackBar.open(`Shelf ${newShelf.name} updated.`);
-    });
+    }));
   }
 
   /**
