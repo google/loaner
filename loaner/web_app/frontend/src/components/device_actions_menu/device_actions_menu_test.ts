@@ -23,9 +23,9 @@ import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
-import {DamagedMock, ExtendMock, GuestModeMock, LostMock} from '../../../../../shared/testing/mocks';
+import {Unenroll} from '../../../../../shared/components/unenroll';
+import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {Dialog} from '../../services/dialog';
 import {DeviceServiceMock, TEST_DEVICE_1} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
@@ -52,14 +52,10 @@ describe('DeviceActionsMenu', () => {
             RouterTestingModule,
             DeviceActionsMenuModule,
             BrowserAnimationsModule,
+            SharedMocksModule,
           ],
           providers: [
-            {provide: ComponentFixtureAutoDetect, useValue: true},
-            {provide: Damaged, useClass: DamagedMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
-            {provide: Extend, useClass: ExtendMock},
-            {provide: GuestMode, useClass: GuestModeMock},
-            {provide: Lost, useClass: LostMock},
           ],
         })
         .compileComponents();
@@ -231,33 +227,22 @@ describe('DeviceActionsMenu', () => {
     });
   });
 
-  it('calls unenroll if the confirmation returns true', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'unenroll');
-    const dialog: Dialog = TestBed.get(Dialog);
-    spyOn(dialog, 'confirm').and.returnValue(of(true));
+  it('calls onUnenroll when Unenroll is clicked.', () => {
+    const unenrollService: Unenroll = TestBed.get(Unenroll);
+    spyOn(unenrollService, 'onUnenroll');
+    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
+    actionsButton.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('.actions-menu'))
+                       .query(By.css('.button-extend'));
+    button.triggerEventHandler('click', null);
     fakeAsync(() => {
-      deviceActionsMenu.openRemoveDeviceDialog();
+      unenrollService.openDialog('123');
       tick(500);
       flushMicrotasks();
       tick(500);
       fixture.detectChanges();
-      expect(deviceService.unenroll).toHaveBeenCalled();
-    });
-  });
-
-  it('should NOT call unenroll if the confirmation returns false', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'unenroll');
-    const dialog: Dialog = TestBed.get(Dialog);
-    spyOn(dialog, 'confirm').and.returnValue(of(false));
-    fakeAsync(() => {
-      deviceActionsMenu.openRemoveDeviceDialog();
-      tick(120);
-      flushMicrotasks();
-      tick(120);
-      fixture.detectChanges();
-      expect(deviceService.unenroll).not.toHaveBeenCalled();
+      expect(unenrollService.onUnenroll).toHaveBeenCalled();
     });
   });
 });

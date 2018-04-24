@@ -19,9 +19,9 @@ import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
+import {Unenroll} from '../../../../../shared/components/unenroll';
 import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';
-import {Dialog} from '../../services/dialog';
 
 /**
  * Component that renders a menu with device actions in it.
@@ -40,23 +40,21 @@ export class DeviceActionsMenu {
   constructor(
       private readonly damagedService: Damaged,
       private readonly deviceService: DeviceService,
-      private readonly dialog: Dialog,
       private readonly extendService: Extend,
       private readonly guestModeService: GuestMode,
       private readonly lostService: Lost,
+      private readonly unenrollService: Unenroll,
   ) {}
 
   /** Dialog for removing a device. */
   openRemoveDeviceDialog() {
-    const dialogTitle = 'Remove device';
-    const dialogContent = 'Are you sure you want to remove this device?';
-    this.dialog.confirm(dialogTitle, dialogContent).subscribe(result => {
-      if (result) {
-        this.deviceService.unenroll(this.device).subscribe(() => {
+    this.unenrollService.openDialog(this.device.id);
+    this.unenrollService.onUnenroll
+        .pipe(switchMap(() => this.deviceService.unenroll(this.device)))
+        .subscribe(() => {
+          this.unenrollService.finished();
           this.unenrolled.emit();
         });
-      }
-    });
   }
 
   /**

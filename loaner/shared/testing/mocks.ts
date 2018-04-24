@@ -12,7 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {NgModule} from '@angular/core';
+import {ComponentFixtureAutoDetect} from '@angular/core/testing';
 import {Observable, of} from 'rxjs';
+
+import {Damaged} from '../components/damaged';
+import {Extend} from '../components/extend';
+import {GuestMode} from '../components/guest';
+import {Lost} from '../components/lost';
+import {Unenroll} from '../components/unenroll';
 
 export abstract class DeviceActionsDialogService {
   openDialog() {}
@@ -50,4 +58,23 @@ export class LostMock extends DeviceActionsDialogService {
   get onLost(): Observable<boolean> {
     return of(true);
   }
+}
+
+export class UnenrollMock extends DeviceActionsDialogService {
+  get onUnenroll(): Observable<boolean> {
+    return of(true);
+  }
+}
+
+@NgModule({
+  providers: [
+    {provide: ComponentFixtureAutoDetect, useValue: true},
+    {provide: Damaged, useClass: DamagedMock},
+    {provide: Extend, useClass: ExtendMock},
+    {provide: GuestMode, useClass: GuestModeMock},
+    {provide: Lost, useClass: LostMock},
+    {provide: Unenroll, useClass: UnenrollMock},
+  ],
+})
+export class SharedMocksModule {
 }

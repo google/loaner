@@ -1,8 +1,21 @@
-<h1>{{ title }}</h1>
-<p>{{ message }}</p>
-<section>
-  <button type="button" mat-button mat-raised-button color="primary"
-    (click)="dialogRef.close(true)">Yes</button>
-  <button type="button" mat-button mat-raised-button
-    (click)="dialogRef.close()">No</button>
-</section>
+<div>
+  <p matDialogTitle>{{title}}</p>
+  <div mat-dialog-content>
+    <p>
+      {{message}}
+    </p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="dialogRef.close(true)"
+            id="yes"
+            class="action-button">
+      Yes
+    </button>
+    <button mat-button (click)="dialogRef.close()"
+            id="cancel"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Cancel
+    </button>
+  </div>
+</div>

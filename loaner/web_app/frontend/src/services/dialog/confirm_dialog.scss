@@ -1,17 +1,5 @@
 @import '../../app';
 
-h1 {
-  color: mat-color($primary, 500) !important;
-  font-size: 20px !important;
-}
-
-section {
-  display: flex;
-  justify-content: center;
-
-  button {
-    margin-left: 15px;
-    margin-right: 15px;
-    margin-top: 6px;
-  }
+.action-button {
+  margin: 12px;
 }

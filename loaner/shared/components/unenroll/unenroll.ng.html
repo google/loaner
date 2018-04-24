@@ -1,0 +1,40 @@
+<div *ngIf="toBeSubmitted && !loading">
+  <p matDialogTitle>Remove device</p>
+  <div mat-dialog-content>
+    <p>
+      Are you sure you want to remove the device {{deviceId}}?
+    </p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary" (click)="unenroll()"
+            id="yes"
+            class="action-button">
+      Yes
+    </button>
+    <button mat-button (click)="closeDialog()"
+            id="cancel"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="unenroll-loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!toBeSubmitted && !loading" tabindex="0" loaner-focus>
+  <h1 mat-dialog-title>Success!</h1>
+  <div mat-dialog-content>
+    <p> Device {{deviceId}} has been successfully unenrolled. </p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="closeDialog()"
+            id="close"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Close
+    </button>
+  </div>
+</div>
