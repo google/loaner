@@ -23,13 +23,10 @@ matrix:
       script:
         - ./backend_tests.sh $GROUP $TOTAL_GROUPS
       env:
-        global:
-          - TOTAL_GROUPS=4
-        matrix:
-          - GROUP=0
-          - GROUP=1
-          - GROUP=2
-          - GROUP=3
+        - GROUP=0
+        - GROUP=1
+        - GROUP=2
+        - GROUP=3
     - language: node_js
       node_js:
         - "8.11.0"
@@ -42,3 +39,7 @@ matrix:
         - "sudo chmod 4755 /opt/google/chrome/chrome-sandbox"
       script:
         - ./angular_tests.sh
+
+env:
+  global:
+    - TOTAL_GROUPS=4
