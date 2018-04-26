@@ -397,7 +397,6 @@ class Device(base_model.BaseModel):
     elif serial_number:
       return cls.query(cls.serial_number == serial_number).get()
     elif urlkey:
-      # Decoding a malformed URL-safe key can fail in multiple ways.
       try:
         return ndb.Key(urlsafe=urlkey).get()
       except Exception as e:  # pylint: disable=broad-except
@@ -411,37 +410,6 @@ class Device(base_model.BaseModel):
           cls.query(cls.asset_tag == unknown_identifier).get())
     else:
       raise DeviceIdentifierError('No identifier supplied to get device.')
-
-  @classmethod
-  def list_devices(
-      cls, enrolled=True, keys_only=False, page_size=100, next_cursor=None,
-      **kwargs):
-    """Returns a list of devices using given filters.
-
-    Args:
-      enrolled: bool, set True if only active devices should be queried,
-          else False if only inactive.
-      keys_only: bool, set True if only device keys should be returned.
-      page_size: int, the number of devices to query for.
-      next_cursor: datastore_query.Cursor, set when next page of results need to
-          be queried.
-      **kwargs: in which each kwarg name is the name of a Device property by
-          which to filter the query, and its value is the filter value (str,
-          int, etc.).
-
-    Returns:
-      A tuple consisting of a list of device keys, Cursor, and a bool.
-    """
-    # pylint: disable=g-explicit-bool-comparison
-    query = cls.query(cls.enrolled == enrolled)
-    # pylint: enable=g-explicit-bool-comparison
-    for filters, filter_values in kwargs.items():
-      if not isinstance(filter_values, (list, tuple)):
-        filter_values = (filter_values,)
-      for value in filter_values:
-        query = query.filter(ndb.GenericProperty(filters) == value)
-    return query.fetch_page(
-        keys_only=keys_only, page_size=page_size, start_cursor=next_cursor)
 
   def calculate_return_dates(self):
     """Calculates maximum and default return dates for a loan.
@@ -792,14 +760,6 @@ class Device(base_model.BaseModel):
       raise UnableToMoveToShelfError(
           'Unable to check device {} to shelf. Shelf {} is not '
           'active.'.format(self.identifier, shelf.location))
-    devices_on_shelf_count = len(self.list_devices(shelf=shelf.key))
-    if devices_on_shelf_count >= shelf.capacity:
-      raise UnableToMoveToShelfError(
-          'Unable to check device {} to shelf. The shelf {} has '
-          'reached capacity. Shelf capactiy: {} Current shelf capacity: '
-          '{}'.format(
-              self.serial_number, shelf.location, shelf.capacity,
-              devices_on_shelf_count))
     logging.info(
         'Checking device %s into shelf %s.', self.identifier, shelf.location)
     self.shelf = shelf.key

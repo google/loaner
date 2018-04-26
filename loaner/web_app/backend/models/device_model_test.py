@@ -354,24 +354,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
             unknown_identifier='serial_number_1').serial_number,
         'serial_number_1')
 
-  def test_list_devices_no_filters_enrolled(self):
-    devices = device_model.Device.list_devices(enrolled=True)
-    self.assertListEqual(devices[0], [self.device, self.device2])
-
-  def test_list_devices_no_filters_inactive(self):
-    devices = device_model.Device.list_devices(enrolled=False)
-    self.assertListEqual(devices[0], [self.device3])
-
-  def test_list_devices_with_filters_enrolled(self):
-    devices = device_model.Device.list_devices(
-        enrolled=True, device_model='HP Chromebook 13 G1')
-    self.assertListEqual(devices[0], [self.device])
-
-  def test_list_devices_with_filters_inactive(self):
-    devices = device_model.Device.list_devices(
-        enrolled=False, current_ou='/')
-    self.assertListEqual(devices[0], [self.device3])
-
   def test_calculate_return_dates(self):
     now = datetime.datetime.utcnow()
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -742,16 +724,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
       self.assertTrue(self.test_device.is_on_shelf)
       self.assertEqual(mock_logging.info.call_count, 2)
       self.assertEqual(now, self.test_device.last_known_healthy)
-
-  def test_move_to_shelf_over_capacity(self):
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.shelf.capacity = 2
-    self.shelf.put()
-    with mock.patch.object(
-        device_model, 'Device', autospec=True) as mock_device:
-      mock_device.list_devices.return_value = [self.device, self.device2]
-      with self.assertRaises(device_model.UnableToMoveToShelfError):
-        self.test_device.move_to_shelf(self.shelf, loanertest.USER_EMAIL)
 
   def test_remove_from_shelf(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)

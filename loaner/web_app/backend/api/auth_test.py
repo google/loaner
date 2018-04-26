@@ -49,7 +49,6 @@ class FakeApiPermissionChecks(root_api.Service):
     self.check_xsrf_token(self.request_state)
     if roles_permitted == ['user']:
       if users.get_current_user() != users.User(email=loanertest.USER_EMAIL):
-        print users.get_current_user(), loanertest.USER_EMAIL
         raise endpoints.ForbiddenException('User is not assignee.')
     return message_types.VoidMessage()
 

@@ -168,10 +168,8 @@ class ShelfApi(root_api.Service):
     shelf = get_shelf(request.shelf_request)
     user_email = user.get_user_email()
     devices_on_shelf = []
-    devices_retrieved_on_shelf, next_cursor, more = (
-        device_model.Device.list_devices(keys_only=True, shelf=shelf.key))
-    del next_cursor  # Unused.
-    del more  # Unused.
+    shelf_string_query = 'shelf: {}'.format(shelf.key.urlsafe())
+    devices_retrieved_on_shelf = device_model.Device.search(shelf_string_query)
     for device_identifier in request.device_identifiers:
       device = device_model.Device.get(unknown_identifier=device_identifier)
       if not device:
@@ -179,7 +177,7 @@ class ShelfApi(root_api.Service):
             _DEVICE_DOES_NOT_EXIST_MSG % device_identifier)
       if device.shelf:
         if device.shelf == shelf.key:
-          devices_on_shelf.append(device.key)
+          devices_on_shelf.append(device.key.urlsafe())
           logging.info('Device %s is already on shelf.', device.serial_number)
           continue
       try:
@@ -187,9 +185,10 @@ class ShelfApi(root_api.Service):
         devices_on_shelf.append(device.key)
       except device_model.UnableToMoveToShelfError as err:
         raise endpoints.BadRequestException(str(err))
-    for device in devices_retrieved_on_shelf:
-      if device not in devices_on_shelf:
-        device.get().remove_from_shelf(shelf=shelf, user_email=user_email)
+    for device in devices_retrieved_on_shelf.results:
+      if device.doc_id not in devices_on_shelf:
+        device_model.Device.get(urlkey=device.doc_id).remove_from_shelf(
+            shelf=shelf, user_email=user_email)
     shelf.audit(user_email=user_email)
 
     return message_types.VoidMessage()

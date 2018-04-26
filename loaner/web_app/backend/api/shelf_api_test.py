@@ -21,6 +21,8 @@ import mock
 
 from protorpc import message_types
 
+from google.appengine.api import search
+
 import endpoints
 
 from loaner.web_app.backend.api import root_api  # pylint: disable=unused-import
@@ -60,7 +62,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         self.shelf.location, shelf1.location, shelf2.location,
         self.disabled_shelf.location]
 
-    self.device1 = device_model.Device(
+    self.device1_key = device_model.Device(
         serial_number='12345',
         enrolled=True,
         device_model='HP Chromebook 13 G1',
@@ -68,7 +70,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         chrome_device_id='unique_id_1',
         damaged=False,
     ).put()
-    self.device2 = device_model.Device(
+    self.device2_key = device_model.Device(
         serial_number='54321',
         enrolled=True,
         device_model='HP Chromebook 13 G1',
@@ -76,7 +78,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         chrome_device_id='unique_id_2',
         damaged=False,
     ).put()
-    self.device3 = device_model.Device(
+    self.device3_key = device_model.Device(
         serial_number='67890',
         enrolled=True,
         shelf=self.shelf.key,
@@ -85,7 +87,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         chrome_device_id='unique_id_3',
         damaged=False,
     ).put()
-    self.device4 = device_model.Device(
+    self.device4_key = device_model.Device(
         serial_number='ABC123',
         enrolled=True,
         shelf=self.shelf.key,
@@ -95,8 +97,9 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         damaged=False,
     ).put()
     self.device_identifiers = [
-        self.device1.get().serial_number, self.device2.get().serial_number,
-        self.device3.get().serial_number]
+        self.device1_key.get().serial_number,
+        self.device2_key.get().serial_number,
+        self.device3_key.get().serial_number]
 
   def tearDown(self):
     super(ShelfApiTest, self).tearDown()
@@ -208,33 +211,31 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         shelf_api._DEVICE_DOES_NOT_EXIST_MSG % 'Invalid'):
       self.service.audit(request)
 
-  def test_audit_unable_to_move_to_shelf(self):
-    self.shelf.capacity = len(device_model.Device.list_devices(
-        shelf=self.shelf.key))
-    request = shelf_messages.ShelfAuditRequest(
-        shelf_request=shelf_messages.ShelfRequest(location=self.shelf.location),
-        device_identifiers=self.device_identifiers)
-    with self.assertRaises(endpoints.BadRequestException):
-      self.service.audit(request)
-
-  @mock.patch('__main__.device_model.Device.list_devices')
-  @mock.patch('__main__.shelf_api.get_shelf')
+  @mock.patch.object(device_model.Device, 'search')
+  @mock.patch.object(shelf_api, 'get_shelf', autospec=True)
   def test_audit_remove_devices(
-      self, mock_get_shelf, mock_model_list_devices):
-    shelf = self.device2.get()
+      self, mock_get_shelf, mock_model_device_search):
+    shelf = self.device2_key.get()
     shelf.shelf = self.shelf.key
     shelf.put()
-    mock_model_list_devices.return_value = (
-        [self.device2.get().key, self.device3.get().key,
-         self.device4.get().key], None, False)
+    mock_model_device_search.return_value = (
+        search.SearchResults(
+            results=[
+                search.ScoredDocument(
+                    doc_id=self.device2_key.urlsafe()),
+                search.ScoredDocument(
+                    doc_id=self.device3_key.urlsafe()),
+                search.ScoredDocument(
+                    doc_id=self.device4_key.urlsafe())],
+            number_found=3))
     mock_get_shelf.return_value = self.shelf
     request = shelf_messages.ShelfAuditRequest(
         shelf_request=shelf_messages.ShelfRequest(location=self.shelf.location),
-        device_identifiers=[self.device3.get().serial_number])
+        device_identifiers=[self.device3_key.get().serial_number])
     self.service.audit(request)
-    self.assertEqual(self.device3.get().shelf, self.shelf.key)
-    self.assertEqual(self.device2.get().shelf, None)
-    self.assertEqual(self.device4.get().shelf, None)
+    self.assertEqual(self.device3_key.get().shelf, self.shelf.key)
+    self.assertEqual(self.device2_key.get().shelf, None)
+    self.assertEqual(self.device4_key.get().shelf, None)
 
   def test_build_shelf_message(self):
     """Test building a shelf message from a shelf dictionary."""
