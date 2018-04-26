@@ -3,10 +3,12 @@
 .mat-toolbar.loaner-toolbar {
   background-color: mat-color($primary, 900);
   color: opacify($white, .07);
+  z-index: 100 !important;
 };
 
 .app-loader {
   margin-top: -5px;
+  z-index: 101;
 }
 
 .mat-sidenav.loaner-sidenav {
