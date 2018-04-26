@@ -79,6 +79,7 @@ class DeviceApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.UNENROLL_DEVICE)
   def unenroll(self, request):
+    """Unenrolls a device from the program."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
@@ -263,7 +264,7 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.EXTEND_LOAN,
       allow_assignee=True)
   def extend_loan(self, request, roles_permitted=None):
-    """Extend the current loan for a given Chrome device."""
+    """Extends the current loan for a given device."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request.device)
     user_email = user_lib.get_user_email()
@@ -288,7 +289,7 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.MARK_DAMAGED,
       allow_assignee=True)
   def mark_damaged(self, request, roles_permitted=None):
-    """Mark that a device is damaged."""
+    """Marks that a device is damaged."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request.device)
     user_email = user_lib.get_user_email()
@@ -308,7 +309,7 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.MARK_LOST,
       allow_assignee=True)
   def mark_lost(self, request, roles_permitted=None):
-    """Mark that a device is damaged."""
+    """Marks that a device is lost."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
@@ -326,7 +327,7 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.MARK_PENDING_RETURN,
       allow_assignee=True)
   def mark_pending_return(self, request, roles_permitted=None):
-    """Mark that a device is pending return."""
+    """Marks that a device is pending return."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
@@ -347,6 +348,7 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.RESUME_LOAN,
       allow_assignee=True)
   def resume_loan(self, request, roles_permitted=None):
+    """Resumes a loan for a given device."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()

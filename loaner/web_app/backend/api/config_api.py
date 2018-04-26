@@ -41,7 +41,7 @@ class ConfigAPI(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.GET_CONFIG)
   def get_config(self, request):
-    """Lists the given setting's value."""
+    """Gets the given config value."""
     self.check_xsrf_token(self.request_state)
     if not request.config_type or not request.name:
       raise endpoints.BadRequestException(_FIELD_MISSING_MSG)
@@ -72,7 +72,7 @@ class ConfigAPI(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.LIST_CONFIGS)
   def list_configs(self, request):
-    """Get a list of all config values."""
+    """Gets a list of all config values."""
     self.check_xsrf_token(self.request_state)
     response_message = []
 

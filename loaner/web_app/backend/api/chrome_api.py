@@ -45,7 +45,7 @@ class ChromeApi(root_api.Service):
       path='heartbeat',
       http_method='GET')
   def heartbeat(self, request):
-    """Heartbeat check-in for Chrome devices."""
+    """Heartbeat check-in for devices."""
     if not request.device_id:
       raise endpoints.BadRequestException(_NO_DEVICE_ID_MSG)
 
@@ -81,7 +81,7 @@ class ChromeApi(root_api.Service):
       path='loan',
       http_method='POST')
   def get_loan(self, request):
-    """Get the current loan for a given Chrome device."""
+    """Gets the current loan for a given device."""
     if not request.device_id:
       raise endpoints.BadRequestException(_NO_DEVICE_ID_MSG)
 
