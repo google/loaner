@@ -1,4 +1,8 @@
-# Grab n Go Loaners
+<!-- mdformat off(GitHub header) -->
+Grab n Go Loaners
+[![Build Status](https://travis-ci.org/google/loaner.svg?branch=master)](https://travis-ci.org/google/loaner)
+======
+<!-- mdformat on -->
 
 <p align="center">
   <a href="#grabngo--">
