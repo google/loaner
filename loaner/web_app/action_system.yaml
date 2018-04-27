@@ -26,6 +26,8 @@ builtins:
 - remote_api: on
 
 libraries:
+- name: enum
+  version: "0.9.23"
 - name: jinja2
   version: "2.6"
 - name: pycrypto

@@ -84,10 +84,10 @@ new_http_archive(
 new_http_archive(
     name = "endpoints_archive",
     build_file = "//third_party:endpoints.BUILD",
-    sha256 = "f5b6bb3cae0c19e1f3ce2baddd8ad20ef56d924342973b3401bdef62fbca33f6",
-    strip_prefix = "google-endpoints-2.4.5",
+    sha256 = "b92b116037298fadb36a72e6bb4d0a68c5c5259afa1d1bcf95cfaaf252dc23a8",
+    strip_prefix = "google-endpoints-4.0.0",
     urls = [
-        "https://pypi.python.org/packages/d1/93/22e170e5cfb918b953162acdfb5ac8480f4643cc92a1b9cb0e113d9301bf/google-endpoints-2.4.5.tar.gz",
+        "https://files.pythonhosted.org/packages/ac/2b/fc597f635dca86c6d28b85e9111830e926bae2fe34b9163d839ca29c8eee/google-endpoints-4.0.0.tar.gz",
     ],
 )
 
@@ -386,6 +386,16 @@ new_http_archive(
     strip_prefix = "python-rsa-version-3.4.2",
     urls = [
         "https://github.com/sybrenstuvel/python-rsa/archive/version-3.4.2.tar.gz",
+    ],
+)
+
+new_http_archive(
+    name = "semver_archive",
+    build_file = "//third_party:semver.BUILD",
+    sha256 = "1ffb55fb86a076cf7c161e6b5931f7da59f15abe217e0f24cea96cc8eec50f42",
+    strip_prefix = "semver-2.7.9",
+    urls = [
+        "https://files.pythonhosted.org/packages/40/56/d1f930872436300b474a447a8042091bd335119f0c58bd8647546d6c3dc0/semver-2.7.9.tar.gz",
     ],
 )
 

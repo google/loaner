@@ -14,6 +14,7 @@ py_library(
     deps = [
         "@cachetools_archive//:cachetools",
         "@dogpile_cache_archive//:dogpile",
+        "@enum_archive//:enum",
         "@google_apitools_archive//:apitools",
         "@oauth2client_archive//:oauth2client",
         "@ply_archive//:ply",

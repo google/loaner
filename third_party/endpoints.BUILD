@@ -15,6 +15,7 @@ py_library(
     deps = [
         "@attr_archive//:attr",
         "@google_endpoints_api_management_archive//:endpoints_management",
+        "@semver_archive//:semver",
         "@setup_tools_archive//:setup_tools",
     ],
 )

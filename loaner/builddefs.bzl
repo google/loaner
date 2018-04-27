@@ -20,7 +20,6 @@ def loaner_appengine_test(name, srcs, deps=[], data=[], size="medium"):
   py_appengine_test(
       name=name, srcs=srcs, deps=deps, data=data, size=size,
       libraries = {
-          "endpoints": "1.0",
           "jinja2": "2.6",
           "protorpc": "1.0",
           "webapp2": "2.5.2",
