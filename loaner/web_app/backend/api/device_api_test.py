@@ -28,6 +28,7 @@ from loaner.web_app import constants
 from loaner.web_app.backend.api import device_api
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
@@ -242,11 +243,26 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       (device_message.Device(enrolled=True), 2,),
       (device_message.Device(current_ou='/'), 2,),
       (device_message.Device(enrolled=False), 1,),
-      (device_message.Device(query_string='sn:6789'), 1,),
-      (device_message.Device(query_string='at:12345'), 1,))
+      (device_message.Device(
+          query=shared_messages.SearchRequest(query_string='sn:6789')), 1,),
+      (device_message.Device(
+          query=shared_messages.SearchRequest(query_string='at:12345')), 1,))
   def test_list_devices(self, request, response_length):
     response = self.service.list_devices(request)
     self.assertEqual(response_length, len(response.devices))
+
+  def test_list_devices_with_search_constraints(self):
+    expressions = shared_messages.SearchExpression(expression='serial_number')
+    expected_response = device_message.ListDevicesResponse(
+        devices=[device_message.Device(serial_number='6789')],
+        additional_results=False)
+    request = device_message.Device(
+        query=shared_messages.SearchRequest(
+            query_string='sn:6789',
+            expressions=[expressions],
+            returned_fields=['serial_number']))
+    response = self.service.list_devices(request)
+    self.assertEqual(response, expected_response)
 
   def test_list_devices_with_filter_message(self):
     message = device_message.Device(

@@ -27,6 +27,7 @@ import endpoints
 
 from loaner.web_app.backend.api import root_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import shelf_api
+from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model  # pylint: disable=unused-import
@@ -159,13 +160,34 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   @parameterized.parameters(
       (shelf_messages.Shelf(capacity=10), 2,),
       (shelf_messages.Shelf(enabled=False), 1,),
-      (shelf_messages.Shelf(query_string='enabled:True capacity:10'), 2,),
-      (shelf_messages.Shelf(query_string='enabled:False'), 1,))
+      (shelf_messages.Shelf(
+          query=shared_messages.SearchRequest(
+              query_string='enabled:True capacity:10')), 2,),
+      (shelf_messages.Shelf(
+          query=shared_messages.SearchRequest(
+              query_string='enabled:False')), 1,))
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   def test_list_shelves(self, request, response_length, mock_xsrf_token):
     response = self.service.list_shelves(request)
     assert mock_xsrf_token.call_count == 1
     self.assertEqual(response_length, len(response.shelves))
+
+  def test_list_shelves_with_search_constraints(self):
+    expressions = shared_messages.SearchExpression(expression='location')
+    expected_response = shelf_messages.ListShelfResponse(
+        shelves=[shelf_messages.Shelf(
+            location=self.shelf.location,
+            shelf_request=shelf_messages.ShelfRequest(
+                location=self.shelf.location,
+                urlsafe_key=self.shelf.key.urlsafe()))],
+        additional_results=False)
+    request = shelf_messages.Shelf(
+        query=shared_messages.SearchRequest(
+            query_string='location:NYC',
+            expressions=[expressions],
+            returned_fields=['location']))
+    response = self.service.list_shelves(request)
+    self.assertEqual(response, expected_response)
 
   def test_list_shelves_with_page_token(self):
     request = shelf_messages.Shelf(enabled=True, page_size=1)
@@ -180,11 +202,6 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       if not response.additional_results:
         break
     self.assertEqual(len(response_shelves), 3)
-
-  def test_list_shelves_with_query_string(self):
-    request = shelf_messages.Shelf(query_string='enabled:True capacity:10')
-    response = self.service.list_shelves(request)
-    self.assertEqual(2, len(response.shelves))
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   @mock.patch('__main__.shelf_api.logging.info')

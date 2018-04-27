@@ -129,15 +129,16 @@ class ShelfApi(root_api.Service):
   def list_shelves(self, request):
     """List enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)
-    if request.query_string:
-      query = request.query_string
-    else:
+    query, sort_options, returned_fields = (
+        self.set_search_query_options(request))
+    if not query:
       query = self.to_query(request, shelf_model.Shelf)
 
     cursor = self.get_search_cursor(request.page_token)
     search_results = shelf_model.Shelf.search(
         query_string=query, query_limit=request.page_size,
-        cursor=cursor)
+        cursor=cursor, sort_options=sort_options,
+        returned_fields=returned_fields)
     new_search_cursor = None
     if search_results.cursor:
       new_search_cursor = search_results.cursor.web_safe_string

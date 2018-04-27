@@ -151,9 +151,9 @@ class DeviceApi(root_api.Service):
   def list_devices(self, request):
     """Lists all devices based on any device attribute."""
     self.check_xsrf_token(self.request_state)
-    if request.query_string:
-      query = request.query_string
-    else:
+    query, sort_options, returned_fields = (
+        self.set_search_query_options(request))
+    if not query:
       shelf_query = ''
       if request.shelf:
         shelf_urlsafe_key = request.shelf.shelf_request.urlsafe_key
@@ -163,15 +163,13 @@ class DeviceApi(root_api.Service):
         request.shelf = None
         shelf_query = ':'.join(('shelf', shelf_urlsafe_key))
       query = self.to_query(request, device_model.Device)
-      try:
-        query = ' '.join((query, shelf_query))
-      except TypeError:
-        query = shelf_query
+      query = ' '.join((query, shelf_query))
 
     cursor = self.get_search_cursor(request.page_token)
     search_results = device_model.Device.search(
         query_string=query, query_limit=request.page_size,
-        cursor=cursor)
+        cursor=cursor, sort_options=sort_options,
+        returned_fields=returned_fields)
     new_search_cursor = None
     if search_results.cursor:
       new_search_cursor = search_results.cursor.web_safe_string

@@ -21,6 +21,16 @@ loaner_appengine_library(
     srcs = [
         "shelf_messages.py",
     ],
+    deps = [
+        ":shared_messages",
+    ],
+)
+
+loaner_appengine_library(
+    name = "shared_messages",
+    srcs = [
+        "shared_messages.py",
+    ],
 )
 
 loaner_appengine_library(
@@ -57,6 +67,7 @@ loaner_appengine_library(
         "device_message.py",
     ],
     deps = [
+        ":shared_messages",
         ":shelf_messages",
     ],
 )

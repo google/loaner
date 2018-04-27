@@ -24,6 +24,8 @@ from google.appengine.api import search
 import endpoints
 
 from loaner.web_app.backend.api import root_api
+from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import xsrf
 from loaner.web_app.backend.models import shelf_model
@@ -136,6 +138,104 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
         endpoints.BadRequestException,
         root_api._MALFORMED_PAGE_TOKEN_MSG):
       self.root_api_service.get_datastore_cursor('malformedPageToken')
+
+  @parameterized.named_parameters(
+      {'testcase_name': 'QueryStringOnly',
+       'request': device_message.Device(
+           query=shared_messages.SearchRequest(query_string='enrolled:True')),
+       'expected_values': ('enrolled:True', None, [])
+      },
+      {'testcase_name': 'QueryStringWithReturnedFields',
+       'request': device_message.Device(
+           query=shared_messages.SearchRequest(
+               query_string='location:US-NYC',
+               returned_fields=['location'])),
+       'expected_values': ('location:US-NYC', None, ['location'])
+      },
+  )
+  def test_set_search_query_options(self, request, expected_values):
+    returned_query, returned_sort_options, returned_returned_fields = (
+        self.root_api_service.set_search_query_options(request))
+    expected_query, expected_sort_options, expcted_returned_fields = (
+        expected_values)
+    self.assertEqual(expected_sort_options, returned_sort_options)
+    self.assertEqual(expected_query, returned_query)
+    self.assertEqual(expcted_returned_fields, returned_returned_fields)
+
+  @parameterized.named_parameters(
+      {'testcase_name': 'ExpressionWithDirection',
+       'request': device_message.Device(
+           query=shared_messages.SearchRequest(
+               query_string='enrolled:True',
+               expressions=[shared_messages.SearchExpression(
+                   expression='enrolled',
+                   direction=shared_messages.SortDirection.ASCENDING)])),
+       'expected_sort_options_expressions': [search.SortExpression(
+           expression='enrolled', direction=search.SortExpression.ASCENDING)]
+      },
+      {'testcase_name': 'MultipleExpressionsWithDirection',
+       'request': device_message.Device(
+           query=shared_messages.SearchRequest(
+               query_string='enrolled:True',
+               expressions=[
+                   shared_messages.SearchExpression(
+                       expression='enrolled',
+                       direction=shared_messages.SortDirection.ASCENDING),
+                   shared_messages.SearchExpression(
+                       expression='serial_number',
+                       direction=shared_messages.SortDirection.DESCENDING)
+               ])),
+       'expected_sort_options_expressions': [
+           search.SortExpression(
+               expression='enrolled',
+               direction=search.SortExpression.ASCENDING),
+           search.SortExpression(
+               expression='serial_number',
+               direction=search.SortExpression.DESCENDING)
+       ]
+      },
+      {'testcase_name': 'ExpressionWithoutDirection',
+       'request': device_message.Device(
+           query=shared_messages.SearchRequest(
+               query_string='enrolled:True',
+               expressions=[shared_messages.SearchExpression(
+                   expression='enrolled')])),
+       'expected_sort_options_expressions': [search.SortExpression(
+           expression='enrolled')]
+      },
+      {'testcase_name': 'MultipleExpressionsWithoutDirection',
+       'request': device_message.Device(
+           query=shared_messages.SearchRequest(
+               query_string='enrolled:True',
+               expressions=[
+                   shared_messages.SearchExpression(
+                       expression='enrolled'),
+                   shared_messages.SearchExpression(
+                       expression='serial_number')
+               ])),
+       'expected_sort_options_expressions': [
+           search.SortExpression(
+               expression='enrolled',
+               direction=search.SortExpression.DESCENDING),
+           search.SortExpression(
+               expression='serial_number',
+               direction=search.SortExpression.DESCENDING)
+       ]
+      },
+  )
+  def test_set_search_query_options_with_sort_options(
+      self, request, expected_sort_options_expressions):
+    returned_query, returned_sort_options, returned_returned_fields = (
+        self.root_api_service.set_search_query_options(request))
+    del returned_query  # Unused.
+    del returned_returned_fields  # Unused.
+    for i in range(len(returned_sort_options.expressions)):
+      self.assertEqual(
+          returned_sort_options.expressions[i].expression,
+          expected_sort_options_expressions[i].expression)
+      self.assertEqual(
+          returned_sort_options.expressions[i].direction,
+          expected_sort_options_expressions[i].direction)
 
 
 if __name__ == '__main__':

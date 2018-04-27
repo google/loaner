@@ -27,6 +27,7 @@ from google.appengine.ext import ndb
 import endpoints
 
 from loaner.web_app import constants
+from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.lib import xsrf
 
 __all__ = ['ROOT_API']
@@ -43,11 +44,11 @@ class Service(remote.Service):
 
     Args:
       request_state: a protorpc.remote.HttpRequestState object from Endpoints
-      API request.
+          API request.
 
     Raises:
       endpoints.ForbiddenException: if the call to xsrf.validate_request returns
-      False.
+          False.
     """
     if not xsrf.validate_request(request_state):
       raise endpoints.ForbiddenException(
@@ -158,6 +159,45 @@ class Service(remote.Service):
       return datastore_query.Cursor(urlsafe=urlsafe_cursor)
     except datastore_errors.BadValueError:
       raise endpoints.BadRequestException(_MALFORMED_PAGE_TOKEN_MSG)
+
+  def set_search_query_options(self, request):
+    """Sets the search query options based on a protorpc request message.
+
+    Args:
+      request: messages.Message, The message that contains the values of the
+          query options.
+
+    Returns:
+      A tuple containing the values of query options if they exist in the
+          message.
+    """
+    try:
+      query = request.query.query_string
+    except AttributeError:
+      query = None
+
+    expressions = []
+    sort_options = None
+    try:
+      for message_expression in request.query.expressions:
+        direction = search.SortExpression.DESCENDING
+        if (message_expression.direction ==
+            shared_messages.SortDirection.ASCENDING):
+          direction = search.SortExpression.ASCENDING
+        expressions.append(
+            search.SortExpression(
+                expression=message_expression.expression, direction=direction))
+      if expressions:
+        sort_options = search.SortOptions(expressions=expressions)
+    except AttributeError:
+      pass
+
+    try:
+      returned_fields = request.query.returned_fields
+    except AttributeError:
+      returned_fields = None
+
+    return query, sort_options, returned_fields
 
 
 def get_ndb_key(urlsafe_key):

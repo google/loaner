@@ -487,8 +487,9 @@ Lists all devices based on any device attribute.
 |                          | been allowed.                                     |
 |                          | return_date: datetime, The date of the default    |
 |                          | return date.                                      |
-|                          | query_string: str, a string query to conduct a    |
-|                          | search on an index.                               |
+|                          | query: shared_message.SearchRequest, a message    |
+|                          | containing query options to conduct a search on an|
+|                          | index.                                            |
 
 | Returns                       | Attributes                                  |
 | :---------------------------- | :------------------------------------------ |
@@ -740,8 +741,9 @@ List enabled or all shelves based on any shelf attribute.
 |                         | shelf_request: ShelfRequest, A message containing  |
 |                         | the unique identifier to be used to retrieve the   |
 |                         | shelf.                                             |
-|                         | query_string: str, a string query to conduct a     |
-|                         | search on an index.                                |
+|                         | query: shared_message.SearchRequest, a message     |
+|                         | containing query options to conduct a search on an |
+|                         | index.                                             |
 
 | Returns                      | Attributes                                    |
 | :--------------------------- | :-------------------------------------------- |

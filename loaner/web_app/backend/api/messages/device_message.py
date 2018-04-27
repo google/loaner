@@ -17,6 +17,7 @@
 from protorpc import message_types
 from protorpc import messages
 
+from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 
 
@@ -83,7 +84,8 @@ class Device(messages.Message):
     guest_enabled: bool, Indicates if guest mode has been already enabled.
     guest_permitted: bool, Indicates if guest mode has been allowed.
     return_date: datetime, The date of the default return date.
-    query_string: str, a string query to conduct a search on an index.
+    query: shared_message.SearchRequest, a message containing query options to
+        conduct a search on an index.
   """
   serial_number = messages.StringField(1)
   asset_tag = messages.StringField(2)
@@ -111,7 +113,7 @@ class Device(messages.Message):
   guest_enabled = messages.BooleanField(24)
   guest_permitted = messages.BooleanField(25)
   return_date = message_types.DateTimeField(26)
-  query_string = messages.StringField(27)
+  query = messages.MessageField(shared_messages.SearchRequest, 27)
 
 
 class ListDevicesResponse(messages.Message):
