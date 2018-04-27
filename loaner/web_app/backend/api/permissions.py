@@ -25,6 +25,7 @@ class Permissions(object):
   """Permissions for all API method calls."""
   AUDIT_SHELF = 'audit_shelf'
   BOOTSTRAP = 'bootstrap'
+  CLEAR_INDICES = 'clear_indices'
   CREATE_SURVEY = 'create_survey'
   DATASTORE_IMPORT = 'datastore_import'
   DEVICE_AUDIT = 'device_audit'
@@ -50,6 +51,7 @@ class Permissions(object):
   MARK_LOST = 'mark_lost'
   MARK_PENDING_RETURN = 'mark_pending_return'
   PATCH_SURVEY = 'patch_survey'
+  REINDEX_SEARCH = 'reindex_search'
   RESPONSIBLE_FOR_AUDIT = 'responsible_for_audit'
   RESUME_LOAN = 'resume_loan'
   UNENROLL_DEVICE = 'unenroll_device'
@@ -63,6 +65,7 @@ ROLES = {
         Permissions.AUDIT_SHELF,
         Permissions.BOOTSTRAP,
         Permissions.CREATE_SURVEY,
+        Permissions.CLEAR_INDICES,
         Permissions.DATASTORE_IMPORT,
         Permissions.DEVICE_AUDIT,
         Permissions.DISABLE_SHELF,
@@ -86,6 +89,7 @@ ROLES = {
         Permissions.MARK_LOST,
         Permissions.MARK_PENDING_RETURN,
         Permissions.PATCH_SURVEY,
+        Permissions.REINDEX_SEARCH,
         Permissions.RESPONSIBLE_FOR_AUDIT,
         Permissions.RESUME_LOAN,
         Permissions.UNENROLL_DEVICE,
