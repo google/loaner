@@ -52,7 +52,8 @@ export class DeviceService extends ApiService {
    */
   getDevice(id: string) {
     return this.post('get', {'unknown_identifier': id})
-        .pipe(map(res => new Device(res)));
+        .pipe(map(
+            (retrievedDevice: DeviceApiParams) => new Device(retrievedDevice)));
   }
 
   /**
@@ -76,23 +77,20 @@ export class DeviceService extends ApiService {
       const retrievedDevices = res;
       return (retrievedDevices['devices'] || [])
           .map(
-              (retrievedDevices: DeviceApiParams) =>
-                  new Device(retrievedDevices));
+              (retrievedDevice: DeviceApiParams) =>
+                  new Device(retrievedDevice));
     }));
   }
 
   /**
    * Request to extend the loan return date.
    * @param newDate Date in Python DateTime formatting, sent as a string.
-   * @param id Device identifier to be extended.
+   * @param device Device to have its due date extended.
    */
-  extend(newDate: string, id: string): Observable<boolean> {
-    return new Observable((observer) => {
-      const device: DeviceRequestApiParams = {
-        'unknown_identifier': id,
-      };
+  extend(newDate: string, device: Device): Observable<boolean> {
+    return new Observable(observer => {
       const request: ExtendDeviceRequestApiParams = {
-        'device': device,
+        'device': device.toApiMessage(),
         'extend_date': newDate,
       };
       this.post('extend_loan', request).subscribe(() => {
@@ -103,72 +101,59 @@ export class DeviceService extends ApiService {
 
   /**
    * Returns a particular device from a user loan.
-   * @param id Device identifier to be returned.
+   * @param device Device to be returned.
    */
-  returnDevice(id: string) {
-    const request: DeviceRequestApiParams = {
-      'unknown_identifier': id,
-    };
-    return this.post('mark_pending_return', request).pipe(tap(() => {
-      this.snackBar.open(`Device ${id} returned.`);
-    }));
+  returnDevice(device: Device) {
+    return this.post('mark_pending_return', device.toApiMessage())
+        .pipe(tap(() => {
+          this.snackBar.open(`Device ${device.id} returned.`);
+        }));
   }
 
   /**
    * Marks a particular device as lost.
-   * @param id Device identifier to be marked as lost.
+   * @param device Device to be marked as lost.
    */
-  markAsLost(id: string) {
-    const request: DeviceRequestApiParams = {
-      'unknown_identifier': id,
-    };
-    return this.post('mark_lost', request).pipe(tap(() => {
-      this.snackBar.open(`Device ${id} marked as lost.`);
+  markAsLost(device: Device) {
+    return this.post('mark_lost', device.toApiMessage()).pipe(tap(() => {
+      this.snackBar.open(`Device ${device.id} marked as lost.`);
     }));
   }
 
   /**
    * Enables Guest mode in a particular device.
-   * @param id Device identifier to have Guest mode enabled.
+   * @param device Device to have Guest mode enabled.
    */
-  enableGuestMode(id: string) {
-    const request: DeviceRequestApiParams = {
-      'unknown_identifier': id,
-    };
-    return this.post('enable_guest_mode', request).pipe(tap(() => {
-      this.snackBar.open(`Enabled guest mode for device ${id}.`);
-    }));
+  enableGuestMode(device: Device) {
+    return this.post('enable_guest_mode', device.toApiMessage())
+        .pipe(tap(() => {
+          this.snackBar.open(`Enabled guest mode for device ${device.id}.`);
+        }));
   }
 
   /**
    * Resumes the loan for a particular device.
-   * @param id Device identifier to resume the loan for.
+   * @param device Device to resume the loan for.
    */
-  resumeLoan(id: string) {
-    const request: DeviceRequestApiParams = {
-      'unknown_identifier': id,
-    };
-    return this.post('resume_loan', request).pipe(tap(() => {
-      this.snackBar.open(`Loan resumed for device ${id}.`);
+  resumeLoan(device: Device) {
+    return this.post('resume_loan', device.toApiMessage()).pipe(tap(() => {
+      this.snackBar.open(`Loan resumed for device ${device.id}.`);
     }));
   }
 
   /**
    * Marks a particular device as damaged.
-   * @param id Device identifier to have device marked as damaged.
+   * @param device Device to be marked as damaged.
    * @param reason The reason why the device is being marked as damaged.
    */
-  markAsDamaged(id: string, reason: string): Observable<void> {
-    const device: DeviceRequestApiParams = {
-      'unknown_identifier': id,
-    };
+  markAsDamaged(device: Device, reason: string): Observable<void> {
     const request: MarkAsDamagedRequestApiParams = {
-      'device': device,
+      'device': device.toApiMessage(),
       'damaged_reason': reason,
     };
     const httpObservable = this.post<void>('mark_damaged', request);
     httpObservable.subscribe(() => {
-      this.snackBar.open(`Device ${id} marked as damaged.`);
+      this.snackBar.open(`Device ${device.id} marked as damaged.`);
     });
     return httpObservable;
   }

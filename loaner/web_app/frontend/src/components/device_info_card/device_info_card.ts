@@ -85,7 +85,7 @@ export class DeviceInfoCard implements OnInit {
    * @param device The device to take action on.
    */
   onGuestModeEnabled(device: Device) {
-    this.deviceService.enableGuestMode(device.id).subscribe(() => {
+    this.deviceService.enableGuestMode(device).subscribe(() => {
       this.guestModeService.finished();
       device.guestEnabled = true;
     });
@@ -100,7 +100,7 @@ export class DeviceInfoCard implements OnInit {
    */
   onExtended(device: Device, formattedNewDueDate: string) {
     const newReturnDate = moment(formattedNewDueDate).toDate();
-    this.deviceService.extend(formattedNewDueDate, device.id)
+    this.deviceService.extend(formattedNewDueDate, device)
         .subscribe(
             () => {
               this.extendService.finished(newReturnDate);
@@ -117,7 +117,7 @@ export class DeviceInfoCard implements OnInit {
    * @param device The device to take action on.
    */
   onReturned(device: Device) {
-    this.deviceService.returnDevice(device.id).subscribe(() => {
+    this.deviceService.returnDevice(device).subscribe(() => {
       device.pendingReturn = true;
       this.loanedDevices =
           this.loanedDevices.filter(device => !device.pendingReturn);
@@ -131,7 +131,7 @@ export class DeviceInfoCard implements OnInit {
    * @param damagedReason The reason why this device is being marked as damaged.
    */
   onDamaged(device: Device, damagedReason: string) {
-    this.deviceService.markAsDamaged(device.id, damagedReason)
+    this.deviceService.markAsDamaged(device, damagedReason)
         .subscribe(
             () => {
               this.damagedService.finished();
@@ -147,7 +147,7 @@ export class DeviceInfoCard implements OnInit {
    * @param device The device to take action on.
    */
   onLost(device: Device) {
-    this.deviceService.markAsLost(device.id).subscribe(
+    this.deviceService.markAsLost(device).subscribe(
         () => {
           this.lostService.finished();
         },
@@ -158,7 +158,7 @@ export class DeviceInfoCard implements OnInit {
 
   /** Calls the deviceService to resume the loan. */
   onLoanResumed(device: Device) {
-    this.deviceService.resumeLoan(device.id).subscribe(() => {
+    this.deviceService.resumeLoan(device).subscribe(() => {
       this.resumeService.finished();
       device.pendingReturn = false;
     });

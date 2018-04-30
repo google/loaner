@@ -379,6 +379,7 @@ def _build_device_message(
   message = device_message.Device(
       serial_number=device.serial_number,
       asset_tag=device.asset_tag,
+      urlkey=device.key.urlsafe(),
       enrolled=device.enrolled,
       device_model=device.device_model,
       due_date=device.due_date,
@@ -478,9 +479,11 @@ def _get_identifier_from_request(device_request):
   Raises:
     endpoints.BadRequestException: if there are no identifiers in DeviceRequest.
   """
+  if getattr(device_request, 'urlkey', None):
+    return 'urlkey'
+
   for device_identifier in [
-      'asset_tag', 'chrome_device_id', 'serial_number', 'urlkey',
-      'unknown_identifier']:
+      'asset_tag', 'chrome_device_id', 'serial_number', 'unknown_identifier']:
     if getattr(device_request, device_identifier, None):
       return device_identifier
   raise endpoints.BadRequestException(_NO_IDENTIFIERS_MSG)

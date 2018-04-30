@@ -53,7 +53,7 @@ export class DeviceDetails implements OnInit {
    * @param deviceID the device identifier used to get the device.
    */
   refreshDevice(deviceId: string) {
-    this.deviceService.getDevice(deviceId).subscribe((device: Device) => {
+    this.deviceService.getDevice(deviceId).subscribe(device => {
       this.device = device;
     });
   }

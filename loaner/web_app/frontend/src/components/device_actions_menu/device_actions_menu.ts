@@ -64,7 +64,7 @@ export class DeviceActionsMenu {
   enableGuestMode(device: Device) {
     this.guestModeService.openDialog();
     this.guestModeService.onGuestModeEnabled
-        .pipe(switchMap(() => this.deviceService.enableGuestMode(device.id)))
+        .pipe(switchMap(() => this.deviceService.enableGuestMode(device)))
         .subscribe(() => {
           this.guestModeService.finished();
           this.refreshDevice.emit(device.id);
@@ -81,7 +81,7 @@ export class DeviceActionsMenu {
     this.extendService.onExtended
         .pipe(switchMap(newDate => {
           temporaryNewDate = newDate;
-          return this.deviceService.extend(newDate, device.id);
+          return this.deviceService.extend(newDate, device);
         }))
         .subscribe(
             () => {
@@ -99,7 +99,7 @@ export class DeviceActionsMenu {
    * @param device The device to take action on.
    */
   onReturned(device: Device) {
-    this.deviceService.returnDevice(device.id).subscribe(() => {
+    this.deviceService.returnDevice(device).subscribe(() => {
       device.pendingReturn = true;
     });
     this.refreshDevice.emit(device.id);
@@ -114,7 +114,7 @@ export class DeviceActionsMenu {
     this.damagedService.onDamaged
         .pipe(switchMap(
             damagedReason =>
-                this.deviceService.markAsDamaged(device.id, damagedReason)))
+                this.deviceService.markAsDamaged(device, damagedReason)))
         .subscribe(
             () => {
               this.damagedService.finished();
@@ -132,7 +132,7 @@ export class DeviceActionsMenu {
   onLost(device: Device) {
     this.lostService.openDialog();
     this.lostService.onLost
-        .pipe(switchMap(() => this.deviceService.markAsLost(device.id)))
+        .pipe(switchMap(() => this.deviceService.markAsLost(device)))
         .subscribe(
             () => {
               this.lostService.finished();

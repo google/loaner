@@ -20,6 +20,7 @@ import {Shelf, ShelfApiParams} from './shelf';
 export declare interface DeviceApiParams {
   serial_number?: string;
   asset_tag?: string;
+  urlkey?: string;
   unknown_identifier?: string;
   damaged?: boolean;
   device_model?: string;
@@ -65,7 +66,9 @@ export class Device {
   serialNumber = '';
   /** Asset tag of the device. */
   assetTag = '';
-  /** Asset tag of the device. */
+  /** Urlsafe Key identifier for the device. */
+  urlkey = '';
+  /** Device that's not known upfront by the frontend. */
   unknownIdentifier: string;
   /** Computer model of the device. */
   deviceModel = '';
@@ -107,6 +110,7 @@ export class Device {
   constructor(device: DeviceApiParams = {}) {
     this.serialNumber = device.serial_number || this.serialNumber;
     this.assetTag = device.asset_tag || this.assetTag;
+    this.urlkey = device.urlkey || this.urlkey;
     this.damaged = !!device.damaged || this.damaged;
     this.deviceModel = device.device_model || this.deviceModel;
     this.lastUpdate =
@@ -181,6 +185,7 @@ export class Device {
   toApiMessage(): DeviceApiParams {
     return {
       asset_tag: this.assetTag,
+      urlkey: this.urlkey,
       unknown_identifier: this.unknownIdentifier,
       assigned_on_date: this.assignedOnDate.getTime(),
       current_ou: this.currentOu,
