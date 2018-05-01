@@ -25,6 +25,7 @@ from loaner.web_app.backend.api import config_api  # pylint: disable=unused-impo
 from loaner.web_app.backend.api import datastore_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import device_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import root_api
+from loaner.web_app.backend.api import search_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import shelf_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import survey_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import user_api  # pylint: disable=unused-import
