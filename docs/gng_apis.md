@@ -485,8 +485,6 @@ Lists all devices based on any device attribute.
 |                          | been already enabled.                             |
 |                          | guest_permitted: bool, Indicates if guest mode has|
 |                          | been allowed.                                     |
-|                          | return_date: datetime, The date of the default    |
-|                          | return date.                                      |
 |                          | query: shared_message.SearchRequest, a message    |
 |                          | containing query options to conduct a search on an|
 |                          | index.                                            |

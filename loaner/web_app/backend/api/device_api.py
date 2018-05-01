@@ -211,7 +211,6 @@ class DeviceApi(root_api.Service):
     user = user_lib.get_user_email()
     device_messages = []
     for device in device_model.Device.list_by_user(user):
-      return_dates = device.calculate_return_dates()
       guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
       device_messages.append(
           device_message.Device(
@@ -223,7 +222,6 @@ class DeviceApi(root_api.Service):
               assignment_date=device.assignment_date,
               max_extend_date=max_extend_date,
               mark_pending_return_date=device.mark_pending_return_date,
-              return_date=return_dates.default,
               guest_enabled=guest_enabled,
               guest_permitted=guest_permitted))
     return device_message.ListUserDeviceResponse(devices=device_messages)
@@ -400,9 +398,6 @@ def _build_device_message(
       last_reminder=last_reminder_message,
       next_reminder=next_reminder_message)
 
-  if device.assigned_user is not None:
-    return_dates = device.calculate_return_dates()
-    message.return_date = return_dates.default
   if max_extend_date is not None:
     message.max_extend_date = max_extend_date
   if guest_enabled is not None:

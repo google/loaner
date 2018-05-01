@@ -39,7 +39,6 @@ export declare interface DeviceApiParams {
   max_extend_date?: number;
   guest_enabled?: boolean;
   guest_permitted?: boolean;
-  return_date?: string;
 }
 
 export declare interface DeviceRequestApiParams {
@@ -102,8 +101,6 @@ export class Device {
   guestAllowed = false;
   /** The maximum date this device can be extended. */
   maxExtendDate: Date;
-  /** The default return date. */
-  returnDate: Date;
   /** List of flags relevant to this device. */
   chips: DeviceChip[] = [];
 
@@ -138,8 +135,6 @@ export class Device {
         new Date();
     this.guestEnabled = device.guest_enabled || this.guestEnabled;
     this.guestAllowed = device.guest_permitted || this.guestAllowed;
-    this.returnDate =
-        (device.return_date! && new Date(device.return_date!)) || new Date();
 
     this.chips = this.makeChips();
   }

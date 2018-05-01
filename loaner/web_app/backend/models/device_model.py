@@ -163,14 +163,12 @@ class Device(base_model.BaseModel):
   locked = ndb.BooleanProperty(default=False)
   lost = ndb.BooleanProperty(default=False)
   mark_pending_return_date = ndb.DateTimeProperty()
-  max_extend_date = ndb.DateTimeProperty()
   chrome_device_id = ndb.StringProperty()
   last_heartbeat = ndb.DateTimeProperty()
   damaged = ndb.BooleanProperty(default=False)
   damaged_reason = ndb.StringProperty()
   last_reminder = ndb.StructuredProperty(Reminder)
   next_reminder = ndb.StructuredProperty(Reminder)
-  return_date = ndb.DateTimeProperty()
 
   _INDEX_NAME = constants.DEVICE_INDEX_NAME
   _SEARCH_PARAMETERS = {
