@@ -592,6 +592,38 @@ Returns                   | Attributes
 :------------------------ | :---------
 message_types.VoidMessage | None
 
+### Search_api
+
+API endpoint that handles requests related to search.
+
+#### Methods
+
+##### clear
+
+Clear the index for a given model (Device or Shelf).
+
+| Requests                      | Attributes
+| :---------------------------- | :---------
+| search_messages.SearchMessage | model: enum, the model to clear the index of
+|                               | (Device or Shelf).
+
+| Returns                        | Attributes                                  |
+| :----------------------------- | :------------------------------------------ |
+| message_types.VoidMessage      | None                                        |
+
+##### reindex
+
+Reindex the entities for a given model (Device or Shelf).
+
+| Requests                      | Attributes
+| :---------------------------- | :---------
+| search_messages.SearchMessage | model: enum, the model to reindex (Device or
+|                               | Shelf).
+
+| Returns                        | Attributes                                  |
+| :----------------------------- | :------------------------------------------ |
+| message_types.VoidMessage      | None                                        |
+
 ### Shelf_api
 
 The entry point for the Shelf methods.

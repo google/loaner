@@ -19,28 +19,13 @@ from __future__ import division
 from __future__ import print_function
 
 from protorpc import message_types
-from protorpc import messages
 
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
+from loaner.web_app.backend.api.messages import search_messages
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
-
-
-class SearchIndexEnum(messages.Enum):
-  """An Enum of models with an index."""
-  DEVICE = 0
-  SHELF = 1
-
-
-class SearchMessage(messages.Message):
-  """ProtoRPC message to take action on a search index.
-
-  Attributes:
-    model: SearchIndexEnum, the type to act on.
-  """
-  model = messages.EnumField(SearchIndexEnum, 1, required=True)
 
 
 @root_api.ROOT_API.api_class(resource_name='search', path='search')
@@ -48,7 +33,7 @@ class SearchApi(root_api.Service):
   """Endpoints API service class for search helper methods."""
 
   @auth.method(
-      SearchMessage,
+      search_messages.SearchMessage,
       message_types.VoidMessage,
       name='clear',
       path='clear',
@@ -56,14 +41,14 @@ class SearchApi(root_api.Service):
       permission=permissions.Permissions.CLEAR_INDICES)
   def clear(self, request):
     """Clear a search index for the given type."""
-    if request.model == SearchIndexEnum.DEVICE:
+    if request.model == search_messages.SearchIndexEnum.DEVICE:
       device_model.Device.clear_index()
-    elif request.model == SearchIndexEnum.SHELF:
+    elif request.model == search_messages.SearchIndexEnum.SHELF:
       shelf_model.Shelf.clear_index()
     return message_types.VoidMessage()
 
   @auth.method(
-      SearchMessage,
+      search_messages.SearchMessage,
       message_types.VoidMessage,
       name='reindex',
       path='reindex',
@@ -71,8 +56,8 @@ class SearchApi(root_api.Service):
       permission=permissions.Permissions.REINDEX_SEARCH)
   def reindex(self, request):
     """Reindex a search index for the given type."""
-    if request.model == SearchIndexEnum.DEVICE:
+    if request.model == search_messages.SearchIndexEnum.DEVICE:
       device_model.Device.index_entities_for_search()
-    elif request.model == SearchIndexEnum.SHELF:
+    elif request.model == search_messages.SearchIndexEnum.SHELF:
       shelf_model.Shelf.index_entities_for_search()
     return message_types.VoidMessage()

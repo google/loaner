@@ -162,6 +162,7 @@ loaner_appengine_library(
         ":auth",
         ":permissions",
         ":root_api",
+        "//loaner/web_app/backend/api/messages:search_messages",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
     ],
@@ -342,6 +343,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":search_api",
+        "//loaner/web_app/backend/api/messages:search_messages",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/testing:loanertest",

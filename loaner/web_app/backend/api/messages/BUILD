@@ -17,23 +17,6 @@ load(
 # ==============================================================================
 
 loaner_appengine_library(
-    name = "shelf_messages",
-    srcs = [
-        "shelf_messages.py",
-    ],
-    deps = [
-        ":shared_messages",
-    ],
-)
-
-loaner_appengine_library(
-    name = "shared_messages",
-    srcs = [
-        "shared_messages.py",
-    ],
-)
-
-loaner_appengine_library(
     name = "config_message",
     srcs = [
         "config_message.py",
@@ -69,6 +52,30 @@ loaner_appengine_library(
     deps = [
         ":shared_messages",
         ":shelf_messages",
+    ],
+)
+
+loaner_appengine_library(
+    name = "search_messages",
+    srcs = [
+        "search_messages.py",
+    ],
+)
+
+loaner_appengine_library(
+    name = "shared_messages",
+    srcs = [
+        "shared_messages.py",
+    ],
+)
+
+loaner_appengine_library(
+    name = "shelf_messages",
+    srcs = [
+        "shelf_messages.py",
+    ],
+    deps = [
+        ":shared_messages",
     ],
 )
 
