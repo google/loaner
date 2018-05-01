@@ -115,7 +115,7 @@ class ShelfApi(root_api.Service):
     self.check_xsrf_token(self.request_state)
     user_email = user.get_user_email()
     shelf = get_shelf(request.shelf_request)
-    kwargs = self.to_dict(request, shelf_model.Shelf)
+    kwargs = api_utils.to_dict(request, shelf_model.Shelf)
     shelf.edit(user_email=user_email, **kwargs)
     return message_types.VoidMessage()
 
@@ -209,7 +209,7 @@ def get_shelf(request):
     endpoints.NotFoundException when a shelf can not be found.
   """
   if request.urlsafe_key:
-    shelf = root_api.get_ndb_key(request.urlsafe_key).get()
+    shelf = api_utils.get_ndb_key(request.urlsafe_key).get()
   else:
     shelf = shelf_model.Shelf.get(location=request.location)
   if not shelf:

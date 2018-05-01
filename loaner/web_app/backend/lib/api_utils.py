@@ -20,10 +20,17 @@ from __future__ import print_function
 
 from absl import logging
 
+from google.appengine.api import datastore_errors
+from google.appengine.datastore import datastore_query
+from google.appengine.ext import ndb
+
 import endpoints
 
 from loaner.web_app.backend.api.messages import device_message
 from loaner.web_app.backend.api.messages import shelf_messages
+
+_CORRUPT_KEY_MSG = 'The key provided for submission was not found.'
+_MALFORMED_PAGE_TOKEN_MSG = 'The page token provided is incorrect.'
 
 
 def build_reminder_message(reminder):
@@ -79,3 +86,58 @@ def build_shelf_message(shelf):
             key, shelf.key.urlsafe())
 
   return message
+
+
+def to_dict(entity, model_class):
+  """Builds a dictionary of filtered properties of an NDB model.
+
+  Args:
+    entity: An instance of an NDB Model or a ProtoRPC message.
+    model_class: NDB model to use for iterating its properties.
+
+  Returns:
+    A dictionary with filter properties.
+  """
+  dictionary = {}
+  for key in model_class._properties:  # pylint: disable=protected-access
+    value = getattr(entity, key, None)
+    if value is not None and value != []:  # pylint: disable=g-explicit-bool-comparison
+      dictionary[key] = value
+  return dictionary
+
+
+def get_datastore_cursor(urlsafe_cursor):
+  """Builds a datastore.Cursor from a urlsafe cursor.
+
+  Args:
+    urlsafe_cursor: str, The urlsafe representation of a datastore.Cursor.
+
+  Returns:
+    datastore.Cursor instance.
+
+  Raises:
+    endpoints.BadRequestException: if the creation of the datastore.Cursor
+        fails.
+  """
+  try:
+    return datastore_query.Cursor(urlsafe=urlsafe_cursor)
+  except datastore_errors.BadValueError:
+    raise endpoints.BadRequestException(_MALFORMED_PAGE_TOKEN_MSG)
+
+
+def get_ndb_key(urlsafe_key):
+  """Builds an ndb.Key from a urlsafe key.
+
+  Args:
+    urlsafe_key: str, A urlsafe ndb.Key to cast into an ndb.Key.
+
+  Returns:
+    An ndb.Key instance.
+
+  Raises:
+    endpoints.BadRequestException: if the creation of the ndb.Key fails.
+  """
+  try:
+    return ndb.Key(urlsafe=urlsafe_key)
+  except Exception:  # pylint: disable=broad-except
+    raise endpoints.BadRequestException(_CORRUPT_KEY_MSG)

@@ -26,6 +26,7 @@ from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import survey_messages
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import survey_models
@@ -95,7 +96,7 @@ class SurveyApi(root_api.Service):
   def submit(self, request):
     """Submit a response to a survey question."""
     user_email = user_lib.get_user_email()
-    question = root_api.get_ndb_key(
+    question = api_utils.get_ndb_key(
         urlsafe_key=request.question_urlsafe_key).get()
     question.submit(
         acting_user=user_email,
@@ -114,7 +115,7 @@ class SurveyApi(root_api.Service):
     """List survey questions."""
     cursor = None
     if request.page_token:
-      cursor = self.get_datastore_cursor(urlsafe_cursor=request.page_token)
+      cursor = api_utils.get_datastore_cursor(urlsafe_cursor=request.page_token)
 
     questions, next_cursor, more = (
         survey_models.Question.list(
@@ -141,7 +142,7 @@ class SurveyApi(root_api.Service):
   def patch(self, request):
     """Patch a given survey question."""
     self.check_xsrf_token(self.request_state)
-    question = root_api.get_ndb_key(
+    question = api_utils.get_ndb_key(
         urlsafe_key=request.question_urlsafe_key).get()
     answers = []
     for answer in request.answers:
@@ -153,7 +154,7 @@ class SurveyApi(root_api.Service):
         answers.append(new_answer)
       except ValueError as e:
         raise endpoints.BadRequestException(e.message)
-    survey_kwargs = self.to_dict(request, survey_models.Question)
+    survey_kwargs = api_utils.to_dict(request, survey_models.Question)
     survey_kwargs['answers'] = answers
     question.patch(**survey_kwargs)
     return message_types.VoidMessage()

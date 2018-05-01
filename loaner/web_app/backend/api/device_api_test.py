@@ -34,6 +34,7 @@ from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_message
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
@@ -143,7 +144,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch(
       '__main__.device_model.directory.DirectoryApiClient', autospec=True)
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_unenroll(self, mock_xsrf_token, mock_directoryclass):
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.move_chrome_device_org_unit.return_value = (
@@ -270,8 +271,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_list_devices_with_filter_message(self):
     message = device_message.Device(
         enrolled=True, device_model='HP Chromebook 13 G1', current_ou='/')
-    service = root_api.Service()
-    filters = service.to_dict(message, device_model.Device)
+    filters = api_utils.to_dict(message, device_model.Device)
     request = device_message.Device(**filters)
     response = self.service.list_devices(request)
     self.assertEqual(1, len(response.devices))
@@ -318,7 +318,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(1, len(response.devices))
 
   @mock.patch('__main__.device_model.Device.list_by_user')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_list_user_devices(self, mock_xsrf_token, mock_list_by_user):
     self.login_endpoints_user()
     device2 = device_model.Device()
@@ -339,7 +339,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
   @mock.patch('__main__.device_model.Device.enable_guest_mode')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_enable_guest_mode(
       self, mock_xsrf_token, mock_enableguest, mock_confirm_assignee_action):
     config_model.Config.set('allow_guest_mode', True)
@@ -391,7 +391,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
   @mock.patch('__main__.device_model.Device.loan_extend')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_extend_loan(
       self, mock_xsrf_token, mock_loanextend, mock_confirm_assignee_action):
     tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
@@ -437,7 +437,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
   @mock.patch('__main__.device_model.Device.mark_damaged')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_mark_damaged(
       self, mock_xsrf_token, mock_markdamaged, mock_confirm_assignee_action):
     self.login_endpoints_user()
@@ -459,7 +459,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     assert mock_xsrf_token.call_count == 1
 
   @mock.patch('__main__.device_model.Device.mark_lost')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_mark_lost(self, mock_xsrf_token, mock_marklost):
     self.service.mark_lost(device_message.DeviceRequest(
         urlkey=self.device.key.urlsafe()))
@@ -469,7 +469,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
   @mock.patch('__main__.device_model.Device.mark_pending_return')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_mark_pending_return(
       self, mock_xsrf_token, mock_markreturned, mock_confirm_assignee_action):
     self.login_endpoints_user()
@@ -492,7 +492,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.device_api._confirm_assignee_action', autospec=True)
   @mock.patch('__main__.device_model.Device.resume_loan')
-  @mock.patch('__main__.root_api.Service.check_xsrf_token')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_resume_loan(
       self, mock_xsrf_token, mock_resume_loan, mock_confirm_assignee_action):
     self.login_endpoints_user()

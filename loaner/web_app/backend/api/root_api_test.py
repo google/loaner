@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from absl.testing import parameterized
 import mock
 
 from protorpc import message_types
@@ -26,9 +25,7 @@ from protorpc import message_types
 import endpoints
 
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import xsrf
-from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
 
 
@@ -41,7 +38,7 @@ class FakeApi(root_api.Service):
     return message_types.VoidMessage()
 
 
-class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
+class RootServiceTest(loanertest.EndpointsTestCase):
 
   def setUp(self):
     super(RootServiceTest, self).setUp()
@@ -60,33 +57,6 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
       self.assertRaisesRegexp(
           endpoints.ForbiddenException, 'XSRF',
           self.service.do_something, request)
-
-  def test_to_dict(self):
-    message = shelf_messages.Shelf(
-        location='NY', capacity=50, friendly_name='The_Big_Apple',
-        audit_requested=False, responsible_for_audit='daredevils',
-        last_audit_by=loanertest.USER_EMAIL, enabled=True)
-    expected_dict = {
-        'location': 'NY', 'capacity': 50, 'friendly_name': 'The_Big_Apple',
-        'audit_requested': False, 'responsible_for_audit': 'daredevils',
-        'last_audit_by': loanertest.USER_EMAIL, 'enabled': True}
-    filters = self.root_api_service.to_dict(message, shelf_model.Shelf)
-    self.assertEqual(filters, expected_dict)
-
-  def test_get_ndb_key_not_found(self):
-    """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
-    with self.assertRaisesRegexp(
-        endpoints.BadRequestException,
-        root_api._CORRUPT_KEY_MSG):
-      root_api.get_ndb_key('corruptKey')
-
-  def test_get_datastore_cursor_not_found(self):
-    """Test the get of a datastore.Cursor, raises endpoints.BadRequestException.
-    """
-    with self.assertRaisesRegexp(
-        endpoints.BadRequestException,
-        root_api._MALFORMED_PAGE_TOKEN_MSG):
-      self.root_api_service.get_datastore_cursor('malformedPageToken')
 
 
 if __name__ == '__main__':

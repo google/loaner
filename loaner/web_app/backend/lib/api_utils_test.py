@@ -94,6 +94,34 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
     with self.assertRaises(endpoints.NotFoundException):
       api_utils.build_shelf_message(shelf_model.Shelf())
 
+  def test_to_dict(self):
+    """Test that a dictionary is build from a ProtoRPC message."""
+    message = shelf_messages.Shelf(
+        location='NY', capacity=50, friendly_name='The_Big_Apple',
+        audit_requested=False, responsible_for_audit='daredevils',
+        last_audit_by=loanertest.USER_EMAIL, enabled=True)
+    expected_dict = {
+        'location': 'NY', 'capacity': 50, 'friendly_name': 'The_Big_Apple',
+        'audit_requested': False, 'responsible_for_audit': 'daredevils',
+        'last_audit_by': loanertest.USER_EMAIL, 'enabled': True}
+    filters = api_utils.to_dict(message, shelf_model.Shelf)
+    self.assertEqual(filters, expected_dict)
+
+  def test_get_ndb_key_not_found(self):
+    """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
+    with self.assertRaisesRegexp(
+        endpoints.BadRequestException,
+        api_utils._CORRUPT_KEY_MSG):
+      api_utils.get_ndb_key('corruptKey')
+
+  def test_get_datastore_cursor_not_found(self):
+    """Test the get of a datastore.Cursor, raises endpoints.BadRequestException.
+    """
+    with self.assertRaisesRegexp(
+        endpoints.BadRequestException,
+        api_utils._MALFORMED_PAGE_TOKEN_MSG):
+      api_utils.get_datastore_cursor('malformedPageToken')
+
 
 if __name__ == '__main__':
   loanertest.main()
