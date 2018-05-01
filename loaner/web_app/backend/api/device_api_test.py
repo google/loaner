@@ -14,6 +14,10 @@
 
 """Tests for backend.api.device_api."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 
 from absl.testing import parameterized
@@ -232,9 +236,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     # Delete the existing shelf key from datastore.
     self.shelf.key.delete()
     # Make sure it raises the execption after deleteing the key.
-    with self.assertRaisesRegexp(
-        device_api.endpoints.NotFoundException,
-        device_api._SHELF_NOT_FOUND_MSG % self.device.shelf.urlsafe()):
+    with self.assertRaises(device_api.endpoints.NotFoundException):
       self.service.get_device(
           device_message.DeviceRequest(
               chrome_device_id=self.device.chrome_device_id))
@@ -513,38 +515,13 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         device_api._BAD_URLKEY_MSG % 'bad-key', device_api._get_device,
         device_message.DeviceRequest(urlkey='bad-key'))
 
-  def test_build_reminder_messages_next_reminder(self):
-    _, next_reminder_message = device_api._build_reminder_messages(self.device)
-    self.assertEqual(
-        next_reminder_message.level, self.device.next_reminder.level)
-
-  @mock.patch('__main__.device_model.logging.info')
-  def test_build_reminder_messages_no_reminders(self, mock_logging):
-    # No next_reminder
-    device = device_model.Device.get(serial_number='4567')
-    _, next_reminder = device_api._build_reminder_messages(device)
-    self.assertIsNone(next_reminder)
-
-    # No last_reminder
-    last_reminder, _ = device_api._build_reminder_messages(device)
-    self.assertIsNone(last_reminder)
-    self.assertEqual(4, mock_logging.call_count)
-
-  def test_build_reminder_messages_last_reminder(self):
-    last_reminder_message, _ = device_api._build_reminder_messages(self.device)
-    self.assertEqual(
-        last_reminder_message.level, self.device.last_reminder.level)
-
-  def test_build_shelf_message(self):
-    message = device_api._build_shelf_message(self.shelf)
-    self.assertEqual(message.location, self.shelf.location)
-
   def test_confirm_assignee_action(self):
     user_email = 'test@{}'.format(loanertest.USER_DOMAIN)
     with self.assertRaisesRegexp(
         device_api.endpoints.UnauthorizedException,
         device_api._ASSIGNMENT_MISMATCH_MSG):
       device_api._confirm_assignee_action(user_email, self.device)
+
 
 if __name__ == '__main__':
   loanertest.main()

@@ -14,6 +14,10 @@
 
 """API endpoint that handles requests related to Devices."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 import logging
 from protorpc import message_types
@@ -27,7 +31,7 @@ from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
 from loaner.web_app.backend.api.messages import device_message
-from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
@@ -118,18 +122,14 @@ class DeviceApi(root_api.Service):
   def get_device(self, request):
     """Gets a device using any identifier in device_message.DeviceRequest."""
     device = _get_device(request)
-    last_reminder_message, _ = _build_reminder_messages(device)
-    _, next_reminder_message = _build_reminder_messages(device)
+    last_reminder_message = api_utils.build_reminder_message(
+        device.last_reminder)
+    next_reminder_message = api_utils.build_reminder_message(
+        device.next_reminder)
 
-    guest_enabled, max_extend_date, due_date, guest_permitted = (
-        get_loan_data(device))
-    del due_date  # Unused
+    guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
     if device.shelf:
-      shelf = device.shelf.get()
-      if not shelf:
-        raise endpoints.NotFoundException(
-            _SHELF_NOT_FOUND_MSG % device.shelf.urlsafe())
-      shelf_message = _build_shelf_message(shelf)
+      shelf_message = api_utils.build_shelf_message(device.shelf.get())
     else:
       shelf_message = None
 
@@ -177,15 +177,14 @@ class DeviceApi(root_api.Service):
     for document in search_results.results:
       message = self.document_to_message(device_message.Device(), document)
       device = _get_device(device_message.DeviceRequest(urlkey=document.doc_id))
-      guest_enabled, max_extend_date, due_date, guest_permitted = (
-          get_loan_data(device))
-      del due_date  # Unused
-      next_reminder, last_reminder = _build_reminder_messages(device)
+      guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
       message.guest_enabled = guest_enabled
       message.max_extend_date = max_extend_date
       message.guest_permitted = guest_permitted
-      message.next_reminder = next_reminder
-      message.last_reminder = last_reminder
+      message.next_reminder = api_utils.build_reminder_message(
+          device.next_reminder)
+      message.last_reminder = api_utils.build_reminder_message(
+          device.last_reminder)
       messages.append(message)
 
     return device_message.ListDevicesResponse(
@@ -209,9 +208,7 @@ class DeviceApi(root_api.Service):
     device_messages = []
     for device in device_model.Device.list_by_user(user):
       return_dates = device.calculate_return_dates()
-      guest_enabled, max_extend_date, due_date, guest_permitted = (
-          get_loan_data(device))
-      del due_date  # Unused
+      guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
       device_messages.append(
           device_message.Device(
               serial_number=device.serial_number,
@@ -412,61 +409,6 @@ def _build_device_message(
   return message
 
 
-def _build_reminder_messages(device):
-  """Builds a next- or last-reminder ProtoRPC message.
-
-  Args:
-    device: device_model.Device, the device from datastore.
-
-  Returns:
-    A tuple containing (last_reminder, next_reminder) in which either item could
-        be a device_message.Reminder, or None if there is no equivalent on the
-        Device entity.
-  """
-  try:
-    next_reminder = device_message.Reminder(
-        level=device.next_reminder.level, time=device.next_reminder.time,
-        count=device.next_reminder.count)
-  except AttributeError:
-    logging.info(
-        'The device with serial %s does not have a next_reminder set.',
-        device.serial_number)
-    next_reminder = None
-  try:
-    last_reminder = device_message.Reminder(
-        level=device.last_reminder.level, time=device.last_reminder.time,
-        count=device.last_reminder.count)
-  except AttributeError:
-    logging.info(
-        'The device with serial %s does not have a last_reminder set.',
-        device.serial_number)
-    last_reminder = None
-
-  return (last_reminder, next_reminder)
-
-
-def _build_shelf_message(shelf):
-  """Builds a shelf_messages.Shelf ProtoRPC message.
-
-  Args:
-    shelf: shelf_model.Shelf, the shelf from datastore.
-
-  Returns:
-    A shelf_messages.Shelf ProtoRPC message for the given shelf.
-  """
-  shelf_request = shelf_messages.ShelfRequest(
-      location=shelf.location, urlsafe_key=shelf.key.urlsafe())
-  return shelf_messages.Shelf(
-      location=shelf.location, capacity=shelf.capacity,
-      friendly_name=shelf.friendly_name, latitude=shelf.lat_long.lat,
-      longitude=shelf.lat_long.lon, altitude=shelf.altitude,
-      audit_requested=shelf.audit_requested,
-      responsible_for_audit=shelf.responsible_for_audit,
-      last_audit_time=shelf.last_audit_time,
-      last_audit_by=shelf.last_audit_by, enabled=shelf.enabled,
-      shelf_request=shelf_request)
-
-
 def _get_identifier_from_request(device_request):
   """Parses the DeviceMessage for an identifier to use to get a Device entity.
 
@@ -548,12 +490,11 @@ def get_loan_data(device):
         related to particular loan.
 
   Returns:
-    A tuple of: (Guest already enabled for this loan, max_extend_date, due_date,
-    guest permitted to this application)
+    A tuple of: (Guest already enabled for this loan, max_extend_date, guest
+        permitted to this application)
   """
   guest_enabled = None
   max_extend_date = None
-  due_date = None
   guest_permitted = None
   if device.is_assigned:
     guest_enabled = device.guest_enabled
@@ -561,7 +502,5 @@ def get_loan_data(device):
     del default_date  # Unused.
     max_extend_date = datetime.datetime.combine(
         max_extend_date_time.date(), datetime.datetime.min.time())
-    due_date = datetime.datetime.combine(
-        device.due_date.date(), datetime.datetime.min.time())
     guest_permitted = config_model.Config.get('allow_guest_mode')
-  return (guest_enabled, max_extend_date, due_date, guest_permitted)
+  return (guest_enabled, max_extend_date, guest_permitted)

@@ -14,7 +14,9 @@
 
 """Tests for backend.api.shelf_api."""
 
-import datetime
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
 from absl.testing import parameterized
 import mock
@@ -195,7 +197,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     while True:
       response = self.service.list_shelves(request)
       for shelf in response.shelves:
-        self.assertTrue(shelf.location in self.shelf_locations)
+        self.assertIn(shelf.location, self.shelf_locations)
         response_shelves.append(shelf)
       request = shelf_messages.Shelf(
           enabled=True, page_size=1, page_token=response.page_token)
@@ -253,23 +255,6 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(self.device3_key.get().shelf, self.shelf.key)
     self.assertEqual(self.device2_key.get().shelf, None)
     self.assertEqual(self.device4_key.get().shelf, None)
-
-  def test_build_shelf_message(self):
-    """Test building a shelf message from a shelf dictionary."""
-    now = datetime.datetime.utcnow()
-    test_data = {
-        'enabled': True, 'friendly_name': 'New York', 'location': 'NYC',
-        'latitude': 40.04, 'longitude': 50.05, 'altitude': 10.01,
-        'capacity': 10, 'audit_notification_enabled': False,
-        'audit_requested': True, 'responsible_for_audit': 'me',
-        'last_audit_time': now, 'last_audit_by': 'you'}
-    expected_response = shelf_messages.Shelf(
-        enabled=True, friendly_name='New York', location='NYC',
-        latitude=40.04, longitude=50.05, altitude=10.01, capacity=10,
-        audit_notification_enabled=False, audit_requested=True,
-        responsible_for_audit='me', last_audit_time=now, last_audit_by='you')
-    response = shelf_api._build_shelf_message(test_data)
-    self.assertEqual(response, expected_response)
 
   def test_get_shelf_urlsafe_key(self):
     """Test getting a shelf using the urlsafe key."""

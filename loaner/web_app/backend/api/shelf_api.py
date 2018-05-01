@@ -14,6 +14,10 @@
 
 """The entry point for the Shelf methods."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import logging
 
 from protorpc import message_types
@@ -26,6 +30,7 @@ from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import user
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -79,13 +84,7 @@ class ShelfApi(root_api.Service):
   def get(self, request):
     """Get a shelf based on location."""
     self.check_xsrf_token(self.request_state)
-    shelf = get_shelf(request)
-    shelf_dict = self.to_dict(shelf, shelf_model.Shelf)
-    response = _build_shelf_message(shelf_dict)
-    response.shelf_request = shelf_messages.ShelfRequest()
-    response.shelf_request.urlsafe_key = shelf.key.urlsafe()
-    response.shelf_request.location = shelf.location
-    return response
+    return api_utils.build_shelf_message(get_shelf(request))
 
   @auth.method(
       shelf_messages.ShelfRequest,
@@ -193,32 +192,6 @@ class ShelfApi(root_api.Service):
     shelf.audit(user_email=user_email)
 
     return message_types.VoidMessage()
-
-
-def _build_shelf_message(shelf_dict):
-  """Builds and returns a shelf message from a dictionary.
-
-  Args:
-    shelf_dict: dict, the dictionary to convert into a
-        shelf_messages.Shelf message.
-
-  Returns:
-    A shelf_messages.Shelf message.
-  """
-  return shelf_messages.Shelf(
-      enabled=shelf_dict.get('enabled'),
-      friendly_name=shelf_dict.get('friendly_name'),
-      location=shelf_dict.get('location'),
-      latitude=shelf_dict.get('latitude'),
-      longitude=shelf_dict.get('longitude'),
-      altitude=shelf_dict.get('altitude'),
-      capacity=shelf_dict.get('capacity'),
-      audit_notification_enabled=shelf_dict.get('audit_notification_enabled'),
-      audit_requested=shelf_dict.get('audit_requested'),
-      responsible_for_audit=shelf_dict.get('responsible_for_audit'),
-      last_audit_time=shelf_dict.get('last_audit_time'),
-      last_audit_by=shelf_dict.get('last_audit_by'),
-  )
 
 
 def get_shelf(request):

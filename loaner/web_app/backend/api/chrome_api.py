@@ -14,6 +14,10 @@
 
 """The entry point for the GnG Loaners Chrome App."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import endpoints
 
 from loaner.web_app.backend.api import auth
@@ -101,11 +105,11 @@ class ChromeApi(root_api.Service):
     else:
       given_name = None
 
-    guest_enabled, max_extend_date, due_date, guest_permitted = (
-        device_api.get_loan_data(device))
+    guest_enabled, max_extend_date, guest_permitted = device_api.get_loan_data(
+        device)
 
     return chrome_message.LoanResponse(
-        due_date=due_date,
+        due_date=device.due_date,
         max_extend_date=max_extend_date,
         given_name=given_name,
         guest_permitted=guest_permitted,

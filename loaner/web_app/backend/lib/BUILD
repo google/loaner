@@ -21,6 +21,7 @@ loaner_appengine_library(
     name = "lib",
     deps = [
         ":action_loader",
+        ":api_utils",
         ":bootstrap",
         ":datastore_yaml",
         ":events",
@@ -38,6 +39,19 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app/backend/actions",
+    ],
+)
+
+loaner_appengine_library(
+    name = "api_utils",
+    srcs = [
+        "api_utils.py",
+    ],
+    deps = [
+        "//loaner/web_app/backend/api/messages:device_message",
+        "//loaner/web_app/backend/api/messages:shelf_messages",
+        "@absl_archive//absl/logging",
+        "@endpoints_archive//:endpoints",
     ],
 )
 
@@ -153,6 +167,23 @@ loaner_appengine_test(
         "//loaner/web_app/backend/actions",
         "//loaner/web_app/backend/testing:loanertest",
         "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
+    name = "api_utils_test",
+    srcs = [
+        "api_utils_test.py",
+    ],
+    deps = [
+        ":api_utils",
+        "//loaner/web_app/backend/api/messages:device_message",
+        "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/models:device_model",
+        "//loaner/web_app/backend/models:shelf_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
+        "@endpoints_archive//:endpoints",
     ],
 )
 
@@ -278,6 +309,7 @@ test_suite(
     name = "all_tests",
     tests = [
         ":action_loader_test",
+        ":api_utils_test",
         ":bootstrap_test",
         ":datastore_yaml_test",
         ":events_test",

@@ -28,6 +28,7 @@ loaner_appengine_library(
         ":device_api",
         ":permissions",
         ":root_api",
+        ":search_api",
         ":shelf_api",
         ":survey_api",
         ":user_api",
@@ -121,7 +122,7 @@ loaner_appengine_library(
         ":root_api",
         ":shelf_api",
         "//loaner/web_app/backend/api/messages:device_message",
-        "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:device_model",
@@ -150,6 +151,20 @@ loaner_appengine_library(
 )
 
 loaner_appengine_library(
+    name = "search_api",
+    srcs = [
+        "search_api.py",
+    ],
+    deps = [
+        ":auth",
+        ":permissions",
+        ":root_api",
+        "//loaner/web_app/backend/models:device_model",
+        "//loaner/web_app/backend/models:shelf_model",
+    ],
+)
+
+loaner_appengine_library(
     name = "shelf_api",
     srcs = [
         "shelf_api.py",
@@ -160,6 +175,7 @@ loaner_appengine_library(
         ":root_api",
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:device_model",
@@ -317,6 +333,21 @@ loaner_appengine_test(
 )
 
 loaner_appengine_test(
+    name = "search_api_test",
+    srcs = [
+        "search_api_test.py",
+    ],
+    deps = [
+        ":search_api",
+        "//loaner/web_app/backend/models:device_model",
+        "//loaner/web_app/backend/models:shelf_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
+        "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
     name = "shelf_api_test",
     srcs = [
         "shelf_api_test.py",
@@ -376,6 +407,7 @@ test_suite(
         ":datastore_api_test",
         ":device_api_test",
         ":root_api_test",
+        ":search_api_test",
         ":shelf_api_test",
         ":survey_api_test",
         ":user_api_test",
