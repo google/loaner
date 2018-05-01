@@ -101,6 +101,18 @@ loaner_appengine_library(
 )
 
 loaner_appengine_library(
+    name = "search_utils",
+    srcs = [
+        "search_utils.py",
+    ],
+    deps = [
+        "//loaner/web_app/backend/api/messages:shared_messages",
+        "@absl_archive//absl/logging",
+        "@endpoints_archive//:endpoints",
+    ],
+)
+
+loaner_appengine_library(
     name = "send_email",
     srcs = [
         "send_email.py",
@@ -240,6 +252,23 @@ loaner_appengine_test(
 )
 
 loaner_appengine_test(
+    name = "search_utils_test",
+    srcs = [
+        "search_utils_test.py",
+    ],
+    deps = [
+        ":search_utils",
+        "//loaner/web_app/backend/api/messages:shared_messages",
+        "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/models:shelf_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
+        "@endpoints_archive//:endpoints",
+        "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
     name = "send_email_test",
     srcs = [
         "send_email_test.py",
@@ -313,6 +342,7 @@ test_suite(
         ":bootstrap_test",
         ":datastore_yaml_test",
         ":events_test",
+        ":search_utils_test",
         ":send_email_test",
         ":sync_users_test",
         ":user_test",

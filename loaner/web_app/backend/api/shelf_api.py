@@ -18,7 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import logging
+from absl import logging
 
 from protorpc import message_types
 
@@ -31,6 +31,7 @@ from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import api_utils
+from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.lib import user
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -129,11 +130,11 @@ class ShelfApi(root_api.Service):
     """List enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)
     query, sort_options, returned_fields = (
-        self.set_search_query_options(request))
+        search_utils.set_search_query_options(request.query))
     if not query:
-      query = self.to_query(request, shelf_model.Shelf)
+      query = search_utils.to_query(request, shelf_model.Shelf)
 
-    cursor = self.get_search_cursor(request.page_token)
+    cursor = search_utils.get_search_cursor(request.page_token)
     search_results = shelf_model.Shelf.search(
         query_string=query, query_limit=request.page_size,
         cursor=cursor, sort_options=sort_options,
@@ -144,7 +145,8 @@ class ShelfApi(root_api.Service):
 
     shelves_messages = []
     for document in search_results.results:
-      message = self.document_to_message(shelf_messages.Shelf(), document)
+      message = search_utils.document_to_message(
+          document, shelf_messages.Shelf())
       message.shelf_request = shelf_messages.ShelfRequest()
       message.shelf_request.urlsafe_key = document.doc_id
       message.shelf_request.location = message.location

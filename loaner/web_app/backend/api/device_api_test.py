@@ -34,6 +34,7 @@ from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_message
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -303,7 +304,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(2, len(response_devices))
 
   @mock.patch.object(
-      root_api.Service, 'to_query', return_value='enrolled:enrolled',
+      search_utils, 'to_query', return_value='enrolled:enrolled',
       autospec=True)
   def test_list_devices_with_malformed_page_token(self, mock_to_query):
     """Test list devices with a fake token, raises BadRequestException."""

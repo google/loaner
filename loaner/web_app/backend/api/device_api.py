@@ -32,6 +32,7 @@ from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
 from loaner.web_app.backend.api.messages import device_message
 from loaner.web_app.backend.lib import api_utils
+from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
@@ -152,7 +153,7 @@ class DeviceApi(root_api.Service):
     """Lists all devices based on any device attribute."""
     self.check_xsrf_token(self.request_state)
     query, sort_options, returned_fields = (
-        self.set_search_query_options(request))
+        search_utils.set_search_query_options(request.query))
     if not query:
       shelf_query = ''
       if request.shelf:
@@ -162,10 +163,10 @@ class DeviceApi(root_api.Service):
               request.shelf.shelf_request).key.urlsafe()
         request.shelf = None
         shelf_query = ':'.join(('shelf', shelf_urlsafe_key))
-      query = self.to_query(request, device_model.Device)
+      query = search_utils.to_query(request, device_model.Device)
       query = ' '.join((query, shelf_query))
 
-    cursor = self.get_search_cursor(request.page_token)
+    cursor = search_utils.get_search_cursor(request.page_token)
     search_results = device_model.Device.search(
         query_string=query, query_limit=request.page_size,
         cursor=cursor, sort_options=sort_options,
@@ -175,7 +176,8 @@ class DeviceApi(root_api.Service):
       new_search_cursor = search_results.cursor.web_safe_string
     messages = []
     for document in search_results.results:
-      message = self.document_to_message(device_message.Device(), document)
+      message = search_utils.document_to_message(
+          document, device_message.Device())
       device = _get_device(device_message.DeviceRequest(urlkey=document.doc_id))
       guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
       message.guest_enabled = guest_enabled

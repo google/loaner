@@ -14,18 +14,18 @@
 
 """Tests for backend.api.root_api."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from absl.testing import parameterized
 import mock
 
 from protorpc import message_types
 
-from google.appengine.api import search
-
 import endpoints
 
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import device_message
-from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import xsrf
 from loaner.web_app.backend.models import shelf_model
@@ -73,57 +73,6 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     filters = self.root_api_service.to_dict(message, shelf_model.Shelf)
     self.assertEqual(filters, expected_dict)
 
-  @parameterized.parameters(
-      (shelf_messages.Shelf(location='NY', capacity=50),
-       'location:NY capacity:50 enabled:True',),
-      (shelf_messages.Shelf(location='NY', capacity=50, enabled=False),
-       'location:NY capacity:50 enabled:False',))
-  def test_to_qery(self, message, expected_query):
-    query = self.root_api_service.to_query(message, shelf_model.Shelf)
-    #  The query is split because ndb properties are unordered when called by
-    #  model_class._properties. This test would be flaky otherwise.
-    self.assertCountEqual(query.split(' '), expected_query.split(' '))
-
-  @mock.patch.object(root_api, 'logging', autospec=True)
-  def test_document_to_message(self, mock_logging):
-    test_search_document = search.ScoredDocument(
-        doc_id='test_doc_id',
-        fields=[
-            search.NumberField(name='capacity', value=20.0),
-            search.TextField(name='location', value='US MTV'),
-            search.AtomField(name='location', value='US-MTV'),
-            search.AtomField(name='enabled', value='True'),
-            search.GeoField(
-                name='lat_long', value=search.GeoPoint(52.37, 4.88)),
-            search.TextField(name='not_present', value='MTV')])
-    expected_message = shelf_messages.Shelf(
-        location='US-MTV', capacity=20, latitude=52.37, longitude=4.88)
-
-    response_message = self.root_api_service.document_to_message(
-        shelf_messages.Shelf(), test_search_document)
-    self.assertEqual(response_message.location, expected_message.location)
-    self.assertEqual(response_message.capacity, expected_message.capacity)
-    self.assertEqual(response_message.latitude, expected_message.latitude)
-    self.assertEqual(response_message.longitude, expected_message.longitude)
-    self.assertTrue(response_message.enabled)
-    assert mock_logging.error.call_count == 1
-
-  def test_get_search_cursor(self):
-    expected_cursor_web_safe_string = 'False:ODUxODBhNTgyYTQ2ZmI0MDU'
-    returned_cursor = (
-        self.root_api_service.get_search_cursor(
-            expected_cursor_web_safe_string))
-    self.assertEqual(
-        expected_cursor_web_safe_string, returned_cursor.web_safe_string)
-
-  @mock.patch.object(search, 'Cursor', autospec=True)
-  def test_get_search_cursor_error(self, mock_cursor):
-    mock_cursor.side_effect = ValueError
-    with self.assertRaisesWithLiteralMatch(
-        endpoints.BadRequestException,
-        root_api._CORRUPT_KEY_MSG):
-      self.root_api_service.get_search_cursor(None)
-
   def test_get_ndb_key_not_found(self):
     """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
     with self.assertRaisesRegexp(
@@ -138,104 +87,6 @@ class RootServiceTest(loanertest.EndpointsTestCase, parameterized.TestCase):
         endpoints.BadRequestException,
         root_api._MALFORMED_PAGE_TOKEN_MSG):
       self.root_api_service.get_datastore_cursor('malformedPageToken')
-
-  @parameterized.named_parameters(
-      {'testcase_name': 'QueryStringOnly',
-       'request': device_message.Device(
-           query=shared_messages.SearchRequest(query_string='enrolled:True')),
-       'expected_values': ('enrolled:True', None, [])
-      },
-      {'testcase_name': 'QueryStringWithReturnedFields',
-       'request': device_message.Device(
-           query=shared_messages.SearchRequest(
-               query_string='location:US-NYC',
-               returned_fields=['location'])),
-       'expected_values': ('location:US-NYC', None, ['location'])
-      },
-  )
-  def test_set_search_query_options(self, request, expected_values):
-    returned_query, returned_sort_options, returned_returned_fields = (
-        self.root_api_service.set_search_query_options(request))
-    expected_query, expected_sort_options, expcted_returned_fields = (
-        expected_values)
-    self.assertEqual(expected_sort_options, returned_sort_options)
-    self.assertEqual(expected_query, returned_query)
-    self.assertEqual(expcted_returned_fields, returned_returned_fields)
-
-  @parameterized.named_parameters(
-      {'testcase_name': 'ExpressionWithDirection',
-       'request': device_message.Device(
-           query=shared_messages.SearchRequest(
-               query_string='enrolled:True',
-               expressions=[shared_messages.SearchExpression(
-                   expression='enrolled',
-                   direction=shared_messages.SortDirection.ASCENDING)])),
-       'expected_sort_options_expressions': [search.SortExpression(
-           expression='enrolled', direction=search.SortExpression.ASCENDING)]
-      },
-      {'testcase_name': 'MultipleExpressionsWithDirection',
-       'request': device_message.Device(
-           query=shared_messages.SearchRequest(
-               query_string='enrolled:True',
-               expressions=[
-                   shared_messages.SearchExpression(
-                       expression='enrolled',
-                       direction=shared_messages.SortDirection.ASCENDING),
-                   shared_messages.SearchExpression(
-                       expression='serial_number',
-                       direction=shared_messages.SortDirection.DESCENDING)
-               ])),
-       'expected_sort_options_expressions': [
-           search.SortExpression(
-               expression='enrolled',
-               direction=search.SortExpression.ASCENDING),
-           search.SortExpression(
-               expression='serial_number',
-               direction=search.SortExpression.DESCENDING)
-       ]
-      },
-      {'testcase_name': 'ExpressionWithoutDirection',
-       'request': device_message.Device(
-           query=shared_messages.SearchRequest(
-               query_string='enrolled:True',
-               expressions=[shared_messages.SearchExpression(
-                   expression='enrolled')])),
-       'expected_sort_options_expressions': [search.SortExpression(
-           expression='enrolled')]
-      },
-      {'testcase_name': 'MultipleExpressionsWithoutDirection',
-       'request': device_message.Device(
-           query=shared_messages.SearchRequest(
-               query_string='enrolled:True',
-               expressions=[
-                   shared_messages.SearchExpression(
-                       expression='enrolled'),
-                   shared_messages.SearchExpression(
-                       expression='serial_number')
-               ])),
-       'expected_sort_options_expressions': [
-           search.SortExpression(
-               expression='enrolled',
-               direction=search.SortExpression.DESCENDING),
-           search.SortExpression(
-               expression='serial_number',
-               direction=search.SortExpression.DESCENDING)
-       ]
-      },
-  )
-  def test_set_search_query_options_with_sort_options(
-      self, request, expected_sort_options_expressions):
-    returned_query, returned_sort_options, returned_returned_fields = (
-        self.root_api_service.set_search_query_options(request))
-    del returned_query  # Unused.
-    del returned_returned_fields  # Unused.
-    for i in range(len(returned_sort_options.expressions)):
-      self.assertEqual(
-          returned_sort_options.expressions[i].expression,
-          expected_sort_options_expressions[i].expression)
-      self.assertEqual(
-          returned_sort_options.expressions[i].direction,
-          expected_sort_options_expressions[i].direction)
 
 
 if __name__ == '__main__':
