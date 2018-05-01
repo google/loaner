@@ -14,8 +14,13 @@
 
 """Event model classes for the loaner project."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
-import logging
+
+from absl import logging
 
 from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
@@ -184,7 +189,7 @@ class CustomEvent(CoreEvent):
   @classmethod
   def get_all_enabled(cls):
     """Retrieves all enabled entities of this class."""
-    return cls.query(cls.enabled == True).fetch()  # pylint: disable=g-explicit-bool-comparison
+    return cls.query(cls.enabled == True).fetch()  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
 
   def _build_query_components(self):
     """Builds a dict containing a query and other useful objects.

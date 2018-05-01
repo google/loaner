@@ -14,6 +14,10 @@
 
 """Frontend handler test cases."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import webtest
 
 from loaner.web_app import main as webapp_main

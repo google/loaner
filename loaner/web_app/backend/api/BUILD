@@ -46,6 +46,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/lib:xsrf",
         "//loaner/web_app/backend/models:user_model",
+        "@absl_archive//absl/logging",
     ],
 )
 
@@ -127,6 +128,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:device_model",
+        "@absl_archive//absl/logging",
         "@endpoints_archive//:endpoints",
     ],
 )
@@ -146,6 +148,7 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/lib:xsrf",
+        "@absl_archive//absl/logging",
         "@endpoints_archive//:endpoints",
     ],
 )

@@ -14,10 +14,14 @@
 
 """Module for the core frontend handler."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import os
 import re
 
+from absl import logging
 import webapp2
 
 from loaner.web_app import constants

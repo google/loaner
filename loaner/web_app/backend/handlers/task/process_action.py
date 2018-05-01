@@ -14,9 +14,13 @@
 
 """Module for processing an action in a task queue."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import pickle
 
+from absl import logging
 import webapp2
 
 from loaner.web_app.backend.lib import action_loader

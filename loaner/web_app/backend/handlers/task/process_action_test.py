@@ -14,8 +14,13 @@
 
 """Tests for backend.handlers.task.process_action."""
 
-import logging  # pylint: disable=unused-import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import pickle
+
+from absl import logging
 
 import mock
 
@@ -26,7 +31,7 @@ from loaner.web_app.backend.testing import handlertest
 class ProcessActionHandlerTest(handlertest.HandlerTestCase):
   """Test the ProcessActionHandler."""
 
-  @mock.patch('logging.info')
+  @mock.patch.object(logging, 'info')
   @mock.patch('__main__.action_loader.load_actions')
   def test_process_action_handler(self, mock_importactions, mock_loginfo):
     """Test the ProcessActionHandler, which imports the sample action."""
@@ -45,7 +50,7 @@ class ProcessActionHandlerTest(handlertest.HandlerTestCase):
     response = self.testapp.post(r'/_ah/queue/process-action', payload)
 
     self.assertEqual(response.status_int, 200)
-    self.assertEqual(len(mock_loginfo.mock_calls), 2)
+    self.assertEqual(mock_loginfo.call_count, 2)
     expected_calls = [
         mock.call('ProcessActionHandler loaded %d actions: %s', 1,
                   "['sample']"),

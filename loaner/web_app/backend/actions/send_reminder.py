@@ -14,7 +14,11 @@
 
 """Action to send an e-mail reminder."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+from absl import logging
 
 from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import send_email

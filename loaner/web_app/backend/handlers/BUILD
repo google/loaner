@@ -35,6 +35,7 @@ loaner_appengine_library(
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/lib:bootstrap",
         "//loaner/web_app/backend/lib:sync_users",
+        "@absl_archive//absl/logging",
         "@mock_archive//:mock",
     ],
 )

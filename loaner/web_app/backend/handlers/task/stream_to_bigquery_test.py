@@ -14,6 +14,10 @@
 
 """Tests for backend.handlers.task.stream_to_bigquery."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import pickle
 
 import mock

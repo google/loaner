@@ -14,6 +14,10 @@
 
 """Endpoints API main entrance."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import endpoints
 
 from loaner.web_app.backend.api import bootstrap_api  # pylint: disable=unused-import

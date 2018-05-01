@@ -14,6 +14,10 @@
 
 """Main WSGI app module for loaner project."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import webapp2
 
 from loaner.web_app.backend.handlers import frontend

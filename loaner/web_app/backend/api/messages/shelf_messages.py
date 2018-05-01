@@ -14,6 +14,10 @@
 
 """Shelf messages for Shelf API."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from protorpc import message_types
 from protorpc import messages
 

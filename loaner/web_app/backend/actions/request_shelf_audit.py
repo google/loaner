@@ -14,6 +14,10 @@
 
 """Action to send a shelf audit e-mail."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import send_email
 

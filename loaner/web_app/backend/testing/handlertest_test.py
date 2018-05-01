@@ -14,6 +14,10 @@
 
 """Tests for backend.testing.handlertest."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import mock
 
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import

@@ -14,9 +14,14 @@
 
 """A model representing a device."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import collections
 import datetime
-import logging
+
+from absl import logging
 
 from google.appengine.api import datastore_errors
 from google.appengine.ext import deferred
@@ -212,7 +217,7 @@ class Device(base_model.BaseModel):
     return cls.query(
         ndb.AND(
             cls.assigned_user == user,
-            cls.mark_pending_return_date == None)).fetch()  # pylint: disable=g-equals-none
+            cls.mark_pending_return_date == None)).fetch()  # pylint: disable=g-equals-none,singleton-comparison
 
   @classmethod
   def enroll(cls, serial_number, user_email, asset_tag=None):

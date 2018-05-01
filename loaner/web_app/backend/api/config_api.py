@@ -14,6 +14,10 @@
 
 """API endpoint that handles requests related to config for App."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from protorpc import message_types
 
 import endpoints

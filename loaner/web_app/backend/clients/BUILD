@@ -32,6 +32,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/models:survey_models",
+        "@absl_archive//absl/logging",
         "@gcloud_bigquery_archive//:gcloud_bigquery",
     ],
 )
@@ -44,6 +45,7 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/common:google_cloud_lib_fixer",
+        "@absl_archive//absl/logging",
         "@gcloud_auth_archive//:gcloud_auth",
         "@google_auth_httplib2_archive//:google_auth_httplib2",
         "@googleapiclient_archive//:googleapiclient",

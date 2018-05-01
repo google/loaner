@@ -79,8 +79,13 @@ def do_something(self, request, roles_permitted=None):
     ...
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import functools
-import logging
+
+from absl import logging
 
 import endpoints
 

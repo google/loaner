@@ -14,9 +14,13 @@
 
 """Module for raising and managing Events for the loaner project."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import pickle
 
+from absl import logging
 from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 

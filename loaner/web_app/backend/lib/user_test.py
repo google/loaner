@@ -14,6 +14,10 @@
 
 """Tests for backend.lib.user."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import mock
 
 import endpoints
@@ -23,9 +27,6 @@ from loaner.web_app.backend.testing import loanertest
 
 
 class UserTest(loanertest.EndpointsTestCase):
-
-  def setUp(self):
-    super(UserTest, self).setUp()
 
   def test_get_user_email(self):
     self.login_user()

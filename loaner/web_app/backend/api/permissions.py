@@ -20,6 +20,10 @@ api.auth.method decorator checks to see if a user has permission to execute each
 method.
 """
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 
 class Permissions(object):
   """Permissions for all API method calls."""

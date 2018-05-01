@@ -68,6 +68,7 @@ loaner_appengine_library(
         ":base_action",
         "//loaner/web_app/backend/lib:send_email",
         "//loaner/web_app/backend/models:device_model",
+        "@absl_archive//absl/logging",
     ],
 )
 

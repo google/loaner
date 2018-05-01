@@ -14,8 +14,12 @@
 
 """Directory API library."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import httplib
-import logging
+from absl import logging
 
 # pylint: disable=unused-import,g-bad-import-order,g-import-not-at-top
 from loaner.web_app.backend.common import google_cloud_lib_fixer

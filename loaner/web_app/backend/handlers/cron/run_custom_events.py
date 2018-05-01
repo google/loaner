@@ -14,6 +14,10 @@
 
 """Module for processing Custom Events in a cron job."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import webapp2
 
 from loaner.web_app.backend.lib import events

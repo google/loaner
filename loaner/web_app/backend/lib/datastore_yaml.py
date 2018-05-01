@@ -14,11 +14,15 @@
 
 """General library for importing YAML to make Cloud Datastore entities."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import random
 import re
-import yaml
 
+from absl import logging
+import yaml
 from google.appengine.ext import ndb
 
 from loaner.web_app import constants

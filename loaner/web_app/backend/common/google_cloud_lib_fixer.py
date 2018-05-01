@@ -14,6 +14,10 @@
 
 """Allows import and use of google-cloud-python libraries on App Engine."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import sys
 import warnings
 

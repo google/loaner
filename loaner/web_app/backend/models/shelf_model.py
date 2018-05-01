@@ -14,8 +14,13 @@
 
 """A model representing a shelf."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
-import logging
+
+from absl import logging
 
 from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb

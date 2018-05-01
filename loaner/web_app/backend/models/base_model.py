@@ -14,12 +14,17 @@
 
 """Base model class for the loaner project."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 import inspect
-import logging
 import numbers
 import pickle
 import string
+
+from absl import logging
 
 from protorpc import messages
 

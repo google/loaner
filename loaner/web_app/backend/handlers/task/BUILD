@@ -32,6 +32,7 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app/backend/lib:action_loader",
+        "@absl_archive//absl/logging",
     ],
 )
 
@@ -58,6 +59,7 @@ loaner_appengine_test(
         ":process_action",
         "//loaner/web_app/backend/lib:action_loader",
         "//loaner/web_app/backend/testing:handlertest",
+        "@absl_archive//absl/logging",
         "@mock_archive//:mock",
     ],
 )

@@ -19,7 +19,9 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
-import logging
+
+from absl import logging
+
 from protorpc import message_types
 
 from google.appengine.api import datastore_errors

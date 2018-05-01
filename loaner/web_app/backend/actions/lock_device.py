@@ -14,6 +14,10 @@
 
 """Action to lock a device."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from loaner.web_app import constants
 from loaner.web_app.backend.actions import base_action
 

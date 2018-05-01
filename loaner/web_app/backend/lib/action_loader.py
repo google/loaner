@@ -14,10 +14,15 @@
 
 """Module for loading Actions for the loaner project."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import inspect
-import logging
 import os
 import pkgutil
+
+from absl import logging
 
 from loaner.web_app.backend.actions import base_action
 

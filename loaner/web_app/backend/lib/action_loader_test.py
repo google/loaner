@@ -14,9 +14,14 @@
 
 """Tests for backend.lib.action_loader."""
 
-import inspect  # pylint: disable=unused-import
-import logging  # pylint: disable=unused-import
-import pkgutil  # pylint: disable=unused-import
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import inspect
+import pkgutil
+
+from absl import logging
 
 import mock
 
@@ -72,9 +77,9 @@ class ActionClassWithoutRunMethod6(base_action.BaseAction):
 class ActionImporterTest(loanertest.TestCase):
   """Tests for the Action Importer lib."""
 
-  @mock.patch('__main__.logging.warning')
-  @mock.patch('__main__.inspect.getmembers')
-  @mock.patch('__main__.pkgutil.ImpImporter')
+  @mock.patch.object(logging, 'warning')
+  @mock.patch.object(inspect, 'getmembers')
+  @mock.patch.object(pkgutil, 'ImpImporter')
   def test_import(
       self, mock_impimporter, mock_getmembers, mock_logwarning):
     """Tests importing modules and actions with success."""

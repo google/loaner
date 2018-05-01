@@ -14,11 +14,15 @@
 
 """Module for handling tokens to prevent malicious XSRF."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
-import logging
 import threading
 import uuid
 
+from absl import logging
 from oauth2client.contrib import xsrfutil
 from protorpc import remote
 import webapp2

@@ -14,8 +14,11 @@
 
 """Client for interacting with the BigQuery API."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
+from absl import logging
 from loaner.web_app.backend.common import google_cloud_lib_fixer  # pylint: disable=unused-import
 # pylint: disable=g-bad-import-order,g-import-not-at-top
 

@@ -14,13 +14,17 @@
 
 """Deferred tasks for bootstrapping the GnG app."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 import functools
 import inspect
-import logging
 import os
 import sys
 
+from absl import logging
 from google.appengine.ext import deferred
 
 from loaner.web_app import constants
@@ -65,6 +69,7 @@ def managed_task(task_function):
   """
   @functools.wraps(task_function)
   def wrapper(*args, **kwargs):
+    """Wrapper for managed task decorator."""
     status_entity = bootstrap_status_model.BootstrapStatus.get_or_insert(
         task_function.__name__)
     status_entity.description = _TASK_DESCRIPTIONS.get(

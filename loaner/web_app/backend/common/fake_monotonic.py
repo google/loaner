@@ -24,6 +24,11 @@ backwards (as the term "monotonic" implies). We can duplicate this behavior by
 wrapping the normal time.time method with a small bit of logic and state that
 ensure the returned tick is greater than or equal to the previous tick.
 """
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import time
 
 _LAST_TICK = time.time()

@@ -14,6 +14,10 @@
 
 """Handler for adding roles to users with a cron job."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import webapp2
 
 from loaner.web_app.backend.lib import sync_users

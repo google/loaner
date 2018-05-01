@@ -14,6 +14,10 @@
 
 """Tests for backend.actions.lock_device."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import mock
 
 from loaner.web_app import constants

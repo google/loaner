@@ -49,6 +49,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:event_models",
+        "@absl_archive//absl/logging",
     ],
 )
 

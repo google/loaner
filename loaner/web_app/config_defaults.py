@@ -14,6 +14,10 @@
 
 """Global config defaults the app can override in the Config datastore model."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 
 DEFAULTS = {
     # allow_guest_mode: bool, Whether an organization allows loaners to enable

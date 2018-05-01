@@ -14,6 +14,10 @@
 
 """Tests for backend.lib.utils."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 from loaner.web_app.backend.lib import utils
 from loaner.web_app.backend.testing import loanertest
@@ -21,9 +25,6 @@ from loaner.web_app.backend.testing import loanertest
 
 class UtilsTest(loanertest.TestCase):
   """Unit tests for loaner minder utils module."""
-
-  def setUp(self):
-    super(UtilsTest, self).setUp()
 
   def testConvertDatetimeToUnix(self):
     timestamp = datetime.datetime(2016, 8, 1, 1, 1)

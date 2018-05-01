@@ -14,7 +14,11 @@
 
 """A model representing a BigQuery row."""
 
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+from absl import logging
 
 from google.appengine.ext import ndb
 
@@ -72,7 +76,7 @@ class BigQueryRow(base_model.BaseModel):
   @classmethod
   def fetch_unstreamed_rows(cls):
     """Retrieves all rows that have not been streamed."""
-    return cls.query(cls.streamed == False).fetch()  # pylint: disable=g-explicit-bool-comparison
+    return cls.query(cls.streamed == False).fetch()  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
 
   def stream(self):
     """Streams the row to BigQuery."""

@@ -14,8 +14,11 @@
 
 """Tests for backend.handlers.cron.run_shelf_audit_events."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
-import logging  # pylint: disable=unused-import
 
 import mock
 

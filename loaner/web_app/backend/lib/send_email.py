@@ -14,9 +14,13 @@
 
 """Helper functions for sending email."""
 
-import datetime
-import logging
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
 
+import datetime
+
+from absl import logging
 import html2text
 
 from google.appengine.api import mail

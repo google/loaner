@@ -14,8 +14,12 @@
 
 """Tests for backend.models.event_models."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
-import logging
+from absl import logging
 import mock
 
 from google.appengine.api import datastore_errors
