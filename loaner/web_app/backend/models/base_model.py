@@ -220,7 +220,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     """
     document_fields = []
     for property_name in self._properties:  # pylint: disable=protected-access
-      value = getattr(self, property_name)
+      value = getattr(self, property_name, None)
       document_fields.extend(self._to_search_fields(property_name, value))
     return document_fields
 
