@@ -375,14 +375,13 @@ class Device(base_model.BaseModel):
   @classmethod
   def get(
       cls, asset_tag=None, chrome_device_id=None, serial_number=None,
-      urlkey=None, unknown_identifier=None):
+      unknown_identifier=None):
     """Retrieves a device object using one of several device identifiers.
 
     Args:
       asset_tag: str, the asset tag of the device.
       chrome_device_id: str, the Chrome device ID of a device.
       serial_number: str, the serial number of a device.
-      urlkey: str, the URL-safe key of a device.
       unknown_identifier: str, either an asset tag or serial number of the
           device, and this function will attempt both.
 
@@ -399,14 +398,6 @@ class Device(base_model.BaseModel):
       return cls.query(cls.chrome_device_id == chrome_device_id).get()
     elif serial_number:
       return cls.query(cls.serial_number == serial_number).get()
-    elif urlkey:
-      try:
-        return ndb.Key(urlsafe=urlkey).get()
-      except Exception as e:  # pylint: disable=broad-except
-        raise DeviceIdentifierError(
-            '{error_type} Exception raised for Device URL-safe key ({urlkey}): '
-            '{error}'.format(
-                error_type=str(type(e)), urlkey=urlkey, error=str(e)))
     elif unknown_identifier:
       return (
           cls.query(cls.serial_number == unknown_identifier).get() or

@@ -14,6 +14,10 @@
 
 """Tests for backend.models.bootstrap_status_model."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from loaner.web_app.backend.models import bootstrap_status_model
 from loaner.web_app.backend.testing import loanertest
 

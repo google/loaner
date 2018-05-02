@@ -20,6 +20,8 @@ from __future__ import print_function
 
 from absl import logging
 
+from protorpc import messages
+
 from google.appengine.api import datastore_errors
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
@@ -33,7 +35,41 @@ _CORRUPT_KEY_MSG = 'The key provided for submission was not found.'
 _MALFORMED_PAGE_TOKEN_MSG = 'The page token provided is incorrect.'
 
 
-def build_reminder_message(reminder):
+def build_device_message_from_model(device, guest_permitted):
+  """Builds a device_message.Device ProtoRPC message.
+
+  Args:
+    device: device_model.Device, a device entity to convert into a message.
+    guest_permitted: bool, whether or not guest is permitted for this
+        organization.
+
+  Returns:
+    A populated device_message.Device ProtoRPC message.
+  """
+  message = device_message.Device(
+      guest_enabled=device.guest_enabled,
+      guest_permitted=guest_permitted)
+  if device.is_assigned:
+    message.max_extend_date = device.calculate_return_dates().max
+  for key in device._properties:  # pylint: disable=protected-access
+    value = getattr(device, key, None)
+    try:
+      setattr(message, key, value)
+    except messages.ValidationError as err:
+      logging.info(err)
+      if key == 'shelf':
+        setattr(message, key, build_shelf_message_from_model(value.get()))
+      elif key.endswith('reminder'):
+        setattr(message, key, build_reminder_message_from_model(value))
+      else:
+        logging.warning(
+            'Attribute (%s) was not found on the device (%s).',
+            key, device)
+
+  return message
+
+
+def build_reminder_message_from_model(reminder):
   """Builds a next- or last-reminder ProtoRPC message.
 
   Args:
@@ -54,7 +90,7 @@ def build_reminder_message(reminder):
   return message
 
 
-def build_shelf_message(shelf):
+def build_shelf_message_from_model(shelf):
   """Builds a shelf_messages.Shelf ProtoRPC message.
 
   Args:
@@ -82,8 +118,8 @@ def build_shelf_message(shelf):
         setattr(message, 'longitude', getattr(shelf.lat_long, 'lon', None))
       else:
         logging.warning(
-            'Attribute (%s) was not found on the shelf with urlsafe key (%s).',
-            key, shelf.key.urlsafe())
+            'Attribute (%s) was not found on the shelf with urlsafe key (%s). '
+            'Error: %s.', key, shelf.key.urlsafe(), err)
 
   return message
 

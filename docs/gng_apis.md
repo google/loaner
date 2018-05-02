@@ -227,31 +227,6 @@ Heartbeat check-in for Chrome devices:
 |                              | start_assignment: bool, Determine if          |
 |                              | assignment workflow should be started.        |
 
-##### get_loan
-
-Get the current loan for a given Chrome device:
-
-| Requests                         | Attributes                               |
-| :------------------------------- | :--------------------------------------- |
-| LoanRequest: Chrome Loan Request | device_id: str, The unique Chrome device |
-| ProtoRPC message.                | ID of the Chrome device.                 |
-|                                  | need_name: bool, If given name should be |
-|                                  | returned.                                |
-
-| Returns                       | Attributes                                  |
-| :---------------------------- | :------------------------------------------ |
-| LoanResponse: Chrome Loan     | due_date: datetime, The due date for the    |
-| information Response ProtoRPC | device.                                     |
-| message.                      |                                             |
-|                               | max_extend_date: datetime, The max date a   |
-|                               | loan can be extended.                       |
-|                               | given_name: str, The given name for the     |
-|                               | user.                                       |
-|                               | guest_permitted: bool, If guest mode can be |
-|                               | enabled.                                    |
-|                               | guest_enabled: bool, If guest mode is       |
-|                               | enabled.                                    |
-
 ### Configuration_api
 
 Lists the given setting's value.
@@ -485,6 +460,7 @@ Lists all devices based on any device attribute.
 |                          | been already enabled.                             |
 |                          | guest_permitted: bool, Indicates if guest mode has|
 |                          | been allowed.                                     |
+|                          | give_name: str, The given name of the user.       |
 |                          | query: shared_message.SearchRequest, a message    |
 |                          | containing query options to conduct a search on an|
 |                          | index.                                            |

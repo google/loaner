@@ -18,7 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from protorpc import message_types
 from protorpc import messages
 
 
@@ -40,31 +39,3 @@ class HeartbeatResponse(messages.Message):
   """
   is_enrolled = messages.BooleanField(1)
   start_assignment = messages.BooleanField(2)
-
-
-class LoanRequest(messages.Message):
-  """Chrome Loan Request ProtoRPC message.
-
-  Attributes:
-    device_id: str, The unique Chrome device ID of the Chrome device.
-    need_name: bool, If given name should be returned.
-  """
-  device_id = messages.StringField(1)
-  need_name = messages.BooleanField(2)
-
-
-class LoanResponse(messages.Message):
-  """Chrome Loan information Response ProtoRPC message.
-
-  Attributed:
-    due_date: datetime, The due date for the device.
-    max_extend_date: datetime, The max date a loan can be extended.
-    given_name: str, The given name for the user.
-    guest_permitted: bool, If guest mode can be enabled.
-    guest_enabled: bool, If guest mode is enabled.
-  """
-  due_date = message_types.DateTimeField(1)
-  max_extend_date = message_types.DateTimeField(2)
-  given_name = messages.StringField(3)
-  guest_permitted = messages.BooleanField(4)
-  guest_enabled = messages.BooleanField(5)

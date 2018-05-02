@@ -18,9 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import datetime
-
-import freezegun
 import mock
 
 import endpoints
@@ -28,7 +25,6 @@ import endpoints
 from loaner.web_app.backend.api import chrome_api
 from loaner.web_app.backend.api.messages import chrome_message
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
-from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -148,85 +144,6 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
         endpoints.NotFoundException,
         'Device ID not found in org.',
         self.service.heartbeat, self.chrome_request)
-
-  def test_get_loan(self):
-    """Tests the get loan function for an existing device."""
-    given_name = 'Dare Devil'
-    self.mock_directoryclient.given_name.return_value = given_name
-    now = datetime.datetime(year=2017, month=1, day=1)
-    with freezegun.freeze_time(now):
-      config_model.Config.set('loan_duration', 3)
-      config_model.Config.set('maximum_loan_duration', 14)
-      # Set guest mode to unpermitted.
-      config_model.Config.set('allow_guest_mode', False)
-      self.create_device(assigned_user=loanertest.USER_EMAIL)
-
-      response = self.service.get_loan(
-          chrome_message.LoanRequest(
-              device_id=UNIQUE_ID, need_name=True))
-      self.assertIsInstance(response, chrome_message.LoanResponse)
-      self.assertEqual(response.due_date, now + datetime.timedelta(days=3))
-      self.assertEqual(
-          response.max_extend_date, now + datetime.timedelta(days=14))
-      self.assertEqual(response.given_name, given_name)
-      self.assertFalse(response.guest_permitted)
-      self.assertFalse(response.guest_enabled)
-
-  def test_get_loan_with_no_given_name(self):
-    """Tests the get loan function when the user has no given name."""
-    self.mock_directoryclient.given_name.side_effect = (
-        directory.GivenNameDoesNotExistError('No name!'))
-    now = datetime.datetime(year=2017, month=1, day=1)
-    with freezegun.freeze_time(now):
-      config_model.Config.set('loan_duration', 3)
-      config_model.Config.set('maximum_loan_duration', 14)
-      # Set guest mode to permitted.
-      config_model.Config.set('allow_guest_mode', True)
-      self.create_device(assigned_user=loanertest.USER_EMAIL)
-
-      response = self.service.get_loan(
-          chrome_message.LoanRequest(device_id=UNIQUE_ID, need_name=True))
-      self.assertIsInstance(response, chrome_message.LoanResponse)
-      self.assertEqual(response.due_date, now + datetime.timedelta(days=3))
-      self.assertEqual(
-          response.max_extend_date, now + datetime.timedelta(days=14))
-      self.assertIsNone(response.given_name)
-      self.assertTrue(response.guest_permitted)
-      self.assertFalse(response.guest_enabled)
-
-  def test_get_loan_without_given_name(self):
-    """Tests the get loan function when the given name is not needed."""
-    self.mock_directoryclient.given_name.side_effect = (
-        directory.DirectoryRPCError('No name!'))
-    now = datetime.datetime(year=2017, month=1, day=1)
-    with freezegun.freeze_time(now):
-      config_model.Config.set('loan_duration', 3)
-      config_model.Config.set('maximum_loan_duration', 14)
-      self.create_device(assigned_user=loanertest.USER_EMAIL)
-
-      response = self.service.get_loan(
-          chrome_message.LoanRequest(device_id=UNIQUE_ID, need_name=False))
-      self.assertIsInstance(response, chrome_message.LoanResponse)
-      self.assertEqual(response.due_date, now + datetime.timedelta(days=3))
-      self.assertEqual(
-          response.max_extend_date, now + datetime.timedelta(days=14))
-      self.assertIsNone(response.given_name)
-      self.assertFalse(response.guest_enabled)
-
-  def test_get_loan_no_device_id(self):
-    """Tests get loan without a request.device_id."""
-    with self.assertRaisesRegexp(
-        endpoints.BadRequestException,
-        chrome_api._NO_DEVICE_ID_MSG):
-      self.service.get_loan(chrome_message.LoanRequest())
-
-  def test_get_loan_no_device_found(self):
-    """Tests get loan for a device not in datastore."""
-    with self.assertRaisesRegexp(
-        endpoints.NotFoundException,
-        chrome_api._NOT_GNG_MSG):
-      self.service.get_loan(
-          chrome_message.LoanRequest(device_id='non_unique_id'))
 
 
 if __name__ == '__main__':

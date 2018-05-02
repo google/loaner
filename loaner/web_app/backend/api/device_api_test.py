@@ -28,12 +28,12 @@ from google.appengine.api import datastore_errors
 
 import endpoints
 
-from loaner.web_app import constants
 from loaner.web_app.backend.api import device_api
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_message
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.models import config_model
@@ -99,8 +99,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     super(DeviceApiTest, self).tearDown()
     self.service = None
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll(self, mock_directoryclass):
     """Tests Enroll with mock methods."""
     mock_directoryclient = mock_directoryclass.return_value
@@ -142,8 +141,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     with self.assertRaises(endpoints.BadRequestException):
       self.service.unenroll(request)
 
-  @mock.patch(
-      '__main__.device_model.directory.DirectoryApiClient', autospec=True)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_unenroll(self, mock_xsrf_token, mock_directoryclass):
     mock_directoryclient = mock_directoryclass.return_value
@@ -184,30 +182,28 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = device_message.DeviceRequest(
         unknown_identifier=self.device.serial_number)
     self.device.enrolled = False
-    with self.assertRaisesRegexp(
-        device_api.endpoints.BadRequestException,
-        device_model._DEVICE_NOT_ENROLLED_MSG % self.device.identifier):
+    with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.device_audit_check(request)
 
   def test_device_audit_check_device_damaged(self):
     request = device_message.DeviceRequest(
         unknown_identifier=self.device.serial_number)
     self.device.damaged = True
-    with self.assertRaisesRegexp(
-        device_api.endpoints.BadRequestException,
-        device_model._DEVICE_DAMAGED_MSG % self.device.identifier):
+    with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.device_audit_check(request)
 
-  def test_get_device_not_enrolled(self):
-    constants.ON_LOCAL = False
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_get_device_not_enrolled(self, mock_directory_class):
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.given_name.return_value = 'given name value'
     request = device_message.DeviceRequest(unknown_identifier='not-enrolled')
-    self.assertRaisesRegexp(
-        device_api.endpoints.NotFoundException,
-        device_api._NO_DEVICE_MSG % 'not-enrolled',
-        self.service.get_device, request)
+    with self.assertRaises(device_api.endpoints.NotFoundException):
+      self.service.get_device(request)
 
-  def test_get_device(self):
-    constants.ON_LOCAL = False
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_get_device(self, mock_directory_class):
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.given_name.return_value = 'given name value'
     asset_tag_response = self.service.get_device(
         device_message.DeviceRequest(asset_tag='12345'))
     chrome_device_id_response = self.service.get_device(
@@ -229,19 +225,14 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(
         self.device.device_model, urlkey_response.device_model)
 
-  def test_get_device_no_shelf(self):
-    chrome_device_id_response = self.service.get_device(
-        device_message.DeviceRequest(chrome_device_id='unique_id_3'))
-    self.assertIsNone(chrome_device_id_response.shelf)
-
-  def test_get_device_unable_to_get_shelf(self):
-    # Delete the existing shelf key from datastore.
-    self.shelf.key.delete()
-    # Make sure it raises the execption after deleteing the key.
-    with self.assertRaises(device_api.endpoints.NotFoundException):
-      self.service.get_device(
-          device_message.DeviceRequest(
-              chrome_device_id=self.device.chrome_device_id))
+  @parameterized.parameters(
+      directory.DirectoryRPCError, directory.GivenNameDoesNotExistError)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_get_device_directory_errors(self, test_error, mock_directory_class):
+    request = device_message.DeviceRequest(asset_tag='12345')
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.given_name.side_effect = test_error
+    self.assertIsNone(self.service.get_device(request).given_name)
 
   @parameterized.parameters(
       (device_message.Device(enrolled=True), 2,),
@@ -266,7 +257,10 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
             expressions=[expressions],
             returned_fields=['serial_number']))
     response = self.service.list_devices(request)
-    self.assertEqual(response, expected_response)
+    self.assertEqual(
+        response.devices[0].serial_number,
+        expected_response.devices[0].serial_number)
+    self.assertFalse(response.additional_results)
 
   def test_list_devices_with_filter_message(self):
     message = device_message.Device(
@@ -505,22 +499,16 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   def test_get_device_errors(self):
     # No identifiers.
-    self.assertRaisesRegexp(
-        device_api.endpoints.BadRequestException,
-        device_api._NO_IDENTIFIERS_MSG, device_api._get_device,
-        device_message.DeviceRequest())
+    with self.assertRaises(endpoints.BadRequestException):
+      device_api._get_device(device_message.DeviceRequest())
 
     # URL-safe key that is still URL-safe, but technically not a key.
-    self.assertRaisesRegexp(
-        device_api.endpoints.BadRequestException,
-        device_api._BAD_URLKEY_MSG % 'bad-key', device_api._get_device,
-        device_message.DeviceRequest(urlkey='bad-key'))
+    with self.assertRaises(device_api.endpoints.BadRequestException):
+      device_api._get_device(device_message.DeviceRequest(urlkey='bad-key'))
 
   def test_confirm_assignee_action(self):
     user_email = 'test@{}'.format(loanertest.USER_DOMAIN)
-    with self.assertRaisesRegexp(
-        device_api.endpoints.UnauthorizedException,
-        device_api._ASSIGNMENT_MISMATCH_MSG):
+    with self.assertRaises(endpoints.UnauthorizedException):
       device_api._confirm_assignee_action(user_email, self.device)
 
 

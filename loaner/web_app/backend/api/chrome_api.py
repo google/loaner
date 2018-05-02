@@ -21,21 +21,12 @@ from __future__ import print_function
 import endpoints
 
 from loaner.web_app.backend.api import auth
-from loaner.web_app.backend.api import device_api
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import chrome_message
-from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import device_model
 
-DEVICE_ID = u'deviceId'
-MODEL = u'model'
-ORG_UNIT_PATH = u'orgUnitPath'
-STATUS = u'status'
-SERIAL_NUMBER = u'serialNumber'
-
 _NO_DEVICE_ID_MSG = 'Device ID must be provided.'
-_NOT_GNG_MSG = 'This device was not found to be a Grab n Go Loaner.'
 
 
 @root_api.ROOT_API.api_class(resource_name='chrome', path='chrome')
@@ -77,40 +68,3 @@ class ChromeApi(root_api.Service):
     device.record_heartbeat()
     return chrome_message.HeartbeatResponse(
         is_enrolled=is_enrolled, start_assignment=start_assignment)
-
-  @auth.method(
-      chrome_message.LoanRequest,
-      chrome_message.LoanResponse,
-      name='loan',
-      path='loan',
-      http_method='POST')
-  def get_loan(self, request):
-    """Gets the current loan for a given device."""
-    if not request.device_id:
-      raise endpoints.BadRequestException(_NO_DEVICE_ID_MSG)
-
-    device = device_model.Device.get(chrome_device_id=request.device_id)
-
-    if not device:
-      raise endpoints.NotFoundException(_NOT_GNG_MSG)
-
-    if request.need_name:
-      user_email = user_lib.get_user_email()
-      directory_client = directory.DirectoryApiClient(user_email=user_email)
-      try:
-        given_name = directory_client.given_name(user_email=user_email)
-      except (
-          directory.DirectoryRPCError, directory.GivenNameDoesNotExistError):
-        given_name = None
-    else:
-      given_name = None
-
-    guest_enabled, max_extend_date, guest_permitted = device_api.get_loan_data(
-        device)
-
-    return chrome_message.LoanResponse(
-        due_date=device.due_date,
-        max_extend_date=max_extend_date,
-        given_name=given_name,
-        guest_permitted=guest_permitted,
-        guest_enabled=guest_enabled)

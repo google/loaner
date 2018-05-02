@@ -20,12 +20,16 @@ from __future__ import print_function
 
 import datetime
 
+from absl import logging
 from absl.testing import parameterized
+
+import mock
 
 from google.appengine.ext import ndb
 
 import endpoints
 
+from loaner.web_app import constants
 from loaner.web_app.backend.api.messages import device_message
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import api_utils
@@ -36,27 +40,9 @@ from loaner.web_app.backend.testing import loanertest
 
 class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
 
-  @parameterized.parameters(
-      (1, datetime.datetime(year=2018, month=1, day=1), 2),
-      (3, datetime.datetime(year=2017, month=4, day=2), None),
-      (5, None, 6),
-  )
-  def test_build_reminder_message(self, test_level, test_datetime, test_count):
-    """Test the construction of a reminder message from a reminder entity."""
-    test_reminder = device_model.Reminder(
-        level=test_level, time=test_datetime, count=test_count).put().get()
-    expected_message = device_message.Reminder(
-        level=test_level, time=test_datetime, count=test_count)
-    returned_message = api_utils.build_reminder_message(test_reminder)
-    self.assertEqual(returned_message, expected_message)
-
-  def test_build_reminder_message_no_reminder(self):
-    """Test that no reminder provided returns None."""
-    self.assertIsNone(api_utils.build_reminder_message(None))
-
-  def test_build_shelf_message(self):
-    """Test the construction of a shelf message from a shelf entitiy."""
-    test_shelf = shelf_model.Shelf(
+  def setUp(self):
+    super(ApiUtilsTest, self).setUp()
+    self.test_shelf_model = shelf_model.Shelf(
         enabled=True,
         friendly_name='test_friendly_name',
         location='test_location',
@@ -69,10 +55,10 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         responsible_for_audit='test_group',
         last_audit_time=datetime.datetime(year=2018, month=1, day=1),
         last_audit_by='test_auditer').put().get()
-
-    expected_message = shelf_messages.Shelf(
+    self.expected_shelf_message = shelf_messages.Shelf(
         shelf_request=shelf_messages.ShelfRequest(
-            location='test_location', urlsafe_key=test_shelf.key.urlsafe()),
+            location='test_location',
+            urlsafe_key=self.test_shelf_model.key.urlsafe()),
         enabled=True,
         friendly_name='test_friendly_name',
         location='test_location',
@@ -86,13 +72,105 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         last_audit_time=datetime.datetime(year=2018, month=1, day=1),
         last_audit_by='test_auditer')
 
-    returned_message = api_utils.build_shelf_message(test_shelf)
-    self.assertEqual(expected_message, returned_message)
+  def test_build_device_message_from_model(self):
+    """Test the construction of a device message from a device entity."""
+    test_device = device_model.Device(
+        serial_number='test_serial_value',
+        asset_tag='test_asset_tag_value',
+        enrolled=True,
+        device_model='test model value',
+        due_date=datetime.datetime(year=2018, month=1, day=1),
+        last_known_healthy=datetime.datetime(year=2018, month=1, day=2),
+        shelf=self.test_shelf_model.key,
+        assigned_user='user value',
+        assignment_date=datetime.datetime(year=2018, month=1, day=3),
+        current_ou=constants.ORG_UNIT_DICT['GUEST'],
+        ou_changed_date=datetime.datetime(year=2018, month=1, day=4),
+        locked=True,
+        lost=False,
+        mark_pending_return_date=datetime.datetime(year=2018, month=1, day=5),
+        chrome_device_id='device id value',
+        last_heartbeat=datetime.datetime(year=2018, month=1, day=6),
+        damaged=False,
+        damaged_reason='Not damaged',
+        last_reminder=device_model.Reminder(level=1),
+        next_reminder=device_model.Reminder(level=2),
+    ).put().get()
+    expected_message = device_message.Device(
+        serial_number='test_serial_value',
+        asset_tag='test_asset_tag_value',
+        enrolled=True,
+        device_model='test model value',
+        due_date=datetime.datetime(year=2018, month=1, day=1),
+        last_known_healthy=datetime.datetime(year=2018, month=1, day=2),
+        shelf=self.expected_shelf_message,
+        assigned_user='user value',
+        assignment_date=datetime.datetime(year=2018, month=1, day=3),
+        current_ou=constants.ORG_UNIT_DICT['GUEST'],
+        ou_changed_date=datetime.datetime(year=2018, month=1, day=4),
+        locked=True,
+        lost=False,
+        mark_pending_return_date=datetime.datetime(year=2018, month=1, day=5),
+        chrome_device_id='device id value',
+        last_heartbeat=datetime.datetime(year=2018, month=1, day=6),
+        damaged=False,
+        damaged_reason='Not damaged',
+        last_reminder=device_message.Reminder(level=1),
+        next_reminder=device_message.Reminder(level=2),
+        guest_permitted=True,
+        guest_enabled=True,
+        max_extend_date=test_device.calculate_return_dates().max,
+    )
+    actual_message = api_utils.build_device_message_from_model(
+        test_device, True)
+    self.assertEqual(actual_message, expected_message)
 
-  def test_build_shelf_message_not_found_error(self):
+  @mock.patch.object(logging, 'warning')
+  def test_build_device_message_from_model_value_mismatch(self, mock_warning):
+    class TestModel(ndb.Model):
+      serial_number = ndb.IntegerProperty(default=1)
+
+      @property
+      def guest_enabled(self):
+        return True
+
+      @property
+      def is_assigned(self):
+        return False
+
+    api_utils.build_device_message_from_model(TestModel(), False)
+    self.assertEqual(mock_warning.call_count, 1)
+
+  @parameterized.parameters(
+      (1, datetime.datetime(year=2018, month=1, day=1), 2),
+      (3, datetime.datetime(year=2017, month=4, day=2), None),
+      (5, None, 6),
+  )
+  def test_build_reminder_message_from_model(
+      self, test_level, test_datetime, test_count):
+    """Test the construction of a reminder message from a reminder entity."""
+    test_reminder = device_model.Reminder(
+        level=test_level, time=test_datetime, count=test_count).put().get()
+    expected_message = device_message.Reminder(
+        level=test_level, time=test_datetime, count=test_count)
+    returned_message = api_utils.build_reminder_message_from_model(
+        test_reminder)
+    self.assertEqual(returned_message, expected_message)
+
+  def test_build_reminder_message_from_model_no_reminder(self):
+    """Test that no reminder provided returns None."""
+    self.assertIsNone(api_utils.build_reminder_message_from_model(None))
+
+  def test_build_shelf_message_from_model(self):
+    """Test the construction of a shelf message from a shelf entitiy."""
+    actual_message = api_utils.build_shelf_message_from_model(
+        self.test_shelf_model)
+    self.assertEqual(actual_message, self.expected_shelf_message)
+
+  def test_build_shelf_message_from_model_not_found_error(self):
     """Test the failure to build a shelf message for an unknown shelf."""
     with self.assertRaises(endpoints.NotFoundException):
-      api_utils.build_shelf_message(shelf_model.Shelf())
+      api_utils.build_shelf_message_from_model(shelf_model.Shelf())
 
   def test_to_dict(self):
     """Test that a dictionary is build from a ProtoRPC message."""

@@ -85,7 +85,7 @@ class ShelfApi(root_api.Service):
   def get(self, request):
     """Get a shelf based on location."""
     self.check_xsrf_token(self.request_state)
-    return api_utils.build_shelf_message(get_shelf(request))
+    return api_utils.build_shelf_message_from_model(get_shelf(request))
 
   @auth.method(
       shelf_messages.ShelfRequest,
@@ -189,7 +189,7 @@ class ShelfApi(root_api.Service):
         raise endpoints.BadRequestException(str(err))
     for device in devices_retrieved_on_shelf.results:
       if device.doc_id not in devices_on_shelf:
-        device_model.Device.get(urlkey=device.doc_id).remove_from_shelf(
+        api_utils.get_ndb_key(device.doc_id).get().remove_from_shelf(
             shelf=shelf, user_email=user_email)
     shelf.audit(user_email=user_email)
 

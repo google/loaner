@@ -201,8 +201,10 @@ loaner_appengine_test(
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/logging",
         "@absl_archive//absl/testing:parameterized",
         "@endpoints_archive//:endpoints",
+        "@mock_archive//:mock",
     ],
 )
 

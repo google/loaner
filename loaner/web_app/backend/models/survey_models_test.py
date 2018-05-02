@@ -14,6 +14,10 @@
 
 """Tests for backend.models.survey_models."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import mock
 
 from loaner.web_app.backend.models import survey_models
@@ -39,9 +43,6 @@ class QuestionTest(loanertest.TestCase):
     self.question_text3 = 'What is the meaning of life?'
     self.question_text4 = 'What company do you work for?'
     self.create_test_questions()
-
-  def tearDown(self):
-    super(QuestionTest, self).tearDown()
 
   def create_test_answers(self):
     """Create the test answers to use in survey tests."""

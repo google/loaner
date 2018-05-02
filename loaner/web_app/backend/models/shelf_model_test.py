@@ -14,6 +14,10 @@
 
 """Tests for backend.models.shelf_model."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 
 from absl.testing import parameterized
@@ -45,9 +49,6 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
         location=self.original_location,
         capacity=self.original_capacity,
         audit_notification_enabled=True).put().get()
-
-  def tearDown(self):
-    super(ShelfModelTest, self).tearDown()
 
   def test_get_search_index(self):
     self.assertIsInstance(shelf_model.Shelf.get_index(), search.Index)

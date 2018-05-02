@@ -14,6 +14,10 @@
 
 """Tests for backend.models.configuration_model."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import itertools
 
 from absl.testing import parameterized

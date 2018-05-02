@@ -18,10 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import datetime
-
-from absl import logging
-
 from protorpc import message_types
 
 from google.appengine.api import datastore_errors
@@ -33,6 +29,7 @@ from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
 from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.lib import user as user_lib
@@ -124,25 +121,17 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.GET_DEVICE)
   def get_device(self, request):
     """Gets a device using any identifier in device_message.DeviceRequest."""
-    device = _get_device(request)
-    last_reminder_message = api_utils.build_reminder_message(
-        device.last_reminder)
-    next_reminder_message = api_utils.build_reminder_message(
-        device.next_reminder)
-
-    guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
-    if device.shelf:
-      shelf_message = api_utils.build_shelf_message(device.shelf.get())
-    else:
-      shelf_message = None
-
-    device = _build_device_message(
-        device=device, shelf_message=shelf_message,
-        last_reminder_message=last_reminder_message,
-        next_reminder_message=next_reminder_message,
-        guest_enabled=guest_enabled, max_extend_date=max_extend_date,
-        guest_permitted=guest_permitted)
-    return device
+    user_email = user_lib.get_user_email()
+    directory_client = directory.DirectoryApiClient(user_email)
+    try:
+      given_name = directory_client.given_name(user_email)
+    except (
+        directory.DirectoryRPCError, directory.GivenNameDoesNotExistError):
+      given_name = None
+    message = api_utils.build_device_message_from_model(
+        _get_device(request), config_model.Config.get('allow_guest_mode'))
+    message.given_name = given_name
+    return message
 
   @auth.method(
       device_message.Device,
@@ -176,20 +165,12 @@ class DeviceApi(root_api.Service):
     new_search_cursor = None
     if search_results.cursor:
       new_search_cursor = search_results.cursor.web_safe_string
+    guest_permitted = config_model.Config.get('allow_guest_mode')
     messages = []
     for document in search_results.results:
-      message = search_utils.document_to_message(
-          document, device_message.Device())
-      device = _get_device(device_message.DeviceRequest(urlkey=document.doc_id))
-      guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
-      message.guest_enabled = guest_enabled
-      message.max_extend_date = max_extend_date
-      message.guest_permitted = guest_permitted
-      message.next_reminder = api_utils.build_reminder_message(
-          device.next_reminder)
-      message.last_reminder = api_utils.build_reminder_message(
-          device.last_reminder)
-      messages.append(message)
+      device = api_utils.get_ndb_key(document.doc_id).get()
+      messages.append(
+          api_utils.build_device_message_from_model(device, guest_permitted))
 
     return device_message.ListDevicesResponse(
         devices=messages,
@@ -209,21 +190,11 @@ class DeviceApi(root_api.Service):
     del roles_permitted  # Unused, as this is only for assignees.
     self.check_xsrf_token(self.request_state)
     user = user_lib.get_user_email()
+    guest_permitted = config_model.Config.get('allow_guest_mode')
     device_messages = []
     for device in device_model.Device.list_by_user(user):
-      guest_enabled, max_extend_date, guest_permitted = get_loan_data(device)
       device_messages.append(
-          device_message.Device(
-              serial_number=device.serial_number,
-              asset_tag=device.asset_tag,
-              device_model=device.device_model,
-              due_date=device.due_date,
-              last_heartbeat=device.last_heartbeat,
-              assignment_date=device.assignment_date,
-              max_extend_date=max_extend_date,
-              mark_pending_return_date=device.mark_pending_return_date,
-              guest_enabled=guest_enabled,
-              guest_permitted=guest_permitted))
+          api_utils.build_device_message_from_model(device, guest_permitted))
     return device_message.ListUserDeviceResponse(devices=device_messages)
 
   @auth.method(
@@ -355,59 +326,6 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
 
-def _build_device_message(
-    device, shelf_message, last_reminder_message, next_reminder_message,
-    max_extend_date=None, guest_enabled=None, guest_permitted=None):
-  """Builds a device_message.Device message with the passed device's attributes.
-
-  Args:
-    device: device_model.Device, an instance of device used to populate the
-        ProtoRPC message.
-    shelf_message: ProtoRPC message containing a shelf_messages.Shelf.
-    last_reminder_message: ProtoRPC message containing a
-        device_message.Reminder.
-    next_reminder_message: ProtoRPC message containing a
-        device_message.Reminder.
-    max_extend_date: datetime, Indicates maximum extend date a device can have.
-    guest_enabled: bool, Indicates if guest mode has been already enabled.
-    guest_permitted: bool, Indicates if guest mode has been allowed.
-
-  Returns:
-    A device_message.Device ProtoRPC message.
-  """
-  message = device_message.Device(
-      serial_number=device.serial_number,
-      asset_tag=device.asset_tag,
-      urlkey=device.key.urlsafe(),
-      enrolled=device.enrolled,
-      device_model=device.device_model,
-      due_date=device.due_date,
-      last_known_healthy=device.last_known_healthy,
-      shelf=shelf_message,
-      assigned_user=device.assigned_user,
-      assignment_date=device.assignment_date,
-      current_ou=device.current_ou,
-      ou_changed_date=device.ou_changed_date,
-      locked=device.locked,
-      lost=device.lost,
-      mark_pending_return_date=device.mark_pending_return_date,
-      chrome_device_id=device.chrome_device_id,
-      last_heartbeat=device.last_heartbeat,
-      damaged=device.damaged,
-      damaged_reason=device.damaged_reason,
-      last_reminder=last_reminder_message,
-      next_reminder=next_reminder_message)
-
-  if max_extend_date is not None:
-    message.max_extend_date = max_extend_date
-  if guest_enabled is not None:
-    message.guest_enabled = guest_enabled
-  if guest_permitted is not None:
-    message.guest_permitted = guest_permitted
-
-  return message
-
-
 def _get_identifier_from_request(device_request):
   """Parses the DeviceMessage for an identifier to use to get a Device entity.
 
@@ -450,14 +368,7 @@ def _get_device(device_request):
   device_identifier = _get_identifier_from_request(device_request)
 
   if device_identifier == 'urlkey':
-    try:
-      device = device_model.Device.get(urlkey=device_request.urlkey)
-    except device_model.DeviceIdentifierError as e:
-      logging.error(
-          'Invalid URL-safe key rased a %s error (key: %s, error: %s).',
-          str(type(e)), device_request.urlkey, e)
-      raise endpoints.BadRequestException(
-          _BAD_URLKEY_MSG % device_request.urlkey)
+    device = api_utils.get_ndb_key(device_request.urlkey).get()
   else:
     device = device_model.Device.get(
         **{device_identifier: getattr(device_request, device_identifier)})
@@ -479,27 +390,3 @@ def _confirm_assignee_action(user_email, device):
   """
   if device.assigned_user != user_email:
     raise endpoints.UnauthorizedException(_ASSIGNMENT_MISMATCH_MSG)
-
-
-def get_loan_data(device):
-  """Retrieves the data from the device model regarding a loan.
-
-  Args:
-    device: device_model.Device, the device that the method will extract data
-        related to particular loan.
-
-  Returns:
-    A tuple of: (Guest already enabled for this loan, max_extend_date, guest
-        permitted to this application)
-  """
-  guest_enabled = None
-  max_extend_date = None
-  guest_permitted = None
-  if device.is_assigned:
-    guest_enabled = device.guest_enabled
-    max_extend_date_time, default_date = device.calculate_return_dates()
-    del default_date  # Unused.
-    max_extend_date = datetime.datetime.combine(
-        max_extend_date_time.date(), datetime.datetime.min.time())
-    guest_permitted = config_model.Config.get('allow_guest_mode')
-  return (guest_enabled, max_extend_date, guest_permitted)

@@ -14,6 +14,10 @@
 
 """Model representing a single-question survey and its answers."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import collections
 import random
 
@@ -141,7 +145,7 @@ class Question(base_model.BaseModel):
     total_weight = 0
     questions = []
     active_questions = cls.query(ndb.AND(
-        cls.enabled == True, cls.question_type == question_type)).fetch()  # pylint: disable=g-explicit-bool-comparison
+        cls.enabled == True, cls.question_type == question_type)).fetch()  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
     for question in active_questions:
       total_weight += question.rand_weight
       questions.append(

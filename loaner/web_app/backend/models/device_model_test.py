@@ -14,6 +14,10 @@
 
 """Tests for backend.models.device_model."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import datetime
 
 import freezegun
@@ -326,11 +330,8 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     for device in test_devices:
       device.put()
 
-    self.assertRaises(
-        device_model.DeviceIdentifierError, device_model.Device.get)  # No args.
-    self.assertRaises(
-        device_model.DeviceIdentifierError, device_model.Device.get,
-        urlkey='not_valid')  # Invalid key.
+    with self.assertRaises(device_model.DeviceIdentifierError):
+      device_model.Device.get()  # No args.
 
     self.assertEqual(
         device_model.Device.get(asset_tag='asset_tag_0').serial_number,
@@ -341,9 +342,6 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.assertEqual(
         device_model.Device.get(chrome_device_id='chrome_id_2').asset_tag,
         'asset_tag_2')
-    self.assertEqual(
-        device_model.Device.get(urlkey=test_devices[0].key.urlsafe()).asset_tag,
-        'asset_tag_0')
 
     # Unknown_identifier is can take either an asset tag or serial number.
     self.assertEqual(

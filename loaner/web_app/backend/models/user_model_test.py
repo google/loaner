@@ -14,6 +14,10 @@
 
 """Tests for backend.models.user_model."""
 
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 

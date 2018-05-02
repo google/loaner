@@ -87,6 +87,7 @@ class Device(messages.Message):
     max_extend_date: datetime, Indicates maximum extend date a device can have.
     guest_enabled: bool, Indicates if guest mode has been already enabled.
     guest_permitted: bool, Indicates if guest mode has been allowed.
+    given_name: str, The given name for the user.
     query: shared_message.SearchRequest, a message containing query options to
         conduct a search on an index.
   """
@@ -116,7 +117,8 @@ class Device(messages.Message):
   max_extend_date = message_types.DateTimeField(24)
   guest_enabled = messages.BooleanField(25)
   guest_permitted = messages.BooleanField(26)
-  query = messages.MessageField(shared_messages.SearchRequest, 27)
+  given_name = messages.StringField(27)
+  query = messages.MessageField(shared_messages.SearchRequest, 28)
 
 
 class ListDevicesResponse(messages.Message):
