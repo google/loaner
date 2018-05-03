@@ -33,9 +33,9 @@ from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
 
+DEVICE_NOT_ENROLLED_MSG = 'Device %s is not enrolled in the application.'
 _GUEST_MODE_DISABLED_MSG = (
     'Cannot enable Guest mode because the administrator has disabled it.')
-_DEVICE_NOT_ENROLLED_MSG = 'Device %s is not enrolled in the application.'
 _DEVICE_DAMAGED_MSG = (
     'Unable to check Device %s into a shelf because it was reported damaged.')
 _DIRECTORY_INFO_INCOMPLETE_MSG = (
@@ -736,7 +736,7 @@ class Device(base_model.BaseModel):
       UnableToMoveToShelfError: when a deivce can not be checked into a shelf.
     """
     if not self.enrolled:
-      raise DeviceNotEnrolledError(_DEVICE_NOT_ENROLLED_MSG % self.identifier)
+      raise DeviceNotEnrolledError(DEVICE_NOT_ENROLLED_MSG % self.identifier)
     if self.damaged:
       raise UnableToMoveToShelfError(_DEVICE_DAMAGED_MSG % self.identifier)
 

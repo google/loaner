@@ -121,6 +121,10 @@ class DeviceApi(root_api.Service):
       permission=permissions.Permissions.GET_DEVICE)
   def get_device(self, request):
     """Gets a device using any identifier in device_message.DeviceRequest."""
+    device = _get_device(request)
+    if not device.enrolled:
+      raise endpoints.BadRequestException(
+          device_model.DEVICE_NOT_ENROLLED_MSG % device.identifier)
     user_email = user_lib.get_user_email()
     directory_client = directory.DirectoryApiClient(user_email)
     try:
@@ -129,7 +133,7 @@ class DeviceApi(root_api.Service):
         directory.DirectoryRPCError, directory.GivenNameDoesNotExistError):
       given_name = None
     message = api_utils.build_device_message_from_model(
-        _get_device(request), config_model.Config.get('allow_guest_mode'))
+        device, config_model.Config.get('allow_guest_mode'))
     message.given_name = given_name
     return message
 

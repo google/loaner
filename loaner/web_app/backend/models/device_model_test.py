@@ -691,7 +691,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.test_device.enrolled = False
     with self.assertRaisesRegexp(
         device_model.DeviceNotEnrolledError,
-        device_model._DEVICE_NOT_ENROLLED_MSG % (
+        device_model.DEVICE_NOT_ENROLLED_MSG % (
             self.test_device.identifier)):
       self.test_device.device_audit_check()
 

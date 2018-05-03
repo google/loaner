@@ -193,11 +193,18 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       self.service.device_audit_check(request)
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
-  def test_get_device_not_enrolled(self, mock_directory_class):
+  def test_get_device_not_found(self, mock_directory_class):
     mock_directory_client = mock_directory_class.return_value
     mock_directory_client.given_name.return_value = 'given name value'
-    request = device_message.DeviceRequest(unknown_identifier='not-enrolled')
+    request = device_message.DeviceRequest(unknown_identifier='not-found')
     with self.assertRaises(device_api.endpoints.NotFoundException):
+      self.service.get_device(request)
+
+  def test_get_device_unenrolled(self):
+    request = device_message.DeviceRequest(
+        unknown_identifier=self.device.serial_number)
+    self.device.enrolled = False
+    with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.get_device(request)
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
