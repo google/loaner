@@ -39,6 +39,7 @@ export declare interface DeviceApiParams {
   max_extend_date?: number;
   guest_enabled?: boolean;
   guest_permitted?: boolean;
+  query?: {query_string?: string;};
 }
 
 export declare interface DeviceRequestApiParams {
@@ -70,7 +71,7 @@ export class Device {
   /** Device that's not known upfront by the frontend. */
   unknownIdentifier: string;
   /** Computer model of the device. */
-  deviceModel = '';
+  deviceModel = 'Unknown Device Model';
   /** When it was last updated on our application. */
   lastUpdate: Date;
   /** Which shelf the device is currently assigned to. */

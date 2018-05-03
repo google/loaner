@@ -70,8 +70,8 @@ export class ShelfService extends ApiService {
   /**
    * Lists all shelves enrolled in the program.
    */
-  list(): Observable<Shelf[]> {
-    return this.post<ListShelfResponse>('list').pipe(map(res => {
+  list(filters: ShelfApiParams = {}): Observable<Shelf[]> {
+    return this.post<ListShelfResponse>('list', filters).pipe(map(res => {
       const retrievedShelves = res;
       return (retrievedShelves['shelves'] || [])
           .map((retrievedShelf: ShelfApiParams) => new Shelf(retrievedShelf));

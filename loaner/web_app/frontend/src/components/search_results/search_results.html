@@ -1,0 +1,39 @@
+
+<mat-card *ngIf="model && resultsLength === 0">
+  <mat-card-title mat-title>
+    Search results for {{ model }} matching "{{ query }}"
+  </mat-card-title>
+  <mat-card-content>
+    No results found for {{ query }}.
+  </mat-card-content>
+</mat-card>
+
+<mat-card *ngIf="resultsLength !== 0">
+  <mat-card-title mat-title>
+    Search results for {{ model }} matching "{{ query }}"
+  </mat-card-title>
+  <mat-card-content>
+    <mat-nav-list *ngIf="model === 'device'">
+      <mat-list-item *ngFor="let device of results"
+                     [routerLink]="['/device/', device.id]">
+        <mat-icon mat-list-icon>laptop_chromebook</mat-icon>
+        <h4 mat-line>
+          {{ device.deviceModel }}
+        </h4>
+        <p mat-line>Serial Number: {{ device.serialNumber }}</p>
+        <p mat-line *ngIf="device.assetTag">Asset Tag: {{ device.assetTag }}</p>
+      </mat-list-item>
+    </mat-nav-list>
+    <mat-nav-list *ngIf="model === 'shelf'">
+      <mat-list-item *ngFor="let shelf of results"
+                      [routerLink]="['/shelf/', shelf.location, 'details']">
+        <mat-icon mat-list-icon>view_list</mat-icon>
+        <h4 mat-line>
+          {{ shelf.name }}
+        </h4>
+        <p mat-line *ngIf="shelf.lastAuditTime">Last Audited: {{ shelf.lastAuditTime | date }}</p>
+        <p mat-line *ngIf="shelf.capacity">Shelf Capacity: {{ shelf.capacity }}</p>
+      </mat-list-item>
+    </mat-nav-list>
+  </mat-card-content>
+</mat-card>

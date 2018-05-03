@@ -22,6 +22,7 @@ import {AuditView, AuditViewModule} from './views/audit_view';
 import {BootstrapView, BootstrapViewModule} from './views/bootstrap_view';
 import {DeviceDetailView, DeviceDetailViewModule} from './views/device_detail_view';
 import {DeviceListView, DeviceListViewModule} from './views/device_list_view';
+import {SearchView, SearchViewModule} from './views/search_view';
 import {ShelfActionsView, ShelfActionsViewModule} from './views/shelf_actions_view';
 import {ShelfDetailView, ShelfDetailViewModule} from './views/shelf_detail_view';
 import {ShelfListView, ShelfListViewModule} from './views/shelf_list_view';
@@ -37,6 +38,47 @@ const routes: Routes = [
     data: {
       'requiredRoles': [CONFIG.roles.TECHNICAL_ADMIN],
     },
+  },
+  {
+    path: 'search',
+    children: [
+      {
+        path: '',
+        component: SearchView,
+        canActivate: [AuthGuard],
+        data: {
+          'requiredRoles': [
+            CONFIG.roles.TECHNICAL_ADMIN,
+            CONFIG.roles.TECHNICIAN,
+            CONFIG.roles.OPERATIONAL_ADMIN,
+          ],
+        },
+      },
+      {
+        path: ':model',
+        component: SearchView,
+        canActivate: [AuthGuard],
+        data: {
+          'requiredRoles': [
+            CONFIG.roles.TECHNICAL_ADMIN,
+            CONFIG.roles.TECHNICIAN,
+            CONFIG.roles.OPERATIONAL_ADMIN,
+          ],
+        },
+      },
+      {
+        path: ':model/:query',
+        component: SearchView,
+        canActivate: [AuthGuard],
+        data: {
+          'requiredRoles': [
+            CONFIG.roles.TECHNICAL_ADMIN,
+            CONFIG.roles.TECHNICIAN,
+            CONFIG.roles.OPERATIONAL_ADMIN,
+          ],
+        },
+      },
+    ],
   },
   {
     path: 'user',
@@ -178,6 +220,7 @@ const routes: Routes = [
     ShelfActionsViewModule,
     DeviceDetailViewModule,
     DeviceListViewModule,
+    SearchViewModule,
     ShelfDetailViewModule,
     ShelfListViewModule,
     UserViewModule,

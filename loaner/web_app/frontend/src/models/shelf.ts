@@ -35,6 +35,7 @@ export declare interface ShelfApiParams {
   responsible_for_audit?: string;
   device_identifiers?: string[];
   shelf_request?: ShelfRequestParams;
+  query?: {query_string?: string;};
 }
 
 export class Shelf {

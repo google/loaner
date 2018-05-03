@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Location} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 
@@ -35,7 +36,8 @@ export class ShelfDetails implements OnInit {
   constructor(
       private readonly shelfService: ShelfService,
       private readonly router: Router, private readonly route: ActivatedRoute,
-      private readonly dialogBox: Dialog) {}
+      private readonly dialogBox: Dialog, private readonly location: Location) {
+  }
 
   ngOnInit() {
     if (!this.shelf) {
@@ -64,6 +66,6 @@ export class ShelfDetails implements OnInit {
 
   /** Navigates to the previous expected page. */
   back() {
-    this.router.navigate(['/shelves']);
+    this.location.back();
   }
 }
