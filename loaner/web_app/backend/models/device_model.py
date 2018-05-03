@@ -27,6 +27,7 @@ from google.appengine.api import datastore_errors
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
+from loaner.web_app import config_defaults
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import events
@@ -51,6 +52,9 @@ _UNASSIGNED_DEVICE = (
 _ASSET_TAGS_REQUIRED_MSG = (
     'The administrator requires asset tags to be present when enrolling a '
     'device but one was not provided.')
+_SERIAL_NUMBERS_REQUIRED_MSG = (
+    'The administrator requires Chrome device serial numbers to be present '
+    'when enrolling a device but one was not provided.')
 
 
 class Error(Exception):
@@ -149,7 +153,7 @@ class Device(base_model.BaseModel):
         the device had.
     next_reminder: Reminder, Level, time, and count of the next reminder.
   """
-  serial_number = ndb.StringProperty(required=True)
+  serial_number = ndb.StringProperty()
   asset_tag = ndb.StringProperty()
   enrolled = ndb.BooleanProperty(default=True)
   device_model = ndb.StringProperty()
@@ -218,12 +222,12 @@ class Device(base_model.BaseModel):
             cls.mark_pending_return_date == None)).fetch()  # pylint: disable=g-equals-none,singleton-comparison
 
   @classmethod
-  def enroll(cls, serial_number, user_email, asset_tag=None):
+  def enroll(cls, user_email, serial_number=None, asset_tag=None):
     """Enrolls a new device.
 
     Args:
-      serial_number: str, serial number of the device.
       user_email: str, email address of the user making the request.
+      serial_number: str, serial number of the device.
       asset_tag: str, optional, asset tag of the device.
 
     Returns:
@@ -234,70 +238,71 @@ class Device(base_model.BaseModel):
           directory API responds with incomplete information or if the device is
           not found in the directory API.
     """
-    if config_model.Config.get('use_asset_tags') and not asset_tag:
+    device_identifier_mode = config_model.Config.get('device_identifier_mode')
+    if not asset_tag and device_identifier_mode in (
+        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED,
+        config_defaults.DeviceIdentifierMode.ASSET_TAG):
       raise datastore_errors.BadValueError(_ASSET_TAGS_REQUIRED_MSG)
-
+    elif not serial_number and device_identifier_mode in (
+        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED,
+        config_defaults.DeviceIdentifierMode.SERIAL_NUMBER):
+      raise datastore_errors.BadValueError(_SERIAL_NUMBERS_REQUIRED_MSG)
     directory_client = directory.DirectoryApiClient(user_email)
-    device = cls.get(asset_tag=asset_tag, serial_number=serial_number)
+    device = cls.get(serial_number=serial_number, asset_tag=asset_tag)
     now = datetime.datetime.utcnow()
-    was_lost_or_locked = False
 
-    if device:
-      logging.info('Previous device found, re-enrolling.')
-
-      if device.locked:
-        was_lost_or_locked = True
-        device.unlock(user_email)
-      if device.lost:
-        was_lost_or_locked = True
-        device.lost = False
-
-      try:
-        device.move_to_default_ou(user_email=user_email)
-      except UnableToMoveToDefaultOUError as err:
-        raise DeviceCreationError(str(err))
-      device.enrolled = True
-      device.asset_tag = asset_tag
-      device.last_known_healthy = now
-      device.mark_pending_return_date = None
+    existing_device = bool(device)
+    if existing_device:
+      device = _update_existing_device(device, user_email, asset_tag)
     else:
-      try:
-        dir_device = directory_client.get_chrome_device_by_serial(serial_number)
-      except directory.DeviceDoesNotExistError as err:
-        raise DeviceCreationError(str(err))
+      device = cls(serial_number=serial_number, asset_tag=asset_tag)
 
-      if dir_device[
-          directory.ORG_UNIT_PATH] != constants.ORG_UNIT_DICT['DEFAULT']:
-        try:
-          directory_client.move_chrome_device_org_unit(
-              device_id=dir_device[directory.DEVICE_ID],
-              org_unit_path=constants.ORG_UNIT_DICT['DEFAULT'])
-        except directory.DirectoryRPCError as err:
-          raise DeviceCreationError(
-              _FAILED_TO_MOVE_DEVICE_MSG % (
-                  serial_number, constants.ORG_UNIT_DICT['DEFAULT'],
-                  str(err)))
+    identifier = serial_number or asset_tag
+    logging.info('Enrolling device %s', identifier)
+    device = events.raise_event('device_enroll', device=device)
+    if device.serial_number:
+      serial_number = device.serial_number
+    else:
+      raise DeviceCreationError('No serial number for device.')
 
-      try:
-        device = cls(
-            serial_number=serial_number,
-            asset_tag=asset_tag,
-            device_model=dir_device.get(directory.MODEL),
-            last_known_healthy=now,
-            current_ou=constants.ORG_UNIT_DICT['DEFAULT'],
-            ou_changed_date=now,
-            chrome_device_id=dir_device[directory.DEVICE_ID])
-      except KeyError:
-        raise DeviceCreationError(_DIRECTORY_INFO_INCOMPLETE_MSG)
+    if not existing_device:
+      # If this implementation of the app can translate asset tags to serial
+      # numbers, recheck for an existing device now that we may have the serial.
+      if device_identifier_mode == (
+          config_defaults.DeviceIdentifierMode.ASSET_TAG):
+        device_by_serial = cls.get(serial_number=serial_number)
+        if device_by_serial:
+          device = _update_existing_device(
+              device_by_serial, user_email, asset_tag)
+          existing_device = True
 
-    logging.info('Enrolling device %s', serial_number)
+    try:
+      # Get a Chrome OS Device object as per
+      # https://developers.google.com/admin-sdk/directory/v1/reference/chromeosdevices
+      directory_device_object = directory_client.get_chrome_device_by_serial(
+          serial_number)
+    except directory.DeviceDoesNotExistError as err:
+      raise DeviceCreationError(str(err))
+    try:
+      device.chrome_device_id = directory_device_object[directory.DEVICE_ID]
+      device.current_ou = directory.ORG_UNIT_PATH
+      device.device_model = directory_device_object.get(directory.MODEL)
+    except KeyError:
+      raise DeviceCreationError(_DIRECTORY_INFO_INCOMPLETE_MSG)
+
+    try:
+      directory_client.move_chrome_device_org_unit(
+          device_id=directory_device_object[directory.DEVICE_ID],
+          org_unit_path=constants.ORG_UNIT_DICT['DEFAULT'])
+    except directory.DirectoryRPCError as err:
+      raise DeviceCreationError(
+          _FAILED_TO_MOVE_DEVICE_MSG % (
+              serial_number, constants.ORG_UNIT_DICT['DEFAULT'], str(err)))
+    device.current_ou = constants.ORG_UNIT_DICT['DEFAULT']
+    device.ou_changed_date = now
+    device.last_known_healthy = now
     device.put()
     device.stream_to_bq(user_email, 'Enrolling device.')
-
-    if was_lost_or_locked:
-      events.raise_event('device_enroll_lost_or_locked', device=device)
-    else:
-      events.raise_event('device_enroll', device=device)
     return device
 
   def unenroll(self, user_email):
@@ -334,10 +339,9 @@ class Device(base_model.BaseModel):
     self.mark_pending_return_date = None
     self.last_reminder = None
     self.next_reminder = None
-
+    self = events.raise_event('device_unenroll', device=self)
     self.put()
     self.stream_to_bq(user_email, 'Unenrolling device.')
-    events.raise_event('device_unenroll', device=self)
     return self
 
   @classmethod
@@ -486,9 +490,9 @@ class Device(base_model.BaseModel):
     self.shelf = None
     self.due_date = self.calculate_return_dates().default
     self.move_to_default_ou(user_email=user_email)
+    self = events.raise_event('device_loan_assign', device=self)
     self.put()
     self.stream_to_bq(user_email, 'Beginning new loan.')
-    events.raise_event('device_loan_assign', device=self)
     return self.key
 
   def resume_loan(self, user_email, message='Resuming loan.'):
@@ -555,7 +559,6 @@ class Device(base_model.BaseModel):
     Returns:
       The key of the datastore record.
     """
-    events.raise_event('device_loan_return', device=self)
     if self.lost:
       self.lost = False
     if self.locked:
@@ -567,6 +570,7 @@ class Device(base_model.BaseModel):
     self.move_to_default_ou(user_email=user_email)
     self.last_reminder = None
     self.next_reminder = None
+    self = events.raise_event('device_loan_return', device=self)
     self.put()
     self.stream_to_bq(user_email, 'Marking device as returned.')
     return self.key
@@ -777,3 +781,35 @@ class Device(base_model.BaseModel):
         self.stream_to_bq(
             user_email, 'Removing device: {} from shelf: {}'.format(
                 self.identifier, shelf.location))
+
+
+def _update_existing_device(device, user_email, asset_tag=None):
+  """Updates an existing device entity during a re-enrollment.
+
+  Args:
+    device: Device model to update.
+    user_email: str, email address of the user making a Directory API request.
+    asset_tag: str, unique org-specific identifier for the device (if
+        available).
+
+  Returns:
+    A modified device model.
+  """
+  logging.info('Previous device found, re-enrolling.')
+  try:
+    device.move_to_default_ou(user_email=user_email)
+  except UnableToMoveToDefaultOUError as err:
+    raise DeviceCreationError(str(err))
+  device.enrolled = True
+  device.asset_tag = asset_tag
+  device.last_known_healthy = datetime.datetime.utcnow()
+  device.assigned_user = None
+  device.assignment_date = None
+  device.due_date = None
+  device.last_reminder = None
+  device.mark_pending_return_date = None
+  device.max_extend_date = None
+  device.next_reminder = None
+  device.return_date = None
+  device.shelf = None
+  return device

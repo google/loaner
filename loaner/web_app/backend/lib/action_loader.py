@@ -26,7 +26,10 @@ from absl import logging
 
 from loaner.web_app.backend.actions import base_action
 
+_DUPLICATE_ACTION_MSG = (
+    'Cannot load Action %s: there is already an Action of that name.')
 _INSTANTIATION_ERROR_MSG = 'Error instantiating class %s in module %s: %s'
+_CACHED_ACTIONS = None
 
 
 def load_actions(filters=None, log_exceptions=True):
@@ -46,7 +49,10 @@ def load_actions(filters=None, log_exceptions=True):
     AttributeError: if log_exceptions is False and Action classes are missing
         ACTION_NAME or FRIENDLY_NAME attributes, or the run method.
   """
-  actions = {}
+  global _CACHED_ACTIONS
+  if _CACHED_ACTIONS:
+    return _CACHED_ACTIONS
+  actions = {base_action.ActionType.SYNC: {}, base_action.ActionType.ASYNC: {}}
   importer = pkgutil.ImpImporter(os.path.abspath(
       os.path.join(os.path.dirname(__file__), '..', 'actions')))
   for module_name, module in importer.iter_modules():
@@ -62,14 +68,23 @@ def load_actions(filters=None, log_exceptions=True):
       if inspect.isclass(obj) and issubclass(obj, base_action.BaseAction):
         if filters and obj.ACTION_NAME not in filters:
           continue
+        # Defaults to async for backward compatibility.
+        action_type = getattr(obj, 'ACTION_TYPE', base_action.ActionType.ASYNC)
         try:
-          actions[obj.ACTION_NAME] = obj()
+          action = obj()
         except AttributeError as e:
           error_message = _INSTANTIATION_ERROR_MSG % (
               obj_name, module_name, e.message)
           if log_exceptions:
             logging.warning(error_message)
+            continue
           else:
             raise AttributeError(error_message)
-
+        if (
+            action.ACTION_NAME in actions[base_action.ActionType.SYNC] or
+            action.ACTION_NAME in actions[base_action.ActionType.ASYNC]):
+          logging.warning(_DUPLICATE_ACTION_MSG, obj.ACTION_NAME)
+          continue
+        actions[action_type][action.ACTION_NAME] = action
+  _CACHED_ACTIONS = actions
   return actions

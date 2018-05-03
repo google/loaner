@@ -18,59 +18,119 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl import logging
+from absl.testing import parameterized
+
 from loaner.web_app.backend.actions import base_action
+from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class BaseActionTest(loanertest.TestCase):
+class TestActionNoActionName(base_action.BaseAction):
+  FRIENDLY_NAME = 'A test action'
+
+  def run(self, device=None):
+    del device  # Unused.
+    return 'foo'
+
+no_action_name_error = base_action._NO_ACTION_NAME_MSG % (
+    'TestActionNoActionName')
+
+
+class TestActionNoFriendlyName(base_action.BaseAction):
+  ACTION_NAME = 'test'
+
+  def run(self, device=None):
+    del device  # Unused.
+    return 'foo'
+
+no_friendly_name_error = base_action._NO_FRIENDLY_NAME_MSG % (
+    'TestActionNoFriendlyName')
+
+
+class TestActionNoRunMethod(base_action.BaseAction):
+  ACTION_NAME = 'test'
+  FRIENDLY_NAME = 'A test action'
+
+no_run_method_error = base_action._NO_RUN_METHOD_MSG % 'TestActionNoRunMethod'
+
+
+class TestActionBadSyncRunMethod(base_action.BaseAction):
+  ACTION_NAME = 'test'
+  FRIENDLY_NAME = 'A test action'
+  ACTION_TYPE = base_action.ActionType.SYNC
+
+  def run(self, device=None):
+    del device  # Unused.
+
+bad_sync_run_method_error = base_action._BAD_SYNC_RUN_MSG % (
+    'TestActionBadSyncRunMethod')
+
+
+class TestActionBadAsyncRunMethod(base_action.BaseAction):
+  ACTION_NAME = 'test'
+  FRIENDLY_NAME = 'A test action'
+  ACTION_TYPE = base_action.ActionType.ASYNC
+
+  def run(self, device=None):
+    return device
+
+bad_async_run_method_error = base_action._BAD_ASYNC_RUN_MSG % (
+    'TestActionBadAsyncRunMethod')
+
+
+class TestActionSyncSuccess(base_action.BaseAction):
+  ACTION_NAME = 'test'
+  FRIENDLY_NAME = 'A test action'
+  ACTION_TYPE = base_action.ActionType.SYNC
+
+  def run(self, device=None):
+    logging.info('blah')
+    return device
+
+
+class TestActionAsyncSuccess(base_action.BaseAction):
+  ACTION_NAME = 'test'
+  FRIENDLY_NAME = 'A test action'
+  ACTION_TYPE = base_action.ActionType.ASYNC
+
+  def run(self, device=None):
+    del device  # Unused.
+    logging.info('blah')
+
+
+class BaseActionTest(parameterized.TestCase, loanertest.TestCase):
   """Test the BaseAction class."""
 
-  def test_success(self):
+  @parameterized.parameters(
+      (TestActionNoActionName, no_action_name_error),
+      (TestActionNoFriendlyName, no_friendly_name_error),
+      (TestActionNoRunMethod, no_run_method_error)
+  )
+  def test_failures_missing_attributes(self, test_class, error):
+    self.assertRaisesWithLiteralMatch(AttributeError, error, test_class)
 
-    class TestActionClass(base_action.BaseAction):
-      ACTION_NAME = 'test'
-      FRIENDLY_NAME = 'A test action'
+  @parameterized.parameters(
+      (TestActionBadSyncRunMethod, bad_sync_run_method_error),
+      (TestActionBadAsyncRunMethod, bad_async_run_method_error),
+  )
+  def test_failures_bad_run_methods(self, test_class, error):
+    test_device = device_model.Device()
+    test_instance = test_class()
+    self.assertRaisesWithLiteralMatch(
+        TypeError, error, test_instance.run, device=test_device)
 
-      def run(self):
-        return 'foo'
+  def test_run_success_sync(self):
+    test_device = device_model.Device()
+    test_instance = TestActionSyncSuccess()
+    test_response = test_instance.run(device=test_device)
+    self.assertEqual(test_device, test_response)
 
-    test_instance = TestActionClass()
-    self.assertEqual(test_instance.run(), 'foo')
-
-  def test_failure_no_action_name(self):
-
-    class TestActionClass(base_action.BaseAction):
-      FRIENDLY_NAME = 'A test action'
-
-      def run(self):
-        return 'foo'
-
-    expected_error_message = base_action._NO_ACTION_NAME_MSG % 'TestActionClass'
-    self.assertRaisesRegexp(
-        AttributeError, expected_error_message, TestActionClass)
-
-  def test_failure_no_friendly_name(self):
-
-    class TestActionClass(base_action.BaseAction):
-      ACTION_NAME = 'test'
-
-      def run(self):
-        return 'foo'
-
-    expected_error_message = base_action._NO_FRIENDLY_NAME_MSG % (
-        'TestActionClass')
-    self.assertRaisesRegexp(
-        AttributeError, expected_error_message, TestActionClass)
-
-  def test_failure_no_run_method(self):
-
-    class TestActionClass(base_action.BaseAction):
-      ACTION_NAME = 'test'
-      FRIENDLY_NAME = 'A test action'
-
-    expected_error_message = base_action._NO_RUN_METHOD_MSG % 'TestActionClass'
-    self.assertRaisesRegexp(
-        AttributeError, expected_error_message, TestActionClass)
+  def test_run_success_async(self):
+    test_device = device_model.Device()
+    test_instance = TestActionAsyncSuccess()
+    test_response = test_instance.run(device=test_device)
+    self.assertIsNone(test_response)
 
 
 if __name__ == '__main__':

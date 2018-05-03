@@ -22,25 +22,16 @@ from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import send_email
 
 
-class Error(Exception):
-  """General Error class for this module."""
-
-
-class SendThanksError(Error):
-  """Error raised when we cannot send the requested e-mail."""
-
-
 class SendThanks(base_action.BaseAction):
   """Action class to send a thank-you e-mail to a former device assignee."""
 
   ACTION_NAME = 'send_return_thanks'
   FRIENDLY_NAME = 'Send a thank you email for a return'
+  ACTION_TYPE = base_action.ActionType.ASYNC
 
-  def run(self, **kwargs):
+  def run(self, device=None):
     """Sends an e-mail to a former device assignee, thanking them."""
-    device = kwargs.get('device')
     if not device:
-      raise SendThanksError(
-          'Cannot send mail. Task did not receive a device; only kwargs: '
-          '{}'.format(str(kwargs)))
+      raise base_action.MissingDeviceError(
+          'Cannot send mail. Task did not receive a device.')
     send_email.send_user_email(device, 'reminder_return_thanks')

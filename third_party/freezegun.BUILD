@@ -10,7 +10,7 @@ py_library(
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
     deps = [
-        "@dateutil_archive//:dateutil",
         "@six_archive//:six",
+        "@dateutil_archive//:dateutil",
     ],
 )

@@ -74,9 +74,11 @@ class CustomEventTest(loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT, loanertest.TEST_DIR_DEVICE2
     ]
     self.device1 = device_model.Device.enroll(
-        '123ABC', loanertest.USER_EMAIL, '123456')
+        user_email=loanertest.USER_EMAIL, serial_number='123ABC',
+        asset_tag='123456')
     self.device2 = device_model.Device.enroll(
-        '654321', loanertest.USER_EMAIL, '789012')
+        user_email=loanertest.USER_EMAIL, serial_number='654321',
+        asset_tag='789012')
 
   def setup_shelves(self):
     self.shelf1 = shelf_model.Shelf.enroll(

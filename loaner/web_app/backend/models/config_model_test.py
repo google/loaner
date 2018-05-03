@@ -86,6 +86,18 @@ class ConfigurationTest(
     self.assertIsNone(memcache.get(config))
     self.assertIsNone(config_model.Config.get_by_id(config))
 
+  def test_get_identifier_with_use_asset(self):
+    config_model.Config.set('use_asset_tags', True)
+    config_datastore = config_model.Config.get('device_identifier_mode')
+    self.assertEqual(
+        config_datastore,
+        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED)
+
+  def test_get_identifier_without_use_asset(self):
+    config_datastore = config_model.Config.get('device_identifier_mode')
+    self.assertEqual(
+        config_datastore, config_defaults.DEFAULTS['device_identifier_mode'])
+
   def test_get_nonexistent(self):
     with self.assertRaisesRegexp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
       config_model.Config.get('does_not_exist')

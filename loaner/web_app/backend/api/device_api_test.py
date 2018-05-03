@@ -28,6 +28,7 @@ from google.appengine.api import datastore_errors
 
 import endpoints
 
+from loaner.web_app import constants
 from loaner.web_app.backend.api import device_api
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_message
@@ -94,6 +95,14 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         damaged=False,
     )
     self.unenrolled_device.put()
+    self.unenrolled_device_directory = {
+        'deviceId': 'unique_id',
+        'serialNumber': '4567',
+        'status': 'ACTIVE',
+        'lastSync': datetime.datetime.utcnow(),
+        'model': 'HP Chromebook 13 G1',
+        'orgUnitPath': constants.ORG_UNIT_DICT['DEFAULT'],
+    }
 
   def tearDown(self):
     super(DeviceApiTest, self).tearDown()
@@ -105,6 +114,8 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.get_chrome_device.return_value = (
         self.unenrolled_device)
+    mock_directoryclient.get_chrome_device_by_serial.return_value = (
+        self.unenrolled_device_directory)
     retrieved_device = device_model.Device.get(
         serial_number=self.unenrolled_device.serial_number)
     self.assertFalse(retrieved_device.enrolled)

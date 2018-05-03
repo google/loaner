@@ -27,6 +27,7 @@ import mock
 
 from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import action_loader
+from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import loanertest
 
 
@@ -34,9 +35,10 @@ class WorkingActionClass1(base_action.BaseAction):
   """Test Action class."""
   ACTION_NAME = 'action1'
   FRIENDLY_NAME = 'Action 1'
+  ACTION_TYPE = base_action.ActionType.SYNC
 
-  def run(self):
-    return 'return1'
+  def run(self, device=None):
+    return device
 
 
 class WorkingActionClass2(base_action.BaseAction):
@@ -44,8 +46,17 @@ class WorkingActionClass2(base_action.BaseAction):
   ACTION_NAME = 'action2'
   FRIENDLY_NAME = 'Action 2'
 
-  def run(self):
-    return 'return2'
+  def run(self, device=None):
+    del device  # Unused.
+
+
+class DuplicateActionClass(base_action.BaseAction):
+  """Test Action class."""
+  ACTION_NAME = 'action1'
+  FRIENDLY_NAME = 'Action 1'
+
+  def run(self, device=None):
+    del device  # Unused.
 
 
 class NonWorkingActionClass3(object):
@@ -56,16 +67,16 @@ class ActionClassWithoutActionName4(base_action.BaseAction):
   """Test Action class with no ACTION_NAME attribute."""
   FRIENDLY_NAME = 'Action 4'
 
-  def run(self):
-    return 'return4'
+  def run(self, device=None):
+    del device  # Unused.
 
 
 class ActionClassWithoutFriendlyName5(base_action.BaseAction):
   """Test Action class with no FRIENDLY_NAME attribute."""
   ACTION_NAME = 'action5'
 
-  def run(self):
-    return 'return5'
+  def run(self, device=None):
+    del device  # Unused.
 
 
 class ActionClassWithoutRunMethod6(base_action.BaseAction):
@@ -96,7 +107,8 @@ class ActionImporterTest(loanertest.TestCase):
         ('module5', 'fake_module'),
         ('module6', 'fake_module'),
         ('module1_test', 'fake_module'),  # Skipped test module.
-        ('base_action', 'fake_module')  # Skipped base_action module.
+        ('base_action', 'fake_module'),  # Skipped base_action module.
+        ('module7', 'fake_module')
     ]
     mock_getmembers.side_effect = [
         (('WorkingActionClass1', WorkingActionClass1),
@@ -107,10 +119,16 @@ class ActionImporterTest(loanertest.TestCase):
         (('ActionClassWithoutActionName4', ActionClassWithoutActionName4),),
         (('ActionClassWithoutFriendlyName5', ActionClassWithoutFriendlyName5),),
         (('ActionClassWithoutRunMethod6', ActionClassWithoutRunMethod6),),
+        (('DuplicateActionClass', DuplicateActionClass),),
     ]
     test_action_dict = action_loader.load_actions()
-    self.assertEqual(test_action_dict['action1'].run(), 'return1')
-    self.assertEqual(test_action_dict['action2'].run(), 'return2')
+    test_device = device_model.Device()
+    self.assertEqual(
+        test_action_dict[base_action.ActionType.SYNC]['action1'].run(
+            device=test_device),
+        test_device)
+    self.assertIsNone(
+        test_action_dict[base_action.ActionType.ASYNC]['action2'].run())
     mock_logwarning.assert_has_calls([
         mock.call(action_loader._INSTANTIATION_ERROR_MSG % (
             'ActionClassWithoutActionName4', 'module4',

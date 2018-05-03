@@ -22,25 +22,16 @@ from loaner.web_app import constants
 from loaner.web_app.backend.actions import base_action
 
 
-class Error(Exception):
-  """General Error class for this module."""
-
-
-class LockDeviceError(Error):
-  """Error raised when we cannot lock the device."""
-
-
 class LockDevice(base_action.BaseAction):
   """Action class to lock a device."""
 
   ACTION_NAME = 'lock_device'
   FRIENDLY_NAME = 'Lock device'
+  ACTION_TYPE = base_action.ActionType.ASYNC
 
-  def run(self, **kwargs):
+  def run(self, device=None):
     """Lock a device."""
-    device = kwargs.get('device')
     if not device:
-      raise LockDeviceError(
-          'Cannot lock device. Task did not receive a device; only kwargs: '
-          '{}'.format(str(kwargs)))
+      raise base_action.MissingDeviceError(
+          'Cannot lock device. Task did not receive a device.')
     device.lock(constants.ADMIN_USERNAME)

@@ -22,27 +22,18 @@ from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import send_email
 
 
-class Error(Exception):
-  """General Error class for this module."""
-
-
-class SendAuditError(Error):
-  """Error raised when we cannot send a shelf audit request email."""
-
-
 class RequestShelfAudit(base_action.BaseAction):
   """Action class to request a shelf audit."""
 
   ACTION_NAME = 'request_shelf_audit'
   FRIENDLY_NAME = 'Request shelf audit'
+  ACTION_TYPE = base_action.ActionType.ASYNC
 
-  def run(self, **kwargs):
+  def run(self, shelf=None):
     """Request a shelf audit."""
-    shelf = kwargs.get('shelf')
     if not shelf:
-      raise SendAuditError(
-          'Cannot send audit request. Task did not receive a shelf; only '
-          'kwargs: {}'.format(str(kwargs)))
+      raise base_action.MissingShelfError(
+          'Cannot send audit request. Task did not receive a shelf.')
     send_email.send_shelf_audit_email(shelf)
     shelf.audit_requested = True
     shelf.put()

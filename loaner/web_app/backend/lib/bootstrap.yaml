@@ -26,9 +26,6 @@ core_events:
   description: Event run when a device is enrolled.
   enabled: True
 
-- name: device_enroll_lost_or_locked
-  description: Event run when newly enrolled device was previously lost/locked.
-
 - name: device_loan_return
   description: Event run when a device is returned.
   enabled: True

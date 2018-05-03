@@ -19,15 +19,15 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
-
+from absl import logging
 import mock
 
-from google.appengine.api import memcache
-
+from google.appengine.api import taskqueue
+from loaner.web_app.backend.actions import base_action
+from loaner.web_app.backend.lib import action_loader
 from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import event_models
-from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
 
 TEST_EVENT_MAPPINGS = {
@@ -40,52 +40,75 @@ TEST_EVENT_MAPPINGS = {
 class EventsTest(loanertest.TestCase):
   """Tests for the Events lib."""
 
-  @mock.patch('__main__.events.logging.info')
-  @mock.patch('__main__.events.taskqueue.add')
-  @mock.patch('__main__.events.get_actions_for_event')
+  @mock.patch.object(logging, 'error')
+  @mock.patch.object(logging, 'warn')
+  @mock.patch.object(taskqueue, 'add')
+  @mock.patch.object(events, 'get_actions_for_event')
+  @mock.patch.object(action_loader, 'load_actions')
   def test_raise_event(
-      self, mock_geteventactions, mock_taskqueueadd, mock_loginfo):
+      self, mock_loadactions, mock_getactionsforevent,
+      mock_taskqueueadd, mock_logwarn, mock_logerror):
     """Tests raising an Action if the Event is configured for Actions."""
-
     self.testbed.raise_event_patcher.stop()  # Disable patcher; use real method.
 
     # No Actions configured for the Event.
-    mock_geteventactions.return_value = []
+    mock_getactionsforevent.return_value = []
     events.raise_event('sample_event')
-    mock_loginfo.assert_called_with(events._NO_ACTIONS_MSG, 'sample_event')
+    mock_logwarn.assert_called_with(events._NO_ACTIONS_MSG, 'sample_event')
 
-    mock_geteventactions.return_value = ['action1', 'action2']
+    # Everything is running smoothly.
+    def side_effect1(device=None):
+      """Side effect for sync action's run method that returns the model."""
+      return device
+
+    mock_sync_action = mock.Mock()
+    mock_sync_action.run.side_effect = side_effect1
+    mock_loadactions.return_value = {
+        'sync': {'sync_action': mock_sync_action},
+        'async': {'async_action': 'fake_async_action'}}
+    mock_getactionsforevent.return_value = ['sync_action', 'async_action']
     test_device = device_model.Device(
         chrome_device_id='4815162342', serial_number='123456')
-    test_shelf = shelf_model.Shelf(capacity=42, location='Helpdesk 123')
-    expected_payload1 = pickle.dumps({
-        'action_name': 'action1',
-        'device': test_device,
-        'shelf': test_shelf
-    })
-    expected_payload2 = pickle.dumps({
-        'action_name': 'action2',
-        'device': test_device,
-        'shelf': test_shelf
+
+    expected_async_payload = pickle.dumps({
+        'action_name': 'async_action',
+        'device': test_device
     })
 
-    events.raise_event('sample_event', device=test_device, shelf=test_shelf)
-
-    self.testbed.raise_event_patcher.start()  # Because cleanup will stop().
+    events.raise_event('sample_event', device=test_device)
 
     expected_calls = [
         mock.call(
             queue_name='process-action',
-            payload=expected_payload1,
+            payload=expected_async_payload,
             target='default'),
-        mock.call(
-            queue_name='process-action',
-            payload=expected_payload2,
-            target='default')
     ]
     mock_taskqueueadd.assert_has_calls(expected_calls)
+    mock_sync_action.run.assert_called_once_with(device=test_device)
 
-  @mock.patch('__main__.events.get_all_event_action_mappings')
+    # A sync action raises a catchable exception.
+    mock_sync_action.reset_mock()
+    mock_logerror.reset_mock()
+    mock_getactionsforevent.reset_mock()
+    mock_loadactions.reset_mock()
+
+    def side_effect2(device=None):
+      """Side effect for sync action's run method that returns the model."""
+      del device  # Unused.
+      raise base_action.BadDeviceError('Found a bad attribute found.')
+
+    mock_sync_action.run.side_effect = side_effect2
+    mock_loadactions.return_value = {
+        'sync': {'sync_action': mock_sync_action}, 'async': {}}
+    mock_getactionsforevent.return_value = ['sync_action']
+
+    returned_device = events.raise_event('sample_event', device=test_device)
+    self.assertEqual(returned_device, test_device)
+    self.assertEqual(len(mock_logerror.mock_calls), 1)
+
+    self.testbed.raise_event_patcher.start()  # Because cleanup will stop().
+
+  @mock.patch.object(events, 'get_all_event_action_mappings')
   def test_get_actions_for_event(self, mock_getalleventmappings):
     """Tests simple get_actions_for_event function."""
 
@@ -96,12 +119,6 @@ class EventsTest(loanertest.TestCase):
     mock_getalleventmappings.return_value = TEST_EVENT_MAPPINGS
     self.assertEqual(
         events.get_actions_for_event('event2'), ['action3', 'action4'])
-
-  def test_get_all_event_action_mappings_existing(self):
-    """Tests get_all_event_action_mappings when they're in memcache."""
-    memcache.set(key='event_action_mappings', value=TEST_EVENT_MAPPINGS)
-    self.assertDictEqual(
-        events.get_all_event_action_mappings(), TEST_EVENT_MAPPINGS)
 
   def test_get_all_event_action_mappings_no_existing(self):
     """Tests get_all_event_action_mappings when they're not in memcache."""

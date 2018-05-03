@@ -35,11 +35,16 @@ class ProcessActionHandler(webapp2.RequestHandler):
 
     self.actions = action_loader.load_actions()
     logging.info(
-        'ProcessActionHandler loaded %d actions: %s',
-        len(self.actions), str(self.actions.keys()))
+        'ProcessActionHandler loaded %d async actions: %s',
+        len(self.actions['async']),
+        str(self.actions['async'].keys()))
 
   def post(self):
     """Process an Action task with the correct Action class."""
     payload = pickle.loads(self.request.body)
-    action_name = payload['action_name']
-    self.actions[action_name].run(**payload)
+    action_name = payload.pop('action_name')
+    action_instance = self.actions['async'].get(action_name)
+    if action_instance:
+      action_instance.run(**payload)
+    else:
+      logging.error('No async Action named %s found.', action_name)

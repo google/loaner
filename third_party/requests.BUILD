@@ -9,9 +9,9 @@ py_library(
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
     deps = [
-        "@certifi_archive//:certifi",
         "@chardet_archive//:chardet",
         "@idna_archive//:idna",
         "@urllib3_archive//:urllib3",
+        "@certifi_archive//:certifi",
     ],
 )

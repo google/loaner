@@ -19,6 +19,13 @@ from __future__ import division
 from __future__ import print_function
 
 
+class DeviceIdentifierMode(object):
+  """Constants defining supported means of identifying devices."""
+  ASSET_TAG = 'asset_tag'
+  SERIAL_NUMBER = 'serial_number'
+  BOTH_REQUIRED = 'both_required'
+
+
 DEFAULTS = {
     # allow_guest_mode: bool, Whether an organization allows loaners to enable
     # guest mode.
@@ -78,11 +85,13 @@ DEFAULTS = {
     # require_surveys: bool, Whether or not the surveys are required.
     'require_surveys': False,
 
-    # use_asset_tags: bool, True if you want to display device asset tags as
-    # user-facing identifiers, False if you want to display serial numbers.
-    'use_asset_tags': False,
+    # device_identifier_mode: str, Choice of asset_tag, serial_number, or both.
+    # If the implementer chooses asset_tag, you must create an Action that can
+    # translate asset tags to serial_numbers during device enrollment (e.g., via
+    # a database query). Replaces the old bool use_asset_tags (below).
+    'device_identifier_mode': DeviceIdentifierMode.SERIAL_NUMBER,
 
-    # img_banner_*: str, The banner images for reminder e-mails.
+    'use_asset_tags': False,
     'img_banner_primary': '',
 
     # img_button_*: str, The button images for reminder e-mails.

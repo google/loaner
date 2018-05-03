@@ -9,9 +9,9 @@ py_library(
         include = ["endpoints/*.py"],
         exclude = ["endpoints/test/**"],
     ),
-    data = ["endpoints/proxy.html"],
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
+    data = ["endpoints/proxy.html"],
     deps = [
         "@attr_archive//:attr",
         "@google_endpoints_api_management_archive//:endpoints_management",

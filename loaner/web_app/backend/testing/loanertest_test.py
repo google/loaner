@@ -45,7 +45,8 @@ class ActionTestCaseTest(loanertest.ActionTestCase):
   def setUp(self, mock_importactions):
     self.testing_action = 'action_sample'
     self.fake_action = 'fake_action'
-    mock_importactions.return_value = {'action_sample': self.fake_action}
+    mock_importactions.return_value = {
+        'sync': {'action_sample': self.fake_action}}
     super(ActionTestCaseTest, self).setUp()
 
   def test_success(self):

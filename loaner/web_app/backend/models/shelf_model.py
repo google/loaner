@@ -44,7 +44,7 @@ _NEGATIVE_CAPACITY_MSG = 'Capacity must be greater than 0.'
 
 
 class Error(Exception):
-  """Base error class for this module."""
+  """Base class for exceptions."""
 
 
 class EnrollmentError(Error):
@@ -190,9 +190,9 @@ class Shelf(base_model.BaseModel):
       if latitude is not None and longitude is not None:
         shelf.lat_long = ndb.GeoPt(latitude, longitude)
       logging.info(_CREATE_NEW_SHELF_MSG, shelf.name)
+    shelf = events.raise_event('shelf_enroll', shelf=shelf)
     shelf.put()
     shelf.stream_to_bq(user_email, _ENROLL_MSG % shelf.name)
-    events.raise_event('shelf_enroll', shelf=shelf)
     return shelf
 
   @classmethod
@@ -233,8 +233,8 @@ class Shelf(base_model.BaseModel):
     self.last_audit_by = user_email
     self.audit_requested = False
     logging.info(_AUDIT_MSG, self.name)
+    self = events.raise_event('shelf_audited', shelf=self)
     self.put()
-    events.raise_event('shelf_audited', shelf=self)
     self.stream_to_bq(user_email, _AUDIT_MSG % self.name)
 
   def request_audit(self):
@@ -264,6 +264,6 @@ class Shelf(base_model.BaseModel):
     """
     self.enabled = False
     logging.info(_DISABLE_MSG, self.name)
+    self = events.raise_event('shelf_disable', shelf=self)
     self.put()
-    events.raise_event('shelf_disable', shelf=self)
     self.stream_to_bq(user_email, _DISABLE_MSG % self.name)

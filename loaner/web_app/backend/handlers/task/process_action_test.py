@@ -25,6 +25,7 @@ from absl import logging
 import mock
 
 from loaner.web_app.backend.lib import action_loader  # pylint: disable=unused-import
+from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import handlertest
 
 
@@ -40,21 +41,24 @@ class ProcessActionHandlerTest(handlertest.HandlerTestCase):
       ACTION_NAME = 'sample'
       FRIENDLY_NAME = 'Sample action'
 
-      def run(self, **kwargs):  # pylint: disable=unused-argument, invalid-name
+      def run(self, device=None, shelf=None):
         """Run the action."""
-        other_arg = kwargs.get('other_arg')
-        logging.info('Action complete, and other_arg is %d.', other_arg)
+        del shelf  # Unused.
+        info = 'Action with a %s.' % device.__class__.__name__
+        logging.info(info)
 
-    mock_importactions.return_value = {'sample': ActionSample()}
-    payload = pickle.dumps({'action_name': 'sample', 'other_arg': 42})
+    mock_importactions.return_value = {'async': {'sample': ActionSample()}}
+    test_device = device_model.Device()
+    payload = pickle.dumps(
+        {'action_name': 'sample', 'device': test_device, 'shelf': None})
     response = self.testapp.post(r'/_ah/queue/process-action', payload)
 
     self.assertEqual(response.status_int, 200)
     self.assertEqual(mock_loginfo.call_count, 2)
     expected_calls = [
-        mock.call('ProcessActionHandler loaded %d actions: %s', 1,
+        mock.call('ProcessActionHandler loaded %d async actions: %s', 1,
                   "['sample']"),
-        mock.call('Action complete, and other_arg is %d.', 42)
+        mock.call('Action with a Device.')
     ]
     mock_loginfo.assert_has_calls(expected_calls)
 

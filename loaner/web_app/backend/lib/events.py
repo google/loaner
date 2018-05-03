@@ -21,12 +21,14 @@ from __future__ import print_function
 import pickle
 
 from absl import logging
-from google.appengine.api import memcache
 from google.appengine.api import taskqueue
 
+from loaner.web_app.backend.actions import base_action
+from loaner.web_app.backend.lib import action_loader
 from loaner.web_app.backend.models import event_models
 
 _NO_ACTIONS_MSG = 'No actions for event %s.'
+_CACHED_EVENT_ACTION_MAPPINGS = None
 
 
 class Error(Exception):
@@ -38,27 +40,64 @@ class NoEventsError(Error):
 
 
 def raise_event(event_name, device=None, shelf=None):
-  """Raises an Event by creating a task.
+  """Raises an Event, running its sync and async Actions.
+
+  This function runs async Actions as tasks, but sync ones serially,
+  accumulating changes from each action. Supply either a device or shelf arg,
+  but not both.
 
   Args:
     event_name: str, the name of the Event.
-    device: a Device model, or None.
-    shelf: a Shelf model, or None.
+    device: a Device model.
+    shelf: a Shelf model.
+
+  Returns:
+    The original model, optionally modified by sync actions.
+
+  Raises:
+    base_action.MissingModelError: if this method is called with neither device
+        nor shelf.
+    base_action.RedundantModelError: if this method is called with both device
+        and shelf.
   """
   event_actions = get_actions_for_event(event_name)
-  if event_actions:
-    for action in event_actions:
-      task_params = {'action_name': action}
-      if device:
-        task_params['device'] = device
-      if shelf:
-        task_params['shelf'] = shelf
-      taskqueue.add(
-          queue_name='process-action',
-          payload=pickle.dumps(task_params),
-          target='default')
+  actions_dict = action_loader.load_actions()
+  model = device or shelf
+  if not event_actions:
+    logging.warn(_NO_ACTIONS_MSG, event_name)
   else:
-    logging.info(_NO_ACTIONS_MSG, event_name)
+    action_kwargs = {}
+    if device:
+      action_kwargs['device'] = device
+    if shelf:
+      action_kwargs['shelf'] = shelf
+
+    if not action_kwargs:
+      raise base_action.MissingModelError(
+          'No model passed to raise_event. You must supply either a device or '
+          'shelf arg.')
+    if len(action_kwargs) > 1:
+      raise base_action.RedundantModelError(
+          'Redundant models passed to raise_event. You must supply either a '
+          'device or a shelf, but not both.')
+
+    for action in event_actions:
+      if action in actions_dict[base_action.ActionType.SYNC]:
+        try:
+          model = actions_dict[base_action.ActionType.SYNC][action].run(
+              **action_kwargs)
+        except base_action.Error as error:
+          logging.error(
+              'Skipping Action "%s" because it raised an exception: %s',
+              action, str(error))
+      if action in actions_dict[base_action.ActionType.ASYNC]:
+        action_kwargs['action_name'] = action
+        taskqueue.add(
+            queue_name='process-action',
+            payload=pickle.dumps(action_kwargs),
+            target='default')
+
+  return model
 
 
 def get_actions_for_event(event_name):
@@ -77,14 +116,15 @@ def get_actions_for_event(event_name):
   if not all_mappings:
     raise NoEventsError(
         'There are no events; run bootstrap to add the default ones.')
+
   return all_mappings.get(event_name)
 
 
 def get_all_event_action_mappings():
-  """Gets all Event-Action mappings and memcaches them if necessary."""
-  all_mappings = memcache.get('event_action_mappings')
-  if not all_mappings:
-    all_mappings = {
+  """Gets all Event-Action mappings and caches them if necessary."""
+  global _CACHED_EVENT_ACTION_MAPPINGS
+  if not _CACHED_EVENT_ACTION_MAPPINGS:
+    _CACHED_EVENT_ACTION_MAPPINGS = {
         event.name: event.actions
         for event in (
             event_models.CoreEvent.query().fetch() +
@@ -93,5 +133,4 @@ def get_all_event_action_mappings():
             event_models.ReminderEvent.query().fetch()
         )
     }
-    memcache.set(key='event_action_mappings', value=all_mappings)
-  return all_mappings
+  return _CACHED_EVENT_ACTION_MAPPINGS

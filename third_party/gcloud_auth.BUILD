@@ -9,10 +9,10 @@ py_library(
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
     deps = [
-        "@cachetools_archive//:cachetools",
         "@pyasn1_archive//:pyasn1",
         "@pyasn1_modules_archive//:pyasn1_modules",
         "@rsa_archive//:rsa",
         "@six_archive//:six",
+        "@cachetools_archive//:cachetools",
     ],
 )

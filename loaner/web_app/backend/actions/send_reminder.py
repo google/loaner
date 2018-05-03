@@ -38,21 +38,20 @@ class SendReminder(base_action.BaseAction):
 
   ACTION_NAME = 'send_reminder'
   FRIENDLY_NAME = 'Send reminder'
+  ACTION_TYPE = base_action.ActionType.ASYNC
 
-  def run(self, **kwargs):
+  def run(self, device=None):
     """Send an e-mail to the device assignee and remove reminder."""
-    device = kwargs.get('device')
     if not device:
-      raise SendReminderError(
-          'Cannot send mail. Task did not receive a device; only kwargs: '
-          '{}'.format(str(kwargs)))
+      raise base_action.MissingDeviceError(
+          'Cannot send mail. Task did not receive a device.')
     if not hasattr(device, 'next_reminder') or not device.next_reminder:
-      raise SendReminderError(
+      raise base_action.BadDeviceError(
           'Cannot send mail without next_reminder on device with serial '
           '{}.'.format(device.serial_number))
     reminder_event = event_models.ReminderEvent.get(device.next_reminder.level)
     if not reminder_event:
-      raise SendReminderError(
+      raise base_action.BadDeviceError(
           'Cannot send mail. There is no ReminderEvent entity for level '
           '{}.'.format(device.next_reminder.level))
     logging.info(

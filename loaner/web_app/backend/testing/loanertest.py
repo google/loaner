@@ -100,11 +100,19 @@ class TestCase(absltest.TestCase):
     self.addCleanup(taskqueue_patcher.stop)
     taskqueue_patcher.start()
 
-    # events.raise_event() raises an exception if there are no events in
-    # datastore, and it's called often in the model methods, many of which are
-    # used in testing. When you want to test that method specifically, first run
+    # The events.raise_event method raises an exception if there are no events
+    # in datastore. It's called often in the model methods, many of which are
+    # used in testing. When you want to test raise_event specifically, first run
     # stop() on this patcher; be sure to run start() again before end of test.
-    self.testbed.mock_raiseevent = mock.Mock()
+    def side_effect(event_name, device=None, shelf=None):
+      """Side effect for raise_event that returns the model."""
+      del event_name  # Unused.
+      if device:
+        return device
+      else:
+        return shelf
+
+    self.testbed.mock_raiseevent = mock.Mock(side_effect=side_effect)
     self.testbed.raise_event_patcher = mock.patch.object(
         events, 'raise_event', self.testbed.mock_raiseevent)
     self.addCleanup(self.testbed.raise_event_patcher.stop)
@@ -186,7 +194,9 @@ class ActionTestCase(TestCase):
           'The unit test must import at least one valid action module. Verify '
           'that self.testing_action is a string that is the name of a module '
           'in the actions directory.')
-    self.action = actions.get(self.testing_action)
+    self.action = (
+        actions['sync'].get(self.testing_action) or
+        actions['async'].get(self.testing_action))
 
 
 def main():

@@ -51,19 +51,22 @@ class RunReminderEventsHandlerTest(handlertest.HandlerTestCase):
     ]
 
     self.device1 = device_model.Device.enroll(
-        '123ABC', loanertest.USER_EMAIL, '123456')
+        user_email=loanertest.USER_EMAIL, serial_number='123ABC',
+        asset_tag='123456')
     self.device1.assigned_user = loanertest.USER_EMAIL
     self.device1.assigned_date = _NOW - datetime.timedelta(days=7)
     self.device1.put()
 
     self.device2 = device_model.Device.enroll(
-        '654321', loanertest.USER_EMAIL, '789012')
+        user_email=loanertest.USER_EMAIL, serial_number='654321',
+        asset_tag='789012')
     self.device2.assigned_user = loanertest.SUPER_ADMIN_EMAIL
     self.device2.assigned_date = _NOW - datetime.timedelta(days=5)
     self.device2.put()
 
     self.device3 = device_model.Device.enroll(
-        '4815162342', loanertest.USER_EMAIL, '135790')
+        user_email=loanertest.USER_EMAIL, serial_number='4815162342',
+        asset_tag='135790')
     self.device3.assigned_user = loanertest.TECHNICIAN_EMAIL
     self.device3.assigned_date = _NOW - datetime.timedelta(days=1)
     self.device3.put()

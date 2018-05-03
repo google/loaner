@@ -105,7 +105,9 @@ loaner_appengine_test(
     ],
     deps = [
         ":base_action",
+        "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
     ],
 )
 
