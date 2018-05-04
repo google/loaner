@@ -20,10 +20,7 @@ from __future__ import print_function
 
 import datetime
 
-from absl import logging
 from absl.testing import parameterized
-
-import mock
 
 from google.appengine.ext import ndb
 
@@ -91,7 +88,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         mark_pending_return_date=datetime.datetime(year=2018, month=1, day=5),
         chrome_device_id='device id value',
         last_heartbeat=datetime.datetime(year=2018, month=1, day=6),
-        damaged=False,
+        damaged=None,
         damaged_reason='Not damaged',
         last_reminder=device_model.Reminder(level=1),
         next_reminder=device_model.Reminder(level=2),
@@ -113,7 +110,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         mark_pending_return_date=datetime.datetime(year=2018, month=1, day=5),
         chrome_device_id='device id value',
         last_heartbeat=datetime.datetime(year=2018, month=1, day=6),
-        damaged=False,
+        damaged=None,
         damaged_reason='Not damaged',
         last_reminder=device_message.Reminder(level=1),
         next_reminder=device_message.Reminder(level=2),
@@ -124,22 +121,6 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
     actual_message = api_utils.build_device_message_from_model(
         test_device, True)
     self.assertEqual(actual_message, expected_message)
-
-  @mock.patch.object(logging, 'warning')
-  def test_build_device_message_from_model_value_mismatch(self, mock_warning):
-    class TestModel(ndb.Model):
-      serial_number = ndb.IntegerProperty(default=1)
-
-      @property
-      def guest_enabled(self):
-        return True
-
-      @property
-      def is_assigned(self):
-        return False
-
-    api_utils.build_device_message_from_model(TestModel(), False)
-    self.assertEqual(mock_warning.call_count, 1)
 
   @parameterized.parameters(
       (1, datetime.datetime(year=2018, month=1, day=1), 2),
@@ -157,20 +138,11 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         test_reminder)
     self.assertEqual(returned_message, expected_message)
 
-  def test_build_reminder_message_from_model_no_reminder(self):
-    """Test that no reminder provided returns None."""
-    self.assertIsNone(api_utils.build_reminder_message_from_model(None))
-
   def test_build_shelf_message_from_model(self):
     """Test the construction of a shelf message from a shelf entitiy."""
     actual_message = api_utils.build_shelf_message_from_model(
         self.test_shelf_model)
     self.assertEqual(actual_message, self.expected_shelf_message)
-
-  def test_build_shelf_message_from_model_not_found_error(self):
-    """Test the failure to build a shelf message for an unknown shelf."""
-    with self.assertRaises(endpoints.NotFoundException):
-      api_utils.build_shelf_message_from_model(shelf_model.Shelf())
 
   def test_to_dict(self):
     """Test that a dictionary is build from a ProtoRPC message."""

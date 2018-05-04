@@ -18,10 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from absl import logging
-
-from protorpc import messages
-
 from google.appengine.api import datastore_errors
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
@@ -47,25 +43,36 @@ def build_device_message_from_model(device, guest_permitted):
     A populated device_message.Device ProtoRPC message.
   """
   message = device_message.Device(
+      serial_number=device.serial_number,
+      asset_tag=device.asset_tag,
+      enrolled=device.enrolled,
+      device_model=device.device_model,
+      due_date=device.due_date,
+      last_known_healthy=device.last_known_healthy,
+      assigned_user=device.assigned_user,
+      assignment_date=device.assignment_date,
+      current_ou=device.current_ou,
+      ou_changed_date=device.ou_changed_date,
+      locked=device.locked,
+      lost=device.lost,
+      mark_pending_return_date=device.mark_pending_return_date,
+      chrome_device_id=device.chrome_device_id,
+      last_heartbeat=device.last_heartbeat,
+      damaged=device.damaged,
+      damaged_reason=device.damaged_reason,
       guest_enabled=device.guest_enabled,
-      guest_permitted=guest_permitted)
+      guest_permitted=guest_permitted,
+  )
+  if device.last_reminder:
+    message.last_reminder = build_reminder_message_from_model(
+        device.last_reminder)
+  if device.next_reminder:
+    message.next_reminder = build_reminder_message_from_model(
+        device.next_reminder)
   if device.is_assigned:
     message.max_extend_date = device.calculate_return_dates().max
-  for key in device._properties:  # pylint: disable=protected-access
-    value = getattr(device, key, None)
-    try:
-      setattr(message, key, value)
-    except messages.ValidationError as err:
-      logging.info(err)
-      if key == 'shelf':
-        setattr(message, key, build_shelf_message_from_model(value.get()))
-      elif key.endswith('reminder'):
-        setattr(message, key, build_reminder_message_from_model(value))
-      else:
-        logging.warning(
-            'Attribute (%s) was not found on the device (%s).',
-            key, device)
-
+  if device.shelf:
+    message.shelf = build_shelf_message_from_model(device.shelf.get())
   return message
 
 
@@ -78,16 +85,10 @@ def build_reminder_message_from_model(reminder):
   Returns:
     A device_message.Reminder message with the respective properties.
   """
-  message = device_message.Reminder()
-  try:
-    for key in reminder._properties:  # pylint:disable=protected-access
-      value = getattr(reminder, key, None)
-      setattr(message, key, value)
-  except AttributeError:
-    # This will occur when the reminder is None, we return an empty message.
-    return None
-
-  return message
+  return device_message.Reminder(
+      level=reminder.level,
+      time=reminder.time,
+      count=reminder.count)
 
 
 def build_shelf_message_from_model(shelf):
@@ -99,29 +100,22 @@ def build_shelf_message_from_model(shelf):
   Returns:
     A shelf_messages.Shelf ProtoRPC message for the given shelf.
   """
-  message = shelf_messages.Shelf()
-  # Get and build the shelf request message.
-  try:
-    message.shelf_request = shelf_messages.ShelfRequest(
-        location=shelf.location, urlsafe_key=shelf.key.urlsafe())
-  except AttributeError as err:
-    logging.warning(err)
-    raise endpoints.NotFoundException(err)
-  # Build the shelf message from the model.
-  for key in shelf._properties:  # pylint:disable=protected-access
-    value = getattr(shelf, key, None)
-    try:
-      setattr(message, key, value)
-    except AttributeError as err:
-      if key == 'lat_long':
-        setattr(message, 'latitude', getattr(shelf.lat_long, 'lat', None))
-        setattr(message, 'longitude', getattr(shelf.lat_long, 'lon', None))
-      else:
-        logging.warning(
-            'Attribute (%s) was not found on the shelf with urlsafe key (%s). '
-            'Error: %s.', key, shelf.key.urlsafe(), err)
-
-  return message
+  return shelf_messages.Shelf(
+      shelf_request=shelf_messages.ShelfRequest(
+          location=shelf.location, urlsafe_key=shelf.key.urlsafe()),
+      enabled=shelf.enabled,
+      friendly_name=shelf.friendly_name,
+      location=shelf.location,
+      latitude=shelf.latitude,
+      longitude=shelf.longitude,
+      altitude=shelf.altitude,
+      capacity=shelf.capacity,
+      audit_notification_enabled=shelf.audit_notification_enabled,
+      audit_requested=shelf.audit_requested,
+      responsible_for_audit=shelf.responsible_for_audit,
+      last_audit_time=shelf.last_audit_time,
+      last_audit_by=shelf.last_audit_by,
+  )
 
 
 def to_dict(entity, model_class):

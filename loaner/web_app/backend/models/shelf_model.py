@@ -111,10 +111,14 @@ class Shelf(base_model.BaseModel):
 
   @property
   def latitude(self):
+    if not self.lat_long:
+      return None
     return self.lat_long.lat
 
   @property
   def longitude(self):
+    if not self.lat_long:
+      return None
     return self.lat_long.lon
 
   @property

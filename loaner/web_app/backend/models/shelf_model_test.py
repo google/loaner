@@ -137,23 +137,20 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
-  def test_enroll_new_shelf_0_lat_long(self, mock_logging, mock_stream):
-    """Test enrolling a new shelf."""
+  def test_enroll_new_shelf_no_lat_long(self, mock_logging, mock_stream):
+    """Test enrolling a new shelf without latitude and longitude."""
     new_location = 'US-NYC2'
     new_capacity = 16
     new_friendly_name = 'Statue of Liberty'
-    lat = 0
-    lon = 0
     new_shelf = shelf_model.Shelf.enroll(
-        loanertest.USER_EMAIL, new_location, new_capacity, new_friendly_name,
-        lat, lon, 1.0, loanertest.USER_EMAIL)
+        loanertest.USER_EMAIL, new_location, new_capacity, new_friendly_name)
 
     self.assertEqual(new_shelf.location, new_location)
     self.assertEqual(new_shelf.capacity, new_capacity)
     self.assertEqual(new_shelf.friendly_name, new_friendly_name)
-    self.assertEqual(new_shelf.lat_long, ndb.GeoPt(lat, lon))
-    self.assertEqual(new_shelf.latitude, lat)
-    self.assertEqual(new_shelf.longitude, lon)
+    self.assertIsNone(new_shelf.lat_long)
+    self.assertIsNone(new_shelf.latitude)
+    self.assertIsNone(new_shelf.longitude)
     mock_logging.info.assert_called_once_with(
         shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.name)
     mock_stream.assert_called_once_with(
