@@ -15,7 +15,6 @@
 import {Component, Injectable, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material';
 import * as moment from 'moment';
-import {switchMap} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
@@ -26,8 +25,6 @@ import {ConfigService} from '../../../../../shared/config';
 import {Background} from '../../shared/background_service';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
-
-import {StatusService} from './status_service';
 
 const ADDITIONAL_MANAGEMENT_TEXT = `If you need guidance or have a question,
 be sure to check out our Troubleshoot and FAQ buttons below.`;
@@ -59,52 +56,28 @@ export class StatusComponent extends LoaderView implements OnInit {
       private readonly guestMode: GuestMode,
       private readonly loan: Loan,
       private readonly resumeService: ResumeLoan,
-      private readonly status: StatusService,
       readonly dialog: MatDialog,
   ) {
     super(true);
   }
 
   ngOnInit() {
-    this.refreshContent();
-  }
-
-  /**
-   * Grabs necessary content on the page and updates it.
-   */
-  refreshContent() {
-    this.getGivenName();
+    this.setLoanInfo();
   }
 
   /** Set loan information for manage view. */
-  setLoanInfo(grabGivenName?: boolean) {
-    let retrievedLoanInfo: LoanResponse;
-    this.loan.getLoan(grabGivenName)
-        .pipe(switchMap(loanInfo => {
-          retrievedLoanInfo = loanInfo;
-          return this.loan.getDevice();
-        }))
-        .subscribe(
-            deviceInfo => {
-              if (grabGivenName) {
-                if (retrievedLoanInfo.given_name) {
-                  this.status.setGivenNameInChromeStorage(
-                      retrievedLoanInfo.given_name);
-                  this.userDisplayName = retrievedLoanInfo.given_name;
-                } else {
-                  this.status.setGivenNameInChromeStorage('there');
-                  this.userDisplayName = retrievedLoanInfo.given_name;
-                }
-              }
-              this.setLocalValues(deviceInfo);
-              this.ready();
-            },
-            error => {
-              const message =
-                  `We had some trouble getting some initial information.`;
-              this.failure.register(
-                  message, FailType.Network, FailAction.Quit, error);
-            });
+  setLoanInfo() {
+    this.loan.getDevice().subscribe(
+        deviceInfo => {
+          this.setLocalValues(deviceInfo);
+          this.ready();
+        },
+        error => {
+          const message =
+              `We had some trouble getting some initial information.`;
+          this.failure.register(
+              message, FailType.Network, FailAction.Quit, error);
+        });
   }
 
   /**
@@ -114,35 +87,19 @@ export class StatusComponent extends LoaderView implements OnInit {
   private setLocalValues(deviceInfo: DeviceInfoResponse) {
     this.dueDate = moment(deviceInfo.due_date!).toDate();
     this.maxExtendDate = moment(deviceInfo.max_extend_date!).toDate();
+    this.userDisplayName = deviceInfo.given_name || 'there';
     this.guestEnabled = deviceInfo.guest_enabled!;
     this.guestAllowed = deviceInfo.guest_permitted!;
     this.pendingReturn = !!deviceInfo.mark_pending_return_date;
     this.canExtend();
   }
 
-  /** Gets the given name of a user and calls for setting initial loan info. */
-  getGivenName() {
-    this.status.getGivenNameFromChromeStorage().subscribe(
-        name => {
-          if (name) {
-            this.userDisplayName = name;
-            this.setLoanInfo(false);
-          } else {
-            this.setLoanInfo(true);
-          }
-        },
-        error => {
-          // Error only occurs when givenName can't be found in local storage.
-          this.setLoanInfo(true);
-        });
-  }
-
   /** Checks the dates to see if the loan can be extended. */
   canExtend() {
-    if (this.dueDate == null) {
+    if (!this.dueDate) {
       console.error('The due date date was never defined.');
     }
-    if (this.maxExtendDate == null) {
+    if (!this.maxExtendDate) {
       console.error('The max extend date date was never defined.');
     }
     return moment(this.dueDate!).diff(this.maxExtendDate!, 'days') <= -1;

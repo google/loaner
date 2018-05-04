@@ -74,22 +74,6 @@ export class Loan {
     }));
   }
 
-  /**
-   * Get loan info for device from backend.
-   * @param givenName Represents if it should retrieve the given name.
-   */
-  getLoan(givenName?: boolean): Observable<LoanResponse> {
-    let request: LoanRequest;
-    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
-      request = {
-        device_id: deviceId,
-        need_name: givenName,
-      };
-      const apiUrl = `${this.chromeUrl}/loan`;
-      return this.http.post<LoanResponse>(apiUrl, request);
-    }));
-  }
-
   /** Enable guest mode for the loan. */
   enableGuestMode(): Observable<boolean> {
     let request: GuestModeRequest;

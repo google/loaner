@@ -90,8 +90,8 @@ export class ReturnComponent extends LoaderView implements OnInit {
    * Additionally sends the values from this component to the service initially.
    */
   setLoanInfo() {
-    this.loan.getLoan(false).subscribe(
-        (loanInfo) => {
+    this.loan.getDevice().subscribe(
+        loanInfo => {
           this.dueDate = loanInfo.due_date;
           this.newReturnDate = loanInfo.due_date;
           this.maxReturnDate = loanInfo.max_extend_date;

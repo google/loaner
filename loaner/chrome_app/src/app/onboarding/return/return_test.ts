@@ -34,8 +34,8 @@ describe('ReturnComponent', () => {
   let loan: Loan;
   let returnService: ReturnDateService;
 
-  // Mock response of loan info
-  const testLoanInfo: LoanResponse = {
+  // Mock response of device info
+  const testDeviceInfo: DeviceInfoResponse = {
     due_date: moment().toDate(),
     max_extend_date: moment().add(1, 'w').toDate(),
     given_name: 'John',
@@ -83,14 +83,14 @@ describe('ReturnComponent', () => {
   });
 
   it('retrieves the loan information', () => {
-    spyOn(loan, 'getLoan').and.returnValue(of(testLoanInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
     app.ready();
     fixture.detectChanges();
-    expect(app.dueDate).toEqual(testLoanInfo.due_date);
+    expect(app.dueDate).toEqual(testDeviceInfo.due_date);
   });
 
   it('allows the loan to be extended 1 day', () => {
-    spyOn(loan, 'getLoan').and.returnValue(of(testLoanInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
     app.ready();
     fixture.detectChanges();
     app.newReturnDate = moment().add(1, 'd').toDate(), app.sendNewReturnDate();
@@ -98,7 +98,7 @@ describe('ReturnComponent', () => {
   });
 
   it('does NOT allow the loan to be extended 2 weeks', () => {
-    spyOn(loan, 'getLoan').and.returnValue(of(testLoanInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
     app.ready();
     fixture.detectChanges();
     app.newReturnDate = moment().add(2, 'w').toDate(), app.sendNewReturnDate();

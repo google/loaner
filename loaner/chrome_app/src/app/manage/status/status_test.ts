@@ -37,7 +37,6 @@ import {Storage} from '../../shared/storage/storage';
 
 import {StatusComponent} from './index';
 import {MaterialModule} from './material_module';
-import {StatusService, StatusServiceMock} from './status_service';
 
 /** Mock material DialogRef. */
 class MatDialogRefMock {}
@@ -46,21 +45,12 @@ describe('StatusComponent', () => {
   let app: StatusComponent;
   let fixture: ComponentFixture<StatusComponent>;
   let loan: Loan;
-  let statusService: StatusService;
-
-  // Mock response of loan info
-  const testLoanInfo: LoanResponse = {
-    due_date: moment().toDate(),
-    max_extend_date: moment().add(1, 'w').toDate(),
-    given_name: 'John',
-    guest_enabled: false,
-    guest_permitted: true,
-  };
 
   // Mock response of device info
   const testDeviceInfo: DeviceInfoResponse = {
     due_date: moment().toDate(),
     max_extend_date: moment().add(1, 'w').toDate(),
+    given_name: 'John',
     guest_enabled: false,
     guest_permitted: true,
   };
@@ -93,10 +83,6 @@ describe('StatusComponent', () => {
               provide: MatDialogRef,
               useClass: MatDialogRefMock,
             },
-            {
-              provide: StatusService,
-              useClass: StatusServiceMock,
-            },
           ],
         })
         .compileComponents();
@@ -104,7 +90,6 @@ describe('StatusComponent', () => {
 
   beforeEach(() => {
     loan = TestBed.get(Loan);
-    statusService = TestBed.get(StatusService);
     fixture = TestBed.createComponent(StatusComponent);
     app = fixture.debugElement.componentInstance;
     app.ready();
@@ -118,12 +103,12 @@ describe('StatusComponent', () => {
   });
 
   it('loads the loan information initially', () => {
-    spyOn(loan, 'getLoan').and.returnValue(of(testLoanInfo));
     spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
-    app.setLoanInfo(false);
+    app.setLoanInfo();
     fixture.detectChanges();
     expect(app.dueDate).toEqual(testDeviceInfo.due_date);
     expect(app.maxExtendDate).toEqual(testDeviceInfo.max_extend_date);
+    expect(app.userDisplayName).toEqual(testDeviceInfo.given_name);
     expect(app.guestAllowed).toEqual(testDeviceInfo.guest_permitted);
     expect(app.guestEnabled).toEqual(testDeviceInfo.guest_enabled);
   });
@@ -145,16 +130,5 @@ describe('StatusComponent', () => {
     app.dueDate = new Date(2017, 3, 3, 0, 0, 0, 0);
     app.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
     expect(app.canExtend()).toBeFalsy();
-  });
-
-  it('sets the given name to John', () => {
-    let retrievedName: string;
-    statusService.setGivenNameInChromeStorage(testLoanInfo.given_name);
-    statusService.getGivenNameFromChromeStorage().subscribe(
-        val => retrievedName = val);
-    fixture.detectChanges();
-    // tslint:disable-next-line:no-unnecessary-type-assertion Value is defined
-    // above.
-    expect(retrievedName!).toEqual(testLoanInfo.given_name);
   });
 });

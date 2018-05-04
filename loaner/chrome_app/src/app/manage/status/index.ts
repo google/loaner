@@ -31,7 +31,6 @@ import {Storage} from '../../shared/storage/storage';
 
 import {MaterialModule} from './material_module';
 import {StatusComponent} from './status';
-import {StatusService} from './status_service';
 
 @NgModule({
   declarations: [StatusComponent],
@@ -53,7 +52,6 @@ import {StatusService} from './status_service';
   providers: [
     Background,
     Loan,
-    StatusService,
     Storage,
   ],
 })

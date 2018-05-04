@@ -51,6 +51,7 @@ declare interface DeviceInfoResponse {
   device_model?: string;
   due_date?: Date;
   enrolled?: boolean;
+  given_name?: string;
   guest_enabled?: boolean;
   guest_permitted?: boolean;
   last_heartbeat?: Date;
@@ -85,15 +86,6 @@ declare interface HeartbeatConfiguration {
 declare interface HeartbeatResponse {
   is_enrolled: boolean;
   start_assignment: boolean;
-}
-
-/** Represents the response we receive upon getting loan information. */
-declare interface LoanResponse {
-  due_date: Date;
-  max_extend_date: Date;
-  given_name: string;
-  guest_enabled: boolean;
-  guest_permitted: boolean;
 }
 
 /** Represents the information we request for loan info. */
