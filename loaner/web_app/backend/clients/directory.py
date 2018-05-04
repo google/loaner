@@ -36,6 +36,7 @@ MODEL = u'model'
 ORG_UNIT_PATH = u'orgUnitPath'
 STATUS = u'status'
 SERIAL_NUMBER = u'serialNumber'
+_NEXT_PAGE = 'nextPageToken'
 
 _NO_DEVICE_MSG = 'Device with serial number %s does not exist in the directory.'
 
@@ -342,3 +343,31 @@ class DirectoryApiClient(object):
       logging.info(
           'The given name for this user (%s) does not exist.', user_email)
       raise GivenNameDoesNotExistError(str(err))
+
+  def get_all_users_in_group(self, group_email):
+    """Retrieves all of the users in a particular Google Group.
+
+    Args:
+      group_email: str, the email address of the group.
+
+    Returns:
+      A list of all user's email addresses in the group provided.
+    """
+    users = []
+    response = self.users_in_group(group_email)
+    if not response.get(_NEXT_PAGE):
+      members = response.get('members')
+      if members:
+        for member in members:
+          users.append(member['email'])
+      return users
+
+    while response.get(_NEXT_PAGE):
+      for member in response['members']:
+        users.append(member['email'])
+      response = self.users_in_group(group_email, response.get(_NEXT_PAGE))
+
+    for member in response['members']:
+      users.append(member['email'])
+
+    return users

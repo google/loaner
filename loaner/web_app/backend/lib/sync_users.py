@@ -24,30 +24,18 @@ from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.models import user_model
 
-_DIR_CALL_INVALID_MSG = (
-    'The call to the Directory client is invalid because: %s.')
-
-
-class Error(Exception):
-  """Default error class for this module."""
-
-
-class InvalidCallToDirectoryError(Error):
-  """Raised when the call to Directory client is invalid."""
-
 
 def sync_user_roles():
   """Syncs all of the elevated user roles for each user in Google groups."""
   logging.info(
       'Using admin account (%s) to sync users.', constants.ADMIN_USERNAME)
-  directory_client = directory.DirectoryApiClient(
-      user_email=constants.ADMIN_USERNAME)
-  technical_admin_users_from_group = _get_users_directory(
-      constants.TECHNICAL_ADMINS_GROUP, directory_client)
-  operational_admin_users_from_group = _get_users_directory(
-      constants.OPERATIONAL_ADMINS_GROUP, directory_client)
-  technician_users_from_group = _get_users_directory(
-      constants.TECHNICIANS_GROUP, directory_client)
+  directory_client = directory.DirectoryApiClient(constants.ADMIN_USERNAME)
+  technical_admin_users_from_group = directory_client.get_all_users_in_group(
+      constants.TECHNICAL_ADMINS_GROUP)
+  operational_admin_users_from_group = directory_client.get_all_users_in_group(
+      constants.OPERATIONAL_ADMINS_GROUP)
+  technician_users_from_group = directory_client.get_all_users_in_group(
+      constants.TECHNICIANS_GROUP)
 
   ndb_technical_admin_users = (
       user_model.User.query(user_model.User.roles.IN(
@@ -70,37 +58,6 @@ def sync_user_roles():
       users_keys=ndb_technician_users,
       group_users=technician_users_from_group,
       role='technician')
-
-
-def _get_users_directory(group_email, client):
-  """Get all users from given Google Group.
-
-  Args:
-    group_email: str, the email used to retrieve a paged list of users.
-    client: the directory client used to call the Directory API.
-
-  Returns:
-    user_group: a list of users for the group.
-  """
-  try:
-    response = client.users_in_group(group_email=group_email)
-  except directory.DirectoryRPCError as err:
-    raise InvalidCallToDirectoryError(
-        _DIR_CALL_INVALID_MSG % str(err))
-  user_group = []
-  while 'nextPageToken' in response:
-    for member in response['members']:
-      user_group.append(member['email'])
-    try:
-      response = client.users_in_group(
-          group_email=group_email, page_token=response.get('nextPageToken'))
-    except directory.DirectoryRPCError as err:
-      raise InvalidCallToDirectoryError(
-          _DIR_CALL_INVALID_MSG % str(err))
-  if 'nextPageToken' not in response:
-    for member in response['members']:
-      user_group.append(member['email'])
-  return user_group
 
 
 def _add_or_remove_user_roles(users_keys, group_users, role):

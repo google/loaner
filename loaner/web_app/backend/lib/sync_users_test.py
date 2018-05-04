@@ -55,26 +55,6 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
     self.datastore_technician_users = user_model.User.query(
         user_model.User.roles.IN(['technician'])).fetch(keys_only=True)
 
-    self.directory_obj_tech_admins = [
-        {'members': [
-            {'email': 'tech_admin_user@{}'.format(loanertest.USER_DOMAIN)},
-        ],
-         'nextPageToken': 'AHmOf6b_Ika37tPYH5N'},
-        {'members': [
-            {'email': 'tech_admin_user2@{}'.format(loanertest.USER_DOMAIN)},
-        ],
-         'nextPageToken': 'AHmOf6b_Ika37tPYH5N'},
-        {'members': [
-            {'email': 'tech_admin_user3@{}'.format(loanertest.USER_DOMAIN)},
-        ],
-        }
-    ]
-    self.directory_obj_tech_admins_no_pagetoken = [
-        {'members': [
-            {'email': 'tech_admin_user@{}'.format(loanertest.USER_DOMAIN)},
-        ],
-        }
-    ]
     self.populated_tech_admins_list = [
         'tech_admin_user@{}'.format(loanertest.USER_DOMAIN),
         'tech_admin_user2@{}'.format(loanertest.USER_DOMAIN),
@@ -88,64 +68,13 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
         'technician2@{}'.format(loanertest.USER_DOMAIN),
         'technician3@{}'.format(loanertest.USER_DOMAIN)]
 
-  @mock.patch('__main__.sync_users.logging.info')
-  @mock.patch('__main__.sync_users.directory.DirectoryApiClient')
-  def test_sync_user_roles(self, mock_directoryclass, mock_logging_info):
-    del mock_directoryclass  # Unused.
+  @mock.patch.object(sync_users, '_add_or_remove_user_roles')
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_sync_user_roles(self, mock_directory_class, mock_add_or_remove):
+    mock_directory_client = mock_directory_class.return_value
     sync_users.sync_user_roles()
-    assert mock_logging_info.call_count == 1
-
-  @mock.patch('__main__.sync_users.directory.DirectoryApiClient')
-  def test_get_users_directory_check(self, mock_directoryclass):
-    mockdirectoryclient = mock_directoryclass.return_value
-    mockdirectoryclient.users_in_group.side_effect = (
-        self.directory_obj_tech_admins)
-    tech_admin_users = sync_users._get_users_directory(
-        loanertest.USER_EMAIL, mockdirectoryclient)
-    self.assertListEqual(tech_admin_users, self.populated_tech_admins_list)
-
-  @mock.patch('__main__.sync_users.directory.DirectoryApiClient')
-  def test_get_users_directory_check_rpcerror_with_nextpagetoken(
-      self, mock_directoryclass):
-    directory_obj_rpcerror = [
-        {'members': [
-            {'email': 'tech_admin_user@{}'.format(loanertest.USER_DOMAIN)},
-        ],
-         'nextPageToken': 'AHmOf6b_Ika37tPYH5N'},
-        directory.DirectoryRPCError('Directory Failed')
-    ]
-    mockdirectoryclient = mock_directoryclass.return_value
-    mockdirectoryclient.users_in_group.side_effect = (directory_obj_rpcerror)
-    with self.assertRaisesRegexp(
-        sync_users.InvalidCallToDirectoryError,
-        sync_users._DIR_CALL_INVALID_MSG % 'Directory Failed'):
-      sync_users._get_users_directory(
-          loanertest.USER_EMAIL, mockdirectoryclient)
-
-  @mock.patch('__main__.sync_users.directory.DirectoryApiClient')
-  def test_get_users_directory_check_no_pagetoken(
-      self, mock_directoryclass):
-    mockdirectoryclient = mock_directoryclass.return_value
-    mockdirectoryclient.users_in_group.side_effect = (
-        self.directory_obj_tech_admins_no_pagetoken)
-    tech_admin_users = sync_users._get_users_directory(
-        loanertest.USER_EMAIL, mockdirectoryclient)
-    self.assertListEqual(
-        tech_admin_users, ['tech_admin_user@{}'.format(loanertest.USER_DOMAIN)])
-
-  @mock.patch('__main__.sync_users.directory.DirectoryApiClient')
-  def test_get_users_directory_invalid_call(self, mock_directoryclass):
-    def raise_error(group_email):
-      raise directory.DirectoryRPCError(group_email)
-    mockdirectoryclient = mock_directoryclass.return_value
-    mockdirectoryclient.users_in_group.side_effect = raise_error
-
-    # Should raise an error when the call to Directory API fails in any way.
-    with self.assertRaises(sync_users.InvalidCallToDirectoryError):
-      sync_users._get_users_directory(
-          group_email='', client=mockdirectoryclient)
-    mockdirectoryclient.users_in_group.side_effect = (
-        self.directory_obj_tech_admins)
+    self.assertEqual(mock_directory_client.get_all_users_in_group.call_count, 3)
+    self.assertEqual(mock_add_or_remove.call_count, 3)
 
   def test_add_or_remove_user_roles_technical_admins(self):
     sync_users._add_or_remove_user_roles(

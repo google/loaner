@@ -81,6 +81,7 @@ loaner_appengine_test(
     deps = [
         ":directory",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@googleapiclient_archive//:googleapiclient",
         "@mock_archive//:mock",
     ],

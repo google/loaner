@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl.testing import parameterized
+
 from googleapiclient import errors
 import mock
 
@@ -33,7 +35,7 @@ class FakeResponse(object):
     self.status = status
 
 
-class DirectoryClientTest(loanertest.TestCase):
+class DirectoryClientTest(parameterized.TestCase, loanertest.TestCase):
   """Test for the Directory API Client library."""
 
   def setUp(self):  # pylint: disable=arguments-differ
@@ -420,6 +422,31 @@ class DirectoryClientTest(loanertest.TestCase):
           user_email=self.user_email)
       directory_client.given_name(loanertest.USER_EMAIL)
     self.assertEqual(mock_logging.info.call_count, 2)
+
+  @parameterized.named_parameters(
+      {'testcase_name': 'NoPageToken',
+       'returns': [
+           {'members': [{'email': 'user@{}'.format(loanertest.USER_DOMAIN)}]}],
+       'expected_result': ['user@{}'.format(loanertest.USER_DOMAIN)]},
+      {'testcase_name': 'PageToken',
+       'returns': [
+           {'members': [
+               {'email': 'user_one@{}'.format(loanertest.USER_DOMAIN)}],
+            'nextPageToken': 'token_value'},
+           {'members': [
+               {'email': 'user_two@{}'.format(loanertest.USER_DOMAIN)}]}],
+       'expected_result': [
+           'user_one@{}'.format(loanertest.USER_DOMAIN),
+           'user_two@{}'.format(loanertest.USER_DOMAIN)]},
+  )
+  def test_get_all_users_in_group(self, returns, expected_result):
+    test_client = directory.DirectoryApiClient(loanertest.USER_EMAIL)
+    with mock.patch.object(
+        test_client, 'users_in_group') as mock_users_in_group:
+      mock_users_in_group.side_effect = returns
+      actual_result = test_client.get_all_users_in_group(
+          'users@{}'.format(loanertest.USER_DOMAIN))
+      self.assertEqual(expected_result, actual_result)
 
 
 if __name__ == '__main__':
