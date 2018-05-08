@@ -13,12 +13,12 @@
 // limitations under the License.
 
 import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatSort} from '@angular/material';
+import {MatSort, MatTableDataSource} from '@angular/material';
 import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
 
-import {ShelfData} from './shelf_data';
-import {ShelfDataSource} from './shelf_data_source';
+import {Shelf} from '../../models/shelf';
+import {ShelfService} from '../../services/shelf';
 
 /**
  * Implements the mat-table component. Implementation details:
@@ -45,30 +45,35 @@ export class ShelfListTable implements OnInit, OnDestroy {
     'icons',
   ];
   /** Type of data source that will be used on this implementation. */
-  dataSource: ShelfDataSource|null;
+  dataSource = new MatTableDataSource<Shelf>();
 
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild('filter') filter: ElementRef;
 
-  loading = true;
   pauseLoading = false;
 
-  constructor(private shelfData: ShelfData) {}
+  constructor(private shelfService: ShelfService) {}
 
   ngOnInit() {
+    this.dataSource.filterPredicate = (shelf: Shelf, filter: string) =>
+        shelf.name.indexOf(filter) !== -1 ||
+        shelf.lastAuditBy.indexOf(filter) !== -1;
+
+    this.dataSource.sort = this.sort;
     interval(5000)
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
-                return this.pauseLoading ? NEVER : this.shelfData.refresh();
+                return this.pauseLoading ? NEVER : this.shelfService.list();
               }))
-        .subscribe();
-
-    this.dataSource = new ShelfDataSource(this.shelfData, this.sort);
+        .subscribe(shelves => {
+          this.dataSource.data = shelves;
+        });
 
     fromEvent(this.filter.nativeElement, 'keyup')
         .pipe(debounceTime(150), distinctUntilChanged())
         .subscribe(() => {
           if (!this.dataSource) return;
-          this.dataSource.filter = this.filter.nativeElement.value;
+          this.dataSource.filter =
+              this.filter.nativeElement.value.trim().toLowerCase();
         });
   }
 

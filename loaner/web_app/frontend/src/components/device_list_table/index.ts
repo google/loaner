@@ -25,7 +25,6 @@ import {DeviceActionBoxModule} from '../device_action_box';
 import {DeviceActionsMenuModule} from '../device_actions_menu';
 import {DeviceButtonsModule} from '../device_buttons';
 
-import {DeviceData} from './device_data';
 import {DeviceListTable} from './device_list_table';
 
 export * from './device_list_table';
@@ -48,9 +47,6 @@ export * from './device_list_table';
     LostModule,
     MaterialModule,
     RouterModule,
-  ],
-  providers: [
-    DeviceData,
   ],
 })
 export class DeviceListTableModule {

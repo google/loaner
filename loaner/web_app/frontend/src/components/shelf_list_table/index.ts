@@ -20,7 +20,6 @@ import {GuestModeModule} from '../../../../../shared/components/guest';
 import {MaterialModule} from '../../core/material_module';
 import {ShelfButtonsModule} from '../shelf_buttons';
 
-import {ShelfData} from './shelf_data';
 import {ShelfListTable} from './shelf_list_table';
 
 export * from './shelf_list_table';
@@ -39,7 +38,6 @@ export * from './shelf_list_table';
     RouterModule,
     ShelfButtonsModule,
   ],
-  providers: [ShelfData],
 })
 export class ShelfListTableModule {
 }

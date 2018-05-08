@@ -13,22 +13,19 @@
 // limitations under the License.
 
 import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {MatSort} from '@angular/material';
+import {MatSort, MatTableDataSource} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
 import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
+import {debounceTime, distinctUntilChanged, startWith, takeUntil, tap} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
-import {Device} from '../../models/device';
+import {Device, DeviceApiParams} from '../../models/device';
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
 import {Actions} from '../device_action_box';
-
-import {DeviceData} from './device_data';
-import {DeviceDataSource} from './device_data_source';
 
 /**
  * Implements the mat-table component. Implementation details:
@@ -58,7 +55,7 @@ export class DeviceListTable implements OnInit {
   displayedColumns: string[];
 
   /** Type of data source that will be used on this implementation. */
-  dataSource: DeviceDataSource|null;
+  dataSource = new MatTableDataSource<Device>();
 
   /** Current action that will be used in the device-action-box if rendered. */
   currentAction: string;
@@ -73,7 +70,6 @@ export class DeviceListTable implements OnInit {
       private readonly damagedService: Damaged,
       private readonly lostService: Lost,
       private readonly extendService: Extend,
-      private readonly deviceData: DeviceData,
       private readonly deviceService: DeviceService,
       private readonly route: ActivatedRoute,
       private readonly guestModeService: GuestMode,
@@ -98,22 +94,31 @@ export class DeviceListTable implements OnInit {
 
   ngOnInit() {
     this.setDisplayColumns();
+    this.dataSource.sort = this.sort;
+    this.applyFilterPredicate();
+
     interval(5000)
-        .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
-                if (this.pauseLoading) return NEVER;
-                if (this.shelf) {
-                  return this.deviceData.refresh({
-                    shelf: {
-                      shelf_request: {
-                        location: this.shelf.shelfRequest.location,
-                        urlsafe_key: this.shelf.shelfRequest.urlsafe_key
-                      }
+        .pipe(
+            startWith(0),
+            takeUntil(this.onDestroy),
+            tap(() => {
+              if (this.pauseLoading) return NEVER;
+
+              let filters: DeviceApiParams = {};
+              if (this.shelf) {
+                filters = {
+                  shelf: {
+                    shelf_request: {
+                      location: this.shelf.shelfRequest.location,
+                      urlsafe_key: this.shelf.shelfRequest.urlsafe_key
                     }
-                  });
-                } else {
-                  return this.deviceData.refresh();
-                }
-              }))
+                  }
+                };
+              }
+
+              return this.refresh(filters);
+            }),
+            )
         .subscribe();
 
     this.route.params.subscribe((params) => {
@@ -125,18 +130,17 @@ export class DeviceListTable implements OnInit {
       }
     });
 
-    this.dataSource = new DeviceDataSource(this.deviceData, this.sort);
-
     fromEvent(this.filter.nativeElement, 'keyup')
         .pipe(debounceTime(150), distinctUntilChanged())
         .subscribe(() => {
           if (!this.dataSource) return;
-          this.dataSource.filter = this.filter.nativeElement.value;
+          this.dataSource.filter =
+              this.filter.nativeElement.value.toLowerCase();
         });
   }
 
   ngOnDestroy() {
-    this.deviceData.clearData();
+    this.dataSource.data = [];
     this.onDestroy.next();
   }
 
@@ -153,6 +157,25 @@ export class DeviceListTable implements OnInit {
       default:
         throw new Error('Device action not recognized.');
     }
-    action.pipe(switchMap(() => this.deviceData.refresh())).subscribe();
+    action.pipe(tap(() => this.refresh())).subscribe();
+  }
+
+  private refresh(filters: DeviceApiParams = {}) {
+    return this.deviceService.list(filters).subscribe(devices => {
+      this.dataSource.data = devices;
+    });
+  }
+
+  private applyFilterPredicate() {
+    this.dataSource.filterPredicate = (device: Device, filter: string) => {
+      if (device.chips
+              .filter(chip => chip.status.toLowerCase().startsWith(filter))
+              .length > 0) {
+        return true;
+      }
+      return device.id.toLowerCase().indexOf(filter) !== -1 ||
+          device.assignedUser.toLowerCase().indexOf(filter) !== -1 ||
+          device.deviceModel.toLowerCase().indexOf(filter) !== -1;
+    };
   }
 }
