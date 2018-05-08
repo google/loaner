@@ -77,7 +77,6 @@ export class ConfigService {
   CHROME_DEV_MODE = false;
   DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
   LOGGING = false;
-  TESTING = true;
 
   // Shared variables
   apiPath = '/_ah/api';

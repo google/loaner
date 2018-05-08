@@ -13,26 +13,28 @@
 // limitations under the License.
 
 
-import {Observable, of, throwError} from 'rxjs';
+import {Observable, of} from 'rxjs';
 
 import {ConfigService} from '../../../../shared/config';
 
 const CONFIG = new ConfigService();
 export function id(): Observable<string> {
-  if (CONFIG.CHROME_DEV_MODE || CONFIG.TESTING) {
-    return of(CONFIG.DEV_DEVICE_ID);
-  }
-
-  const deviceAttributes = chrome.enterprise.deviceAttributes;
-
-  if (!deviceAttributes) {
-    return throwError(`This application was not force installed by an OU. Please
-contact your administrator`);
-  }
-
-  return new Observable(observer => {
-    deviceAttributes.getDirectoryDeviceId(deviceId => {
-      observer.next(deviceId);
+  try {
+    const deviceAttributes = chrome.enterprise.deviceAttributes;
+    return new Observable(observer => {
+      deviceAttributes.getDirectoryDeviceId(deviceId => {
+        observer.next(deviceId);
+      });
     });
-  });
+  } catch (error) {
+    if (CONFIG.CHROME_DEV_MODE) {
+      console.warn(`The Chrome App is currently running in developer/testing
+mode and using a device id of ${CONFIG.DEV_DEVICE_ID}.`);
+      return of(CONFIG.DEV_DEVICE_ID);
+    } else {
+      console.error(`This application was not force installed by an OU.
+Please contact your administrator. ${error}`);
+      return of('NO_DEVICE_ID');
+    }
+  }
 }
