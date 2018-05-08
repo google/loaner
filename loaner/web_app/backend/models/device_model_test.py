@@ -59,7 +59,7 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         device_model='HP Chromebook 13 G1', current_ou='/',
         shelf=self.shelf.key, chrome_device_id='unique_id_8',
         damaged=False).put()
-    self.device = device_model.Device.get(serial_number='12321')
+    self.device1 = device_model.Device.get(serial_number='12321')
     self.device2 = device_model.Device.get(serial_number='67890')
     self.device3 = device_model.Device.get(serial_number='Void')
 
@@ -91,12 +91,12 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
   def test_identifier(self):
 
     # Devices without an asset tag should return the serial number.
-    self.device.asset_tag = None
-    self.assertEqual(self.device.serial_number, self.device.identifier)
+    self.device1.asset_tag = None
+    self.assertEqual(self.device1.serial_number, self.device1.identifier)
 
     # Devices with an asset tag should return the asset tag.
-    self.device.asset_tag = '123456'
-    self.assertEqual(self.device.asset_tag, self.device.identifier)
+    self.device1.asset_tag = '123456'
+    self.assertEqual(self.device1.asset_tag, self.device1.identifier)
 
   @mock.patch.object(logging, 'info')
   def test_enroll_new_device(self, mock_loginfo):
@@ -376,25 +376,25 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
         device_id=u'unique_id', org_unit_path='/')
 
   def test_list_by_user(self):
-    self.device.assigned_user = loanertest.SUPER_ADMIN_EMAIL
-    self.device.put()
+    self.device1.assigned_user = loanertest.SUPER_ADMIN_EMAIL
+    self.device1.put()
     self.device2.assigned_user = loanertest.SUPER_ADMIN_EMAIL
     self.device2.put()
     devices = device_model.Device.list_by_user(loanertest.SUPER_ADMIN_EMAIL)
     self.assertListEqual(
         [device.serial_number for device in devices],
-        [self.device.serial_number, self.device2.serial_number])
+        [self.device1.serial_number, self.device2.serial_number])
 
   def test_list_by_user_with_pending_return(self):
-    self.device.assigned_user = loanertest.SUPER_ADMIN_EMAIL
-    self.device.put()
+    self.device1.assigned_user = loanertest.SUPER_ADMIN_EMAIL
+    self.device1.put()
     self.device2.assigned_user = loanertest.SUPER_ADMIN_EMAIL
     self.device2.mark_pending_return_date = datetime.datetime.utcnow()
     self.device2.put()
     devices = device_model.Device.list_by_user(loanertest.SUPER_ADMIN_EMAIL)
     self.assertListEqual(
         [device.serial_number for device in devices],
-        [self.device.serial_number])
+        [self.device1.serial_number])
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_create_unenrolled(self, mock_directoryclass):
@@ -631,19 +631,26 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.assertIsNone(retrieved_device.next_reminder)
     self.assertEqual(mock_unlock.call_count, 1)
 
-  def test_lock_and_unlock(self):
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.test_device.lock(loanertest.USER_EMAIL)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_lock(self, mock_directoryclass):
+    mock_directoryclient = mock_directoryclass.return_value
+    unlocked_device = device_model.Device(
+        serial_number='123456', chrome_device_id='fake-chrome-789')
+    unlocked_device.lock(loanertest.USER_EMAIL)
     retrieved_device = device_model.Device.get(serial_number='123456')
-    self.mock_directoryclient.disable_chrome_device.assert_called_with(
-        self.test_device.chrome_device_id)
+    mock_directoryclient.disable_chrome_device.assert_called_with(
+        'fake-chrome-789')
     self.assertTrue(retrieved_device.locked)
 
-    self.mock_directoryclient.reset_mock()
-    self.test_device.unlock(loanertest.USER_EMAIL)
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_unlock(self, mock_directoryclass):
+    mock_directoryclient = mock_directoryclass.return_value
+    locked_device = device_model.Device(
+        serial_number='123456', locked=True, chrome_device_id='fake-chrome-789')
+    locked_device.unlock(loanertest.USER_EMAIL)
     retrieved_device = device_model.Device.get(serial_number='123456')
-    self.mock_directoryclient.reenable_chrome_device.assert_called_with(
-        self.test_device.chrome_device_id)
+    mock_directoryclient.reenable_chrome_device.assert_called_with(
+        'fake-chrome-789')
     self.assertFalse(retrieved_device.locked)
 
   @mock.patch.object(device_model, 'logging', autospec=True)

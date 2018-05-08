@@ -464,6 +464,7 @@ class Device(base_model.BaseModel):
     self.locked = False
     self.move_to_default_ou(user_email=user_email)
     self.stream_to_bq(user_email, 'Re-enabling disabled device.')
+    self.put()
 
   def loan_assign(self, user_email):
     """Assigns a device to a user.
