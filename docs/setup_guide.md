@@ -20,7 +20,7 @@ configure a Google Cloud Platform project:
     Enterprise](https://enterprise.google.com/chrome/chrome-enterprise/)**
 
     To log in to an assigned loaner Chromebook, borrowers must use a Google G
-    Suite account (GnG won’t work with standard Gmail accounts).
+    Suite account (GnG will not work with standard Gmail accounts).
 
 1.  **Setup an App Engine project in Google Cloud**
 
@@ -28,7 +28,7 @@ configure a Google Cloud Platform project:
         computing environment that runs on Google Cloud. [Create a Google Cloud
         Platform
         Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
-        Name the project something you’ll remember, such as *loaner*.
+        Name the project something you will remember, such as *loaner*.
 
     1.  [Create a billing
         account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
@@ -161,26 +161,26 @@ deployments of GnG:
     To customize the GnG backend, you’ll use Python 2.7.
 
 +   **[Know some Angular and Typescript](https://angular.io/).** \
-    To modify the GnG frontend and Chrome App, you’ll use Angular with
+    To modify the GnG frontend and Chrome App, you will use Angular with
     Typescript.
 
 +   **[Learn the Basics of Google App
     Engine](https://cloud.google.com/appengine/docs/standard/python/).** \
-    Although GnG is mostly set up, it's helpful to know the App Engine
+    Although GnG is mostly set up, it is helpful to know the App Engine
     environment should you want to customize it.
 
 +   **[Learn Git](https://git-scm.com/).** \
-    If you haven't used Git before, become familiar with this popular version
-    control system. You will clone our repository with Git.
+    If you have not used Git before, become familiar with this popular version
+    control system. You will clone the repository with Git.
 
 ## Configuration
 
 Use Git to make a copy of the GnG loaner source code:
 
-    ```
-    git clone https://github.com/google/loaner
-    cd loaner
-    ```
+```
+git clone https://github.com/google/loaner
+cd loaner
+```
 
 **Note**: The rest of this setup guide assumes that your working directory will
 be the root of the Git repository.
