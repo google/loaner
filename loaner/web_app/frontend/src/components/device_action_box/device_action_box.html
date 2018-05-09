@@ -14,18 +14,20 @@
       <section fxLayout="row"
                fxLayout.xs="column"
                *ngIf="action == actions.ENROLL">
-        <mat-form-field fxFlex class="serial-number">
+        <mat-form-field *ngIf="useSerialNumber" fxFlex class="serial-number">
           <input loanerRemoveWhitespaces
-                 #mainIdentifier matInput
-                 (keyup.enter)="useAssetTag ? assetTag.nativeElement.focus() : takeActionOnDevice()"
+                 #serialNumber
+                 matInput
+                 (keyup.enter)="takeActionOnDevice()"
                  placeholder="Serial number"
                  [(ngModel)]="device.serialNumber"
-                 name="mainIdentifier"
+                 name="serialNumber"
                  required>
         </mat-form-field>
         <mat-form-field *ngIf="useAssetTag" fxFlex class="asset-tag">
           <input loanerRemoveWhitespaces
-                 #assetTag matInput
+                 #assetTag
+                 matInput
                  (keyup.enter)="takeActionOnDevice()"
                  placeholder="Asset tag"
                  [(ngModel)]="device.assetTag"
@@ -38,7 +40,8 @@
                *ngIf="action == actions.UNENROLL">
         <mat-form-field fxFlex class="serial-number">
           <input loanerRemoveWhitespaces
-                 #mainIdentifier matInput
+                 #mainIdentifier
+                 matInput
                  (keyup.enter)="takeActionOnDevice()"
                  [placeholder]="mainIdentifierName"
                  [(ngModel)]="device.id"
@@ -48,7 +51,8 @@
       </section>
       <section>
         <div fxFlex></div>
-        <button mat-button #actionButton
+        <button mat-button
+                #actionButton
                 type="button"
                 (click)="takeActionOnDevice()"
                 class="action-button"

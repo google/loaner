@@ -13,11 +13,10 @@
 // limitations under the License.
 
 import {Component} from '@angular/core';
-import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-
 import {of} from 'rxjs';
 
 import {Device} from '../../models/device';
@@ -25,7 +24,7 @@ import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
 import {ConfigServiceMock} from '../../testing/mocks';
 
-import {DeviceActionBox, DeviceActionBoxModule} from '.';
+import {DeviceActionBox, DeviceActionBoxModule, DeviceIdentifierMode} from '.';
 
 @Component({
   preserveWhitespaces: true,
@@ -72,8 +71,10 @@ describe('DeviceActionBox', () => {
                     .componentInstance;
 
     configService = TestBed.get(ConfigService);
-    configServiceSpy = spyOn(configService, 'getBooleanConfig');
-    configServiceSpy.and.returnValue(of(true));
+    configServiceSpy = spyOn(configService, 'getStringConfig');
+    configServiceSpy.and.returnValue(of(DeviceIdentifierMode.SERIAL_NUMBER));
+
+    actionBox.ngOnInit();
   }));
 
   it('creates the EnrollUnenrollComponentTest', () => {
@@ -103,50 +104,118 @@ describe('DeviceActionBox', () => {
           .toContain('Add device');
     });
 
-    it('renders serial number input', () => {
-      const compiled = fixture.debugElement.nativeElement;
-      const formField = compiled.querySelector('.mat-form-field.serial-number');
-      const input = formField.querySelector('input');
+    it('renders serial input if device_identifier_mode is set to serial_number',
+       () => {
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierMode.SERIAL_NUMBER));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
+         const compiled = fixture.debugElement.nativeElement;
+         const formField =
+             compiled.querySelector('.mat-form-field.serial-number');
+         const input = formField.querySelector('input');
 
-      expect(formField.textContent).toContain('Serial number');
-      expect(input).toBeDefined();
-      expect(input.getAttribute('required')).not.toBeNull();
-    });
+         expect(formField.textContent).toContain('Serial number');
+         expect(input).toBeDefined();
+         expect(input.getAttribute('required')).not.toBeNull();
+       });
 
-    it('renders asset tag input if use_asset_tag is true', () => {
-      const compiled = fixture.debugElement.nativeElement;
-      const formField = compiled.querySelector('.mat-form-field.asset-tag');
-      const input = formField.querySelector('input');
+    it('renders serial input if device_identifier_mode is set to both_required',
+       () => {
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierMode.BOTH_REQUIRED));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
+         const compiled = fixture.debugElement.nativeElement;
+         const formField =
+             compiled.querySelector('.mat-form-field.serial-number');
+         const input = formField.querySelector('input');
 
-      expect(formField.textContent).toContain('Asset tag');
-      expect(input).toBeDefined();
-      expect(input.getAttribute('required')).not.toBeNull();
-    });
+         expect(formField.textContent).toContain('Serial number');
+         expect(input).toBeDefined();
+         expect(input.getAttribute('required')).not.toBeNull();
+       });
 
-    it('does not render asset tag input if use_asset_tag is false', () => {
-      configServiceSpy.and.returnValue(of(false));
-      actionBox.ngOnInit();
-      fixture.detectChanges();
-      const compiled = fixture.debugElement.nativeElement;
-      const formField = compiled.querySelector('.mat-form-field.asset-tag');
+    it('renders asset input if device_identifier_mode is set to asset_tag',
+       () => {
+         configServiceSpy.and.returnValue(of(DeviceIdentifierMode.ASSET_TAG));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
+         const compiled = fixture.debugElement.nativeElement;
+         const formField = compiled.querySelector('.mat-form-field.asset-tag');
+         const input = formField.querySelector('input');
 
-      expect(formField).toBeNull();
-    });
+         expect(formField.textContent).toContain('Asset tag');
+         expect(input).toBeDefined();
+         expect(input.getAttribute('required')).not.toBeNull();
+       });
+
+    it('renders asset input if device_identifier_mode is set to both_required',
+       () => {
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierMode.BOTH_REQUIRED));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
+         const compiled = fixture.debugElement.nativeElement;
+         const formField = compiled.querySelector('.mat-form-field.asset-tag');
+         const input = formField.querySelector('input');
+
+         expect(formField.textContent).toContain('Asset tag');
+         expect(input).toBeDefined();
+         expect(input.getAttribute('required')).not.toBeNull();
+       });
+
+    it('renders 2 inputs if device_identifier_mode is set to both_required',
+       () => {
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierMode.BOTH_REQUIRED));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
+         const compiled = fixture.debugElement.nativeElement;
+         const inputFields = compiled.querySelectorAll('.mat-form-field');
+
+         expect(inputFields.length).toBe(2);
+       });
+
+    it('renders 1 input if device_identifier_mode is not set to both_required',
+       fakeAsync(() => {
+         configServiceSpy.and.returnValue(of(DeviceIdentifierMode.ASSET_TAG));
+         actionBox.ngOnInit();
+         tick();
+         fixture.detectChanges();
+         let compiled = fixture.debugElement.nativeElement;
+         let inputFields = compiled.querySelectorAll('.mat-form-field');
+
+         expect(inputFields.length).toBe(1);
+
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierMode.SERIAL_NUMBER));
+         actionBox.ngOnInit();
+         fixture.detectChanges();
+         compiled = fixture.debugElement.nativeElement;
+         inputFields = compiled.querySelectorAll('.mat-form-field');
+
+         expect(inputFields.length).toBe(1);
+       }));
 
     it('only emits the device when button is pressed with asset tag', () => {
-      const compiled = fixture.debugElement.nativeElement;
-      const actionButton =
-          compiled.querySelector('.action-button') as HTMLElement;
-
+      configServiceSpy.and.returnValue(of(DeviceIdentifierMode.BOTH_REQUIRED));
       spyOn(testComponent, 'takeAction');
       actionBox.device.serialNumber = '123123';
+      actionBox.ngOnInit();
       fixture.detectChanges();
+      let compiled = fixture.debugElement.nativeElement;
+      let actionButton =
+          compiled.querySelector('.action-button') as HTMLElement;
 
       actionButton.click();
 
       expect(testComponent.takeAction).not.toHaveBeenCalled();
       actionBox.device.assetTag = 'asset';
+      actionBox.ngOnInit();
       fixture.detectChanges();
+      compiled = fixture.debugElement.nativeElement;
+      actionButton = compiled.querySelector('.action-button') as HTMLElement;
 
       actionButton.click();
 
@@ -178,7 +247,7 @@ describe('DeviceActionBox', () => {
           .toContain('Remove device');
     });
 
-    it('only renders 1 input with placeholder depending on use_asset_tag',
+    it('only renders 1 input with placeholder depending on device_identifier',
        () => {
          let compiled = fixture.debugElement.nativeElement;
          let formFields = compiled.querySelectorAll('.mat-form-field');
@@ -186,11 +255,12 @@ describe('DeviceActionBox', () => {
 
          let field = formFields[0];
          let input = field.querySelector('input');
-         expect(field.textContent).toContain('Asset tag');
+         expect(field.textContent).toContain('Serial Number');
          expect(input).toBeDefined();
          expect(input.getAttribute('required')).not.toBeNull();
 
-         configServiceSpy.and.returnValue(of(false));
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierMode.BOTH_REQUIRED));
          actionBox.ngOnInit();
          fixture.detectChanges();
 
@@ -200,7 +270,7 @@ describe('DeviceActionBox', () => {
 
          field = formFields[0];
          input = field.querySelector('input');
-         expect(field.textContent).toContain('Serial Number');
+         expect(field.textContent).toContain('Asset tag');
          expect(input).toBeDefined();
          expect(input.getAttribute('required')).not.toBeNull();
        });

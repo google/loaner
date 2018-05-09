@@ -28,6 +28,16 @@ export enum Actions {
   UNENROLL = 'unenroll',
 }
 
+/**
+ * Device identifier supported modes, needs to match modes on
+ * web_app/config_defaults.py
+ */
+export enum DeviceIdentifierMode {
+  ASSET_TAG = 'asset_tag',
+  SERIAL_NUMBER = 'serial_number',
+  BOTH_REQUIRED = 'both_required'
+}
+
 /** Possible states that the action box can have: expanded or collapsed. */
 export type ExpansionState = 'expanded'|'collapsed';
 
@@ -59,10 +69,24 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   state: ExpansionState;
   /** Device model that will be added. */
   device = new Device();
+  /** Which device identifier mode the app is currently configured to use. */
+  private deviceIdentifierMode: DeviceIdentifierMode =
+      DeviceIdentifierMode.SERIAL_NUMBER;
+
   /** If asset tag should be used on this instace of the app. */
-  useAssetTag = false;
+  get useAssetTag() {
+    return this.deviceIdentifierMode === DeviceIdentifierMode.ASSET_TAG ||
+        this.deviceIdentifierMode === DeviceIdentifierMode.BOTH_REQUIRED;
+  }
+
+  /** If serial number should be used on this instace of the app. */
+  get useSerialNumber() {
+    return this.deviceIdentifierMode === DeviceIdentifierMode.SERIAL_NUMBER ||
+        this.deviceIdentifierMode === DeviceIdentifierMode.BOTH_REQUIRED;
+  }
 
   @ViewChild('mainIdentifier') mainIdentifier: ElementRef;
+  @ViewChild('serialNumber') serialNumber: ElementRef;
   @ViewChild('assetTag') assetTag: ElementRef;
   @ViewChild('actionForm') actionForm: NgForm;
 
@@ -71,16 +95,17 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
 
   constructor(
       private readonly configService: ConfigService,
-      private router: Router,
+      private readonly router: Router,
       private readonly snackBar: LoanerSnackBar,
   ) {}
 
   ngOnInit() {
-    this.configService.getBooleanConfig('use_asset_tags')
+    this.configService.getStringConfig('device_identifier_mode')
         .subscribe(response => {
+          this.deviceIdentifierMode = response as DeviceIdentifierMode;
           this.state = 'expanded';
-          this.useAssetTag = response;
         });
+
 
     fromEvent<KeyboardEvent>(document, 'keyup').subscribe(event => {
       if (event.key === 'Escape') {
@@ -90,7 +115,9 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
 
     this.router.events.subscribe(event => {
       if (event instanceof NavigationEnd) {
-        this.setUpInput();
+        setTimeout(() => {
+          this.setUpInput();
+        });
       }
     });
   }
@@ -99,8 +126,43 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
     this.setUpInput();
   }
 
+  /** Setup input field configuration */
+  private setUpInput() {
+    this.setUpMainIdentifier();
+    if (this.actionForm) {
+      setTimeout(() => {
+        this.mainIdentifier.nativeElement.focus();
+        this.mainIdentifier.nativeElement.select();
+      }, 500);
+      this.blurFromAnyInput();
+      this.actionForm.resetForm();
+    }
+  }
+
+  private setUpMainIdentifier() {
+    if (this.action === Actions.ENROLL) {
+      if (this.useSerialNumber) {
+        this.mainIdentifier = this.serialNumber;
+      } else {
+        this.mainIdentifier = this.assetTag;
+      }
+    }
+  }
+
   get mainIdentifierName() {
     return this.useAssetTag ? 'Asset tag' : 'Serial Number';
+  }
+
+  private blurFromAnyInput() {
+    if (this.serialNumber) {
+      this.serialNumber.nativeElement.blur();
+    }
+    if (this.assetTag) {
+      this.assetTag.nativeElement.blur();
+    }
+    if (this.mainIdentifier) {
+      this.mainIdentifier.nativeElement.blur();
+    }
   }
 
   /** Emits the takeAction event with the current device on the component. */
@@ -113,12 +175,10 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   }
 
   private takeEnrollActions() {
-    if (!this.device.serialNumber) {
-      this.mainIdentifier.nativeElement.focus();
-      this.snackBar.open('Serial Number is empty and it is required');
+    if (this.useSerialNumber && !this.device.serialNumber) {
+      this.serialNumber.nativeElement.focus();
     } else if (this.useAssetTag && !this.device.assetTag) {
       this.assetTag.nativeElement.focus();
-      this.snackBar.open('Asset tag is empty and it is required');
     } else {
       this.emitDevice();
     }
@@ -137,19 +197,7 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   private emitDevice() {
     this.takeAction.emit(this.device);
     this.device = new Device();
-    this.mainIdentifier.nativeElement.focus();
-    this.actionForm.resetForm();
-  }
-
-  /** Setup input field configuration */
-  setUpInput() {
-    if (this.actionForm) {
-      setTimeout(() => {
-        this.mainIdentifier.nativeElement.focus();
-        this.mainIdentifier.nativeElement.select();
-      }, 500);
-      this.actionForm.resetForm();
-    }
+    this.setUpInput();
   }
 
   collapse() {
