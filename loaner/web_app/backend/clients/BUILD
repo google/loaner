@@ -1,7 +1,7 @@
 # Description:
 #   BUILD file for //loaner/web_app/backend/clients.
 
-package(default_visibility = ["//loaner:internal"])
+package(default_visibility = ["//loaner:__subpackages__"])
 
 load(
     "//loaner:builddefs.bzl",

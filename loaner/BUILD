@@ -10,6 +10,6 @@ package_group(
 
 package(
     default_visibility = [
-        ":internal",
+        ":__subpackages__",
     ],
 )
