@@ -48,17 +48,12 @@ export class ShelfListTable implements OnInit, OnDestroy {
   dataSource = new MatTableDataSource<Shelf>();
 
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild('filter') filter: ElementRef;
 
   pauseLoading = false;
 
   constructor(private shelfService: ShelfService) {}
 
   ngOnInit() {
-    this.dataSource.filterPredicate = (shelf: Shelf, filter: string) =>
-        shelf.name.indexOf(filter) !== -1 ||
-        shelf.lastAuditBy.indexOf(filter) !== -1;
-
     this.dataSource.sort = this.sort;
     interval(5000)
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
@@ -67,17 +62,10 @@ export class ShelfListTable implements OnInit, OnDestroy {
         .subscribe(shelves => {
           this.dataSource.data = shelves;
         });
-
-    fromEvent(this.filter.nativeElement, 'keyup')
-        .pipe(debounceTime(150), distinctUntilChanged())
-        .subscribe(() => {
-          if (!this.dataSource) return;
-          this.dataSource.filter =
-              this.filter.nativeElement.value.trim().toLowerCase();
-        });
   }
 
   ngOnDestroy() {
+    this.dataSource.data = [];
     this.onDestroy.next();
   }
 }

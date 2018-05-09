@@ -4,10 +4,6 @@
       {{ cardTitle }}
     </span>
     <loaner-shelf-buttons></loaner-shelf-buttons>
-    <div fxFlex></div>
-    <mat-form-field class="filter-form-field">
-      <input matInput #filter placeholder="Filter shelves">
-    </mat-form-field>
   </mat-card-title>
   <mat-card-content>
     <mat-table #table [dataSource]="dataSource" matSort>

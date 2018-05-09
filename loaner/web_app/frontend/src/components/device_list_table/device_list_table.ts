@@ -64,7 +64,6 @@ export class DeviceListTable implements OnInit {
   pauseLoading = false;
 
   @ViewChild(MatSort) sort: MatSort;
-  @ViewChild('filter') filter: ElementRef;
 
   constructor(
       private readonly damagedService: Damaged,
@@ -95,7 +94,6 @@ export class DeviceListTable implements OnInit {
   ngOnInit() {
     this.setDisplayColumns();
     this.dataSource.sort = this.sort;
-    this.applyFilterPredicate();
 
     interval(5000)
         .pipe(
@@ -129,14 +127,6 @@ export class DeviceListTable implements OnInit {
         }
       }
     });
-
-    fromEvent(this.filter.nativeElement, 'keyup')
-        .pipe(debounceTime(150), distinctUntilChanged())
-        .subscribe(() => {
-          if (!this.dataSource) return;
-          this.dataSource.filter =
-              this.filter.nativeElement.value.toLowerCase();
-        });
   }
 
   ngOnDestroy() {
@@ -164,18 +154,5 @@ export class DeviceListTable implements OnInit {
     return this.deviceService.list(filters).subscribe(devices => {
       this.dataSource.data = devices;
     });
-  }
-
-  private applyFilterPredicate() {
-    this.dataSource.filterPredicate = (device: Device, filter: string) => {
-      if (device.chips
-              .filter(chip => chip.status.toLowerCase().startsWith(filter))
-              .length > 0) {
-        return true;
-      }
-      return device.id.toLowerCase().indexOf(filter) !== -1 ||
-          device.assignedUser.toLowerCase().indexOf(filter) !== -1 ||
-          device.deviceModel.toLowerCase().indexOf(filter) !== -1;
-    };
   }
 }

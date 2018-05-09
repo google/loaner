@@ -4,10 +4,6 @@
       {{ cardTitle }}
     </span>
     <loaner-device-buttons *ngIf="showButtons"></loaner-device-buttons>
-    <div fxFlex></div>
-    <mat-form-field class="filter-form-field">
-      <input matInput #filter placeholder="Filter devices">
-    </mat-form-field>
   </mat-card-title>
   <mat-card-content>
     <loaner-device-action-box *ngIf="currentAction"
