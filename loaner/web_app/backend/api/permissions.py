@@ -30,6 +30,7 @@ class Permissions(object):
   AUDIT_SHELF = 'audit_shelf'
   BOOTSTRAP = 'bootstrap'
   CLEAR_INDICES = 'clear_indices'
+  CREATE_ROLE = 'create_role'
   CREATE_SURVEY = 'create_survey'
   DATASTORE_IMPORT = 'datastore_import'
   DEVICE_AUDIT = 'device_audit'
@@ -43,6 +44,7 @@ class Permissions(object):
   GET_CONFIG = 'get_config'
   GET_DEVICE = 'get_device'
   GET_SHELF = 'get_shelf'
+  GET_ROLE = 'get_role'
   GET_USER = 'get_user'
   LIST_CONFIGS = 'list_configs'
   LIST_DEVICES = 'list_devices'
@@ -61,90 +63,6 @@ class Permissions(object):
   UNENROLL_DEVICE = 'unenroll_device'
   UPDATE_CONFIG = 'update_config'
   UPDATE_SHELF = 'update_shelf'
+  UPDATE_ROLE = 'update_role'
   UPDATE_USER = 'update_user'
-
-
-ROLES = {
-    'technical-admin': [
-        Permissions.AUDIT_SHELF,
-        Permissions.BOOTSTRAP,
-        Permissions.CREATE_SURVEY,
-        Permissions.CLEAR_INDICES,
-        Permissions.DATASTORE_IMPORT,
-        Permissions.DEVICE_AUDIT,
-        Permissions.DISABLE_SHELF,
-        Permissions.EDIT_SHELF,
-        Permissions.ENABLE_SHELF,
-        Permissions.ENROLL_DEVICE,
-        Permissions.ENABLE_GUEST_MODE,
-        Permissions.ENROLL_SHELF,
-        Permissions.EXTEND_LOAN,
-        Permissions.GET_CONFIG,
-        Permissions.GET_DEVICE,
-        Permissions.GET_SHELF,
-        Permissions.GET_USER,
-        Permissions.LIST_CONFIGS,
-        Permissions.LIST_DEVICES,
-        Permissions.LIST_SHELVES,
-        Permissions.LIST_SURVEYS,
-        Permissions.LIST_USER_DEVICES,
-        Permissions.LIST_USERBYROLE,
-        Permissions.MARK_DAMAGED,
-        Permissions.MARK_LOST,
-        Permissions.MARK_PENDING_RETURN,
-        Permissions.PATCH_SURVEY,
-        Permissions.REINDEX_SEARCH,
-        Permissions.RESPONSIBLE_FOR_AUDIT,
-        Permissions.RESUME_LOAN,
-        Permissions.UNENROLL_DEVICE,
-        Permissions.UPDATE_CONFIG,
-        Permissions.UPDATE_SHELF,
-        Permissions.UPDATE_USER
-    ],
-    'operational-admin': [
-        Permissions.ENABLE_GUEST_MODE,
-        Permissions.ENROLL_DEVICE,
-        Permissions.EXTEND_LOAN,
-        Permissions.GET_CONFIG,
-        Permissions.GET_DEVICE,
-        Permissions.GET_SHELF,
-        Permissions.GET_USER,
-        Permissions.LIST_CONFIGS,
-        Permissions.LIST_DEVICES,
-        Permissions.LIST_SHELVES,
-        Permissions.LIST_USER_DEVICES,
-        Permissions.LIST_USERBYROLE,
-        Permissions.MARK_DAMAGED,
-        Permissions.MARK_LOST,
-        Permissions.MARK_PENDING_RETURN,
-        Permissions.RESPONSIBLE_FOR_AUDIT,
-        Permissions.RESUME_LOAN,
-        Permissions.UNENROLL_DEVICE,
-    ],
-    'technician': [
-        Permissions.AUDIT_SHELF,
-        Permissions.DEVICE_AUDIT,
-        Permissions.ENROLL_DEVICE,
-        Permissions.GET_CONFIG,
-        Permissions.GET_DEVICE,
-        Permissions.GET_SHELF,
-        Permissions.GET_USER,
-        Permissions.LIST_CONFIGS,
-        Permissions.LIST_DEVICES,
-        Permissions.LIST_SHELVES,
-        Permissions.LIST_USER_DEVICES,
-        Permissions.RESPONSIBLE_FOR_AUDIT,
-        Permissions.UNENROLL_DEVICE
-    ],
-    'user': [
-        Permissions.ENABLE_GUEST_MODE,
-        Permissions.EXTEND_LOAN,
-        Permissions.GET_DEVICE,
-        Permissions.LIST_USER_DEVICES,
-        Permissions.MARK_DAMAGED,
-        Permissions.MARK_LOST,
-        Permissions.MARK_PENDING_RETURN,
-        Permissions.RESUME_LOAN,
-    ]
-}
 

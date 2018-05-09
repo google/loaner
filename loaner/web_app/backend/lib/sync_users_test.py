@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import mock
 
+from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import sync_users
 from loaner.web_app.backend.models import user_model
@@ -30,125 +31,89 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
 
   def setUp(self):
     super(SyncUsersTest, self).setUp()
+    user_model.Role.create(
+        name='technician',
+        associated_group='technicians@{}'.format(loanertest.USER_DOMAIN))
 
-    user_model.User.get_user(
-        'tech_admin_user@{}'.format(loanertest.USER_DOMAIN))
-    user_model.User.get_user(
-        'tech_admin_user2@{}'.format(loanertest.USER_DOMAIN),
-        opt_roles=['technical-admin', 'operational-admin'])
-    user_model.User.get_user(
-        'ops_admin_user@{}'.format(loanertest.USER_DOMAIN))
-    user_model.User.get_user(
-        'ops_admin_user2@{}'.format(loanertest.USER_DOMAIN),
-        opt_roles=['operational-admin'])
-    user_model.User.get_user('technician@{}'.format(loanertest.USER_DOMAIN))
-    user_model.User.get_user(
-        'technician2@{}'.format(loanertest.USER_DOMAIN),
-        opt_roles=['technician'])
-    user_model.User.get_user(loanertest.USER_EMAIL)
-    self.datastore_technical_admin_users = user_model.User.query(
-        user_model.User.roles.IN(
-            ['technical-admin'])).fetch(keys_only=True)
-    self.datastore_operational_admin_users = user_model.User.query(
-        user_model.User.roles.IN(
-            ['operational-admin'])).fetch(keys_only=True)
-    self.datastore_technician_users = user_model.User.query(
-        user_model.User.roles.IN(['technician'])).fetch(keys_only=True)
+    mock_directory = mock.patch.object(
+        directory, 'DirectoryApiClient', autospec=True)
+    self.addCleanup(mock_directory.stop)
+    mock_directory_client = mock_directory.start()
 
-    self.populated_tech_admins_list = [
-        'tech_admin_user@{}'.format(loanertest.USER_DOMAIN),
-        'tech_admin_user2@{}'.format(loanertest.USER_DOMAIN),
-        'tech_admin_user3@{}'.format(loanertest.USER_DOMAIN)]
-    self.populated_ops_admins_list = [
-        'ops_admin_user@{}'.format(loanertest.USER_DOMAIN),
-        'ops_admin_user2@{}'.format(loanertest.USER_DOMAIN),
-        'ops_admin_user3@{}'.format(loanertest.USER_DOMAIN)]
-    self.populated_technicians_list = [
-        'technician@{}'.format(loanertest.USER_DOMAIN),
-        'technician2@{}'.format(loanertest.USER_DOMAIN),
-        'technician3@{}'.format(loanertest.USER_DOMAIN)]
+    def directory_client_side_effect(*args, **kwargs):  # pylint: disable=unused-argument
+      if args[0] == constants.SUPERADMINS_GROUP:
+        return [
+            'need-superadmin@{}'.format(loanertest.USER_DOMAIN),
+            'keep-superadmin@{}'.format(loanertest.USER_DOMAIN),
+        ]
+      elif args[0] == 'technicians@{}'.format(loanertest.USER_DOMAIN):
+        return [
+            'need-technician@{}'.format(loanertest.USER_DOMAIN),
+            'keep-technician@{}'.format(loanertest.USER_DOMAIN),
+        ]
+    mock_directory_client = mock_directory_client.return_value
+    mock_directory_client.get_all_users_in_group.side_effect = (
+        directory_client_side_effect)
 
-  @mock.patch.object(sync_users, '_add_or_remove_user_roles')
-  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
-  def test_sync_user_roles(self, mock_directory_class, mock_add_or_remove):
-    mock_directory_client = mock_directory_class.return_value
+  def test_sync_user_roles__standard_user(self):
+    user_model.User.get_user('standard-user@{}'.format(loanertest.USER_DOMAIN))
+
     sync_users.sync_user_roles()
-    self.assertEqual(mock_directory_client.get_all_users_in_group.call_count, 3)
-    self.assertEqual(mock_add_or_remove.call_count, 3)
 
-  def test_add_or_remove_user_roles_technical_admins(self):
-    sync_users._add_or_remove_user_roles(
-        users_keys=self.datastore_technical_admin_users,
-        group_users=self.populated_tech_admins_list,
-        role='technical-admin')
-    # Make sure tech_admin_user still has technical-admin role.
-    user = user_model.User.get_user(
-        'tech_admin_user@{}'.format(loanertest.USER_DOMAIN))
-    self.assertListEqual(
-        user.roles,
-        ['user', 'technical-admin'])
-    # Make sure that tech_admin_user2 got technical-admin role
-    # added.
-    user = user_model.User.get_user(
-        'tech_admin_user2@{}'.format(loanertest.USER_DOMAIN))
-    self.assertTrue('technical-admin' in user.roles)
-    # Make sure that tech_admin_user3 was created and roles
-    # added.
-    user = user_model.User.get_user(
-        'tech_admin_user3@{}'.format(loanertest.USER_DOMAIN))
-    self.assertListEqual(
-        user.roles,
-        ['user', 'technical-admin'])
+    self.make_assertions(
+        'standard-user@{}'.format(loanertest.USER_DOMAIN), [], False)
 
-  def test_add_or_remove_user_roles_operational_admins(self):
-    sync_users._add_or_remove_user_roles(
-        users_keys=self.datastore_operational_admin_users,
-        group_users=self.populated_ops_admins_list,
-        role='operational-admin')
-    # Make sure ops_admin_user still has technical-admin role.
-    user = user_model.User.get_user(
-        'ops_admin_user@{}'.format(loanertest.USER_DOMAIN))
-    self.assertListEqual(
-        user.roles,
-        ['user', 'operational-admin'])
-    # Make sure that ops_admin_user2 got technical-admin role
-    # added.
-    user = user_model.User.get_user(
-        'ops_admin_user2@{}'.format(loanertest.USER_DOMAIN))
-    self.assertTrue('operational-admin' in user.roles)
-    self.assertEqual(len(user.roles), 2)
-    # Make sure that ops_admin_user3 was created and roles added.
-    user = user_model.User.get_user(
-        'ops_admin_user3@{}'.format(loanertest.USER_DOMAIN))
-    self.assertListEqual(
-        user.roles,
-        ['user', 'operational-admin'])
+  def test_sync_user_roles__superadmin(self):
+    user_model.User.get_user(
+        'need-superadmin@{}'.format(loanertest.USER_DOMAIN))
+    user_model.User.get_user(
+        'remove-superadmin@{}'.format(loanertest.USER_DOMAIN)
+    ).update(superadmin=True)
+    user_model.User.get_user(
+        'keep-superadmin@{}'.format(loanertest.USER_DOMAIN)
+    ).update(superadmin=True)
 
-    # Make sure that tech_admin_user2 got role removed.
-    user = user_model.User.get_user(
-        'tech_admin_user2@{}'.format(loanertest.USER_DOMAIN))
-    self.assertTrue('operational-admin' not in user.roles)
+    sync_users.sync_user_roles()
 
-  def test_add_or_remove_user_roles_technicians(self):
-    sync_users._add_or_remove_user_roles(
-        users_keys=self.datastore_technician_users,
-        group_users=self.populated_technicians_list,
-        role='technician')
-    # Make sure technician still has technical-admin role.
-    user = user_model.User.get_user(
-        'technician@{}'.format(loanertest.USER_DOMAIN))
-    self.assertListEqual(
-        user.roles, ['user', 'technician'])
-    # Make sure that technician2 got technical-admin role added.
-    user = user_model.User.get_user(
-        'technician2@{}'.format(loanertest.USER_DOMAIN))
-    self.assertTrue('technician' in user.roles)
-    self.assertEqual(len(user.roles), 2)
-    # Make sure that technician3 was created and roles added.
-    user = user_model.User.get_user(
-        'technician3@{}'.format(loanertest.USER_DOMAIN))
-    self.assertListEqual(
-        user.roles, ['user', 'technician'])
+    self.make_assertions(
+        'need-superadmin@{}'.format(loanertest.USER_DOMAIN), [], True)
+    self.make_assertions(
+        'remove-superadmin@{}'.format(loanertest.USER_DOMAIN), [], False)
+    self.make_assertions(
+        'keep-superadmin@{}'.format(loanertest.USER_DOMAIN), [], True)
+
+  def test_sync_User_roles__role(self):
+    user_model.User.get_user(
+        'need-technician@{}'.format(loanertest.USER_DOMAIN))
+    user_model.User.get_user(
+        'remove-technician@{}'.format(loanertest.USER_DOMAIN)
+    ).update(roles=['technician'])
+    user_model.User.get_user(
+        'keep-technician@{}'.format(loanertest.USER_DOMAIN)
+    ).update(roles=['technician'])
+
+    sync_users.sync_user_roles()
+
+    self.make_assertions(
+        'need-technician@{}'.format(loanertest.USER_DOMAIN), ['technician'],
+        False)
+    self.make_assertions(
+        'remove-technician@{}'.format(loanertest.USER_DOMAIN), [], False)
+    self.make_assertions(
+        'keep-technician@{}'.format(loanertest.USER_DOMAIN), ['technician'],
+        False)
+
+  def make_assertions(self, user_id, roles, superadmin):
+    """Asserts that users have correct roles/superadmin.
+
+    Args:
+      user_id: str, user email ID.
+      roles: list|str|, roles user should have.
+      superadmin: bool, if the user should be superadmin.
+    """
+    user = user_model.User.get_user(user_id)
+    self.assertCountEqual(user.role_names, roles)
+    self.assertEqual(user.superadmin, superadmin)
 
 if __name__ == '__main__':
   loanertest.main()

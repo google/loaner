@@ -20,6 +20,8 @@ from __future__ import print_function
 
 from absl import logging
 
+from google.appengine.ext import ndb
+
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.models import user_model
@@ -29,38 +31,22 @@ def sync_user_roles():
   """Syncs all of the elevated user roles for each user in Google groups."""
   logging.info(
       'Using admin account (%s) to sync users.', constants.ADMIN_USERNAME)
-  directory_client = directory.DirectoryApiClient(constants.ADMIN_USERNAME)
-  technical_admin_users_from_group = directory_client.get_all_users_in_group(
-      constants.TECHNICAL_ADMINS_GROUP)
-  operational_admin_users_from_group = directory_client.get_all_users_in_group(
-      constants.OPERATIONAL_ADMINS_GROUP)
-  technician_users_from_group = directory_client.get_all_users_in_group(
-      constants.TECHNICIANS_GROUP)
+  directory_client = directory.DirectoryApiClient(
+      user_email=constants.ADMIN_USERNAME)
 
-  ndb_technical_admin_users = (
-      user_model.User.query(user_model.User.roles.IN(
-          ['technical-admin'])).fetch(keys_only=True))
-  ndb_operational_admin_users = (
-      user_model.User.query(user_model.User.roles.IN(
-          ['operational-admin'])).fetch(keys_only=True))
-  ndb_technician_users = (
-      user_model.User.query(user_model.User.roles.IN(
-          ['technician'])).fetch(keys_only=True))
-  _add_or_remove_user_roles(
-      users_keys=ndb_technical_admin_users,
-      group_users=technical_admin_users_from_group,
-      role='technical-admin')
-  _add_or_remove_user_roles(
-      users_keys=ndb_operational_admin_users,
-      group_users=operational_admin_users_from_group,
-      role='operational-admin')
-  _add_or_remove_user_roles(
-      users_keys=ndb_technician_users,
-      group_users=technician_users_from_group,
-      role='technician')
+  superadmins_from_group = directory_client.get_all_users_in_group(
+      constants.SUPERADMINS_GROUP)
+  _add_or_remove_user_roles(superadmins_from_group, 'superadmin')
+
+  all_roles = user_model.Role.query().fetch()
+  for role in all_roles:
+    if role.associated_group:
+      users_from_group = directory_client.get_all_users_in_group(
+          role.associated_group)
+      _add_or_remove_user_roles(users_from_group, role.name)
 
 
-def _add_or_remove_user_roles(users_keys, group_users, role):
+def _add_or_remove_user_roles(group_users, role):
   """Add or remove a user's role based on Google group membership.
 
   This will check the datastore users that are passed (ndb_users) against the
@@ -71,18 +57,32 @@ def _add_or_remove_user_roles(users_keys, group_users, role):
   the ndb_users are not in group_users.
 
   Args:
-    users_keys: user_model.User obj, the user object keys from datastore.
     group_users: list, a list of users from a Google Group.
     role: str, the role to add or remove from user.
   """
+  if role == 'superadmin':
+    users_keys = user_model.User.query(
+        user_model.User.superadmin == True).fetch(keys_only=True)  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
+  else:
+    role_key = ndb.Key(user_model.Role, role)
+    users_keys = user_model.User.query(
+        user_model.User.roles.IN([role_key])).fetch(keys_only=True)
   ndb_user_ids = [user.id() for user in users_keys]
   users_to_add_role = set(group_users) - set(ndb_user_ids)
   users_to_remove_role = set(ndb_user_ids) - set(group_users)
   for user_email in users_to_add_role:
-    user = user_model.User.get_user(email=user_email)
-    user.roles.append(role)
-    user.put()
+    user = user_model.User.get_user(user_email)
+    if role == 'superadmin':
+      user.update(superadmin=True)
+    else:
+      new_roles = user.role_names
+      new_roles.append(role)
+      user.update(roles=new_roles)
   for user_email in users_to_remove_role:
-    user = user_model.User.get_by_id(user_email)
-    user.roles.remove(role)
-    user.put()
+    user = user_model.User.get_user(user_email)
+    if role == 'superadmin':
+      user.update(superadmin=False)
+    else:
+      new_roles = user.role_names
+      new_roles.remove(role)
+      user.update(roles=new_roles)

@@ -78,19 +78,9 @@ ADMIN_USERNAME = ''
 # The email address application emails will come from.
 EMAIL_FROM = 'noreply@example.com'
 
-# technical_admins_group: str, The name of the Google Group that contains a
-# 'Technical Admin' in charge of configuring the app and experience.
-TECHNICAL_ADMINS_GROUP = 'technical-admins@example.com'
-
-# operational_admins_group: str, The name of the Google Group that
-# contains a 'Operational Admin' - a person in charge of the operational
-# health of the program.
-OPERATIONAL_ADMINS_GROUP = 'operational-admins@example.com'
-
-# technicians_group: str, The name of the Google Group that contains a
-# 'Technician' - a person responsible for the day-to-day of the program,
-# check in, auditing, enrolling, etc. Also can see historical information.
-TECHNICIANS_GROUP = 'technicians@example.com'
+# superadmins_group: str, The name of the Google Group that governs who is
+# a superadmin. Superadmins have all permissions by default.
+SUPERADMINS_GROUP = 'technical-admins@example.com'
 
 # The PROD server specific configurations.
 if ON_PROD:

@@ -18,10 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import random
 import re
 
-from absl import logging
 import yaml
 from google.appengine.ext import ndb
 

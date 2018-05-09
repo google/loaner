@@ -115,9 +115,6 @@ USER_YAML = """
 users:
   - id: daredevil@{}
   - id: jessicajones@{}
-    roles:
-      - operational_admin
-      - technical_admin
 """.format(loanertest.USER_DOMAIN, loanertest.USER_DOMAIN)
 ALL_YAML = (
     SHELF_YAML + DEVICE_YAML + CORE_EVENT_YAML + SHELF_AUDIT_EVENT_YAML +

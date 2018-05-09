@@ -81,6 +81,7 @@ loaner_appengine_library(
     deps = [
         ":base_model",
         ":config_model",
+        "//loaner/web_app:config_defaults",
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:events",
@@ -268,6 +269,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":user_model",
+        "//loaner/web_app/backend/api:permissions",
         "//loaner/web_app/backend/testing:loanertest",
     ],
 )

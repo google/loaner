@@ -55,6 +55,9 @@ _ASSET_TAGS_REQUIRED_MSG = (
 _SERIAL_NUMBERS_REQUIRED_MSG = (
     'The administrator requires Chrome device serial numbers to be present '
     'when enrolling a device but one was not provided.')
+_ASSIGNMENT_MISMATCH_MSG = (
+    'Unable to perform this action. Device is currently assigned to another '
+    'user.')
 
 
 class Error(Exception):

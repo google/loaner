@@ -22,13 +22,13 @@ import mock
 
 from protorpc import message_types
 from google.appengine.api import users
+from google.appengine.ext import ndb
 import endpoints
 
 from loaner.web_app import constants
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.lib import user as user_lib  # pylint: disable=unused-import
 from loaner.web_app.backend.lib import xsrf
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
@@ -47,20 +47,16 @@ class FakeApiPermissionChecks(root_api.Service):
   @auth.method(
       message_types.VoidMessage,
       http_method='POST',
-      permission=permissions.Permissions.LIST_USER_DEVICES,
-      allow_assignee=True)
-  def api_for_assignee_or_admins(self, request, roles_permitted=None):
+      permission=permissions.Permissions.AUDIT_SHELF)
+  def api_with_permission(self, request):
     self.check_xsrf_token(self.request_state)
-    if roles_permitted == ['user']:
-      if users.get_current_user() != users.User(email=loanertest.USER_EMAIL):
-        raise endpoints.ForbiddenException('User is not assignee.')
     return message_types.VoidMessage()
 
   @auth.method(
       message_types.VoidMessage,
       http_method='POST',
       permission=permissions.Permissions.ENROLL_DEVICE)
-  def api_for_admins_only(self, request):
+  def api_for_superadmins_only(self, request):
     self.check_xsrf_token(self.request_state)
     return message_types.VoidMessage()
 
@@ -72,20 +68,17 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
     self.service = FakeApiPermissionChecks()
     self.request = message_types.VoidMessage()
 
+    user_model.Role.create(
+        'technical_admin',
+        permissions=[permissions.Permissions.AUDIT_SHELF],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    user_model.User(
+        id=loanertest.SUPER_ADMIN_EMAIL, superadmin=True).put()
     user_model.User(
         id=loanertest.TECHNICAL_ADMIN_EMAIL,
-        roles=['technical-admin']).put()
-    user_model.User(
-        id=loanertest.OPERATIONAL_ADMIN_EMAIL,
-        roles=['operational-admin']).put()
-    user_model.User(
-        id=loanertest.TECHNICIAN_EMAIL,
-        roles=['technician']).put()
-    user_model.User(
-        id=loanertest.USER_EMAIL, roles=['user']).put()
-    user_model.User(
-        id='someone-else@{}'.format(loanertest.USER_DOMAIN),
-        roles=['user']).put()
+        roles=[ndb.Key(user_model.Role, 'technical_admin')]).put()
+    user_model.User(id=loanertest.USER_EMAIL).put()
 
   def call_test_as(self, api_name, user):
     """Makes a call FakeApiPermissionChecks APIs with different users.
@@ -106,7 +99,7 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
         if api_method(self.request) == message_types.VoidMessage():
           return True
 
-  def test_loaner_endpoints_auth_method(self):
+  def test_loaner_endpoints_auth_method__unauthenticated(self):
     # Test no user logged in.
     constants.ON_GAE = True
     user = None
@@ -115,55 +108,53 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
 
     with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as(
-          api_name='api_for_assignee_or_admins', user=user)
+          api_name='api_with_permission', user=user)
 
     with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as(
-          api_name='api_for_admins_only', user=user)
+          api_name='api_for_superadmins_only', user=user)
 
-    # Test api_for_any_authenticated_user with a user.
+  def test_loaner_endpoints_auth_method__api_for_any_authenticated_user(self):
+    # Test api_with_permission with a user.
     user = users.User(email=loanertest.USER_EMAIL)
     self.assertTrue(self.call_test_as('api_for_any_authenticated_user', user))
 
-    # Test api_for_any_authenticated_user with a technical_admin.
+    # Test api_for_any_authenticated_user with permission.
     user = users.User(email=loanertest.TECHNICAL_ADMIN_EMAIL)
     self.assertTrue(self.call_test_as('api_for_any_authenticated_user', user))
 
-    # Test api_for_assignee_or_admins with the assignee.
-    user = users.User(email=loanertest.USER_EMAIL)
-    self.assertTrue(self.call_test_as('api_for_assignee_or_admins', user))
-
-    # Make sure api_for_admins_only forbids non-admins.
-    user = users.User(email=loanertest.USER_EMAIL)
-    with self.assertRaises(endpoints.ForbiddenException):
-      self.call_test_as('api_for_admins_only', user)
+    # Test api_for_any_authenticated_user with the superadmin.
+    user = users.User(email=loanertest.SUPER_ADMIN_EMAIL)
+    self.assertTrue(self.call_test_as('api_for_any_authenticated_user', user))
 
     # Test invalid domain.
-    user = users.User(email='daredevil@fakedomain.com')
+    user = users.User(email='userl@fakedomain.com')
     with self.assertRaises(endpoints.UnauthorizedException):
-      self.call_test_as('api_for_admins_only', user)
+      self.call_test_as('api_for_any_authenticated_user', user)
+
+  def test_loaner_endpoints_auth_method__api_with_permission(self):
+    # Forbid standard users.
+    user = users.User(email=loanertest.USER_EMAIL)
+    with self.assertRaises(endpoints.ForbiddenException):
+      self.call_test_as('api_with_permission', user)
 
     # Test permission for Technical Admin user.
     user = users.User(email=loanertest.TECHNICAL_ADMIN_EMAIL)
-    self.assertTrue(self.call_test_as('api_for_admins_only', user))
+    self.assertTrue(self.call_test_as('api_with_permission', user))
 
-    # Test permission for Operational Admin user.
-    user = users.User(email=loanertest.OPERATIONAL_ADMIN_EMAIL)
-    self.assertTrue(self.call_test_as('api_for_admins_only', user))
+    # Test permission for superadmin.
+    user = users.User(email=loanertest.SUPER_ADMIN_EMAIL)
+    self.assertTrue(self.call_test_as('api_with_permission', user))
 
-    # Test permission for Technician user.
-    user = users.User(email=loanertest.TECHNICIAN_EMAIL)
-    self.assertTrue(self.call_test_as('api_for_admins_only', user))
-
-    # Test permission for normal user.
-    user = users.User(email=loanertest.USER_EMAIL)
+  def test_loaner_endpoints_auth_method__api_for_superadmins_only(self):
+    # Test wrong permission.
+    user = users.User(email=loanertest.TECHNICAL_ADMIN_EMAIL)
     with self.assertRaises(endpoints.ForbiddenException):
-      self.call_test_as('api_for_admins_only', user)
+      self.call_test_as('api_for_superadmins_only', user)
 
-    # Test permission for normal user, but not the assignee.
-    user = users.User(email='someone-else@{}'.format(loanertest.USER_DOMAIN))
-    with self.assertRaises(endpoints.ForbiddenException):
-      self.call_test_as('api_for_assignee_or_admins', user)
+    # Test superadmin access.
+    user = users.User(email=loanertest.SUPER_ADMIN_EMAIL)
+    self.call_test_as('api_for_superadmins_only', user)
 
 
 if __name__ == '__main__':

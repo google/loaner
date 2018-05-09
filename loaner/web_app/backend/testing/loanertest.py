@@ -38,7 +38,6 @@ USER_DOMAIN = constants.APP_DOMAIN
 USER_EMAIL = 'user@{}'.format(USER_DOMAIN)
 SUPER_ADMIN_EMAIL = 'super_admin@{}'.format(USER_DOMAIN)
 TECHNICAL_ADMIN_EMAIL = 'technical-admin@{}'.format(USER_DOMAIN)
-OPERATIONAL_ADMIN_EMAIL = 'operational-admin@{}'.format(USER_DOMAIN)
 TECHNICIAN_EMAIL = 'technician@{}'.format(USER_DOMAIN)
 
 TEST_DIR_DEVICE_DEFAULT = {
@@ -165,14 +164,8 @@ class EndpointsTestCase(TestCase):
   def login_admin_endpoints_user(self, email=SUPER_ADMIN_EMAIL):
     """Logs in an admin with all roles."""
     self.mock_endpoints_get_current_user.return_value = users.User(email)
-    user_model.User.get_user(
-        email=email,
-        opt_roles=[
-            'technical-admin',
-            'operational-admin',
-            'technician',
-            'user'
-        ])
+    admin_user = user_model.User.get_user(email=email)
+    admin_user.update(superadmin=True)
 
 
 class ActionTestCase(TestCase):

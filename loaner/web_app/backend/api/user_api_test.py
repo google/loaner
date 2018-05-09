@@ -18,8 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from absl.testing import parameterized
-
 from protorpc import message_types
 
 from loaner.web_app.backend.api import user_api
@@ -28,7 +26,7 @@ from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class UserApiTest(loanertest.EndpointsTestCase, parameterized.TestCase):
+class UserApiTest(loanertest.EndpointsTestCase):
 
   def setUp(self):
     super(UserApiTest, self).setUp()
@@ -38,27 +36,77 @@ class UserApiTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     super(UserApiTest, self).tearDown()
     self.service = None
 
-  @parameterized.parameters(
-      {'test_email': loanertest.USER_EMAIL, 'test_roles': ['user'],},
-      {'test_email': loanertest.TECHNICIAN_EMAIL, 'test_roles': [
-          'technician', 'user'],},
-      {'test_email': loanertest.OPERATIONAL_ADMIN_EMAIL, 'test_roles': [
-          'operational-admin', 'user'],},
-      {'test_email': loanertest.TECHNICAL_ADMIN_EMAIL, 'test_roles': [
-          'technical-admin', 'user'],},
-      {'test_email': loanertest.SUPER_ADMIN_EMAIL, 'test_roles': [
-          'technical-admin', 'operational-admin', 'technician', 'user'],},)
-  def test_get(self, test_email, test_roles):
+  def test_get(self):
     """Test that a get returns the expected user message from the datastore."""
-    self.login_endpoints_user(test_email)
-    test_user_key = user_model.User(id=test_email, roles=test_roles).put()
+    self.login_endpoints_user(loanertest.USER_EMAIL)
+    test_user_key = user_model.User(id=loanertest.USER_EMAIL).put()
     test_user = test_user_key.get()
     request = message_types.VoidMessage()
-    expected_response = user_messages.UserResponse(
-        email=test_user.key.id(), roles=test_user.roles)
+    expected_response = user_messages.User(
+        email=test_user.key.id(), roles=[], permissions=[], superadmin=False)
+
     actual_response = self.service.get(request)
+
     self.assertEqual(actual_response.email, expected_response.email)
-    self.assertCountEqual(actual_response.roles, expected_response.roles)
+    self.assertEqual(actual_response.roles, expected_response.roles)
+    self.assertEqual(actual_response.permissions, expected_response.permissions)
+    self.assertEqual(actual_response.superadmin, expected_response.superadmin)
+
+
+class RoleApiTest(loanertest.EndpointsTestCase):
+
+  def setUp(self):
+    super(RoleApiTest, self).setUp()
+    self.service = user_api.RoleApi()
+    self.login_admin_endpoints_user()
+
+  def tearDown(self):
+    super(RoleApiTest, self).tearDown()
+    self.service = None
+
+  def test_create(self):
+    new_role = user_messages.Role(
+        name='test',
+        permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    self.service.create(new_role)
+
+    created_role = user_model.Role.get_by_name('test')
+    self.assertEqual(new_role.name, created_role.name)
+    self.assertCountEqual(new_role.permissions, created_role.permissions)
+
+  def test_get(self):
+    created_role = user_model.Role.create(
+        name='test',
+        permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    retrieved_role = self.service.get(
+        user_messages.GetRoleRequest(name='test'))
+
+    self.assertEqual(created_role.name, retrieved_role.name)
+    self.assertCountEqual(created_role.permissions, retrieved_role.permissions)
+    self.assertEqual(
+        created_role.associated_group, retrieved_role.associated_group)
+
+  def test_update(self):
+    created_role = user_model.Role.create(
+        name='test',
+        permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+    update_message = user_messages.Role(
+        name='test',
+        permissions=['get', 'create'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    self.service.update(update_message)
+
+    retrieved_role = user_model.Role.get_by_name('test')
+    self.assertCountEqual(
+        update_message.permissions, retrieved_role.permissions)
+    self.assertEqual(
+        created_role.associated_group, retrieved_role.associated_group)
 
 
 if __name__ == '__main__':

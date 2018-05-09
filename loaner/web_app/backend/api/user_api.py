@@ -21,6 +21,7 @@ from __future__ import print_function
 from protorpc import message_types
 
 from loaner.web_app.backend.api import auth
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import user_messages
 from loaner.web_app.backend.lib import user as user_lib
@@ -33,12 +34,68 @@ class UserApi(root_api.Service):
 
   @auth.method(
       message_types.VoidMessage,
-      user_messages.UserResponse,
+      user_messages.User,
       name='get',
       path='get',
       http_method='GET')
   def get(self, request):
     """Get user details for the logged in user."""
     user = user_model.User.get_user(email=user_lib.get_user_email())
-    return user_messages.UserResponse(
-        email=user.key.id(), roles=user.roles)
+    return user_messages.User(
+        email=user.key.id(),
+        roles=user.role_names,
+        permissions=user.get_permissions(),
+        superadmin=user.superadmin)
+
+
+@root_api.ROOT_API.api_class(resource_name='role', path='role')
+class RoleApi(root_api.Service):
+  """Endpoints API service class for Role and Role-related User requests."""
+
+  @auth.method(
+      user_messages.Role,
+      message_types.VoidMessage,
+      name='create',
+      path='create',
+      http_method='POST',
+      permission=permissions.Permissions.CREATE_ROLE)
+  def create(self, request):
+    """Create a new role."""
+    self.check_xsrf_token(self.request_state)
+    user_model.Role.create(
+        name=request.name,
+        permissions=request.permissions,
+        associated_group=request.associated_group)
+    return message_types.VoidMessage()
+
+  @auth.method(
+      user_messages.GetRoleRequest,
+      user_messages.Role,
+      name='get',
+      path='get',
+      http_method='GET',
+      permission=permissions.Permissions.GET_ROLE)
+  def get(self, request):
+    """Get a role."""
+    self.check_xsrf_token(self.request_state)
+    role = user_model.Role.get_by_name(request.name)
+    return user_messages.Role(
+        name=role.name,
+        permissions=role.permissions,
+        associated_group=role.associated_group)
+
+  @auth.method(
+      user_messages.Role,
+      message_types.VoidMessage,
+      name='update',
+      path='update',
+      http_method='POST',
+      permission=permissions.Permissions.UPDATE_ROLE)
+  def update(self, request):
+    """Update a role's permissions or associated group. Cannot edit name."""
+    self.check_xsrf_token(self.request_state)
+    role = user_model.Role.get_by_name(request.name)
+    role.update(
+        permissions=request.permissions,
+        associated_group=request.associated_group)
+    return message_types.VoidMessage()

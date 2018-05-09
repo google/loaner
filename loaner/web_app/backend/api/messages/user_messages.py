@@ -21,12 +21,39 @@ from __future__ import print_function
 from protorpc import messages
 
 
-class UserResponse(messages.Message):
-  """UserResponse response for ProtoRPC message.
+class User(messages.Message):
+  """User ProtoRPC message.
 
   Attributes:
     email: str, The user email to be displayed.
-    roles: list|str|, The roles of the user to be displayed.
+    roles: list|str|, The roles of the user.
+    permissions: list|str|, The permissions the user has.
+    superadmin: bool, If the user is designated as a superadmin.
   """
   email = messages.StringField(1)
   roles = messages.StringField(2, repeated=True)
+  permissions = messages.StringField(3, repeated=True)
+  superadmin = messages.BooleanField(4)
+
+
+class Role(messages.Message):
+  """Role ProtoRPC message.
+
+  Attributes:
+    name: str, The role's name. Immutable once set.
+    permissions: list|str|, The permissions associated with the role.
+    associated_group: str, name of the Google Group (or other permissions
+        container) used to associate this role to users automatically.
+  """
+  name = messages.StringField(1, required=True)
+  permissions = messages.StringField(2, repeated=True)
+  associated_group = messages.StringField(3)
+
+
+class GetRoleRequest(messages.Message):
+  """Get a role by name.
+
+  Attributes:
+    name: str, The role's name.
+  """
+  name = messages.StringField(1, required=True)
