@@ -20,39 +20,15 @@ describe('UserModel', () => {
   let user: User;
 
   beforeEach(() => {
-    user = new User({
-      roles: [CONFIG.roles.USER],
-    });
+    user = new User();
   });
 
-  it('should verify user isUser', () => {
-    expect(user.isUser).toBe(true);
-    user.roles = [];
-    expect(user.isUser).toBe(false);
+  it('should verify user does not have permission', () => {
+    expect(user.hasPermission(CONFIG.appPermissions.READ_SHELVES)).toBe(false);
   });
 
-  it('should verify user isTechnician', () => {
-    expect(user.isTechnician).toBe(false);
-    user.roles.push(CONFIG.roles.TECHNICIAN);
-    expect(user.isTechnician).toBe(true);
-  });
-
-  it('should verify user isOperationalAdmin', () => {
-    expect(user.isOperationalAdmin).toBe(false);
-    user.roles.push(CONFIG.roles.OPERATIONAL_ADMIN);
-    expect(user.isOperationalAdmin).toBe(true);
-  });
-
-  it('should verify user isTechnician', () => {
-    expect(user.isTechnicalAdmin).toBe(false);
-    user.roles.push(CONFIG.roles.TECHNICAL_ADMIN);
-    expect(user.isTechnicalAdmin).toBe(true);
-  });
-
-  it('should verify user has roles', () => {
-    expect(user.hasRole(CONFIG.roles.TECHNICAL_ADMIN)).toBe(false);
-    expect(user.hasRole(CONFIG.roles.USER)).toBe(true);
-    user.roles.push(CONFIG.roles.TECHNICAL_ADMIN);
-    expect(user.hasRole(CONFIG.roles.TECHNICAL_ADMIN)).toBe(true);
+  it('should verify user does have permission', () => {
+    user.permissions = [CONFIG.appPermissions.READ_SHELVES];
+    expect(user.hasPermission(CONFIG.appPermissions.READ_SHELVES)).toBe(true);
   });
 });

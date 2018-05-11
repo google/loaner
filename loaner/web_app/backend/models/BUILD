@@ -136,6 +136,7 @@ loaner_appengine_library(
     name = "user_model",
     srcs = [
         "user_model.py",
+        "//loaner/web_app/backend/api:permissions",
     ],
 )
 

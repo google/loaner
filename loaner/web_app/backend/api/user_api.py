@@ -58,13 +58,13 @@ class RoleApi(root_api.Service):
       name='create',
       path='create',
       http_method='POST',
-      permission=permissions.Permissions.CREATE_ROLE)
+      permission=permissions.Permissions.MODIFY_ROLE)
   def create(self, request):
     """Create a new role."""
     self.check_xsrf_token(self.request_state)
     user_model.Role.create(
         name=request.name,
-        permissions=request.permissions,
+        role_permissions=request.permissions,
         associated_group=request.associated_group)
     return message_types.VoidMessage()
 
@@ -74,7 +74,7 @@ class RoleApi(root_api.Service):
       name='get',
       path='get',
       http_method='GET',
-      permission=permissions.Permissions.GET_ROLE)
+      permission=permissions.Permissions.READ_ROLES)
   def get(self, request):
     """Get a role."""
     self.check_xsrf_token(self.request_state)
@@ -90,7 +90,7 @@ class RoleApi(root_api.Service):
       name='update',
       path='update',
       http_method='POST',
-      permission=permissions.Permissions.UPDATE_ROLE)
+      permission=permissions.Permissions.MODIFY_ROLE)
   def update(self, request):
     """Update a role's permissions or associated group. Cannot edit name."""
     self.check_xsrf_token(self.request_state)

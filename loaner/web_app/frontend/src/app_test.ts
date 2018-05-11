@@ -35,14 +35,13 @@ describe('AppComponent', () => {
     icon: 'laptop_chromebook',
     name: 'TestItem_Visible',
     routerLink: 'user',
-    requiredRole: CONFIG.roles.USER,
     hideOnRoutes: []
   };
   const hiddenRoute: NavigationItem = {
     icon: 'laptop_chromebook',
     name: 'TestItem_Hidden',
     routerLink: 'user',
-    requiredRole: CONFIG.roles.USER,
+    requiredPermission: CONFIG.appPermissions.AUDIT_SHELF,
     hideOnRoutes: ['']
   };
 
@@ -64,32 +63,31 @@ describe('AppComponent', () => {
     app.user = new User();
   }));
 
-  it(`should have as title 'Grab n Go Application'`, () => {
+  it(`has title 'Grab n Go Application'`, () => {
     expect(app.title).toEqual('Grab n Go Application');
   });
 
-  it('should have an mat-toolbar tag', () => {
+  it('has an mat-toolbar tag', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('mat-toolbar')).toBeTruthy();
   });
 
-  it('should have an mat-sidenav inside an mat-sidenav-container', () => {
+  it('has an mat-sidenav inside an mat-sidenav-container', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('mat-sidenav-container > mat-sidenav'))
         .toBeTruthy();
   });
 
-  it('should have a menu button inside of mat-toolbar', () => {
+  it('has a menu button inside of mat-toolbar', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('mat-toolbar button mat-icon').textContent)
         .toContain('menu');
   });
 
-  it('should not render shelves side bar item if is only user', () => {
-    app.user = new User({roles: [CONFIG.roles.USER]});
+  it('does not render shelves side bar item for standard user', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     compiled
@@ -101,12 +99,12 @@ describe('AppComponent', () => {
         });
   });
 
-  it('should render technician sidebar items if a list of roles is passed',
+  it('renders sidebar items if a list of permissions are passed',
      () => {
        app.user = new User({
-         roles: [
-           CONFIG.roles.USER,
-           CONFIG.roles.TECHNICIAN,
+         permissions: [
+           CONFIG.appPermissions.READ_SHELVES,
+           CONFIG.appPermissions.READ_DEVICES,
          ]
        });
        fixture.detectChanges();
@@ -122,12 +120,7 @@ describe('AppComponent', () => {
        expect(sideNavListContent).toContain('ng-reflect-router-link="shelves"');
      });
 
-  it('should render user sidebar items for user role', () => {
-    app.user = new User({
-      roles: [
-        CONFIG.roles.USER,
-      ]
-    });
+  it('renders user sidebar items for standard user', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const sideNavListContent =
@@ -139,12 +132,7 @@ describe('AppComponent', () => {
        .toContain('https://github.com/google/loaner/issues');
   });
 
-  it('should determine whether a navigation item can be shown', () => {
-    app.user = new User({
-      roles: [
-        CONFIG.roles.USER,
-      ]
-    });
+  it('determines whether a navigation item can be shown', () => {
     app.navigationItems.push(visibleRoute);
     app.navigationItems.push(hiddenRoute);
     fixture.detectChanges();
@@ -152,12 +140,7 @@ describe('AppComponent', () => {
     expect(app.canShow(hiddenRoute)).toBe(false);
   });
 
-  it('should hide options for hidden routes', () => {
-    app.user = new User({
-      roles: [
-        CONFIG.roles.USER,
-      ]
-    });
+  it('hides options for hidden routes', () => {
     app.navigationItems.push(visibleRoute);
     app.navigationItems.push(hiddenRoute);
     fixture.detectChanges();
@@ -170,18 +153,12 @@ describe('AppComponent', () => {
     expect(sideNavListContent).not.toContain('TestItem_Hidden');
   });
 
-  it('should show navigation items only once each', () => {
-    app.user = new User({
-      roles: [
-        CONFIG.roles.USER,
-      ]
-    });
+  it('shows navigation items only once each', () => {
     app.navigationItems.push({
       icon: 'laptop_chromebook',
       name: 'TestItem_WithRouterLinkAndUrl',
       routerLink: 'user',
       url: '/user',
-      requiredRole: CONFIG.roles.USER,
       hideOnRoutes: [],
     });
 
@@ -197,9 +174,9 @@ describe('AppComponent', () => {
 
   it('shows the loader when there\'s a pending task', fakeAsync(() => {
        app.user = new User({
-         roles: [
-           CONFIG.roles.USER,
-           CONFIG.roles.TECHNICIAN,
+         permissions: [
+           CONFIG.appPermissions.READ_SHELVES,
+           CONFIG.appPermissions.READ_DEVICES,
          ]
        });
 

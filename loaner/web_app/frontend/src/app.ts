@@ -32,7 +32,7 @@ export declare interface NavigationItem {
   name: string;
   routerLink?: string;
   url?: string;
-  requiredRole: string|string[];
+  requiredPermission?: string|string[];
   hideOnRoutes: string[];
 }
 
@@ -42,7 +42,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'laptop_chromebook',
     name: 'My Loans',
     routerLink: 'user',
-    requiredRole: CONFIG.roles.USER,
     hideOnRoutes: [
       '/bootstrap',
       '/authorization',
@@ -52,10 +51,8 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'view_list',
     name: 'Shelves',
     routerLink: 'shelves',
-    requiredRole: [
-      CONFIG.roles.TECHNICIAN,
-      CONFIG.roles.OPERATIONAL_ADMIN,
-      CONFIG.roles.TECHNICAL_ADMIN,
+    requiredPermission: [
+      CONFIG.appPermissions.READ_SHELVES,
     ],
     hideOnRoutes: [
       '/bootstrap',
@@ -66,10 +63,8 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'devices',
     name: 'Devices',
     routerLink: 'devices',
-    requiredRole: [
-      CONFIG.roles.TECHNICIAN,
-      CONFIG.roles.OPERATIONAL_ADMIN,
-      CONFIG.roles.TECHNICAL_ADMIN,
+    requiredPermission: [
+      CONFIG.appPermissions.READ_DEVICES,
     ],
     hideOnRoutes: [
       '/bootstrap',
@@ -80,12 +75,6 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     icon: 'bug_report',
     name: 'Report issues',
     url: 'https://github.com/google/loaner/issues',
-    requiredRole: [
-      CONFIG.roles.USER,
-      CONFIG.roles.TECHNICIAN,
-      CONFIG.roles.OPERATIONAL_ADMIN,
-      CONFIG.roles.TECHNICAL_ADMIN,
-    ],
     hideOnRoutes: [],
   },
 ];
@@ -137,11 +126,15 @@ export class AppComponent extends LoaderView {
   }
 
   /*
-   * Checks a NavigationItem's required role against the user's role to
-   * determine whether it can be shown.
+   * Checks a NavigationItem's required permission against the user's
+   * permissions to determine whether it can be shown.
    */
-  canViewBasedOnRole(navigationItem: NavigationItem): boolean {
-    return this.user && this.user.hasRole(navigationItem.requiredRole);
+  canViewBasedOnPermission(navigationItem: NavigationItem): boolean {
+    if (!navigationItem.requiredPermission) {
+      return true;
+    }
+    return this.user &&
+        this.user.hasPermission(navigationItem.requiredPermission);
   }
 
   /*
@@ -160,6 +153,6 @@ export class AppComponent extends LoaderView {
    */
   canShow(navigationItem: NavigationItem): boolean {
     return this.canViewBasedOnHiddenRoutes(navigationItem) &&
-        this.canViewBasedOnRole(navigationItem);
+        this.canViewBasedOnPermission(navigationItem);
   }
 }

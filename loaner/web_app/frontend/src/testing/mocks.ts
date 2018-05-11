@@ -394,11 +394,11 @@ export class AuthServiceMock {
 }
 
 export const TEST_USER = new User({
-  roles: [
-    CONFIG.roles.USER,
-    CONFIG.roles.TECHNICIAN,
-    CONFIG.roles.TECHNICAL_ADMIN,
-    CONFIG.roles.OPERATIONAL_ADMIN,
+  permissions: [
+    CONFIG.appPermissions.READ_SHELVES,
+    CONFIG.appPermissions.READ_DEVICES,
+    CONFIG.appPermissions.MODIFY_DEVICE,
+    CONFIG.appPermissions.MODIFY_SHELF,
   ],
 });
 TEST_USER.email = 'daredevil@example.com';

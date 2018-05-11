@@ -14,24 +14,48 @@
 
 import {ConfigService, PROGRAM_NAME} from '../../../shared/config';
 
-export interface Roles {
-  USER: string;
-  TECHNICIAN: string;
-  OPERATIONAL_ADMIN: string;
-  TECHNICAL_ADMIN: string;
+export interface Permissions {
+  ADMINISTRATE_LOAN: string;
+  AUDIT_DEVICE: string;
+  AUDIT_SHELF: string;
+  BOOTSTRAP: string;
+  CLEAR_INDICES: string;
+  DATASTORE_IMPORT: string;
+  READ_CONFIGS: string;
+  READ_DEVICES: string;
+  READ_SHELVES: string;
+  READ_SURVEYS: string;
+  MODIFY_CONFIG: string;
+  MODIFY_DEVICE: string;
+  MODIFY_ROLE: string;
+  MODIFY_SHELF: string;
+  MODIFY_SURVEY: string;
+  REINDEX_SEARCH: string;
 }
 
 /**
- * Contains roles for the app to render the elements in the frontend.
+ * Contains permissions for the app to render the elements in the frontend.
  *
  * This schema must match the schema on web_app/backend/auth/permissions.py file
  * or the elements won't be able to be rendered correctly.
  */
-export const applicationRoles: Roles = {
-  USER: 'user',
-  TECHNICIAN: 'technician',
-  OPERATIONAL_ADMIN: 'operational-admin',
-  TECHNICAL_ADMIN: 'technical-admin',
+export const APPLICATION_PERMISSIONS: Permissions = {
+  ADMINISTRATE_LOAN: 'administrate_loan',
+  AUDIT_DEVICE: 'audit_device',
+  AUDIT_SHELF: 'audit_shelf',
+  BOOTSTRAP: 'bootstrap',
+  CLEAR_INDICES: 'clear_indices',
+  DATASTORE_IMPORT: 'datastore_import',
+  READ_CONFIGS: 'read_configs',
+  READ_DEVICES: 'read_devices',
+  READ_SHELVES: 'read_shelves',
+  READ_SURVEYS: 'read_surveys',
+  MODIFY_CONFIG: 'modify_config',
+  MODIFY_DEVICE: 'modify_device',
+  MODIFY_ROLE: 'modify_role',
+  MODIFY_SHELF: 'modify_shelf',
+  MODIFY_SURVEY: 'modify_survey',
+  REINDEX_SEARCH: 'reindex_search',
 };
 
 /**
@@ -44,7 +68,7 @@ export interface Config {
   apiVersion?: string;
   gapiClientId: string;
   scope: string[];
-  roles: Roles;
+  appPermissions: Permissions;
 }
 
 /** Default configuration for the application with dev default values. */
@@ -55,5 +79,5 @@ export const CONFIG: Config = {
   apiVersion: 'v1',
   gapiClientId: new ConfigService().webClientId || '',
   scope: ['email'],
-  roles: applicationRoles,
+  appPermissions: APPLICATION_PERMISSIONS,
 };

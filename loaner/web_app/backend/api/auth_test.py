@@ -55,7 +55,7 @@ class FakeApiPermissionChecks(root_api.Service):
   @auth.method(
       message_types.VoidMessage,
       http_method='POST',
-      permission=permissions.Permissions.ENROLL_DEVICE)
+      permission=permissions.Permissions.MODIFY_DEVICE)
   def api_for_superadmins_only(self, request):
     self.check_xsrf_token(self.request_state)
     return message_types.VoidMessage()
@@ -70,7 +70,7 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
 
     user_model.Role.create(
         'technical_admin',
-        permissions=[permissions.Permissions.AUDIT_SHELF],
+        role_permissions=[permissions.Permissions.AUDIT_SHELF],
         associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
 
     user_model.User(

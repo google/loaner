@@ -43,7 +43,7 @@ class ConfigAPI(root_api.Service):
       name='get',
       path='get',
       http_method='GET',
-      permission=permissions.Permissions.GET_CONFIG)
+      permission=permissions.Permissions.READ_CONFIGS)
   def get_config(self, request):
     """Gets the given config value."""
     self.check_xsrf_token(self.request_state)
@@ -74,7 +74,7 @@ class ConfigAPI(root_api.Service):
       name='list',
       path='list',
       http_method='GET',
-      permission=permissions.Permissions.LIST_CONFIGS)
+      permission=permissions.Permissions.READ_CONFIGS)
   def list_configs(self, request):
     """Gets a list of all config values."""
     self.check_xsrf_token(self.request_state)
@@ -103,7 +103,7 @@ class ConfigAPI(root_api.Service):
       name='update',
       path='update',
       http_method='POST',
-      permission=permissions.Permissions.UPDATE_CONFIG)
+      permission=permissions.Permissions.MODIFY_CONFIG)
   def update_config(self, request):
     """Updates a given config value."""
     self.check_xsrf_token(self.request_state)

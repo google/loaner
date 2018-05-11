@@ -20,6 +20,8 @@ from __future__ import print_function
 
 from google.appengine.ext import ndb
 
+from loaner.web_app.backend.api import permissions
+
 _SUPERADMIN_RESERVED_ERROR = (
     'Cannot create a role named "superadmin", that name is reserved.')
 _UPDATE_ROLE_NAME_ERROR = "Cannot update a role's name, generate a new role."
@@ -60,12 +62,12 @@ class Role(ndb.Model):
     return self.key.string_id()
 
   @classmethod
-  def create(cls, name, permissions=None, associated_group=None):
+  def create(cls, name, role_permissions=None, associated_group=None):
     """Creates a new role.
 
     Args:
       name: str, name of the new role.
-      permissions: list|str|, zero or more Permissions to include.
+      role_permissions: list|str|, zero or more Permissions to include.
       associated_group: str, name of the Google Group (or other permission
         container) used to associate this group of permissions to users.
 
@@ -81,7 +83,7 @@ class Role(ndb.Model):
       raise CreateRoleError(_ROLE_ALREADY_EXISTS, name)
     new_role = cls(
         key=ndb.Key(cls, name),
-        permissions=permissions or [],
+        permissions=role_permissions or [],
         associated_group=associated_group)
     new_role.put()
     return new_role
@@ -163,8 +165,10 @@ class User(ndb.Model):
     Returns:
       Iterable of string Permissions.
     """
-    permissions = []
+    if self.superadmin:
+      return permissions.Permissions.ALL
+    user_permissions = []
     for role in self.roles:
       for permission in role.get().permissions:
-        permissions.append(permission)
-    return list(set(permissions))
+        user_permissions.append(permission)
+    return list(set(user_permissions))

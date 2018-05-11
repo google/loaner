@@ -20,7 +20,7 @@ import {CONFIG} from '../app.config';
  * Interface with fields that come from our User API.
  */
 export declare interface UserApiParams {
-  roles?: string[];
+  permissions?: string[];
 }
 
 /** An user model with all its properties and methods. */
@@ -29,47 +29,35 @@ export class User {
   givenName = '';
   /** Email of the user on Google's oauth credentials. */
   email = '';
-  /** Permission roles which the user pertains */
+  /** Roles the user has. Only used in configuration view, not authorization. */
   roles: string[] = [];
+  /** Permissions the user has. Used to route/enable/disable page elements. */
+  permissions: string[] = [];
+  /** If user is superadmin. Only used in configuration view. */
+  superadmin = false;
 
   constructor(user: UserApiParams = {}) {
-    this.roles = user.roles || this.roles;
+    this.permissions = user.permissions || this.permissions;
   }
 
   /** Translates the User model object to the API message. */
   toApiMessage(): UserApiParams {
     return {
-      roles: this.roles,
+      permissions: this.permissions,
     };
   }
 
-  get isUser(): boolean {
-    return this.roles.includes(CONFIG.roles.USER);
-  }
-
-  get isTechnician(): boolean {
-    return this.roles.includes(CONFIG.roles.TECHNICIAN);
-  }
-
-  get isOperationalAdmin(): boolean {
-    return this.roles.includes(CONFIG.roles.OPERATIONAL_ADMIN);
-  }
-
-  get isTechnicalAdmin(): boolean {
-    return this.roles.includes(CONFIG.roles.TECHNICAL_ADMIN);
-  }
-
-  hasRole(requiredRoles: string|string[]): boolean {
-    if (typeof requiredRoles === 'string') {
-      return this.roles.includes(requiredRoles);
+  hasPermission(requiredPermissions: string|string[]): boolean {
+    if (typeof requiredPermissions === 'string') {
+      return this.permissions.includes(requiredPermissions);
     }
 
-    let hasRole = false;
-    for (const role of requiredRoles) {
-      if (this.roles.includes(role)) {
-        hasRole = true;
+    let hasPermission = false;
+    for (const permission of requiredPermissions) {
+      if (this.permissions.includes(permission)) {
+        hasPermission = true;
       }
     }
-    return hasRole;
+    return hasPermission;
   }
 }

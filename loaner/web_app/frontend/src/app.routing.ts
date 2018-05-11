@@ -36,7 +36,10 @@ const routes: Routes = [
     component: BootstrapView,
     canActivate: [AuthGuard],
     data: {
-      'requiredRoles': [CONFIG.roles.TECHNICAL_ADMIN],
+      'requiredPermissions': [
+        CONFIG.appPermissions.BOOTSTRAP,
+        CONFIG.appPermissions.READ_CONFIGS,
+      ],
     },
   },
   {
@@ -47,10 +50,9 @@ const routes: Routes = [
         component: SearchView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.READ_DEVICES,
+            CONFIG.appPermissions.READ_SHELVES,
           ],
         },
       },
@@ -59,10 +61,9 @@ const routes: Routes = [
         component: SearchView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.READ_DEVICES,
+            CONFIG.appPermissions.READ_SHELVES,
           ],
         },
       },
@@ -71,10 +72,9 @@ const routes: Routes = [
         component: SearchView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.READ_DEVICES,
+            CONFIG.appPermissions.READ_SHELVES,
           ],
         },
       },
@@ -87,17 +87,11 @@ const routes: Routes = [
         path: '',
         component: UserView,
         canActivate: [AuthGuard],
-        data: {
-          'requiredRoles': [CONFIG.roles.USER],
-        },
       },
       {
         path: ':id',
         component: UserView,
         canActivate: [AuthGuard],
-        data: {
-          'requiredRoles': [CONFIG.roles.USER],
-        },
       },
     ]
   },
@@ -109,10 +103,9 @@ const routes: Routes = [
         component: DeviceListView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.READ_DEVICES,
+            CONFIG.appPermissions.MODIFY_DEVICE,
           ],
         },
       },
@@ -121,10 +114,10 @@ const routes: Routes = [
         component: DeviceListView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.MODIFY_DEVICE,
+            CONFIG.appPermissions.READ_CONFIGS,
+            CONFIG.appPermissions.READ_DEVICES,
           ],
         },
       },
@@ -135,10 +128,8 @@ const routes: Routes = [
     component: DeviceDetailView,
     canActivate: [AuthGuard],
     data: {
-      'requiredRoles': [
-        CONFIG.roles.TECHNICAL_ADMIN,
-        CONFIG.roles.TECHNICIAN,
-        CONFIG.roles.OPERATIONAL_ADMIN,
+      'requiredPermissions': [
+        CONFIG.appPermissions.READ_DEVICES,
       ],
     },
   },
@@ -147,10 +138,9 @@ const routes: Routes = [
     component: ShelfListView,
     canActivate: [AuthGuard],
     data: {
-      'requiredRoles': [
-        CONFIG.roles.TECHNICAL_ADMIN,
-        CONFIG.roles.TECHNICIAN,
-        CONFIG.roles.OPERATIONAL_ADMIN,
+      'requiredPermissions': [
+        CONFIG.appPermissions.READ_DEVICES,
+        CONFIG.appPermissions.READ_SHELVES,
       ],
     },
   },
@@ -164,10 +154,9 @@ const routes: Routes = [
         component: ShelfActionsView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.MODIFY_SHELF,
+            CONFIG.appPermissions.READ_CONFIGS,
           ],
         },
       },
@@ -176,10 +165,10 @@ const routes: Routes = [
         component: ShelfActionsView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.MODIFY_SHELF,
+            CONFIG.appPermissions.READ_CONFIGS,
+            CONFIG.appPermissions.READ_SHELVES,
           ],
         },
       },
@@ -188,10 +177,9 @@ const routes: Routes = [
         component: ShelfDetailView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.READ_DEVICES,
+            CONFIG.appPermissions.READ_SHELVES,
           ],
         },
       },
@@ -200,10 +188,10 @@ const routes: Routes = [
         component: AuditView,
         canActivate: [AuthGuard],
         data: {
-          'requiredRoles': [
-            CONFIG.roles.TECHNICAL_ADMIN,
-            CONFIG.roles.TECHNICIAN,
-            CONFIG.roles.OPERATIONAL_ADMIN,
+          'requiredPermissions': [
+            CONFIG.appPermissions.READ_DEVICES,
+            CONFIG.appPermissions.READ_SHELVES,
+            CONFIG.appPermissions.AUDIT_SHELF,
           ],
         },
       },

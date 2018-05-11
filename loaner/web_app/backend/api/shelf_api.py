@@ -54,7 +54,7 @@ class ShelfApi(root_api.Service):
       name='enroll',
       path='enroll',
       http_method='POST',
-      permission=permissions.Permissions.ENROLL_SHELF)
+      permission=permissions.Permissions.MODIFY_SHELF)
   def enroll(self, request):
     """Enroll request for the Shelf API."""
     user_email = user.get_user_email()
@@ -81,7 +81,7 @@ class ShelfApi(root_api.Service):
       name='get',
       path='get',
       http_method='POST',
-      permission=permissions.Permissions.GET_SHELF)
+      permission=permissions.Permissions.READ_SHELVES)
   def get(self, request):
     """Get a shelf based on location."""
     self.check_xsrf_token(self.request_state)
@@ -93,7 +93,7 @@ class ShelfApi(root_api.Service):
       name='disable',
       path='disable',
       http_method='POST',
-      permission=permissions.Permissions.DISABLE_SHELF)
+      permission=permissions.Permissions.MODIFY_SHELF)
   def disable(self, request):
     """Disable a shelf by its location."""
     self.check_xsrf_token(self.request_state)
@@ -109,7 +109,7 @@ class ShelfApi(root_api.Service):
       name='update',
       path='update',
       http_method='POST',
-      permission=permissions.Permissions.UPDATE_SHELF)
+      permission=permissions.Permissions.MODIFY_SHELF)
   def update(self, request):
     """Get a shelf using location to update its properties."""
     self.check_xsrf_token(self.request_state)
@@ -125,7 +125,7 @@ class ShelfApi(root_api.Service):
       name='list',
       path='list',
       http_method='POST',
-      permission=permissions.Permissions.LIST_SHELVES)
+      permission=permissions.Permissions.READ_SHELVES)
   def list_shelves(self, request):
     """List enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)

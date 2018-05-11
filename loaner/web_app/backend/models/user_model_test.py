@@ -28,10 +28,8 @@ class RoleModelTest(loanertest.TestCase):
   def setUp(self):
     super(RoleModelTest, self).setUp()
     self.role_name = 'Technician'
-    self.permissions = (
-        permissions.Permissions.BOOTSTRAP,
-        permissions.Permissions.ENROLL_SHELF
-    )
+    self.permissions = (permissions.Permissions.BOOTSTRAP,
+                        permissions.Permissions.MODIFY_SHELF)
     self.associated_group = 'technicians@example.com'
 
   def test_create_role(self):
@@ -65,11 +63,9 @@ class RoleModelTest(loanertest.TestCase):
   def test_update(self):
     user_model.Role.create(
         self.role_name, self.permissions, self.associated_group)
-    updated_permissions = (
-        permissions.Permissions.AUDIT_SHELF,
-        permissions.Permissions.BOOTSTRAP,
-        permissions.Permissions.CREATE_SURVEY
-    )
+    updated_permissions = (permissions.Permissions.AUDIT_SHELF,
+                           permissions.Permissions.BOOTSTRAP,
+                           permissions.Permissions.MODIFY_SURVEY)
 
     role = user_model.Role.get_by_id(self.role_name)
     role.update(permissions=updated_permissions)
@@ -92,16 +88,16 @@ class UserModelTest(loanertest.TestCase):
     super(UserModelTest, self).setUp()
     self.technician_role = user_model.Role.create(
         name='technician',
-        permissions=[
+        role_permissions=[
             permissions.Permissions.AUDIT_SHELF,
-            permissions.Permissions.GET_SHELF,
+            permissions.Permissions.READ_SHELVES,
         ],
         associated_group='technicians@example.com')
     self.operations_role = user_model.Role.create(
         name='operations',
-        permissions=[
-            permissions.Permissions.GET_USER,
-            permissions.Permissions.UPDATE_USER,
+        role_permissions=[
+            permissions.Permissions.MODIFY_DEVICE,
+            permissions.Permissions.MODIFY_SHELF,
         ],
         associated_group='operations@example.com')
 
@@ -181,12 +177,18 @@ class UserModelTest(loanertest.TestCase):
     user.update(roles=['technician', 'operations'])
     expected_permissions = [
         permissions.Permissions.AUDIT_SHELF,
-        permissions.Permissions.GET_SHELF,
-        permissions.Permissions.GET_USER,
-        permissions.Permissions.UPDATE_USER,
+        permissions.Permissions.READ_SHELVES,
+        permissions.Permissions.MODIFY_DEVICE,
+        permissions.Permissions.MODIFY_SHELF,
     ]
 
     self.assertCountEqual(user.get_permissions(), expected_permissions)
+
+  def test_get_permissions__superadmin(self):
+    user = user_model.User.get_user(email=loanertest.SUPER_ADMIN_EMAIL)
+    user.update(superadmin=True)
+
+    self.assertCountEqual(user.get_permissions(), permissions.Permissions.ALL)
 
 
 if __name__ == '__main__':

@@ -52,6 +52,15 @@ class UserApiTest(loanertest.EndpointsTestCase):
     self.assertEqual(actual_response.permissions, expected_response.permissions)
     self.assertEqual(actual_response.superadmin, expected_response.superadmin)
 
+  def test_get__superadmin(self):
+    self.login_admin_endpoints_user()
+
+    response = self.service.get(message_types.VoidMessage())
+
+    self.assertCountEqual(response.permissions,
+                          user_api.permissions.Permissions.ALL)
+    self.assertTrue(response.superadmin)
+
 
 class RoleApiTest(loanertest.EndpointsTestCase):
 
@@ -79,7 +88,7 @@ class RoleApiTest(loanertest.EndpointsTestCase):
   def test_get(self):
     created_role = user_model.Role.create(
         name='test',
-        permissions=['get', 'put'],
+        role_permissions=['get', 'put'],
         associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
 
     retrieved_role = self.service.get(
@@ -93,7 +102,7 @@ class RoleApiTest(loanertest.EndpointsTestCase):
   def test_update(self):
     created_role = user_model.Role.create(
         name='test',
-        permissions=['get', 'put'],
+        role_permissions=['get', 'put'],
         associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
     update_message = user_messages.Role(
         name='test',

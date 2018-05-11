@@ -46,7 +46,7 @@ class SurveyApi(root_api.Service):
       name='create',
       path='create',
       http_method='POST',
-      permission=permissions.Permissions.CREATE_SURVEY)
+      permission=permissions.Permissions.MODIFY_SURVEY)
   def create(self, request):
     """Create a new survey question and insert instance into datastore."""
     self.check_xsrf_token(self.request_state)
@@ -110,7 +110,7 @@ class SurveyApi(root_api.Service):
       name='list',
       path='list',
       http_method='GET',
-      permission=permissions.Permissions.LIST_SURVEYS)
+      permission=permissions.Permissions.READ_SURVEYS)
   def list(self, request):
     """List survey questions."""
     cursor = None
@@ -138,7 +138,7 @@ class SurveyApi(root_api.Service):
       name='patch',
       path='patch',
       http_method='POST',
-      permission=permissions.Permissions.PATCH_SURVEY)
+      permission=permissions.Permissions.MODIFY_SURVEY)
   def patch(self, request):
     """Patch a given survey question."""
     self.check_xsrf_token(self.request_state)

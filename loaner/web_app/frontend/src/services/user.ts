@@ -90,7 +90,7 @@ export class UserService extends ApiService {
           return this.getUser();
         }),
         switchMap(user => {
-          this.user.roles = user.roles;
+          this.user.permissions = user.permissions;
           this.userLoadedSubject.next(this.user);
           this.userLoadedSubject.complete();
           return of(this.user);

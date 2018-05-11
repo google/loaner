@@ -35,8 +35,13 @@ export class AuthGuard implements CanActivate {
     const destinationUrl = state.url;
     return this.userService.loadUser().pipe(
         map(user => {
-          const requiredRoles = route.data['requiredRoles'] as string[];
-          const userCanAccess = isAllowedAccess(requiredRoles, user.roles);
+          const requiredPermissions =
+              route.data['requiredPermissions'] as string[];
+          if (!requiredPermissions) {
+            return true;
+          }
+          const userCanAccess =
+              isAllowedAccess(requiredPermissions, user.permissions);
 
           if (!userCanAccess) {
             if (destinationUrl.match(/^\/bootstrap/)) {
@@ -68,18 +73,20 @@ export class AuthGuard implements CanActivate {
 }
 
 /**
- * Return if whether a set of current roles intersects with the allowed roles.
+ * Return if whether a set of current permissions intersects with the allowed
+ * permissions.
  *
- * @param rolesAllowed Roles that are allowed access.
- * @param currentRoles Roles that the user currently has.
+ * @param permissionsAllowed Permissions that are allowed access.
+ * @param currentPermissions Permissions that the user currently has.
  */
-const isAllowedAccess = (rolesAllowed: string[], currentRoles: string[]) => {
-  const intersectedRoles = currentRoles.reduce(
-      (acc, curr) =>
-          [...acc,
-           ...rolesAllowed.filter(
-               role =>
-                   role.trim().toUpperCase() === curr.trim().toUpperCase())],
-      []);
-  return intersectedRoles.length > 0;
-};
+const isAllowedAccess =
+    (permissionsAllowed: string[], currentPermissions: string[]) => {
+      const intersectedPermissions = currentPermissions.reduce(
+          (acc, curr) =>
+              [...acc,
+               ...permissionsAllowed.filter(
+                   permission => permission.trim().toUpperCase() ===
+                       curr.trim().toUpperCase())],
+          []);
+      return intersectedPermissions.length > 0;
+    };

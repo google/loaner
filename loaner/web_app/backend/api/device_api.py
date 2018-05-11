@@ -56,7 +56,7 @@ class DeviceApi(root_api.Service):
       name='enroll',
       path='enroll',
       http_method='POST',
-      permission=permissions.Permissions.ENROLL_DEVICE)
+      permission=permissions.Permissions.MODIFY_DEVICE)
   def enroll(self, request):
     """Enrolls a device in the program."""
     self.check_xsrf_token(self.request_state)
@@ -78,7 +78,7 @@ class DeviceApi(root_api.Service):
       name='unenroll',
       path='unenroll',
       http_method='POST',
-      permission=permissions.Permissions.UNENROLL_DEVICE)
+      permission=permissions.Permissions.MODIFY_DEVICE)
   def unenroll(self, request):
     """Unenrolls a device from the program."""
     self.check_xsrf_token(self.request_state)
@@ -96,7 +96,7 @@ class DeviceApi(root_api.Service):
       name='auditable',
       path='auditable',
       http_method='POST',
-      permission=permissions.Permissions.DEVICE_AUDIT)
+      permission=permissions.Permissions.AUDIT_SHELF)
   def device_audit_check(self, request):
     """Runs prechecks on a device to see if it can be audited."""
     self.check_xsrf_token(self.request_state)
@@ -114,7 +114,8 @@ class DeviceApi(root_api.Service):
       device_message.Device,
       name='get',
       path='get',
-      http_method='POST')
+      http_method='POST',
+      permission=permissions.Permissions.READ_DEVICES)
   def get_device(self, request):
     """Gets a device using any identifier in device_message.DeviceRequest."""
     device = _get_device(request)
@@ -139,7 +140,7 @@ class DeviceApi(root_api.Service):
       name='list',
       path='list',
       http_method='POST',
-      permission=permissions.Permissions.LIST_DEVICES)
+      permission=permissions.Permissions.READ_DEVICES)
   def list_devices(self, request):
     """Lists all devices based on any device attribute."""
     self.check_xsrf_token(self.request_state)
