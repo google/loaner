@@ -48,6 +48,10 @@ class BadModelError(Error):
   """Base error raised when a BaseAction subclass receives a bad model."""
 
 
+class RedundantModelError(Error):
+  """Error raised when a baseaction subclass receives both device and shelf."""
+
+
 class MissingDeviceError(MissingModelError):
   """Error raised when a BaseAction subclass doesn't receive a device model."""
 
@@ -64,8 +68,8 @@ class BadShelfError(BadModelError):
   """Error raised when a BaseAction subclass receives a bad shelf model."""
 
 
-class RedundantModelError(Error):
-  """Error raised when a BaseAction subclass receives both device and shelf."""
+class RunError(Error):
+  """Error raised when a BaseAction subclass run method fails."""
 
 
 class ActionType(object):
