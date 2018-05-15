@@ -288,8 +288,8 @@ class Device(base_model.BaseModel):
       raise DeviceCreationError(str(err))
     try:
       device.chrome_device_id = directory_device_object[directory.DEVICE_ID]
-      device.current_ou = directory.ORG_UNIT_PATH
-      device.device_model = directory_device_object.get(directory.MODEL)
+      device.current_ou = directory_device_object[directory.ORG_UNIT_PATH]
+      device.device_model = directory_device_object[directory.MODEL]
     except KeyError:
       raise DeviceCreationError(_DIRECTORY_INFO_INCOMPLETE_MSG)
 

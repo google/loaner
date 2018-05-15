@@ -41,6 +41,9 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
 
   def setUp(self):
     super(DeviceModelTest, self).setUp()
+    config_model.Config.set(
+        'device_identifier_mode',
+        config_defaults.DeviceIdentifierMode.SERIAL_NUMBER)
     self.shelf = shelf_model.Shelf.enroll(
         user_email=loanertest.USER_EMAIL, location='MTV', capacity=10,
         friendly_name='MTV office')
@@ -66,8 +69,32 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
   def test_get_search_index(self):
     self.assertIsInstance(device_model.Device.get_index(), search.Index)
 
-  def test_validate_asset_tag_required_on_enroll(self):
-    config_model.Config.set('use_asset_tags', True)
+  def test_validate_required_input_on_enroll(self):
+    # Provide asset tag when serial number required.
+    with self.assertRaisesWithLiteralMatch(
+        datastore_errors.BadValueError,
+        device_model._SERIAL_NUMBERS_REQUIRED_MSG):
+      device_model.Device.enroll(
+          asset_tag='12345', user_email=loanertest.USER_EMAIL)
+
+    # Provide serial number when asset tag required.
+    config_model.Config.set(
+        'device_identifier_mode',
+        config_defaults.DeviceIdentifierMode.ASSET_TAG)
+    with self.assertRaisesWithLiteralMatch(
+        datastore_errors.BadValueError, device_model._ASSET_TAGS_REQUIRED_MSG):
+      device_model.Device.enroll(
+          serial_number='test_serial', user_email=loanertest.USER_EMAIL)
+
+    # Provide insufficient data when both asset tag and serial number required.
+    config_model.Config.set(
+        'device_identifier_mode',
+        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED)
+    with self.assertRaisesWithLiteralMatch(
+        datastore_errors.BadValueError,
+        device_model._SERIAL_NUMBERS_REQUIRED_MSG):
+      device_model.Device.enroll(
+          asset_tag='12345', user_email=loanertest.USER_EMAIL)
     with self.assertRaisesWithLiteralMatch(
         datastore_errors.BadValueError, device_model._ASSET_TAGS_REQUIRED_MSG):
       device_model.Device.enroll(
