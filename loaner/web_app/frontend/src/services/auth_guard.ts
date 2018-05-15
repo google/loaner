@@ -81,12 +81,17 @@ export class AuthGuard implements CanActivate {
  */
 const isAllowedAccess =
     (permissionsAllowed: string[], currentPermissions: string[]) => {
-      const intersectedPermissions = currentPermissions.reduce(
-          (acc, curr) =>
-              [...acc,
-               ...permissionsAllowed.filter(
-                   permission => permission.trim().toUpperCase() ===
-                       curr.trim().toUpperCase())],
-          []);
-      return intersectedPermissions.length > 0;
+      const intersectedPermissions =
+          currentPermissions
+              .reduce(
+                  (acc, curr) =>
+                      [...acc,
+                       ...permissionsAllowed.filter(
+                           permission => permission.trim().toUpperCase() ===
+                               curr.trim().toUpperCase())],
+                  [])
+              .sort();
+      return intersectedPermissions.length === permissionsAllowed.length &&
+          permissionsAllowed.sort().every(
+              (element, index) => intersectedPermissions[index] === element);
     };
