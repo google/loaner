@@ -12,14 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {FormControl, Validators} from '@angular/forms';
+import {NgForm} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
-
-import {switchMap} from 'rxjs/operators';
-
+import {Observable, of} from 'rxjs';
+import {map, switchMap} from 'rxjs/operators';
 import {Shelf} from '../../models/shelf';
 import {ConfigService} from '../../services/config';
+import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 
 /**
@@ -42,9 +43,12 @@ export class ShelfActionsCard implements OnInit {
   capacityFormControl = new FormControl('', [
     Validators.min(1),
   ]);
+  /** Access properties in the form. */
+  @ViewChild('shelfActionsForm') shelfActionsForm: NgForm;
 
   constructor(
       private readonly configService: ConfigService,
+      private readonly dialogBox: Dialog,
       private readonly shelfService: ShelfService,
       private readonly router: Router, private readonly route: ActivatedRoute) {
   }
@@ -87,6 +91,7 @@ export class ShelfActionsCard implements OnInit {
         .pipe(switchMap(() => this.shelfService.getShelf(this.shelf.location)))
         .subscribe(shelf => {
           this.shelf = shelf;
+          this.editing = false;
           this.backToShelfDetails();
         });
   }
@@ -99,5 +104,17 @@ export class ShelfActionsCard implements OnInit {
   /** Navigates to the shelf details page. */
   backToShelfDetails() {
     this.router.navigate([`/shelf/${this.shelf.location}/details`]);
+  }
+
+  /** Can deactivate route checking. */
+  canDeactivate(): Observable<boolean> {
+    if (this.editing && this.shelfActionsForm.dirty) {
+      return this.dialogBox
+          .confirm(
+              'Discard changes?',
+              'Moving away will not save the current changes!')
+          .pipe(map(result => Boolean(result)));
+    }
+    return of(true);
   }
 }

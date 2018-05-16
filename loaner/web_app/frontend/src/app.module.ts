@@ -26,6 +26,7 @@ import {MaterialModule, MatIconRegistry} from './core/material_module';
 import {AuthService} from './services/auth';
 import {AuthGuard} from './services/auth_guard';
 import {BootstrapService} from './services/bootstrap';
+import {CanDeactivateGuard} from './services/can_deactivate_guard';
 import {ConfigService} from './services/config';
 import {DeviceService} from './services/device';
 import {LoanerOAuthInterceptor} from './services/oauth_interceptor';
@@ -52,6 +53,7 @@ import {UserService} from './services/user';
     AuthService,
     AuthGuard,
     BootstrapService,
+    CanDeactivateGuard,
     ConfigService,
     DeviceService,
     LoanerSnackBar,

@@ -18,6 +18,7 @@ import {RouterModule, Routes} from '@angular/router';
 import {CONFIG} from './app.config';
 import {Authorization, AuthorizationModule} from './components/authorization';
 import {AuthGuard} from './services/auth_guard';
+import {CanDeactivateGuard} from './services/can_deactivate_guard';
 import {AuditView, AuditViewModule} from './views/audit_view';
 import {BootstrapView, BootstrapViewModule} from './views/bootstrap_view';
 import {DeviceDetailView, DeviceDetailViewModule} from './views/device_detail_view';
@@ -161,6 +162,7 @@ const routes: Routes = [
         path: ':id/update',
         component: ShelfActionsView,
         canActivate: [AuthGuard],
+        canDeactivate: [CanDeactivateGuard],
         data: {
           'requiredPermissions': [
             CONFIG.appPermissions.MODIFY_SHELF,

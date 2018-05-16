@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs';
 
 import {CONFIG} from '../../app.config';
+import {ShelfActionsCard} from '../../components/shelf_actions';
 
 @Component({
   preserveWhitespaces: true,
@@ -30,6 +32,7 @@ export class ShelfActionsView implements OnInit {
   private readonly createShelfTitle = `Create Shelf - ${CONFIG.appName}`;
   private readonly updateShelfTitle = `Update Shelf - ${CONFIG.appName}`;
 
+  @ViewChild('shelfAction') shelfAction: ShelfActionsCard;
   constructor(
       private titleService: Title, private readonly route: ActivatedRoute) {}
 
@@ -41,5 +44,8 @@ export class ShelfActionsView implements OnInit {
         this.titleService.setTitle(this.createShelfTitle);
       }
     });
+  }
+  canDeactivate(): Observable<boolean> {
+    return this.shelfAction.canDeactivate();
   }
 }

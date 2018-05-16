@@ -19,6 +19,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
 import {ConfigService} from '../../services/config';
+import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {ActivatedRouteMock, ConfigServiceMock, ShelfServiceMock, TEST_SHELF} from '../../testing/mocks';
 
@@ -37,6 +38,7 @@ describe('ShelfActionsComponent', () => {
             BrowserAnimationsModule,
           ],
           providers: [
+            Dialog,
             {provide: ActivatedRoute, useClass: ActivatedRouteMock},
             {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: ShelfService, useClass: ShelfServiceMock},
