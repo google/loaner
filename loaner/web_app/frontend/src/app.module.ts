@@ -21,6 +21,7 @@ import {LoaderModule} from '../../../shared/components/loader';
 
 import {AppComponent} from './app';
 import {LoanerRouterModule} from './app.routing';
+import {SearchBoxModule} from './components/search_box';
 import {MaterialModule, MatIconRegistry} from './core/material_module';
 import {AuthService} from './services/auth';
 import {AuthGuard} from './services/auth_guard';
@@ -45,6 +46,7 @@ import {UserService} from './services/user';
     MaterialModule,
     LoaderModule,
     LoanerRouterModule,
+    SearchBoxModule,
   ],
   providers: [
     AuthService,

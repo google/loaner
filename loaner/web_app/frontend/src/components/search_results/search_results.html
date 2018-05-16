@@ -1,5 +1,5 @@
 
-<mat-card *ngIf="model && resultsLength === 0">
+<mat-card *ngIf="!loading && resultsLength === 0" tabindex="0">
   <mat-card-title mat-title>
     Search results for {{ model }} matching "{{ query }}"
   </mat-card-title>
@@ -8,7 +8,7 @@
   </mat-card-content>
 </mat-card>
 
-<mat-card *ngIf="resultsLength !== 0">
+<mat-card *ngIf="resultsLength !== 0" tabindex="0">
   <mat-card-title mat-title>
     Search results for {{ model }} matching "{{ query }}"
   </mat-card-title>

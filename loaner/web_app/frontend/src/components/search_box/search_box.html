@@ -1,0 +1,23 @@
+<mat-icon [class.search-box-focused]="isFocused">search</mat-icon>
+<input #searchBox
+       type="text"
+       class="search-box"
+       [(ngModel)]="searchText"
+       (ngModelChanges)="updateSearchText($event)"
+       (blur)="isFocused = false"
+       (focus)="isFocused = true"
+       (keyup.enter)="search('device')"
+       [matAutocomplete]="auto"
+       [class.mat-elevation-z4]='isFocused'
+       [class.mat-elevation-z1]='!isFocused'
+       [class.search-box-unfocused]="!isFocused"
+       [class.search-box-focused]="isFocused"
+       placeholder="Search">
+
+<mat-autocomplete #auto="matAutocomplete">
+  <mat-option *ngFor="let option of searchType"
+              [value]="searchText"
+              (onSelectionChange)="searchTypeSelected($event, option.model)">
+    {{ option.name }}: {{ searchText }}
+  </mat-option>
+</mat-autocomplete>

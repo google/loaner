@@ -19,6 +19,7 @@ import {Title} from '@angular/platform-browser';
 import {LoaderService, LoaderView} from '../../../shared/components/loader';
 
 import {CONFIG} from './app.config';
+import {SEARCH_PERMISSIONS} from './app.routing';
 import {User} from './models/user';
 import {AuthService} from './services/auth';
 import {UserService} from './services/user';
@@ -154,5 +155,12 @@ export class AppComponent extends LoaderView {
   canShow(navigationItem: NavigationItem): boolean {
     return this.canViewBasedOnHiddenRoutes(navigationItem) &&
         this.canViewBasedOnPermission(navigationItem);
+  }
+
+  /**
+   * Checks whether a given user can access the search features.
+   */
+  canShowSearchBox(): boolean {
+    return this.user && this.user.hasPermission(SEARCH_PERMISSIONS);
   }
 }

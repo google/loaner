@@ -1,15 +1,20 @@
 <div class="body-container">
   <mat-toolbar class="loaner-toolbar mat-elevation-z3">
-    <button mat-icon-button (click)="sidenav.toggle()">
-      <mat-icon>menu</mat-icon>
-    </button>
-    <span>{{title}}</span>
+    <span class="flex-1">
+      <button mat-icon-button (click)="sidenav.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <span class="middle-align">{{ title }}</span>
+    </span>
+    <loaner-search-box class="flex-1" *ngIf="canShowSearchBox()">
+    </loaner-search-box>
+    <span class="flex-1"></span>
   </mat-toolbar>
   <!--  App's main loader on the toolbar. This loader loads if anything is tried to be retrieved
         from own application's endpoints. -->
   <loaner-loader class="app-loader" loaderType="bar" [loading]="pending">
   </loaner-loader>
-  <mat-sidenav-container class="sidenav-container">
+  <mat-sidenav-container class="flex-1">
     <mat-sidenav #sidenav mode="over" class="loaner-sidenav">
       <mat-nav-list>
         <div *ngFor="let navigationItem of navigationItems">

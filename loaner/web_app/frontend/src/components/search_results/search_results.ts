@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Location} from '@angular/common';
-import {Component, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import {Device, DeviceApiParams} from '../../models/device';
@@ -21,6 +21,7 @@ import {Shelf, ShelfApiParams} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
 import {ShelfService} from '../../services/shelf';
 import {LoanerSnackBar} from '../../services/snackbar';
+import {SearchBoxService} from '../search_box/search_box.service';
 
 /**
  * Component that renders the search results on the frontend.
@@ -30,7 +31,8 @@ import {LoanerSnackBar} from '../../services/snackbar';
   styleUrls: ['search_results.scss'],
   templateUrl: 'search_results.html',
 })
-export class SearchResultsComponent implements OnInit {
+export class SearchResultsComponent implements OnDestroy, OnInit {
+  loading = true;
   model: string;
   query: string;
   results: Device[]|Shelf[];
@@ -43,6 +45,7 @@ export class SearchResultsComponent implements OnInit {
       private readonly deviceService: DeviceService,
       private readonly location: Location,
       private readonly route: ActivatedRoute, private readonly router: Router,
+      private searchBoxService: SearchBoxService,
       private readonly shelfService: ShelfService,
       private readonly snackBar: LoanerSnackBar) {}
 
@@ -87,7 +90,7 @@ export class SearchResultsComponent implements OnInit {
   private searchForDevice(queryString: string) {
     const request: DeviceApiParams = {
       query: {
-        query_string: queryString,
+        'query_string': queryString,
       },
     };
     this.deviceService.list(request).subscribe(devices => {
@@ -97,6 +100,7 @@ export class SearchResultsComponent implements OnInit {
         this.results = devices;
         this.location.replaceState(`/search/device/${queryString}`);
       }
+      this.loading = false;
     });
   }
 
@@ -107,7 +111,7 @@ export class SearchResultsComponent implements OnInit {
   private searchForShelf(queryString: string) {
     const request: ShelfApiParams = {
       query: {
-        query_string: queryString,
+        'query_string': queryString,
       }
     };
     this.shelfService.list(request).subscribe(shelves => {
@@ -117,11 +121,16 @@ export class SearchResultsComponent implements OnInit {
         this.results = shelves;
         this.location.replaceState(`/search/shelf/${queryString}`);
       }
+      this.loading = false;
     });
   }
 
   /** Goes back to the previous view. */
   back() {
     this.location.back();
+  }
+
+  ngOnDestroy() {
+    this.searchBoxService.changeSearchText('');
   }
 }

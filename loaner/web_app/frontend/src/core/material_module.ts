@@ -15,32 +15,21 @@
 import {CdkTableModule} from '@angular/cdk/table';
 import {NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {MatButtonModule, MatCardModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatGridListModule, MatIconModule, MatIconRegistry, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatProgressBarModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule,} from '@angular/material';
+import {MatAutocompleteModule, MatButtonModule, MatCardModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatGridListModule, MatIconModule, MatIconRegistry, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatProgressBarModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule,} from '@angular/material';
 
 const MATERIAL_MODULES = [
-  CdkTableModule,
-  FlexLayoutModule,
-  MatButtonModule,
-  MatCardModule,
-  MatDialogModule,
-  MatExpansionModule,
-  MatGridListModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatMenuModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSnackBarModule,
-  MatSortModule,
-  MatTableModule,
-  MatTabsModule,
-  MatToolbarModule,
-  MatTooltipModule,
-  MatDatepickerModule,
-  MatNativeDateModule,
+  CdkTableModule,        FlexLayoutModule,
+  MatAutocompleteModule, MatButtonModule,
+  MatCardModule,         MatDialogModule,
+  MatExpansionModule,    MatGridListModule,
+  MatIconModule,         MatInputModule,
+  MatListModule,         MatMenuModule,
+  MatProgressBarModule,  MatProgressSpinnerModule,
+  MatSelectModule,       MatSidenavModule,
+  MatSnackBarModule,     MatSortModule,
+  MatTableModule,        MatTabsModule,
+  MatToolbarModule,      MatTooltipModule,
+  MatDatepickerModule,   MatNativeDateModule,
   MatChipsModule,
 ];
 

@@ -28,6 +28,12 @@ import {ShelfDetailView, ShelfDetailViewModule} from './views/shelf_detail_view'
 import {ShelfListView, ShelfListViewModule} from './views/shelf_list_view';
 import {UserView, UserViewModule} from './views/user_view';
 
+/** Defines the required permission to see/use the search. */
+export const SEARCH_PERMISSIONS: string[] = [
+  CONFIG.appPermissions.READ_DEVICES,
+  CONFIG.appPermissions.READ_SHELVES,
+];
+
 /** Defines the Angular app routes and which views are loaded on which route. */
 const routes: Routes = [
   {path: 'authorization', component: Authorization},
@@ -50,10 +56,7 @@ const routes: Routes = [
         component: SearchView,
         canActivate: [AuthGuard],
         data: {
-          'requiredPermissions': [
-            CONFIG.appPermissions.READ_DEVICES,
-            CONFIG.appPermissions.READ_SHELVES,
-          ],
+          'requiredPermissions': SEARCH_PERMISSIONS,
         },
       },
       {
@@ -61,10 +64,7 @@ const routes: Routes = [
         component: SearchView,
         canActivate: [AuthGuard],
         data: {
-          'requiredPermissions': [
-            CONFIG.appPermissions.READ_DEVICES,
-            CONFIG.appPermissions.READ_SHELVES,
-          ],
+          'requiredPermissions': SEARCH_PERMISSIONS,
         },
       },
       {
@@ -72,10 +72,7 @@ const routes: Routes = [
         component: SearchView,
         canActivate: [AuthGuard],
         data: {
-          'requiredPermissions': [
-            CONFIG.appPermissions.READ_DEVICES,
-            CONFIG.appPermissions.READ_SHELVES,
-          ],
+          'requiredPermissions': SEARCH_PERMISSIONS,
         },
       },
     ],

@@ -29,9 +29,13 @@
   right: 0;
 };
 
-.sidenav-container {
+.flex-1 {
   flex: 1;
-};
+}
+
+.middle-align {
+  vertical-align: middle;
+}
 
 html,
 body {

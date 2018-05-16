@@ -15,32 +15,30 @@
 import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
-import {RouterModule} from '@angular/router';
 
 import {MaterialModule} from '../../core/material_module';
-import {SearchBoxService} from '../search_box/search_box.service';
 
-import {SearchResultsComponent} from './search_results';
+import {SearchBox} from './search_box';
+import {SearchBoxService} from './search_box.service';
 
-export * from './search_results';
+export * from './search_box';
 
 @NgModule({
   declarations: [
-    SearchResultsComponent,
+    SearchBox,
   ],
   exports: [
-    SearchResultsComponent,
+    SearchBox,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
-    RouterModule,
     MaterialModule,
   ],
   providers: [
     SearchBoxService,
   ],
 })
-export class SearchResultsModule {
+export class SearchBoxModule {
 }
