@@ -33,10 +33,11 @@ from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
+from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class DeviceModelTest(loanertest.EndpointsTestCase):
+class DeviceModelTest(loanertest.TestCase):
   """Tests for the Device class."""
 
   def setUp(self):
@@ -65,6 +66,8 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.device1 = device_model.Device.get(serial_number='12321')
     self.device2 = device_model.Device.get(serial_number='67890')
     self.device3 = device_model.Device.get(serial_number='Void')
+    datastore_user = user_model.User.get_user(loanertest.USER_EMAIL)
+    datastore_user.update(superadmin=True)
 
   def test_get_search_index(self):
     self.assertIsInstance(device_model.Device.get_index(), search.Index)
@@ -874,6 +877,48 @@ class DeviceModelTest(loanertest.EndpointsTestCase):
     self.test_device.remove_from_shelf(
         shelf=self.shelf, user_email=loanertest.USER_EMAIL)
     self.assertIsNone(self.test_device.shelf)
+
+
+class DecoratorTest(loanertest.TestCase):
+  """Tests for decorators."""
+
+  def setUp(self):
+    super(DecoratorTest, self).setUp()
+
+    class TestDevice(device_model.Device):
+      """Device for testing."""
+
+      @device_model.validate_assignee_or_admin
+      def testable_method(self):
+        return True
+
+    self.test_device = TestDevice()
+    self.test_device.assigned_user = loanertest.USER_EMAIL
+
+  @mock.patch.object(
+      device_model.user_lib, 'get_user_email',
+      return_value=loanertest.SUPER_ADMIN_EMAIL)
+  def test_validate_assignee_or_admin__is_admin(self, unused_mock):
+    del unused_mock
+    datastore_user = user_model.User.get_user(loanertest.SUPER_ADMIN_EMAIL)
+    datastore_user.update(superadmin=True)
+
+    self.assertTrue(self.test_device.testable_method())
+
+  @mock.patch.object(
+      device_model.user_lib, 'get_user_email',
+      return_value=loanertest.USER_EMAIL)
+  def test_validate_assignee_or_admin__is_assignee(self, unused_mock):
+    del unused_mock
+    self.assertTrue(self.test_device.testable_method())
+
+  @mock.patch.object(
+      device_model.user_lib, 'get_user_email',
+      return_value=loanertest.TECHNICIAN_EMAIL)
+  def test_validate_assignee_or_admin__not_authorized(self, unused_mock):
+    del unused_mock
+    self.assertRaises(
+        device_model.UnauthorizedError, self.test_device.testable_method)
 
 
 if __name__ == '__main__':

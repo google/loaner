@@ -212,7 +212,8 @@ class DeviceApi(root_api.Service):
       raise endpoints.InternalServerErrorException(str(err))
     except (
         device_model.UnassignedDeviceError,
-        device_model.GuestNotAllowedError) as err:
+        device_model.GuestNotAllowedError,
+        device_model.UnauthorizedError) as err:
       raise endpoints.UnauthorizedException(str(err))
     else:
       return message_types.VoidMessage()
@@ -235,7 +236,9 @@ class DeviceApi(root_api.Service):
       return message_types.VoidMessage()
     except device_model.ExtendError as err:
       raise endpoints.BadRequestException(str(err))
-    except device_model.UnassignedDeviceError as err:
+    except (
+        device_model.UnassignedDeviceError,
+        device_model.UnauthorizedError)as err:
       raise endpoints.UnauthorizedException(str(err))
 
   @auth.method(
@@ -249,9 +252,12 @@ class DeviceApi(root_api.Service):
     self.check_xsrf_token(self.request_state)
     device = _get_device(request.device)
     user_email = user_lib.get_user_email()
-    device.mark_damaged(
-        user_email=user_email,
-        damaged_reason=request.damaged_reason)
+    try:
+      device.mark_damaged(
+          user_email=user_email,
+          damaged_reason=request.damaged_reason)
+    except device_model.UnauthorizedError as err:
+      raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
   @auth.method(
@@ -265,7 +271,10 @@ class DeviceApi(root_api.Service):
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
-    device.mark_lost(user_email=user_email)
+    try:
+      device.mark_lost(user_email=user_email)
+    except device_model.UnauthorizedError as err:
+      raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
   @auth.method(
@@ -281,7 +290,9 @@ class DeviceApi(root_api.Service):
     user_email = user_lib.get_user_email()
     try:
       device.mark_pending_return(user_email=user_email)
-    except device_model.UnassignedDeviceError as err:
+    except (
+        device_model.UnassignedDeviceError,
+        device_model.UnauthorizedError) as err:
       raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
@@ -296,7 +307,10 @@ class DeviceApi(root_api.Service):
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()
-    device.resume_loan(user_email=user_email)
+    try:
+      device.resume_loan(user_email=user_email)
+    except device_model.UnauthorizedError as err:
+      raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
 

@@ -458,6 +458,17 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         user_email=loanertest.USER_EMAIL, damaged_reason=None)
     assert mock_xsrf_token.call_count == 1
 
+  @mock.patch.object(device_model.Device, 'mark_damaged')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
+  def test_mark_damaged__unauthorized(self, mock_xsrf, mock_markdamaged):
+    del mock_xsrf  # unusued.
+    self.login_endpoints_user()
+    mock_markdamaged.side_effect = device_model.UnauthorizedError()
+    with self.assertRaises(endpoints.UnauthorizedException):
+      self.service.mark_damaged(device_message.DamagedRequest(
+          device=device_message.DeviceRequest(urlkey=self.device.key.urlsafe()),
+          damaged_reason='Foo'))
+
   @mock.patch('__main__.device_model.Device.mark_lost')
   @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_mark_lost(self, mock_xsrf_token, mock_marklost):
@@ -466,6 +477,15 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     mock_marklost.assert_called_once_with(
         user_email=loanertest.SUPER_ADMIN_EMAIL)
     assert mock_xsrf_token.call_count == 1
+
+  @mock.patch.object(device_model.Device, 'mark_lost')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
+  def test_mark_lost__unauthorized(self, mock_xsrf_token, mock_marklost):
+    del mock_xsrf_token  # unused.
+    mock_marklost.side_effect = device_model.UnauthorizedError()
+    with self.assertRaises(endpoints.UnauthorizedException):
+      self.service.mark_lost(device_message.DeviceRequest(
+          urlkey=self.device.key.urlsafe()))
 
   @mock.patch('__main__.device_model.Device.mark_pending_return')
   @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
@@ -494,6 +514,16 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         urlkey=self.device.key.urlsafe()))
     assert mock_resume_loan.call_count == 1
     assert mock_xsrf_token.call_count == 1
+
+  @mock.patch.object(device_model.Device, 'resume_loan')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
+  def test_resume_loan__unauthorized(self, mock_xsrf_token, mock_resume_loan):
+    del mock_xsrf_token  # unused.
+    self.login_endpoints_user()
+    mock_resume_loan.side_effect = device_model.UnauthorizedError()
+    with self.assertRaises(endpoints.UnauthorizedException):
+      self.service.resume_loan(device_message.DeviceRequest(
+          urlkey=self.device.key.urlsafe()))
 
   def test_get_device_errors(self):
     # No identifiers.

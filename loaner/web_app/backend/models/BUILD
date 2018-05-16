@@ -81,10 +81,13 @@ loaner_appengine_library(
     deps = [
         ":base_model",
         ":config_model",
+        ":user_model",
         "//loaner/web_app:config_defaults",
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/api:permissions",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:events",
+        "//loaner/web_app/backend/lib:user",
         "@absl_archive//absl/logging",
     ],
 )
@@ -204,6 +207,7 @@ loaner_appengine_test(
         ":config_model",
         ":device_model",
         ":shelf_model",
+        ":user_model",
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/testing:loanertest",

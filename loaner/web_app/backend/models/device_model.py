@@ -29,10 +29,13 @@ from google.appengine.ext import ndb
 
 from loaner.web_app import config_defaults
 from loaner.web_app import constants
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import events
+from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
+from loaner.web_app.backend.models import user_model
 
 DEVICE_NOT_ENROLLED_MSG = 'Device %s is not enrolled in the application.'
 _GUEST_MODE_DISABLED_MSG = (
@@ -112,6 +115,10 @@ class UnassignedDeviceError(Error):
   """Raised when a device is not assigned during an assignment error."""
 
 
+class UnauthorizedError(Error):
+  """Raised when the current user is not authorized to perform an action."""
+
+
 ReturnDates = collections.namedtuple('ReturnDates', ['max', 'default'])
 
 
@@ -126,6 +133,34 @@ class Reminder(base_model.BaseModel):
   level = ndb.IntegerProperty(required=True)
   time = ndb.DateTimeProperty()
   count = ndb.IntegerProperty()
+
+
+def validate_assignee_or_admin(method):
+  """Decorator that validates if the assignee or an admin is calling method.
+
+  Args:
+    method: A Device instance method.
+
+  Returns:
+    The wrapped method.
+
+  Raises:
+    UnauthorizedError: If the user is not authorized to call this method.
+  """
+
+  def wrapper(*args, **kwargs):
+    """Inner method."""
+    datastore_user = user_model.User.get_user(user_lib.get_user_email())
+    current_device = args[0]
+    if current_device.assigned_user == datastore_user.key.id():
+      return method(*args, **kwargs)
+    elif (permissions.Permissions.ADMINISTRATE_LOAN in
+          datastore_user.get_permissions()):
+      return method(*args, **kwargs)
+    else:
+      raise UnauthorizedError(_ASSIGNMENT_MISMATCH_MSG)
+
+  return wrapper
 
 
 class Device(base_model.BaseModel):
@@ -528,6 +563,7 @@ class Device(base_model.BaseModel):
         self.resume_loan(
             user_email, message='Resuming loan, since use continued.')
 
+  @validate_assignee_or_admin
   def loan_extend(self, user_email, extend_date_time):
     """Requests an extension to the provided date.
 
@@ -586,6 +622,7 @@ class Device(base_model.BaseModel):
     self.last_known_healthy = now
     self.put()
 
+  @validate_assignee_or_admin
   def mark_pending_return(self, user_email):
     """Marks a device as returned, as reported by the user.
 
@@ -630,6 +667,7 @@ class Device(base_model.BaseModel):
     self.next_reminder = Reminder(level=reminder_level, time=reminder_time)
     self.put()
 
+  @validate_assignee_or_admin
   def mark_damaged(self, user_email, damaged_reason=None):
     """Marks a device as damaged.
 
@@ -647,6 +685,7 @@ class Device(base_model.BaseModel):
             reason=damaged_reason))
     self.put()
 
+  @validate_assignee_or_admin
   def mark_lost(self, user_email):
     """Marks a device as lost.
 
@@ -663,6 +702,7 @@ class Device(base_model.BaseModel):
     self.lock(user_email)
     self.stream_to_bq(user_email, 'Marking device lost and locking it.')
 
+  @validate_assignee_or_admin
   def enable_guest_mode(self, user_email):
     """Moves a device into guest mode if allowed.
 
