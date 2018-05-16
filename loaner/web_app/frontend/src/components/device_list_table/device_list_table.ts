@@ -95,7 +95,7 @@ export class DeviceListTable implements OnInit {
     this.setDisplayColumns();
     this.dataSource.sort = this.sort;
 
-    interval(5000)
+    interval(60000)  // 1 minute.
         .pipe(
             startWith(0),
             takeUntil(this.onDestroy),

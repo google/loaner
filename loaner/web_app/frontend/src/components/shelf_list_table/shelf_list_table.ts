@@ -55,7 +55,7 @@ export class ShelfListTable implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.dataSource.sort = this.sort;
-    interval(5000)
+    interval(60000)  // 1 minute.
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
                 return this.pauseLoading ? NEVER : this.shelfService.list();
               }))
