@@ -1,0 +1,66 @@
+# Copyright 2018 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS-IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# This is the configuration file for Grab n Go Loaners.
+
+# Each top level key (prod, qa, dev) represents a Google Cloud Project, only one
+# is strictly required. For each configured project the project_id, client_id,
+# and client_secret are required. If you choose to use less than three projects
+# default to using prod for your production application.
+
+prod:
+  # Replace project_id with the Google Cloud Project ID found in Cloud Console:
+  # https://console.cloud.google.com
+  project_id:  # Required.
+  # Replace client_id with the Google OAuth2 Client ID found at
+  # https://console.cloud.google.com/apis/credentials
+  client_id:  # Required.
+  # Replace client_secret with the Google OAuth2 Client Secret found at
+  # https://console.cloud.google.com/apis/credentials
+  client_secret:  # Required.
+  # If not provided we will create a default bucket name and store the secure
+  # configuration data there. Should you decide you'd rather use a custom Google
+  # Cloud Storage Bucket to store this information please place the name of the
+  # bucket below.
+  custom_bucket:  # Optional.
+qa:
+  # Replace project_id with the Google Cloud Project ID found in Cloud Console:
+  # https://console.cloud.google.com
+  project_id:  # Required if using qa.
+  # Replace client_id with the Google OAuth2 Client ID found at
+  # https://console.cloud.google.com/apis/credentials
+  client_id:  # Required if using qa.
+  # Replace client_secret with the Google OAuth2 Client Secret found at
+  # https://console.cloud.google.com/apis/credentials
+  client_secret:  # Required if using qa.
+  # If not provided we will create a default bucket name and store the secure
+  # configuration data there. Should you decide you'd rather use a custom Google
+  # Cloud Storage Bucket to store this information please place the name of the
+  # bucket below.
+  custom_bucket:  # Optional.
+dev:
+  # Replace project_id with the Google Cloud Project ID found in Cloud Console:
+  # https://console.cloud.google.com
+  project_id:  # Required if using dev.
+  # Replace client_id with the Google OAuth2 Client ID found at
+  # https://console.cloud.google.com/apis/credentials
+  client_id:  # Required if using dev.
+  # Replace client_secret with the Google OAuth2 Client Secret found at
+  # https://console.cloud.google.com/apis/credentials
+  client_secret:  # Required if using dev.
+  # If not provided we will create a default bucket name and store the secure
+  # configuration data there. Should you decide you'd rather use a custom Google
+  # Cloud Storage Bucket to store this information please place the name of the
+  # bucket below.
+  custom_bucket:  # Optional.
