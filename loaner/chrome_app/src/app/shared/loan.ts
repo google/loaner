@@ -18,6 +18,7 @@ import {Observable} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 import {ConfigService} from '../../../../shared/config';
+import {DeviceApiParams, DeviceRequestApiParams, ExtendDeviceRequestApiParams, MarkAsDamagedRequestApiParams} from '../../../../shared/models/device';
 
 import * as DeviceIdentifier from './device_identifier';
 
@@ -35,10 +36,12 @@ export class Loan {
    * @param newDate Date in Python DateTime formatting, sent as a string.
    */
   extend(newDate: string): Observable<boolean> {
-    let request: ExtendRequest;
+    let request: ExtendDeviceRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
-        device: {chrome_device_id: deviceId},
+        device: {
+          chrome_device_id: deviceId,
+        },
         extend_date: newDate,
       };
       const apiUrl = `${this.endpointsDeviceUrl}/extend_loan`;
@@ -48,7 +51,7 @@ export class Loan {
 
   /** Mark device as returned on the backend. */
   return(): Observable<boolean> {
-    let request: ReturnRequest;
+    let request: DeviceRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
         chrome_device_id: deviceId,
@@ -63,11 +66,13 @@ export class Loan {
    * @param damagedReason Optional reason for what's damaged on the device.
    */
   damaged(damagedReason?: string): Observable<boolean> {
-    let request: DamagedReasonRequest;
+    let request: MarkAsDamagedRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
         damaged_reason: damagedReason,
-        device: {chrome_device_id: deviceId},
+        device: {
+          chrome_device_id: deviceId,
+        },
       };
       const apiUrl = `${this.endpointsDeviceUrl}/mark_damaged`;
       return this.http.post<boolean>(apiUrl, request);
@@ -76,7 +81,7 @@ export class Loan {
 
   /** Enable guest mode for the loan. */
   enableGuestMode(): Observable<boolean> {
-    let request: GuestModeRequest;
+    let request: DeviceRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
         chrome_device_id: deviceId,
@@ -88,7 +93,7 @@ export class Loan {
 
   /** Resumes the loan and removes the pending return status. */
   resumeLoan(): Observable<boolean> {
-    let request: ResumeLoanRequest;
+    let request: DeviceRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
         chrome_device_id: deviceId,
@@ -101,14 +106,14 @@ export class Loan {
   /**
    * Gets the device info and some additional loan info.
    */
-  getDevice(): Observable<DeviceInfoResponse> {
-    let request: DeviceInfoRequest;
+  getDevice(): Observable<DeviceApiParams> {
+    let request: DeviceRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
         chrome_device_id: deviceId,
       };
       const apiUrl = `${this.endpointsDeviceUrl}/get`;
-      return this.http.post<DeviceInfoResponse>(apiUrl, request);
+      return this.http.post<DeviceApiParams>(apiUrl, request);
     }));
   }
 }

@@ -36,6 +36,7 @@ export declare interface DeviceApiParams {
   pending_return?: boolean;
   mark_pending_return_date?: Date;
   max_extend_date?: Date;
+  given_name?: string;
   guest_enabled?: boolean;
   guest_permitted?: boolean;
   query?: {query_string?: string;};

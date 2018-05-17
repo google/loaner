@@ -30,49 +30,6 @@ declare interface ChromeNotificationOptions {
   type: string;
 }
 
-/** Represents the damaged reason for the HTTP request. */
-declare interface DamagedReasonRequest {
-  damaged_reason?: string;
-  device: {chrome_device_id: string};
-}
-
-/** Represents the request that is made for requesting device info. */
-declare interface DeviceInfoRequest {
-  chrome_device_id: string;
-}
-
-/** Represents the HTTP response with device info. */
-declare interface DeviceInfoResponse {
-  assigned_user?: string;
-  assignment_date?: Date;
-  current_ou?: string;
-  damaged?: boolean;
-  damaged_reason?: string;
-  device_model?: string;
-  due_date?: Date;
-  enrolled?: boolean;
-  given_name?: string;
-  guest_enabled?: boolean;
-  guest_permitted?: boolean;
-  last_heartbeat?: Date;
-  last_known_healthy?: Date;
-  locked?: boolean;
-  lost?: boolean;
-  mark_pending_return_date?: Date;
-  max_extend_date?: Date;
-}
-
-/** Represents the loan extension for the HTTP request. */
-declare interface ExtendRequest {
-  device: {chrome_device_id: string};
-  extend_date: string;
-}
-
-/** Represents the request that is made for enabling guest mode. */
-declare interface GuestModeRequest {
-  chrome_device_id: string;
-}
-
 /** Interface for the heartbeat configuration parameters. */
 declare interface HeartbeatConfiguration {
   duration: number;
@@ -84,16 +41,6 @@ declare interface HeartbeatConfiguration {
 declare interface HeartbeatResponse {
   is_enrolled: boolean;
   start_assignment: boolean;
-}
-
-/** Represents the return request */
-declare interface ReturnRequest {
-  chrome_device_id: string;
-}
-
-/** Represents the request that is made for resuming a loan. */
-declare interface ResumeLoanRequest {
-  chrome_device_id: string;
 }
 
 /** Represents the runtime requests that are made via Chrome Messages. */

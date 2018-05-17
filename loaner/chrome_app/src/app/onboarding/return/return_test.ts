@@ -21,6 +21,7 @@ import * as moment from 'moment';
 
 import {LoaderModule} from '../../../../../shared/components/loader';
 import {ConfigService} from '../../../../../shared/config';
+import {DeviceApiParams} from '../../../../../shared/models/device';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
 import {ReturnDateService} from '../../shared/return_date_service';
@@ -35,7 +36,7 @@ describe('ReturnComponent', () => {
   let returnService: ReturnDateService;
 
   // Mock response of device info
-  const testDeviceInfo: DeviceInfoResponse = {
+  const testDeviceInfo: DeviceApiParams = {
     due_date: moment().toDate(),
     max_extend_date: moment().add(1, 'w').toDate(),
     given_name: 'John',

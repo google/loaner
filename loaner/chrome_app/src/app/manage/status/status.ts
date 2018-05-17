@@ -22,6 +22,7 @@ import {GuestMode} from '../../../../../shared/components/guest';
 import {LoaderView} from '../../../../../shared/components/loader';
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {ConfigService} from '../../../../../shared/config';
+import {DeviceApiParams} from '../../../../../shared/models/device';
 import {Background} from '../../shared/background_service';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -84,7 +85,7 @@ export class StatusComponent extends LoaderView implements OnInit {
    * Sets the local values to the populated info from the API.
    * @param deviceInfo represents the various info for a given device.
    */
-  private setLocalValues(deviceInfo: DeviceInfoResponse) {
+  private setLocalValues(deviceInfo: DeviceApiParams) {
     this.dueDate = moment(deviceInfo.due_date!).toDate();
     this.maxExtendDate = moment(deviceInfo.max_extend_date!).toDate();
     this.userDisplayName = deviceInfo.given_name || 'there';

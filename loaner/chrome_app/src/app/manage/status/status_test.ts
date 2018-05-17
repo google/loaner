@@ -30,6 +30,7 @@ import {LoanActionsCardModule} from '../../../../../shared/components/loan_manag
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {ConfigService} from '../../../../../shared/config';
 import {FocusModule} from '../../../../../shared/directives/focus/index';
+import {DeviceApiParams} from '../../../../../shared/models/device';
 import {Background} from '../../shared/background_service';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -47,7 +48,7 @@ describe('StatusComponent', () => {
   let loan: Loan;
 
   // Mock response of device info
-  const testDeviceInfo: DeviceInfoResponse = {
+  const testDeviceInfo: DeviceApiParams = {
     due_date: moment().toDate(),
     max_extend_date: moment().add(1, 'w').toDate(),
     given_name: 'John',
