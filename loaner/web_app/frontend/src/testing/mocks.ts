@@ -29,7 +29,7 @@ export class ShelfServiceMock {
       location: 'Location 1',
       last_audit_by: 'user',
       capacity: 10,
-      last_audit_time: 1499202031707,
+      last_audit_time: new Date(2018, 1, 1),
       shelf_request: {
         location: 'Location 1',
         urlsafe_key: 'urlsafekey1',
@@ -40,7 +40,7 @@ export class ShelfServiceMock {
       location: 'Location 2',
       last_audit_by: 'user',
       capacity: 10,
-      last_audit_time: 1499202031707,
+      last_audit_time: new Date(2018, 1, 1),
       shelf_request: {
         location: 'Location 2',
         urlsafe_key: 'urlsafekey2',
@@ -51,7 +51,7 @@ export class ShelfServiceMock {
       location: 'Location 3',
       last_audit_by: 'user',
       capacity: 10,
-      last_audit_time: 1499202031707,
+      last_audit_time: new Date(2018, 1, 1),
       shelf_request: {
         location: 'Location 3',
         urlsafe_key: 'urlsafekey3',
@@ -62,7 +62,7 @@ export class ShelfServiceMock {
       location: 'Location 4',
       last_audit_by: 'user',
       capacity: 10,
-      last_audit_time: 1499202031707,
+      last_audit_time: new Date(2018, 1, 1),
       shelf_request: {
         location: 'Location 4',
         urlsafe_key: 'urlsafekey4',
@@ -73,7 +73,7 @@ export class ShelfServiceMock {
       location: 'Location 5',
       last_audit_by: 'user',
       capacity: 10,
-      last_audit_time: 1499202031707,
+      last_audit_time: new Date(2018, 1, 1),
       shelf_request: {
         location: 'Location 5',
         urlsafe_key: 'urlsafekey5',
@@ -133,11 +133,11 @@ export const DEVICE_1 = new Device({
   device_model: 'chromebook',
   serial_number: '321653',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 });
 
 export const DEVICE_2 = new Device({
@@ -145,11 +145,11 @@ export const DEVICE_2 = new Device({
   device_model: 'chromebook',
   serial_number: '236135',
   pending_return: true,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 
 });
 
@@ -158,11 +158,11 @@ export const DEVICE_WITH_ASSET_TAG = new Device({
   device_model: 'chromebook',
   serial_number: '777001',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 
 });
 
@@ -171,11 +171,11 @@ export const DEVICE_WITHOUT_ASSET_TAG = new Device({
   device_model: 'chromebook',
   serial_number: '777002',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 });
 
 export const DEVICE_MARKED_FOR_RETURN = new Device({
@@ -183,9 +183,9 @@ export const DEVICE_MARKED_FOR_RETURN = new Device({
   device_model: 'chromebook',
   serial_number: '777003',
   pending_return: true,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
 });
 
@@ -194,18 +194,18 @@ export const DEVICE_NOT_MARKED_FOR_RETURN = new Device({
   device_model: 'chromebook',
   serial_number: '777004',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 });
 
 export const DEVICE_UNASSIGNED = new Device({
   device_model: 'chromebook',
   serial_number: '777005',
   pending_return: false,
-  due_date: 1499202031707,
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
 });
 
@@ -214,19 +214,19 @@ export const DEVICE_ASSIGNED = new Device({
   device_model: 'chromebook',
   serial_number: '777006',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 });
 
 export const DEVICE_LOST = new Device({
   device_model: 'chromebook',
   serial_number: '777007',
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
   lost: true,
 });
@@ -236,9 +236,9 @@ export const DEVICE_DAMAGED = new Device({
   device_model: 'chromebook',
   serial_number: '777008',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
   damaged: true,
 });
@@ -248,9 +248,9 @@ export const DEVICE_LOCKED = new Device({
   device_model: 'chromebook',
   serial_number: '777009',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
   locked: true,
 });
@@ -260,19 +260,19 @@ export const DEVICE_OVERDUE = new Device({
   device_model: 'chromebook',
   serial_number: '777009',
   pending_return: false,
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 0,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 3),
   current_ou: 'ROOT',
-  max_extend_date: 1499400000000,
+  max_extend_date: new Date(2018, 1, 4),
 });
 
 export const DEVICE_LOST_AND_MORE = new Device({
   device_model: 'chromebook',
   serial_number: '777007',
-  assigned_on_date: 1499202031707,
-  last_update: 1499202031707,
-  due_date: 1499202031707,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
   lost: true,
   damaged: true,

@@ -60,8 +60,6 @@ declare interface DeviceInfoResponse {
   lost?: boolean;
   mark_pending_return_date?: Date;
   max_extend_date?: Date;
-  ou_changed_date?: Date;
-  return_date?: Date;
 }
 
 /** Represents the loan extension for the HTTP request. */
@@ -86,12 +84,6 @@ declare interface HeartbeatConfiguration {
 declare interface HeartbeatResponse {
   is_enrolled: boolean;
   start_assignment: boolean;
-}
-
-/** Represents the information we request for loan info. */
-declare interface LoanRequest {
-  device_id: string;
-  need_name?: boolean;
 }
 
 /** Represents the return request */

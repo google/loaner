@@ -30,13 +30,13 @@ describe('Device', () => {
     serial_number: 'fakeserial1',
     assigned_user: 'fakeuser1',
     device_model: 'fakemodel1',
-    due_date: moment(today).add(1, 'w').toDate().valueOf()
+    due_date: moment(today).add(1, 'w').toDate()
   });
   const overdueDevice = new Device({
     serial_number: 'fakeserial2',
     assigned_user: 'fakeuser2',
     device_model: 'fakemodel2',
-    due_date: moment(today).subtract(1, 'w').toDate().valueOf()
+    due_date: moment(today).subtract(1, 'w').toDate()
   });
   const assetTagDevice = new Device({
     serial_number: '123',
@@ -47,39 +47,37 @@ describe('Device', () => {
   const maximumExtendedDevice = new Device({
     serial_number: '012',
     pending_return: false,
-    due_date: moment(today).toDate().valueOf(),
-    max_extend_date: moment(today).toDate().valueOf()
+    due_date: moment(today).toDate(),
+    max_extend_date: moment(today).toDate()
   });
   const serialNumberDevice = new Device({serial_number: '456', asset_tag: ''});
 
-  it('should be overdue when the current date/time is after the due date/time',
-     () => {
-       expect(overdueDevice.isOverdue).toBe(true);
-     });
+  it('is overdue when the current date/time is after the due date/time', () => {
+    expect(overdueDevice.isOverdue).toBe(true);
+  });
 
-  it('should not be overdue when the current date/time is before the due date/time',
+  it('isn\'t overdue when the current date/time is before the due date/time',
      () => {
        expect(underdueDevice.isOverdue).toBe(false);
      });
 
-  it('should return a value < 0 when a device is overdue', () => {
+  it('returns a value < 0 when a device is overdue', () => {
     expect(overdueDevice.timeUntilDue).toBeLessThan(0);
   });
 
-  it('should return a value >= 0 when a device is underdue', () => {
+  it('returns a value >= 0 when a device is underdue', () => {
     expect(underdueDevice.timeUntilDue).toBeGreaterThanOrEqual(0);
   });
 
-  it('should not be able to extend if marked pending return', () => {
+  it('isn\'t able to extend if marked pending return', () => {
     expect(pendingReturnDevice.canExtend).toBe(false);
   });
 
-  it('should not be able to extend if due date exceeds maximum return date',
-     () => {
-       expect(maximumExtendedDevice.canExtend).toBe(false);
-     });
+  it('isn\'t able to extend if due date exceeds maximum return date', () => {
+    expect(maximumExtendedDevice.canExtend).toBe(false);
+  });
 
-  it('should return asset tag before serial number for its id', () => {
+  it('returns asset tag before serial number for its id', () => {
     expect(assetTagDevice.id).toBe(assetTagDevice.assetTag);
     expect(serialNumberDevice.id).toBe(serialNumberDevice.serialNumber);
   });
