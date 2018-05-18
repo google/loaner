@@ -33,7 +33,7 @@ export class LoanerSnackBar {
 
     if (!permanent) {
       options['duration'] = 3000;
-      action = 'Dismiss';
+      action = 'DISMISS';
     }
 
     this.snackBar.open(message, action, options);
