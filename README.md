@@ -24,14 +24,16 @@ The program is comprised of three parts:
 *   A Google App Engine (GAE) application
 *   A Chrome App that runs on each ChromeOS device
 
-## Current release: Alpha (v0.5a)
+## Current release: [Alpha (v0.5a)](https://github.com/google/loaner/tree/Alpha-(0.5))
 
 Please note that the current release of this application is in ALPHA.
 We will be actively contributing to the project. Please keep an eye out for
 future updates and features!
 
 * To discuss this project send an email to loaner@googlegroups.com.
+* Read more about releases in our [release notes](docs/release_notes.md).
 * Please file bugs using the GitHub issue tracker.
+
 ## Technical Stack
 
 *   Chrome App

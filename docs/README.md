@@ -17,3 +17,5 @@ below.
 -   [User Guide](user_guide.md)
 -   [Frequently Asked
     Questions](faq.md)
+-   [Release Notes]
+    (release_notes.md)
