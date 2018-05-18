@@ -135,6 +135,9 @@ loaner_appengine_library(
     srcs = [
         "permissions.py",
     ],
+    data = [
+        "//loaner/web_app:permissions",
+    ],
 )
 
 loaner_appengine_library(

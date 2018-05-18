@@ -1,0 +1,18 @@
+{
+  "ADMINISTRATE_LOAN": "administrate_loan",
+  "AUDIT_SHELF": "audit_shelf",
+  "BOOTSTRAP": "bootstrap",
+  "CLEAR_INDICES": "clear_indices",
+  "DATASTORE_IMPORT": "datastore_import",
+  "READ_CONFIGS": "read_configs",
+  "READ_DEVICES": "read_devices",
+  "READ_ROLES": "read_roles",
+  "READ_SHELVES": "read_shelves",
+  "READ_SURVEYS": "read_surveys",
+  "MODIFY_CONFIG": "modify_config",
+  "MODIFY_DEVICE": "modify_device",
+  "MODIFY_ROLE": "modify_role",
+  "MODIFY_SHELF": "modify_shelf",
+  "MODIFY_SURVEY": "modify_survey",
+  "REINDEX_SEARCH": "reindex_search"
+}
