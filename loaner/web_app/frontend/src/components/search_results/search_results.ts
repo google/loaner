@@ -19,9 +19,9 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {Device, DeviceApiParams} from '../../models/device';
 import {Shelf, ShelfApiParams} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
+import {SearchService} from '../../services/search';
 import {ShelfService} from '../../services/shelf';
 import {LoanerSnackBar} from '../../services/snackbar';
-import {SearchBoxService} from '../search_box/search_box.service';
 
 /**
  * Component that renders the search results on the frontend.
@@ -45,7 +45,7 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
       private readonly deviceService: DeviceService,
       private readonly location: Location,
       private readonly route: ActivatedRoute, private readonly router: Router,
-      private searchBoxService: SearchBoxService,
+      private readonly searchService: SearchService,
       private readonly shelfService: ShelfService,
       private readonly snackBar: LoanerSnackBar) {}
 
@@ -56,7 +56,7 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
         this.query = params.query;
         this.search(params.model, params.query);
       } else if (!params.model) {
-        this.snackBar.open(`You haven't search for anything!`);
+        this.snackBar.open(`You haven't searched for anything!`);
         this.back();
       } else if (!params.query && params.model) {
         this.snackBar.open(`You haven't provided a query for your search!`);
@@ -131,6 +131,6 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
   }
 
   ngOnDestroy() {
-    this.searchBoxService.changeSearchText('');
+    this.searchService.changeSearchText('');
   }
 }

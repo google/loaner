@@ -13,25 +13,36 @@
 // limitations under the License.
 
 import {OverlayContainer} from '@angular/cdk/overlay';
+import {HttpClientModule} from '@angular/common/http';
 import {async, ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
+import {of} from 'rxjs';
 
+import {SearchService} from '../../services/search';
 import {LoanerSnackBar} from '../../services/snackbar';
 
 import {SearchBox, SearchBoxModule} from './index';
+
+const MARKDOWN_EXAMPLE = `# Testing
+## 123
+### 456
+Regular text.
+`;
 
 describe('SearchBox', () => {
   let fixture: ComponentFixture<SearchBox>;
   let overlayContainerElement: HTMLElement;
   let searchBox: SearchBox;
+  let searchService: SearchService;
   let router: Router;
 
   beforeEach(fakeAsync(() => {
     TestBed
         .configureTestingModule({
           imports: [
+            HttpClientModule,
             RouterTestingModule,
             SearchBoxModule,
             BrowserAnimationsModule,
@@ -39,6 +50,7 @@ describe('SearchBox', () => {
           providers: [
             {provide: ComponentFixtureAutoDetect, useValue: true},
             LoanerSnackBar,
+            SearchService,
           ],
         })
         .compileComponents();
@@ -48,6 +60,7 @@ describe('SearchBox', () => {
     fixture = TestBed.createComponent(SearchBox);
     searchBox = fixture.debugElement.componentInstance;
     router = TestBed.get(Router);
+    searchService = TestBed.get(SearchService);
     overlayContainerElement =
         TestBed.get(OverlayContainer).getContainerElement();
   }));
@@ -223,5 +236,29 @@ describe('SearchBox', () => {
        expect(router.navigate)
            .not.toHaveBeenCalledWith(
                ['/search/shelf/', ''], Object({skipLocationChange: true}));
+     }));
+
+  it('opens the search helper and displays the text properly', async(() => {
+       fixture.debugElement.nativeElement
+           .querySelector('button.help-icon-button')
+           .click();
+       spyOn(searchService, 'getHelp').and.returnValue(of(MARKDOWN_EXAMPLE));
+       fixture.detectChanges();
+
+       fixture.whenStable().then(() => {
+         const headingTwoElements = overlayContainerElement.querySelectorAll(
+                                        'h2') as NodeListOf<HTMLElement>;
+         expect(headingTwoElements[0]!.textContent).toContain('Search helper');
+         expect(overlayContainerElement.querySelector('h1')!.textContent)
+             .toContain('Testing');
+         expect(headingTwoElements[1]!.textContent).toContain('123');
+         expect(overlayContainerElement.querySelector('h3')!.textContent)
+             .toContain('456');
+         expect(overlayContainerElement.querySelector('p')!.textContent)
+             .toContain('Regular text.');
+         expect(
+             overlayContainerElement.querySelector('button#close')!.textContent)
+             .toContain('Close');
+       });
      }));
 });

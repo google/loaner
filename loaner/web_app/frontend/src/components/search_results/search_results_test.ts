@@ -12,11 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {HttpClientModule} from '@angular/common/http';
 import {ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {DeviceService} from '../../services/device';
+import {SearchService} from '../../services/search';
 import {ShelfService} from '../../services/shelf';
 import {LoanerSnackBar} from '../../services/snackbar';
 import {DEVICE_1, DEVICE_2, DeviceServiceMock, ShelfServiceMock} from '../../testing/mocks';
@@ -31,6 +33,7 @@ describe('SearchResultsComponent', () => {
     TestBed
         .configureTestingModule({
           imports: [
+            HttpClientModule,
             RouterTestingModule,
             SearchResultsModule,
             BrowserAnimationsModule,
@@ -40,6 +43,7 @@ describe('SearchResultsComponent', () => {
             {provide: DeviceService, useClass: DeviceServiceMock},
             {provide: ShelfService, useClass: ShelfServiceMock},
             LoanerSnackBar,
+            SearchService,
           ],
         })
         .compileComponents();

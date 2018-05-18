@@ -4,10 +4,24 @@ $black: rgba(0, 0, 0, .87);
 $border-color: rgba(0, 0, 0, .1);
 $search-bar-background-color: #1565c0;
 
-mat-icon {
-  padding: 11px 0px 0px 5px;
-  padding-left: 16px;
+.action-button {
+  margin: 12px;
+}
+
+.search-icon {
+  margin-top: 12px;
+  margin-left: 16px;
   position: absolute;
+}
+
+.help-icon-button {
+  margin-left: -50px;
+  margin-top: 3.5px;
+  position: absolute;
+}
+
+.help-icon {
+  font-size: 21px;
 }
 
 .search-box {

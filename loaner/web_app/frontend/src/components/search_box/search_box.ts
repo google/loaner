@@ -12,13 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {MatAutocompleteTrigger, MatOptionSelectionChange} from '@angular/material';
+import {Component, ElementRef, OnInit, SecurityContext, ViewChild} from '@angular/core';
+import {MatAutocompleteTrigger, MatDialog, MatDialogRef, MatOptionSelectionChange} from '@angular/material';
+import {DomSanitizer} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 
-import {LoanerSnackBar} from '../../services/snackbar';
+import {SearchService} from '../../services/search';
+import * as marked from 'marked';
 
-import {SearchBoxService} from './search_box.service';
+import {LoanerSnackBar} from '../../services/snackbar';
 
 export declare interface SearchType {
   model: string;
@@ -52,12 +54,14 @@ export class SearchBox implements OnInit {
 
 
   constructor(
-      private router: Router, private searchBoxService: SearchBoxService,
-      private readonly snackBar: LoanerSnackBar) {}
+      private readonly router: Router,
+      private readonly searchService: SearchService,
+      private readonly snackBar: LoanerSnackBar,
+      public dialog: MatDialog,
+  ) {}
 
   ngOnInit() {
-    this.searchBoxService.searchText.subscribe(
-        query => this.searchText = query);
+    this.searchService.searchText.subscribe(query => this.searchText = query);
   }
 
   /**
@@ -83,7 +87,7 @@ export class SearchBox implements OnInit {
    * @param query the query to be updated for the search text.
    */
   updateSearchText(query: string) {
-    this.searchBoxService.changeSearchText(query);
+    this.searchService.changeSearchText(query);
   }
 
   /**
@@ -100,5 +104,38 @@ export class SearchBox implements OnInit {
   blurInput() {
     if (this.searchInputElement) this.searchInputElement.nativeElement.blur();
     if (this.autocompleteTrigger) this.autocompleteTrigger.closePanel();
+  }
+
+  /** Opens the helper dialog for using the search box. */
+  openHelper() {
+    this.dialog.open(SearchHelper);
+  }
+}
+
+
+@Component({
+  selector: 'loaner-search-helper',
+  styleUrls: ['search_box.scss'],
+  templateUrl: 'search_box_helper.html',
+})
+export class SearchHelper implements OnInit {
+  sanitizedHelperContent: string|null;
+
+  constructor(
+      private dialogRef: MatDialogRef<SearchHelper>,
+      private readonly sanitizer: DomSanitizer,
+      private readonly searchService: SearchService,
+  ) {}
+
+  ngOnInit() {
+    this.searchService.getHelp().subscribe(response => {
+      this.sanitizedHelperContent =
+          this.sanitizer.sanitize(SecurityContext.HTML, marked(response));
+    });
+  }
+
+  /** Closes the helper dialog. */
+  closeDialog() {
+    this.dialogRef.close();
   }
 }

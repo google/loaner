@@ -1,0 +1,9 @@
+<h2 mat-title>Search helper</h2>
+<p [innerHtml]="sanitizedHelperContent"></p>
+<button mat-button
+        (click)="closeDialog()"
+        id="close"
+        class="action-button"
+        matTooltip="This will close the helper dialog.">
+  Close
+</button>

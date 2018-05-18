@@ -30,6 +30,7 @@ import {CanDeactivateGuard} from './services/can_deactivate_guard';
 import {ConfigService} from './services/config';
 import {DeviceService} from './services/device';
 import {LoanerOAuthInterceptor} from './services/oauth_interceptor';
+import {SearchService} from './services/search';
 import {ShelfService} from './services/shelf';
 import {LoanerSnackBar} from './services/snackbar';
 import {UserService} from './services/user';
@@ -57,6 +58,7 @@ import {UserService} from './services/user';
     ConfigService,
     DeviceService,
     LoanerSnackBar,
+    SearchService,
     ShelfService,
     Title,
     UserService,

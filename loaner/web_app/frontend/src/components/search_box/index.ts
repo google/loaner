@@ -18,26 +18,27 @@ import {BrowserModule} from '@angular/platform-browser';
 
 import {MaterialModule} from '../../core/material_module';
 
-import {SearchBox} from './search_box';
-import {SearchBoxService} from './search_box.service';
+import {SearchBox, SearchHelper} from './search_box';
 
 export * from './search_box';
 
 @NgModule({
   declarations: [
     SearchBox,
+    SearchHelper,
+  ],
+  entryComponents: [
+    SearchHelper,
   ],
   exports: [
     SearchBox,
+    SearchHelper,
   ],
   imports: [
     BrowserModule,
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
-  ],
-  providers: [
-    SearchBoxService,
   ],
 })
 export class SearchBoxModule {

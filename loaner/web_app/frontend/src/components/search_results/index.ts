@@ -18,7 +18,6 @@ import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
 
 import {MaterialModule} from '../../core/material_module';
-import {SearchBoxService} from '../search_box/search_box.service';
 
 import {SearchResultsComponent} from './search_results';
 
@@ -37,9 +36,6 @@ export * from './search_results';
     ReactiveFormsModule,
     RouterModule,
     MaterialModule,
-  ],
-  providers: [
-    SearchBoxService,
   ],
 })
 export class SearchResultsModule {

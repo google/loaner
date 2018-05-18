@@ -1,4 +1,6 @@
-<mat-icon [class.search-box-focused]="isFocused">search</mat-icon>
+<mat-icon class="search-icon" [class.search-box-focused]="isFocused">
+  search
+</mat-icon>
 <input #searchBox
        type="text"
        class="search-box"
@@ -13,6 +15,15 @@
        [class.search-box-unfocused]="!isFocused"
        [class.search-box-focused]="isFocused"
        placeholder="Search">
+<button mat-icon-button
+        aria-label="Open the search helper."
+        (click)="openHelper()"
+        class="help-icon-button"
+        [class.search-box-focused]="isFocused">
+  <mat-icon class="help-icon">
+    help_outline
+  </mat-icon>
+</button>
 
 <mat-autocomplete #auto="matAutocomplete">
   <mat-option *ngFor="let option of searchType"

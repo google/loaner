@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 
 @Injectable()
-export class SearchBoxService {
+export class SearchService {
   private searchTextSource = new BehaviorSubject<string>('');
 
   searchText: Observable<string> = this.searchTextSource.asObservable();
+
+  constructor(private readonly http: HttpClient) {}
 
   /**
    * Function to change the text to be searched.
@@ -27,5 +30,10 @@ export class SearchBoxService {
    */
   changeSearchText(query: string) {
     this.searchTextSource.next(query);
+  }
+
+  /** Gets the helper text from assets/search_help.md file. */
+  getHelp(): Observable<string> {
+    return this.http.get('./assets/search_help.md', {'responseType': 'text'});
   }
 }
