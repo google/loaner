@@ -1,3 +1,5 @@
+
+
 Looking for a way to narrow your search to be a bit more specific? Below are different expressions you can attach to queries to narrow down results.
 
 #### Device search options:
