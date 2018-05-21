@@ -100,6 +100,8 @@ export class Device {
   guestAllowed = false;
   /** The maximum date this device can be extended. */
   maxExtendDate: Date;
+  /** Given name on this loan. */
+  givenName = 'there';
   /** List of flags relevant to this device. */
   chips: DeviceChip[] = [];
 
@@ -123,6 +125,7 @@ export class Device {
     this.maxExtendDate = device.max_extend_date || this.maxExtendDate;
     this.guestEnabled = device.guest_enabled || this.guestEnabled;
     this.guestAllowed = device.guest_permitted || this.guestAllowed;
+    this.givenName = device.given_name || this.givenName;
 
     this.chips = this.makeChips();
   }
@@ -183,6 +186,7 @@ export class Device {
       guest_enabled: this.guestEnabled,
       guest_permitted: this.guestAllowed,
       max_extend_date: this.maxExtendDate,
+      given_name: this.givenName,
     };
   }
 

@@ -16,6 +16,7 @@ import {Component, OnInit} from '@angular/core';
 import * as moment from 'moment';
 
 import {LoaderView} from '../../../../../shared/components/loader';
+import {Device} from '../../../../../shared/models/device';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
 import {ReturnDateService} from '../../shared/return_date_service';
@@ -27,9 +28,8 @@ import {ReturnDateService} from '../../shared/return_date_service';
   templateUrl: './return.ng.html',
 })
 export class ReturnComponent extends LoaderView implements OnInit {
-  dueDate?: Date;
-  maxReturnDate?: Date;
-  newReturnDate?: Date;
+  device = new Device();
+  newReturnDate: Date;
   toBeSubmitted = true;
   validDate = true;
 
@@ -40,8 +40,39 @@ export class ReturnComponent extends LoaderView implements OnInit {
   }
 
   ngOnInit() {
-    this.setLoanInfo();
-    this.returnService.validDate.subscribe((val) => this.validDate = val);
+    this.loan.getDevice().subscribe(
+        device => {
+          this.device = device;
+          this.newReturnDate = this.getMinimumReturnDate();
+          this.initializeDateServiceVariables(device);
+          this.ready();
+        },
+        error => {
+          this.ready();
+          const message = `We had some trouble getting your loan information.`;
+          this.failure.register(
+              message, FailType.Network, FailAction.Quit, error);
+        });
+
+    this.returnService.validDate.subscribe(validDate => {
+      this.validDate = validDate;
+    });
+  }
+
+  private initializeDateServiceVariables(device: Device) {
+    this.returnService.updateDueDate(device.dueDate);
+    this.returnService.updateNewReturnDate(device.dueDate)
+        .subscribe(newReturnDate => {
+          if (this.newReturnDate instanceof Date) {
+            this.newReturnDate = newReturnDate!;
+          }
+        });
+
+    // Do validation checks on changes.
+    this.returnService.validationChecks().subscribe(val => {
+      this.validDate = val;
+      this.returnService.updateValidDate(val);
+    });
   }
 
   /** Gets the minimum return date. */
@@ -53,59 +84,6 @@ export class ReturnComponent extends LoaderView implements OnInit {
     });
 
     return moment(today).add(1, 'd').toDate();
-  }
-
-  /** Sends the due date to the return service. */
-  sendDueDate() {
-    if (this.dueDate == null) {
-      console.error('The due date was never defined.');
-    }
-    this.returnService.updateDueDate(this.dueDate!);
-  }
-
-  /** Sends the max return date to the return service. */
-  sendMaxReturnDate() {
-    if (this.maxReturnDate == null) {
-      console.error('The max return date was never defined.');
-    }
-    this.returnService.updateMaxReturnDate(this.maxReturnDate!);
-  }
-
-  /** Sends the new return date to the return service. */
-  sendNewReturnDate() {
-    if (this.newReturnDate == null) {
-      return console.error('The new return date was never defined.');
-    }
-    this.returnService.updateNewReturnDate(this.newReturnDate!);
-
-    // Do validation checks on changes.
-    this.returnService.validationChecks().subscribe(val => {
-      this.validDate = val;
-      this.returnService.updateValidDate(val);
-    });
-  }
-
-  /**
-   * Gets the loan info and sets it locally.
-   * Additionally sends the values from this component to the service initially.
-   */
-  setLoanInfo() {
-    this.loan.getDevice().subscribe(
-        loanInfo => {
-          this.dueDate = loanInfo.due_date;
-          this.newReturnDate = loanInfo.due_date;
-          this.maxReturnDate = loanInfo.max_extend_date;
-          this.sendDueDate();
-          this.sendMaxReturnDate();
-          this.sendNewReturnDate();
-          this.ready();
-        },
-        (error) => {
-          this.ready();
-          const message = `We had some trouble getting your loan information.`;
-          this.failure.register(
-              message, FailType.Network, FailAction.Quit, error);
-        });
   }
 
   /**

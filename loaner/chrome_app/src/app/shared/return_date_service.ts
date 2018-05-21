@@ -48,10 +48,15 @@ export class ReturnDateService {
 
   constructor(private readonly loan: Loan, private readonly failure: Failure) {}
 
-  /** Used to update the new return date using behavior subjects. */
-  updateNewReturnDate(date: Date) {
-    this.newReturnDateSource.next(date);
+  /**
+   * Used to update the new return date using behavior subjects.
+   *
+   * @returns The new return date added to the service.
+   */
+  updateNewReturnDate(date: Date): Observable<undefined|Date> {
     this.newReturnDate = date;
+    this.newReturnDateSource.next(date);
+    return this.newReturnDateSource.asObservable();
   }
 
   /** Used to update the max due date using behavior subjects. */

@@ -30,7 +30,7 @@ import {LoanActionsCardModule} from '../../../../../shared/components/loan_manag
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {ConfigService} from '../../../../../shared/config';
 import {FocusModule} from '../../../../../shared/directives/focus/index';
-import {DeviceApiParams} from '../../../../../shared/models/device';
+import {Device, DeviceApiParams} from '../../../../../shared/models/device';
 import {Background} from '../../shared/background_service';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -104,32 +104,32 @@ describe('StatusComponent', () => {
   });
 
   it('loads the loan information initially', () => {
-    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.setLoanInfo();
     fixture.detectChanges();
-    expect(app.dueDate).toEqual(testDeviceInfo.due_date);
-    expect(app.maxExtendDate).toEqual(testDeviceInfo.max_extend_date);
-    expect(app.userDisplayName).toEqual(testDeviceInfo.given_name);
-    expect(app.guestAllowed).toEqual(testDeviceInfo.guest_permitted);
-    expect(app.guestEnabled).toEqual(testDeviceInfo.guest_enabled);
+    expect(app.device.dueDate).toEqual(testDeviceInfo.due_date);
+    expect(app.device.maxExtendDate).toEqual(testDeviceInfo.max_extend_date);
+    expect(app.device.givenName).toEqual(testDeviceInfo.given_name);
+    expect(app.device.guestAllowed).toEqual(testDeviceInfo.guest_permitted);
+    expect(app.device.guestEnabled).toEqual(testDeviceInfo.guest_enabled);
   });
 
   it('renders content on the page', () => {
-    app.dueDate = new Date(2018, 1, 1);
+    app.device.dueDate = new Date(2018, 1, 1);
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent)
         .toContain('Please return your loaner by:');
   });
 
   it('allows the loan to be extended', () => {
-    app.dueDate = new Date(2017, 2, 27, 0, 0, 0, 0);
-    app.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
+    app.device.dueDate = new Date(2017, 2, 27, 0, 0, 0, 0);
+    app.device.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
     expect(app.canExtend()).toBeTruthy();
   });
 
   it('doesn\'t allow the loan to be extended', () => {
-    app.dueDate = new Date(2017, 3, 3, 0, 0, 0, 0);
-    app.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
+    app.device.dueDate = new Date(2017, 3, 3, 0, 0, 0, 0);
+    app.device.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
     expect(app.canExtend()).toBeFalsy();
   });
 });

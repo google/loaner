@@ -21,7 +21,7 @@ import * as moment from 'moment';
 
 import {LoaderModule} from '../../../../../shared/components/loader';
 import {ConfigService} from '../../../../../shared/config';
-import {DeviceApiParams} from '../../../../../shared/models/device';
+import {Device, DeviceApiParams} from '../../../../../shared/models/device';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
 import {ReturnDateService} from '../../shared/return_date_service';
@@ -84,25 +84,27 @@ describe('ReturnComponent', () => {
   });
 
   it('retrieves the loan information', () => {
-    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    expect(app.dueDate).toEqual(testDeviceInfo.due_date);
+    expect(app.device.dueDate).toEqual(testDeviceInfo.due_date);
   });
 
   it('allows the loan to be extended 1 day', () => {
-    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    app.newReturnDate = moment().add(1, 'd').toDate(), app.sendNewReturnDate();
+    app.newReturnDate = moment().add(1, 'd').toDate();
+    returnService.updateNewReturnDate(app.newReturnDate);
     expect(returnService.changeReturnDate()).toBeTruthy();
   });
 
   it('does NOT allow the loan to be extended 2 weeks', () => {
-    spyOn(loan, 'getDevice').and.returnValue(of(testDeviceInfo));
+    spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    app.newReturnDate = moment().add(2, 'w').toDate(), app.sendNewReturnDate();
+    app.newReturnDate = moment().add(2, 'w').toDate();
+    returnService.updateNewReturnDate(app.newReturnDate);
     expect(returnService.changeReturnDate()).toBeFalsy();
   });
 });

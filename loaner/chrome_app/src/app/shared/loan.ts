@@ -15,10 +15,10 @@
 import {HttpClient, HttpErrorResponse} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {switchMap} from 'rxjs/operators';
+import {map, switchMap} from 'rxjs/operators';
 
 import {ConfigService} from '../../../../shared/config';
-import {DeviceApiParams, DeviceRequestApiParams, ExtendDeviceRequestApiParams, MarkAsDamagedRequestApiParams} from '../../../../shared/models/device';
+import {Device, DeviceApiParams, DeviceRequestApiParams, ExtendDeviceRequestApiParams, MarkAsDamagedRequestApiParams} from '../../../../shared/models/device';
 
 import * as DeviceIdentifier from './device_identifier';
 
@@ -106,14 +106,15 @@ export class Loan {
   /**
    * Gets the device info and some additional loan info.
    */
-  getDevice(): Observable<DeviceApiParams> {
+  getDevice(): Observable<Device> {
     let request: DeviceRequestApiParams;
     return DeviceIdentifier.id().pipe(switchMap(deviceId => {
       request = {
         chrome_device_id: deviceId,
       };
       const apiUrl = `${this.endpointsDeviceUrl}/get`;
-      return this.http.post<DeviceApiParams>(apiUrl, request);
+      return this.http.post<Device>(apiUrl, request)
+          .pipe(map(deviceApiParams => new Device(deviceApiParams)));
     }));
   }
 }

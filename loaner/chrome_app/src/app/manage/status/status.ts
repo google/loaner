@@ -22,7 +22,7 @@ import {GuestMode} from '../../../../../shared/components/guest';
 import {LoaderView} from '../../../../../shared/components/loader';
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {ConfigService} from '../../../../../shared/config';
-import {DeviceApiParams} from '../../../../../shared/models/device';
+import {Device} from '../../../../../shared/models/device';
 import {Background} from '../../shared/background_service';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -40,13 +40,8 @@ be sure to check out our Troubleshoot and FAQ buttons below.`;
 })
 export class StatusComponent extends LoaderView implements OnInit {
   additionalText = ADDITIONAL_MANAGEMENT_TEXT;
-  dueDate: Date;
-  guestAllowed: boolean;
-  guestEnabled: boolean;
-  maxExtendDate: Date;
+  device = new Device();
   newReturnDate: Date;
-  pendingReturn: boolean;
-  userDisplayName: string;
 
   constructor(
       private readonly bg: Background,
@@ -69,8 +64,9 @@ export class StatusComponent extends LoaderView implements OnInit {
   /** Set loan information for manage view. */
   setLoanInfo() {
     this.loan.getDevice().subscribe(
-        deviceInfo => {
-          this.setLocalValues(deviceInfo);
+        device => {
+          this.device = device;
+          this.canExtend();
           this.ready();
         },
         error => {
@@ -81,29 +77,16 @@ export class StatusComponent extends LoaderView implements OnInit {
         });
   }
 
-  /**
-   * Sets the local values to the populated info from the API.
-   * @param deviceInfo represents the various info for a given device.
-   */
-  private setLocalValues(deviceInfo: DeviceApiParams) {
-    this.dueDate = moment(deviceInfo.due_date!).toDate();
-    this.maxExtendDate = moment(deviceInfo.max_extend_date!).toDate();
-    this.userDisplayName = deviceInfo.given_name || 'there';
-    this.guestEnabled = deviceInfo.guest_enabled!;
-    this.guestAllowed = deviceInfo.guest_permitted!;
-    this.pendingReturn = !!deviceInfo.mark_pending_return_date;
-    this.canExtend();
-  }
-
   /** Checks the dates to see if the loan can be extended. */
   canExtend() {
-    if (!this.dueDate) {
+    if (!this.device.dueDate) {
       console.error('The due date date was never defined.');
     }
-    if (!this.maxExtendDate) {
+    if (!this.device.maxExtendDate) {
       console.error('The max extend date date was never defined.');
     }
-    return moment(this.dueDate!).diff(this.maxExtendDate!, 'days') <= -1;
+    return moment(this.device.dueDate)
+               .diff(this.device.maxExtendDate, 'days') <= -1;
   }
 
   /**
@@ -116,7 +99,7 @@ export class StatusComponent extends LoaderView implements OnInit {
           if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
             console.info(response);
           }
-          this.guestEnabled = true;
+          this.device.guestEnabled = true;
         },
         error => {
           const message = 'Something happened with enabling guest mode.';
@@ -132,7 +115,7 @@ export class StatusComponent extends LoaderView implements OnInit {
         .subscribe(
             () => {
               this.extend.finished(this.newReturnDate);
-              this.dueDate = this.newReturnDate;
+              this.device.dueDate = this.newReturnDate;
             },
             error => {
               this.loading = false;
@@ -174,7 +157,7 @@ export class StatusComponent extends LoaderView implements OnInit {
           if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
             console.info(response);
           }
-          this.pendingReturn = false;
+          this.device.pendingReturn = false;
         },
         error => {
           const message = 'An error occurred when resuming this loan.';

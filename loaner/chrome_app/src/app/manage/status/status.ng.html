@@ -3,23 +3,23 @@
 </div>
 
 <div *ngIf="!loading" class="status-box">
-  <loaner-greetings-card [userDisplayName]="userDisplayName"
-                         [dueDate]="dueDate"
-                         [pendingReturn]="pendingReturn">
+  <loaner-greetings-card [userDisplayName]="device.givenName"
+                         [dueDate]="device.dueDate"
+                         [pendingReturn]="device.pendingReturn">
   </loaner-greetings-card>
   <br />
 
   <loaner-loan-actions-card tabindex="0"
                             [additionalManagementText]="additionalText"
-                            [pendingReturn]="pendingReturn">
+                            [pendingReturn]="device.pendingReturn">
     <loan-button extendButton
                  [canExtend]="canExtend()"
-                 [dueDate]="dueDate"
-                 [maxExtendDate]="maxExtendDate"
+                 [dueDate]="device.dueDate"
+                 [maxExtendDate]="device.maxExtendDate"
                  (done)="onExtended($event)"></loan-button>
     <loan-button guestButton
-                 [guestEnabled]="guestEnabled"
-                 [guestAllowed]="guestAllowed"
+                 [guestEnabled]="device.guestEnabled"
+                 [guestAllowed]="device.guestAllowed"
                  (done)="onGuestModeEnabled()"></loan-button>
     <loan-button returnButton (done)="onReturned()"></loan-button>
     <loan-button damagedButton (done)="onDamaged($event)"></loan-button>
