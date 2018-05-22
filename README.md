@@ -30,6 +30,13 @@ Please note that the current release of this application is in ALPHA.
 We will be actively contributing to the project. Please keep an eye out for
 future updates and features!
 
+To clone this release run the following command:
+
+```
+git clone -b Alpha-\(0.5\) https://github.com/google/loaner.git
+cd loaner
+```
+
 * To discuss this project send an email to loaner@googlegroups.com.
 * Read more about releases in our [release notes](docs/release_notes.md).
 * Please file bugs using the GitHub issue tracker.

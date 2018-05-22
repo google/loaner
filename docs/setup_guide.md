@@ -175,12 +175,9 @@ deployments of GnG:
 
 ## Configuration
 
-Use Git to make a copy of the GnG loaner source code:
-
-```
-git clone https://github.com/google/loaner
-cd loaner
-```
+Use Git to make a copy of the GnG loaner source code, the command to run for the
+current release can be found on the
+[README](README.md).
 
 **Note**: The rest of this setup guide assumes that your working directory will
 be the root of the Git repository.
