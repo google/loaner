@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import tempfile
 
 from absl import flags
 from absl import logging
@@ -94,6 +95,8 @@ class ProjectConfig(object):
         long and short term data.
     configs: str, the path to where the secure configurations are stored in
         Google Cloud Storage.
+    local_credentials_file_path: str, the path to the locally stored
+        credentials file.
   """
 
   def __init__(self, project, client_id, client_secret, bucket):
@@ -155,6 +158,12 @@ class ProjectConfig(object):
   def configs(self):
     """Getter for Google Cloud Storage configuration path."""
     return '{}/configs'.format(self.bucket)
+
+  @property
+  def local_credentials_file_path(self):
+    """Getter for the local credentials file."""
+    return os.path.join(
+        tempfile.gettempdir(), 'gng_auth_{}.dat'.format(self.project))
 
   @classmethod
   def from_yaml(cls, project, config_file_path):
