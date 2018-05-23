@@ -144,6 +144,9 @@ class DeviceApi(root_api.Service):
   def list_devices(self, request):
     """Lists all devices based on any device attribute."""
     self.check_xsrf_token(self.request_state)
+    if request.page_size <= 0:
+      raise endpoints.BadRequestException(
+          'The value for page_size must be greater than 0.')
     query, sort_options, returned_fields = (
         search_utils.set_search_query_options(request.query))
     if not query:
@@ -158,14 +161,15 @@ class DeviceApi(root_api.Service):
       query = search_utils.to_query(request, device_model.Device)
       query = ' '.join((query, shelf_query))
 
-    cursor = search_utils.get_search_cursor(request.page_token)
+    offset = search_utils.calculate_page_offset(
+        page_size=request.page_size, page_number=request.page_number)
+
     search_results = device_model.Device.search(
         query_string=query, query_limit=request.page_size,
-        cursor=cursor, sort_options=sort_options,
+        offset=offset, sort_options=sort_options,
         returned_fields=returned_fields)
-    new_search_cursor = None
-    if search_results.cursor:
-      new_search_cursor = search_results.cursor.web_safe_string
+    total_pages = search_utils.calculate_total_pages(
+        page_size=request.page_size, total_results=search_results.number_found)
     guest_permitted = config_model.Config.get('allow_guest_mode')
     messages = []
     for document in search_results.results:
@@ -175,8 +179,8 @@ class DeviceApi(root_api.Service):
 
     return device_message.ListDevicesResponse(
         devices=messages,
-        additional_results=bool(new_search_cursor),
-        page_token=new_search_cursor)
+        total_results=search_results.number_found,
+        total_pages=total_pages)
 
   @auth.method(
       message_types.VoidMessage,

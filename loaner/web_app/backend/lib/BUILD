@@ -110,7 +110,6 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app/backend/api/messages:shared_messages",
         "@absl_archive//absl/logging",
-        "@endpoints_archive//:endpoints",
     ],
 )
 
@@ -268,7 +267,6 @@ loaner_appengine_test(
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:parameterized",
-        "@endpoints_archive//:endpoints",
         "@mock_archive//:mock",
     ],
 )

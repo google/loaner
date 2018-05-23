@@ -23,8 +23,6 @@ import mock
 
 from google.appengine.api import search
 
-import endpoints
-
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import search_utils
@@ -69,23 +67,19 @@ class SearchTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertTrue(response_message.enabled)
     assert mock_logging.error.call_count == 1
 
-  def test_get_search_cursor(self):
-    """Tests the creation of a search cursor with a web_safe_string."""
-    expected_cursor_web_safe_string = 'False:ODUxODBhNTgyYTQ2ZmI0MDU'
-    returned_cursor = (
-        search_utils.get_search_cursor(
-            expected_cursor_web_safe_string))
-    self.assertEqual(
-        expected_cursor_web_safe_string, returned_cursor.web_safe_string)
+  def test_calculate_page_offset(self):
+    """Tests the calculation of page offset."""
+    page_size = 10
+    page_number = 5
+    offset = search_utils.calculate_page_offset(page_size, page_number)
+    self.assertEqual(40, offset)
 
-  @mock.patch.object(search, 'Cursor', autospec=True)
-  def test_get_search_cursor_error(self, mock_cursor):
-    """Tests the creation of a search cursor when an error occurs."""
-    mock_cursor.side_effect = ValueError
-    with self.assertRaisesWithLiteralMatch(
-        endpoints.BadRequestException,
-        search_utils._CORRUPT_KEY_MSG):
-      search_utils.get_search_cursor(None)
+  def test_calculate_total_pages(self):
+    """Tests the calculation of total pages."""
+    page_size = 6
+    total_results = 11
+    total_pages = search_utils.calculate_total_pages(page_size, total_results)
+    self.assertEqual(2, total_pages)
 
   @parameterized.named_parameters(
       {'testcase_name': 'QueryStringOnly',

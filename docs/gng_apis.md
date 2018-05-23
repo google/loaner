@@ -395,10 +395,10 @@ Lists all devices based on any device attribute.
 |                          | of the last reminder the device had.              |
 |                          | next_reminder: Reminder, Level, time, and count   |
 |                          | of the next reminder.                             |
-|                          | page_token: str, A page token to query next page  |
-|                          | results.                                          |
 |                          | page_size: int, The number of results to query    |
 |                          | for and display.                                  |
+|                          | page_number: int, the page index to offset the    |
+|                          | results                                           |
 |                          | max_extend_date: datetime, Indicates maximum      |
 |                          | extend date a device can have.                    |
 |                          | guest_enabled: bool, Indicates if guest mode has  |
@@ -414,11 +414,10 @@ Lists all devices based on any device attribute.
 | :---------------------------- | :------------------------------------------ |
 | List device response ProtoRPC | devices: Device, A device to display.       |
 | message.                      |                                             |
-|                               | additional_results: bool, If there are more |
-|                               | results to be displayed.                    |
-|                               | page_token: str, A page token that will     |
-|                               | allow be used to query for additional       |
-|                               | results.                                    |
+|                               | total_results: int, the total number of     |
+|                               | results for a query.                        |
+|                               | total_pages: int, the total number of pages |
+|                               | needed to display all of the results.       |
 
 ##### mark_damaged
 
@@ -759,10 +758,10 @@ List enabled or all shelves based on any shelf attribute.
 |                         | audit time.                                        |
 |                         | last_audit_by: str, Indicates the last user to     |
 |                         | audit the shelf.                                   |
-|                         | page_token: str, A page token to query next page   |
-|                         | results.                                           |
 |                         | page_size: int, The number of results to query for |
 |                         | and display.                                       |
+|                         | page_number: int, the page index to offset the     |
+|                         | results                                            |
 |                         | shelf_request: ShelfRequest, A message containing  |
 |                         | the unique identifier to be used to retrieve the   |
 |                         | shelf.                                             |
@@ -774,10 +773,10 @@ List enabled or all shelves based on any shelf attribute.
 | :--------------------------- | :-------------------------------------------- |
 | List Shelf Response ProtoRPC | shelves: Shelf, The list of shelves being     |
 | message.                     | returned.                                     |
-|                              | additional_results: bool, If there are more   |
-|                              | results to be displayed.                      |
-|                              | page_token: str, A page token that will allow |
-|                              | be used to query for additional results.      |
+|                              | total_results: int, the total number of       |
+|                              | results for a query.                          |
+|                              | total_pages: int, the total number of pages   |
+|                              | needed to display all of the results.         |
 
 ##### update
 

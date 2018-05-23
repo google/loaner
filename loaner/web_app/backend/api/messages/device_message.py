@@ -82,8 +82,8 @@ class Device(messages.Message):
     last_reminder: Reminder, Level, time, and count of the last reminder
         the device had.
     next_reminder: Reminder, Level, time, and count of the next reminder.
-    page_token: str, A page token to query next page results.
     page_size: int, The number of results to query for and display.
+    page_number: int, the page index to offset the results.
     max_extend_date: datetime, Indicates maximum extend date a device can have.
     guest_enabled: bool, Indicates if guest mode has been already enabled.
     guest_permitted: bool, Indicates if guest mode has been allowed.
@@ -112,8 +112,8 @@ class Device(messages.Message):
   damaged_reason = messages.StringField(19)
   last_reminder = messages.MessageField(Reminder, 20)
   next_reminder = messages.MessageField(Reminder, 21)
-  page_token = messages.StringField(22)
-  page_size = messages.IntegerField(23, default=20)
+  page_size = messages.IntegerField(22, default=10)
+  page_number = messages.IntegerField(23, default=1)
   max_extend_date = message_types.DateTimeField(24)
   guest_enabled = messages.BooleanField(25)
   guest_permitted = messages.BooleanField(26)
@@ -126,13 +126,11 @@ class ListDevicesResponse(messages.Message):
 
   Attributes:
     devices: Device, A device to display.
-    additional_results: bool, If there are more results to be displayed.
-    page_token: str, A page token that will allow be used to query for
-        additional results.
+    total_results: int, the total number of results for a query.
   """
   devices = messages.MessageField(Device, 1, repeated=True)
-  additional_results = messages.BooleanField(2)
-  page_token = messages.StringField(3)
+  total_results = messages.IntegerField(2)
+  total_pages = messages.IntegerField(3)
 
 
 class DamagedRequest(messages.Message):

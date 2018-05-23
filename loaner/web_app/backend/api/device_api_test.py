@@ -36,7 +36,6 @@ from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
-from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -264,11 +263,15 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     response = self.service.list_devices(request)
     self.assertEqual(response_length, len(response.devices))
 
+  def test_list_devices_invalid_page_size(self):
+    with self.assertRaises(endpoints.BadRequestException):
+      request = device_message.Device(page_size=0)
+      self.service.list_devices(request)
+
   def test_list_devices_with_search_constraints(self):
     expressions = shared_messages.SearchExpression(expression='serial_number')
     expected_response = device_message.ListDevicesResponse(
-        devices=[device_message.Device(serial_number='6789')],
-        additional_results=False)
+        devices=[device_message.Device(serial_number='6789')])
     request = device_message.Device(
         query=shared_messages.SearchRequest(
             query_string='sn:6789',
@@ -278,7 +281,6 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(
         response.devices[0].serial_number,
         expected_response.devices[0].serial_number)
-    self.assertFalse(response.additional_results)
 
   def test_list_devices_with_filter_message(self):
     message = device_message.Device(
@@ -302,27 +304,18 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     mock_get_shelf.assert_called_once_with(shelf_request_message)
     self.assertEqual(len(response.devices), 2)
 
-  def test_list_devices_with_page_token(self):
-    request = device_message.Device(enrolled=True, page_size=1)
-    response_devices = []
-    while True:
-      response = self.service.list_devices(request)
-      for device in response.devices:
-        response_devices.append(device)
-      request = device_message.Device(
-          enrolled=True, page_size=1, page_token=response.page_token)
-      if not response.additional_results:
-        break
-    self.assertEqual(2, len(response_devices))
+  def test_list_devices_with_offset(self):
+    request = device_message.Device(page_size=1, page_number=1)
+    response = self.service.list_devices(request)
+    self.assertEqual(1, len(response.devices))
+    previous_device_serial = response.devices[0].serial_number
 
-  @mock.patch.object(
-      search_utils, 'to_query', return_value='enrolled:enrolled',
-      autospec=True)
-  def test_list_devices_with_malformed_page_token(self, mock_to_query):
-    """Test list devices with a fake token, raises BadRequestException."""
-    request = device_message.Device(page_token='malformedtoken')
-    with self.assertRaises(endpoints.BadRequestException):
-      self.service.list_devices(request)
+    # Get next page results and make sure it's not the same as last.
+    request = device_message.Device(page_size=1, page_number=2)
+    response = self.service.list_devices(request)
+    self.assertEqual(1, len(response.devices))
+    self.assertNotEqual(
+        response.devices[0].serial_number, previous_device_serial)
 
   def test_list_devices_inactive_no_shelf(self):
     request = device_message.Device(enrolled=False, page_size=1)
