@@ -499,6 +499,8 @@ class Device(base_model.BaseModel):
         self.identifier)
     client = directory.DirectoryApiClient(user_email)
     client.reenable_chrome_device(self.chrome_device_id)
+    if self.lost:
+      self.lost = False
     self.locked = False
     self.move_to_default_ou(user_email=user_email)
     self.stream_to_bq(user_email, 'Re-enabling disabled device.')

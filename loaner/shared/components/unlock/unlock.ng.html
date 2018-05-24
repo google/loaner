@@ -1,0 +1,44 @@
+<div *ngIf="toBeSubmitted && !loading">
+  <p matDialogTitle>Unlock device</p>
+  <div mat-dialog-content>
+    <p>
+      Are you sure you want to unlock the device {{deviceId}}?
+      You should only do this if you've confirmed it's in the user's possession.
+    </p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button color="primary"
+            (click)="unlock()"
+            id="yes"
+            class="action-button">
+      Yes
+    </button>
+    <button mat-button
+            (click)="closeDialog()"
+            id="cancel"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="unlock-loading">
+  <loaner-loader></loaner-loader>
+</div>
+
+<div *ngIf="!toBeSubmitted && !loading" tabindex="0" loaner-focus>
+  <h1 mat-dialog-title>Success!</h1>
+  <div mat-dialog-content>
+    <p> Device {{deviceId}} has been successfully unlocked. </p>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button
+            (click)="closeDialog()"
+            id="close"
+            class="action-button"
+            matTooltip="This will take you back to the management screen.">
+      Close
+    </button>
+  </div>
+</div>

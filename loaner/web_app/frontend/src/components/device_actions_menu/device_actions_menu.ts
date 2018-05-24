@@ -20,6 +20,7 @@ import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
+import {Unlock} from '../../../../../shared/components/unlock';
 import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';
 
@@ -44,6 +45,7 @@ export class DeviceActionsMenu {
       private readonly guestModeService: GuestMode,
       private readonly lostService: Lost,
       private readonly unenrollService: Unenroll,
+      private readonly unlockService: Unlock,
   ) {}
 
   /** Dialog for removing a device. */
@@ -67,6 +69,20 @@ export class DeviceActionsMenu {
         .pipe(switchMap(() => this.deviceService.enableGuestMode(device)))
         .subscribe(() => {
           this.guestModeService.finished();
+          this.refreshDevice.emit(device.id);
+        });
+  }
+
+  /**
+   * Unlock a lost or locked device.
+   * @param device The device we are enabling guest on.
+   */
+  unlock(device: Device) {
+    this.unlockService.openDialog(device.id);
+    this.unlockService.onUnlock
+        .pipe(switchMap(() => this.deviceService.unlock(device)))
+        .subscribe(() => {
+          this.unlockService.finished();
           this.refreshDevice.emit(device.id);
         });
   }

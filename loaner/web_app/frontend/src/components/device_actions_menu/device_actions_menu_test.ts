@@ -125,6 +125,17 @@ describe('DeviceActionsMenu', () => {
     expect(button.textContent).toContain('Mark as lost');
   });
 
+  it('renders the Unlock button after more is clicked', () => {
+    fixture.detectChanges();
+    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
+    actionsButton.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('.actions-menu'))
+                       .query(By.css('.button-unlock'))
+                       .nativeElement as HTMLElement;
+    expect(button.textContent).toContain('Unlock');
+  });
+
   it('renders the Unenroll button after more is clicked', () => {
     fixture.detectChanges();
     const actionsButton = fixture.debugElement.query(By.css('.icon-more'));

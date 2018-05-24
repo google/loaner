@@ -167,6 +167,40 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertIsInstance(response, message_types.VoidMessage)
     assert mock_xsrf_token.call_count == 1
 
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
+  def test_unlock(self, mock_xsrf_token, mock_directoryclass):
+    self.device.lost = True
+    self.device.locked = True
+    self.device.put()
+    mock_directoryclient = mock_directoryclass.return_value
+    mock_directoryclient.move_chrome_device_org_unit.return_value = (
+        loanertest.TEST_DIR_DEVICE_DEFAULT)
+    request = device_message.DeviceRequest(
+        serial_number=self.device.serial_number)
+    response = self.service.unlock(request)
+    self.assertFalse(self.device.locked)
+    self.assertFalse(self.device.lost)
+    self.assertIsInstance(response, message_types.VoidMessage)
+    assert mock_xsrf_token.call_count == 1
+
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_unlock_directory_error(self, mock_directory_class):
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.reenable_chrome_device.side_effect = (
+        directory.DirectoryRPCError)
+    with self.assertRaises(endpoints.BadRequestException):
+      self.service.unlock(device_message.DeviceRequest(asset_tag='12345'))
+
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_unlock_move_ou_error(self, mock_directory_class):
+    del mock_directory_class  # Unused.
+    with mock.patch.object(
+        self.device, 'move_to_default_ou',
+        side_effect=device_model.UnableToMoveToDefaultOUError):
+      with self.assertRaises(endpoints.BadRequestException):
+        self.service.unlock(device_message.DeviceRequest(asset_tag='12345'))
+
   @mock.patch('__main__.device_model.Device.device_audit_check')
   def test_device_audit_check(self, mock_device_audit_check):
     request = device_message.DeviceRequest(unknown_identifier='6765')

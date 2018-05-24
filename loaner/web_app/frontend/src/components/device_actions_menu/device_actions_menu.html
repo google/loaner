@@ -7,32 +7,50 @@
   </mat-icon>
 </button>
 <mat-menu #actionsMenu="matMenu" class="actions-menu">
-  <button mat-menu-item [disabled]="!device.assignedUser"
+  <button mat-menu-item
+          [disabled]="!device.assignedUser"
           (click)="extendDevice(device)"
           class="button-extend">
     <mat-icon>update</mat-icon>
     Extend
   </button>
-  <button mat-menu-item [disabled]="device.pendingReturn" (click)="onReturned(device)"
+  <button mat-menu-item
+          [disabled]="device.pendingReturn"
+          (click)="onReturned(device)"
           class="button-return">
      <mat-icon>exit_to_app</mat-icon>
     Return
   </button>
-  <button mat-menu-item [disabled]="device.guestAllowed && device.guestEnabled"
-          (click)="enableGuestMode(device)" class="button-guest">
+  <button mat-menu-item
+          [disabled]="device.guestAllowed && device.guestEnabled"
+          (click)="enableGuestMode(device)"
+          class="button-guest">
     <mat-icon>account_circle</mat-icon>
     Enable guest
   </button>
-  <button mat-menu-item [disabled]="device.damaged"
-          (click)="onDamaged(device)" class="button-damaged">
+  <button mat-menu-item
+          [disabled]="device.damaged"
+          (click)="onDamaged(device)"
+          class="button-damaged">
     <mat-icon>build</mat-icon>
     Mark as damaged
   </button>
-  <button mat-menu-item [disabled]="device.lost" (click)="onLost(device)" class="button-lost">
+  <button mat-menu-item
+          [disabled]="device.lost"
+          (click)="onLost(device)"
+          class="button-lost">
     <mat-icon>gps_off</mat-icon>
     Mark as lost
   </button>
-  <button mat-menu-item class="remove-device"
+  <button mat-menu-item
+          [disabled]="!device.locked"
+          (click)="unlock(device)"
+          class="button-unlock">
+    <mat-icon>lock_open</mat-icon>
+    Unlock
+  </button>
+  <button mat-menu-item
+          class="remove-device"
           (click)="openRemoveDeviceDialog()"
           class="button-unenroll">
     <mat-icon>phonelink_off</mat-icon>

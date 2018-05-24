@@ -121,6 +121,16 @@ export class DeviceService extends ApiService {
   }
 
   /**
+   * Unlocks a particular device.
+   * @param device Device to be unlocked.
+   */
+  unlock(device: Device) {
+    return this.post<void>('unlock', device.toApiMessage()).pipe(tap(() => {
+      this.snackBar.open(`Device ${device.id} has been unlocked.`);
+    }));
+  }
+
+  /**
    * Enables Guest mode in a particular device.
    * @param device Device to have Guest mode enabled.
    */

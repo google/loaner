@@ -93,6 +93,26 @@ class DeviceApi(root_api.Service):
   @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
+      name='unlock',
+      path='unlock',
+      http_method='POST',
+      permission=permissions.Permissions.ADMINISTRATE_LOAN)
+  def unlock(self, request):
+    """Unlocks a device is locked or has been marked as lost."""
+    self.check_xsrf_token(self.request_state)
+    device = _get_device(request)
+    user_email = user_lib.get_user_email()
+    try:
+      device.unlock(user_email)
+    except (
+        directory.DirectoryRPCError,
+        device_model.UnableToMoveToDefaultOUError) as error:
+      raise endpoints.BadRequestException(str(error))
+    return message_types.VoidMessage()
+
+  @auth.method(
+      device_message.DeviceRequest,
+      message_types.VoidMessage,
       name='auditable',
       path='auditable',
       http_method='POST',

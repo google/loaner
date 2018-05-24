@@ -676,12 +676,14 @@ class DeviceModelTest(loanertest.TestCase):
   def test_unlock(self, mock_directoryclass):
     mock_directoryclient = mock_directoryclass.return_value
     locked_device = device_model.Device(
-        serial_number='123456', locked=True, chrome_device_id='fake-chrome-789')
+        serial_number='123456', locked=True, lost=True,
+        chrome_device_id='fake-chrome-789')
     locked_device.unlock(loanertest.USER_EMAIL)
     retrieved_device = device_model.Device.get(serial_number='123456')
     mock_directoryclient.reenable_chrome_device.assert_called_with(
         'fake-chrome-789')
     self.assertFalse(retrieved_device.locked)
+    self.assertFalse(retrieved_device.lost)
 
   @mock.patch.object(device_model, 'logging', autospec=True)
   def test_already_locked_device(self, mock_logging):
