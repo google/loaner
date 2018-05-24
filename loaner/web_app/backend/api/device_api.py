@@ -35,6 +35,7 @@ from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
+from loaner.web_app.backend.models import user_model
 
 _NO_DEVICE_MSG = (
     'Device could not be found using device_identifier "%s".')
@@ -133,9 +134,8 @@ class DeviceApi(root_api.Service):
       device_message.DeviceRequest,
       device_message.Device,
       name='get',
-      path='get',
-      http_method='POST',
-      permission=permissions.Permissions.READ_DEVICES)
+      path='user/get',
+      http_method='POST')
   def get_device(self, request):
     """Gets a device using any identifier in device_message.DeviceRequest."""
     device = _get_device(request)
@@ -143,6 +143,14 @@ class DeviceApi(root_api.Service):
       raise endpoints.BadRequestException(
           device_model.DEVICE_NOT_ENROLLED_MSG % device.identifier)
     user_email = user_lib.get_user_email()
+    datastore_user = user_model.User.get_user(user_email)
+    if (permissions.Permissions.READ_DEVICES not in
+        datastore_user.get_permissions()):
+      if device.assigned_user != user_email:
+        raise endpoints.UnauthorizedException(
+            'You do not have the proper permission to perform this action. '
+            'Please contact your IT administrator if you feel like this is in '
+            'error.')
     directory_client = directory.DirectoryApiClient(user_email)
     try:
       given_name = directory_client.given_name(user_email)

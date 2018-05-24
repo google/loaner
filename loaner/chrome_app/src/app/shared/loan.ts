@@ -112,7 +112,7 @@ export class Loan {
       request = {
         chrome_device_id: deviceId,
       };
-      const apiUrl = `${this.endpointsDeviceUrl}/get`;
+      const apiUrl = `${this.endpointsDeviceUrl}/user/get`;
       return this.http.post<Device>(apiUrl, request)
           .pipe(map(deviceApiParams => new Device(deviceApiParams)));
     }));

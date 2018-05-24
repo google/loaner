@@ -276,6 +276,38 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(
         self.device.device_model, urlkey_response.device_model)
 
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_get_device_no_permission(self, mock_directory_class):
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.given_name.return_value = 'given name value'
+    email = 'random@{}'.format(loanertest.USER_DOMAIN)
+    self.login_endpoints_user(email=email)
+    with self.assertRaises(endpoints.UnauthorizedException):
+      self.service.get_device(
+          device_message.DeviceRequest(serial_number=self.device.serial_number))
+
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_get_device_has_permission(self, mock_directory_class):
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.given_name.return_value = 'given name value'
+    device = self.service.get_device(
+        device_message.DeviceRequest(serial_number=self.device.serial_number))
+    self.assertIsInstance(device, device_message.Device)
+    self.assertEqual(device.serial_number, self.device.serial_number)
+
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_get_device_assigned_user(self, mock_directory_class):
+    mock_directory_client = mock_directory_class.return_value
+    mock_directory_client.given_name.return_value = 'given name value'
+    email = 'random@{}'.format(loanertest.USER_DOMAIN)
+    self.login_endpoints_user(email=email)
+    self.device.assigned_user = email
+    self.device.put()
+    device = self.service.get_device(
+        device_message.DeviceRequest(serial_number=self.device.serial_number))
+    self.assertIsInstance(device, device_message.Device)
+    self.assertEqual(device.serial_number, self.device.serial_number)
+
   @parameterized.parameters(
       directory.DirectoryRPCError, directory.GivenNameDoesNotExistError)
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
