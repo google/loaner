@@ -44,7 +44,7 @@ export class Loan {
         },
         extend_date: newDate,
       };
-      const apiUrl = `${this.endpointsDeviceUrl}/extend_loan`;
+      const apiUrl = `${this.endpointsDeviceUrl}/user/extend_loan`;
       return this.http.post<boolean>(apiUrl, request);
     }));
   }
@@ -56,7 +56,7 @@ export class Loan {
       request = {
         chrome_device_id: deviceId,
       };
-      const apiUrl = `${this.endpointsDeviceUrl}/mark_pending_return`;
+      const apiUrl = `${this.endpointsDeviceUrl}/user/mark_pending_return`;
       return this.http.post<boolean>(apiUrl, request);
     }));
   }
@@ -74,7 +74,7 @@ export class Loan {
           chrome_device_id: deviceId,
         },
       };
-      const apiUrl = `${this.endpointsDeviceUrl}/mark_damaged`;
+      const apiUrl = `${this.endpointsDeviceUrl}/user/mark_damaged`;
       return this.http.post<boolean>(apiUrl, request);
     }));
   }
@@ -86,7 +86,7 @@ export class Loan {
       request = {
         chrome_device_id: deviceId,
       };
-      const apiUrl = `${this.endpointsDeviceUrl}/enable_guest_mode`;
+      const apiUrl = `${this.endpointsDeviceUrl}/user/enable_guest_mode`;
       return this.http.post<boolean>(apiUrl, request);
     }));
   }
@@ -98,7 +98,7 @@ export class Loan {
       request = {
         chrome_device_id: deviceId,
       };
-      const apiUrl = `${this.endpointsDeviceUrl}/resume_loan`;
+      const apiUrl = `${this.endpointsDeviceUrl}/user/resume_loan`;
       return this.http.post<boolean>(apiUrl, request);
     }));
   }

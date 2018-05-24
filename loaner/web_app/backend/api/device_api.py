@@ -206,7 +206,7 @@ class DeviceApi(root_api.Service):
       message_types.VoidMessage,
       device_message.ListUserDeviceResponse,
       name='user_devices',
-      path='user_devices',
+      path='user/devices',
       http_method='POST')
   def list_user_devices(self, request):
     """Lists all devices assigned to the user."""
@@ -223,7 +223,7 @@ class DeviceApi(root_api.Service):
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='enable_guest_mode',
-      path='enable_guest_mode',
+      path='user/enable_guest_mode',
       http_method='POST')
   def enable_guest_mode(self, request):
     """Enables Guest Mode for a given device."""
@@ -246,7 +246,7 @@ class DeviceApi(root_api.Service):
       device_message.ExtendLoanRequest,
       message_types.VoidMessage,
       name='extend_loan',
-      path='extend_loan',
+      path='user/extend_loan',
       http_method='POST')
   def extend_loan(self, request):
     """Extends the current loan for a given device."""
@@ -269,7 +269,7 @@ class DeviceApi(root_api.Service):
       device_message.DamagedRequest,
       message_types.VoidMessage,
       name='mark_damaged',
-      path='mark_damaged',
+      path='user/mark_damaged',
       http_method='POST')
   def mark_damaged(self, request):
     """Marks that a device is damaged."""
@@ -288,7 +288,7 @@ class DeviceApi(root_api.Service):
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='mark_lost',
-      path='mark_lost',
+      path='user/mark_lost',
       http_method='POST')
   def mark_lost(self, request):
     """Marks that a device is lost."""
@@ -305,7 +305,7 @@ class DeviceApi(root_api.Service):
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='mark_pending_return',
-      path='mark_pending_return',
+      path='user/mark_pending_return',
       http_method='POST')
   def mark_pending_return(self, request):
     """Marks that a device is pending return."""
@@ -324,7 +324,7 @@ class DeviceApi(root_api.Service):
       device_message.DeviceRequest,
       message_types.VoidMessage,
       name='resume_loan',
-      path='resume_loan',
+      path='user/resume_loan',
       http_method='POST')
   def resume_loan(self, request):
     """Resumes a loan for a given device."""

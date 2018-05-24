@@ -73,7 +73,7 @@ export class DeviceService extends ApiService {
    * Returns assigned devices based on the current user.
    */
   listUserDevices(): Observable<Device[]> {
-    return this.post<ListDeviceResponse>('user_devices').pipe(map(res => {
+    return this.post<ListDeviceResponse>('user/devices').pipe(map(res => {
       const retrievedDevices = res;
       return (retrievedDevices['devices'] || [])
           .map(
@@ -93,7 +93,7 @@ export class DeviceService extends ApiService {
         'device': device.toApiMessage(),
         'extend_date': newDate,
       };
-      this.post('extend_loan', request).subscribe(() => {
+      this.post('user/extend_loan', request).subscribe(() => {
         observer.next(true);
       });
     });
@@ -104,7 +104,7 @@ export class DeviceService extends ApiService {
    * @param device Device to be returned.
    */
   returnDevice(device: Device) {
-    return this.post('mark_pending_return', device.toApiMessage())
+    return this.post('user/mark_pending_return', device.toApiMessage())
         .pipe(tap(() => {
           this.snackBar.open(`Device ${device.id} returned.`);
         }));
@@ -115,7 +115,7 @@ export class DeviceService extends ApiService {
    * @param device Device to be marked as lost.
    */
   markAsLost(device: Device) {
-    return this.post('mark_lost', device.toApiMessage()).pipe(tap(() => {
+    return this.post('user/mark_lost', device.toApiMessage()).pipe(tap(() => {
       this.snackBar.open(`Device ${device.id} marked as lost.`);
     }));
   }
@@ -135,7 +135,7 @@ export class DeviceService extends ApiService {
    * @param device Device to have Guest mode enabled.
    */
   enableGuestMode(device: Device) {
-    return this.post('enable_guest_mode', device.toApiMessage())
+    return this.post('user/enable_guest_mode', device.toApiMessage())
         .pipe(tap(() => {
           this.snackBar.open(`Enabled guest mode for device ${device.id}.`);
         }));
@@ -146,7 +146,7 @@ export class DeviceService extends ApiService {
    * @param device Device to resume the loan for.
    */
   resumeLoan(device: Device) {
-    return this.post('resume_loan', device.toApiMessage()).pipe(tap(() => {
+    return this.post('user/resume_loan', device.toApiMessage()).pipe(tap(() => {
       this.snackBar.open(`Loan resumed for device ${device.id}.`);
     }));
   }
@@ -161,7 +161,7 @@ export class DeviceService extends ApiService {
       'device': device.toApiMessage(),
       'damaged_reason': reason,
     };
-    const httpObservable = this.post<void>('mark_damaged', request);
+    const httpObservable = this.post<void>('user/mark_damaged', request);
     httpObservable.subscribe(() => {
       this.snackBar.open(`Device ${device.id} marked as damaged.`);
     });
