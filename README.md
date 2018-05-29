@@ -11,7 +11,7 @@ Grab n Go Loaners
 </p>
 
 The Grab n Go (GnG) Loaner project is a fully automated loaner management suite
-that manages enterprise enrolled ChromeOS devices by automatically assigning,
+that manages enterprise enrolled Chrome OS devices by automatically assigning,
 returning, and monitoring these devices.
 
 Using the GnG project, enterprise users can self-checkout a loaner Chromebook
@@ -22,7 +22,7 @@ The program is comprised of three parts:
 
 *   An enterprise G Suite domain
 *   A Google App Engine (GAE) application
-*   A Chrome App that runs on each ChromeOS device
+*   A Chrome App that runs on each Chrome OS device
 
 ## Current release: [Alpha (v0.5a)](https://github.com/google/loaner/tree/Alpha-(0.5))
 

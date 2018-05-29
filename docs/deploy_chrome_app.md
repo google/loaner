@@ -347,9 +347,9 @@ To deploy the Chrome App:
 
 **NOTE**: When publishing Chrome Apps, allow at least 30 minutes for the new
 version to become available. In addition, it can take up to 24 hours for the
-Chrome App to be updated on your ChromeOS fleet.
+Chrome App to be updated on your Chrome OS fleet.
 
 ## Step 9: Deploy Chrome App
 
-In order to deploy the Chrome App to your ChromeOS fleet, continue to follow the
-instructions at: [Configure the G Suite Environment](gsuite_config.md).
+In order to deploy the Chrome App to your Chrome OS fleet, continue to follow
+the instructions at: [Configure the G Suite Environment](gsuite_config.md).
