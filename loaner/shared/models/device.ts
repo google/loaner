@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import * as moment from 'moment';
+
 import {Shelf, ShelfApiParams} from './shelf';
 
 /**
@@ -149,7 +151,8 @@ export class Device {
    * Property to determine if the device can be extended.
    */
   get canExtend(): boolean {
-    return !this.pendingReturn && this.dueDate < this.maxExtendDate;
+    return !this.pendingReturn &&
+        moment(this.dueDate).diff(this.maxExtendDate, 'days') <= -1;
   }
 
   /**

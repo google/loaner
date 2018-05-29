@@ -17,21 +17,23 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
-import {ResumeLoanMock} from '../../../testing/mocks';
+import {DEVICE, ResumeLoanMock} from '../../../testing/mocks';
 import {ResumeLoan} from '../../resume_loan';
 
 import {LoanActionsCardComponent, LoanActionsCardModule} from './index';
 
+const PENDING_DEVICE = {...DEVICE};
+PENDING_DEVICE.pendingReturn = true;
+
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button resumeButton
                  (done)="onLoanResumed()"></loan-button>
   </loaner-loan-actions-card>`,
 })
 class ResumeButtonComponent {
-  @ViewChild(LoanActionsCardComponent) loanActions: LoanActionsCardComponent;
-  pendingReturn = true;
+  device = PENDING_DEVICE;
   onLoanResumed() {}
 }
 
@@ -59,7 +61,6 @@ describe('LoanActionsCardComponent ResumeLoanButton', () => {
 
     fixture = TestBed.createComponent(ResumeButtonComponent);
     app = fixture.debugElement.componentInstance;
-    app.loanActions.pendingReturn = true;
     fixture.detectChanges();
     compiled = fixture.debugElement.nativeElement;
   });

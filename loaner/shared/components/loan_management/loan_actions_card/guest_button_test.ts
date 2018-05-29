@@ -17,23 +17,22 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
-import {GuestModeMock} from '../../../testing/mocks';
+import {DEVICE, GuestModeMock} from '../../../testing/mocks';
 import {GuestMode} from '../../guest';
 
 import {LoanActionsCardModule} from './index';
 
+const GUEST_DEVICE = {...DEVICE};
+
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button guestButton
-                 [guestEnabled]="guestEnabled"
-                 [guestAllowed]="guestAllowed"
                  (done)="onGuestModeEnabled()"></loan-button>
   </loaner-loan-actions-card>`,
 })
 class GuestButtonComponent {
-  guestAllowed = true;
-  guestEnabled = false;
+  device = GUEST_DEVICE;
   onGuestModeEnabled() {}
 }
 
@@ -72,14 +71,6 @@ describe('LoanActionsCardComponent GuestModeButton', () => {
     expect(buttons[0].textContent).toContain('Enable Guest');
   });
 
-  it('does not render guest button if guestAllowed is false.', () => {
-    app.guestAllowed = false;
-    fixture.detectChanges();
-    compiled = fixture.debugElement.nativeElement;
-    const button = compiled.querySelector('button');
-    expect(button).toBeNull();
-  });
-
   it('calls onGuestModeEnabled function after is clicked.', () => {
     spyOn(app, 'onGuestModeEnabled');
     const button = compiled.querySelector('button');
@@ -98,5 +89,13 @@ describe('LoanActionsCardComponent GuestModeButton', () => {
     compiled = fixture.debugElement.nativeElement;
     button = compiled.querySelector('button');
     expect(button!.getAttribute('disabled')).toBeDefined();
+  });
+
+  it('does not render guest button if guestAllowed is false.', () => {
+    GUEST_DEVICE.guestAllowed = false;
+    fixture.detectChanges();
+    compiled = fixture.debugElement.nativeElement;
+    const button = compiled.querySelector('button');
+    expect(button).toBeNull();
   });
 });

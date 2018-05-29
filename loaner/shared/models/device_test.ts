@@ -17,7 +17,6 @@ import * as moment from 'moment';
 
 import {Device} from './device';
 
-
 describe('Device', () => {
   const today: Date = moment()
                           .set({
@@ -75,6 +74,8 @@ describe('Device', () => {
 
   it('isn\'t able to extend if due date exceeds maximum return date', () => {
     expect(maximumExtendedDevice.canExtend).toBe(false);
+    maximumExtendedDevice.maxExtendDate = moment(today).add(1, 'd').toDate();
+    expect(maximumExtendedDevice.canExtend).toBe(true);
   });
 
   it('returns asset tag before serial number for its id', () => {

@@ -120,16 +120,4 @@ describe('StatusComponent', () => {
     expect(fixture.nativeElement.textContent)
         .toContain('Please return your loaner by:');
   });
-
-  it('allows the loan to be extended', () => {
-    app.device.dueDate = new Date(2017, 2, 27, 0, 0, 0, 0);
-    app.device.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
-    expect(app.canExtend()).toBeTruthy();
-  });
-
-  it('doesn\'t allow the loan to be extended', () => {
-    app.device.dueDate = new Date(2017, 3, 3, 0, 0, 0, 0);
-    app.device.maxExtendDate = new Date(2017, 3, 1, 0, 0, 0);
-    expect(app.canExtend()).toBeFalsy();
-  });
 });

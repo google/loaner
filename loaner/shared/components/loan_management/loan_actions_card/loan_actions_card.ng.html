@@ -4,24 +4,24 @@
       Maintain your loan
     </h1>
     <p class="card-description">
-      <ng-container *ngIf="pendingReturn">
+      <ng-container *ngIf="device.pendingReturn">
         This device is marked as being returned. If you would like to resume your loan,
         please click the button below.
       </ng-container>
-      <ng-container *ngIf="dueDate && !pendingReturn">
+      <ng-container *ngIf="device.dueDate && !device.pendingReturn">
         <p>
           Please return this device by:
         </p>
-        <span class="mat-title">{{ dueDate | date: 'fullDate' }}</span>
+        <span class="mat-title">{{ device.dueDate | date: 'fullDate' }}</span>
       </ng-container>
     </p>
-    <div *ngIf="!pendingReturn">
+    <div *ngIf="!device.pendingReturn">
       <ng-content select="loan-button[extendButton]"></ng-content>
       <ng-content select="loan-button[guestButton]"></ng-content>
       <ng-content select="loan-button[returnButton]"></ng-content>
     </div>
   </div>
-  <div *ngIf="pendingReturn">
+  <div *ngIf="device.pendingReturn">
     <ng-content select="loan-button[resumeButton]"></ng-content>
   </div>
   <div>

@@ -17,19 +17,16 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {DEVICE} from '../../../testing/mocks';
+
 import {LoanActionsCardModule} from './index';
 
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button extendButton
-                 [canExtend]="canExtend()"
-                 [dueDate]="dueDate"
-                 [maxExtendDate]="maxExtendDate"
                  (done)="onExtended($event)"></loan-button>
     <loan-button guestButton
-                 [guestEnabled]="guestEnabled"
-                 [guestAllowed]="guestAllowed"
                  (done)="onGuestModeEnabled()"></loan-button>
     <loan-button returnButton (done)="onReturned()"></loan-button>
     <loan-button damagedButton (done)="onDamaged($event)"></loan-button>
@@ -37,13 +34,7 @@ import {LoanActionsCardModule} from './index';
   </loaner-loan-actions-card>`,
 })
 class AllButtonsComponent {
-  dueDate = new Date(2018, 1, 1);
-  maxExtendDate = new Date(2018, 1, 1);
-  guestAllowed = true;
-  guestEnabled = false;
-  canExtend() {
-    return true;
-  }
+  device = DEVICE;
   onExtended(newDate: string) {}
   onGuestModeEnabled() {}
   onReturned() {}
@@ -53,12 +44,14 @@ class AllButtonsComponent {
 
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button returnButton (done)="onReturned()"></loan-button>
     <loan-button damagedButton (done)="onDamaged($event)"></loan-button>
+    <loan-button lostButton (done)="onDamaged($event)"></loan-button>
   </loaner-loan-actions-card>`,
 })
 class TwoButtonsComponent {
+  device = DEVICE;
   onReturned() {}
   onDamaged(reason: string) {}
 }
@@ -93,6 +86,6 @@ describe('LoanActionsCardComponent', () => {
         TestBed.createComponent(TwoButtonsComponent);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelectorAll('button').length).toBe(2);
+    expect(compiled.querySelectorAll('button').length).toBe(3);
   });
 });

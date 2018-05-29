@@ -11,26 +11,16 @@
             {{ device.id }}
           </ng-template>
           <div fxLayout="column" fxLayoutAlign="center center">
-            <loaner-loan-actions-card [pendingReturn]="device.pendingReturn"
-                                      [dueDate]="device.dueDate"
-                                      [deviceId]="device.id"
-                                      [oneOfMany]="loanedDevices.length > 1">
+            <loaner-loan-actions-card [device]="device">
               <loan-button extendButton
-                           [canExtend]="device.canExtend"
-                           [dueDate]="device.dueDate"
-                           [maxExtendDate]="device.maxExtendDate"
                            (done)="onExtended(device, $event)"></loan-button>
               <loan-button guestButton
-                           *ngIf="!device.pendingReturn"
-                           [guestEnabled]="device.guestEnabled"
-                           [guestAllowed]="device.guestAllowed"
                            (done)="onGuestModeEnabled(device)"></loan-button>
               <loan-button returnButton
-                           *ngIf="!device.pendingReturn"
                            (done)="onReturned(device)"></loan-button>
-              <loan-button damagedButton (done)="onDamaged(device, $event)"></loan-button>
+              <loan-button damagedButton
+                           (done)="onDamaged(device, $event)"></loan-button>
               <loan-button lostButton (done)="onLost(device)"></loan-button>
-              <loan-button resumeButton (done)="onLoanResumed(device)"></loan-button>
             </loaner-loan-actions-card>
           </div>
         </mat-tab>

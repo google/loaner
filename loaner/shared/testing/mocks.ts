@@ -22,6 +22,19 @@ import {GuestMode} from '../components/guest';
 import {Lost} from '../components/lost';
 import {Unenroll} from '../components/unenroll';
 
+import {Device} from '../models/device';
+
+export const DEVICE = new Device({
+  asset_tag: 'asset',
+  serial_number: 'serial',
+  assigned_user: 'daredevil@example.com',
+  due_date: new Date(2018, 1, 1),
+  max_extend_date: new Date(2018, 1, 3),
+  pending_return: false,
+  guest_permitted: true,
+  guest_enabled: false,
+});
+
 export abstract class DeviceActionsDialogService {
   openDialog() {}
 

@@ -17,27 +17,26 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {Device} from '../../../models/device';
 import {ExtendMock} from '../../../testing/mocks';
 import {Extend} from '../../extend';
 
 import {LoanActionsCardModule} from './index';
 
+const EXTEND_DEVICE = new Device({
+  due_date: new Date(2018, 1, 1),
+  max_extend_date: new Date(2018, 1, 3),
+});
+
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button extendButton
-                 [canExtend]="canExtend()"
-                 [dueDate]="dueDate"
-                 [maxExtendDate]="maxExtendDate"
                  (done)="onExtended($event)"></loan-button>
   </loaner-loan-actions-card>`,
 })
 class ExtendButtonComponent {
-  dueDate = new Date(2018, 1, 1);
-  maxExtendDate = new Date(2018, 1, 3);
-  canExtend() {
-    return true;
-  }
+  device = EXTEND_DEVICE;
   onExtended(newDate: string) {}
 }
 
@@ -76,19 +75,20 @@ describe('LoanActionsCardComponent ExtendButton', () => {
     expect(buttons[0].textContent).toContain('Extend');
   });
 
-  it('renders a disabled extend button if canExtend is false.', () => {
-    spyOn(app, 'canExtend').and.returnValue(false);
-    fixture.detectChanges();
-    compiled = fixture.debugElement.nativeElement;
-    const button = compiled.querySelector('button');
-    expect(button!.getAttribute('disabled')).toBeDefined();
-  });
-
   it('calls extend function after is clicked.', () => {
     spyOn(app, 'onExtended');
+    fixture.detectChanges();
     const button = compiled.querySelector('button');
 
     button!.dispatchEvent(new Event('click'));
     expect(app.onExtended).toHaveBeenCalled();
+  });
+
+  it('renders a disabled extend button if canExtend is false.', () => {
+    EXTEND_DEVICE.dueDate = EXTEND_DEVICE.maxExtendDate;
+    fixture.detectChanges();
+    compiled = fixture.debugElement.nativeElement;
+    const button = compiled.querySelector('button');
+    expect(button!.getAttribute('disabled')).toBeDefined();
   });
 });

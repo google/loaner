@@ -17,18 +17,19 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
-import {DamagedMock} from '../../../testing/mocks';
+import {DamagedMock, DEVICE} from '../../../testing/mocks';
 import {Damaged} from '../../damaged';
 
 import {LoanActionsCardModule} from './index';
 
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button damagedButton (done)="onDamaged($event)"></loan-button>
   </loaner-loan-actions-card>`,
 })
 class DamagedButtonComponent {
+  device = DEVICE;
   onDamaged(reason: string) {}
 }
 

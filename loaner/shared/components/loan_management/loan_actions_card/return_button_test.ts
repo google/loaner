@@ -17,16 +17,19 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {DEVICE} from '../../../testing/mocks';
+
 import {LoanActionsCardModule} from './index';
 
 
 @Component({
   template: `
-  <loaner-loan-actions-card>
+  <loaner-loan-actions-card [device]="device">
     <loan-button returnButton (done)="onReturn()"></loan-button>
   </loaner-loan-actions-card>`,
 })
 class ReturnButtonComponent {
+  device = DEVICE;
   onReturn() {}
 }
 

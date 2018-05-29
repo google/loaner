@@ -66,7 +66,6 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.getDevice().subscribe(
         device => {
           this.device = device;
-          this.canExtend();
           this.ready();
         },
         error => {
@@ -75,18 +74,6 @@ export class StatusComponent extends LoaderView implements OnInit {
           this.failure.register(
               message, FailType.Network, FailAction.Quit, error);
         });
-  }
-
-  /** Checks the dates to see if the loan can be extended. */
-  canExtend() {
-    if (!this.device.dueDate) {
-      console.error('The due date date was never defined.');
-    }
-    if (!this.device.maxExtendDate) {
-      console.error('The max extend date date was never defined.');
-    }
-    return moment(this.device.dueDate)
-               .diff(this.device.maxExtendDate, 'days') <= -1;
   }
 
   /**
