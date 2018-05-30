@@ -4,8 +4,7 @@
 
 <div *ngIf="!loading" class="status-box">
   <loaner-greetings-card [userDisplayName]="device.givenName"
-                         [dueDate]="device.dueDate"
-                         [pendingReturn]="device.pendingReturn">
+                         [hasDevices]="hasDevices">
   </loaner-greetings-card>
   <br />
 

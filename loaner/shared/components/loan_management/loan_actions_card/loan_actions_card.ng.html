@@ -1,17 +1,15 @@
 <mat-card>
   <div>
-    <h1 class="mat-title">
+    <mat-card-title>
       Maintain your loan
-    </h1>
-    <p class="card-description">
+    </mat-card-title>
+    <p>
       <ng-container *ngIf="device.pendingReturn">
-        This device is marked as being returned. If you would like to resume your loan,
-        please click the button below.
+        This device is marked as being returned. If you would like to resume
+        your loan, please click the button below.
       </ng-container>
       <ng-container *ngIf="device.dueDate && !device.pendingReturn">
-        <p>
-          Please return this device by:
-        </p>
+        <div class="mat-small">Please return this device by:</div>
         <span class="mat-title">{{ device.dueDate | date: 'fullDate' }}</span>
       </ng-container>
     </p>

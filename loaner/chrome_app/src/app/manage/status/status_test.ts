@@ -116,8 +116,9 @@ describe('StatusComponent', () => {
 
   it('renders content on the page', () => {
     app.device.dueDate = new Date(2018, 1, 1);
+    app.device.assetTag = 'asset tag';
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent)
-        .toContain('Please return your loaner by:');
+        .toContain('Please return this device by:');
   });
 });

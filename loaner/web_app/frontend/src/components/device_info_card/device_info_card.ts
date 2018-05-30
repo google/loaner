@@ -49,6 +49,11 @@ export class DeviceInfoCard implements OnInit {
   /* Index of the tab to focus on landing when coming from route with id. */
   selectedTab = 0;
 
+  /** Boolean property if the current user has any devices assigned to them. */
+  get hasDevices() {
+    return this.loanedDevices && Boolean(this.loanedDevices.length);
+  }
+
   constructor(
       private readonly damagedService: Damaged,
       private readonly deviceService: DeviceService,

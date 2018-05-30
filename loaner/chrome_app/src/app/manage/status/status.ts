@@ -43,6 +43,11 @@ export class StatusComponent extends LoaderView implements OnInit {
   device = new Device();
   newReturnDate: Date;
 
+  /** If the device model data is populated. */
+  get hasDevices() {
+    return Boolean(this.device.id);
+  }
+
   constructor(
       private readonly bg: Background,
       private readonly config: ConfigService,

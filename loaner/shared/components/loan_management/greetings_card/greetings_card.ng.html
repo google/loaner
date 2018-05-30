@@ -1,24 +1,11 @@
 <mat-card tabindex="0">
-  <div>
-    <p>
-      <span class="mat-headline">
-        Hi {{ userDisplayName }}!
-      </span>
-    </p>
-    <p *ngIf="numberOfAssignedDevices > 0">You can manage your loan using the button(s) below.</p>
-    <p *ngIf="dueDate && !pendingReturn">
-      <span class="mat-title">
-        Please return your loaner by:
-      </span>
-      <br>
-      <span class="mat-title">
-        <strong>{{ dueDate | date:'fullDate' }}</strong>
-      </span>
-    </p>
-    <p *ngIf="numberOfAssignedDevices < 1">
-      <span class="mat-title">
-        You currently have no devices assigned to you.
-      </span>
-    </p>
-  </div>
+  <p class="mat-headline">
+      Hi {{ userDisplayName }}!
+  </p>
+  <p class="mat-subheading-2" *ngIf="hasDevices">
+    You can manage your loan using the button(s) below.
+  </p>
+  <p class="mat-subheading-2" *ngIf="!hasDevices">
+    You currently have no devices assigned to you.
+  </p>
 </mat-card>

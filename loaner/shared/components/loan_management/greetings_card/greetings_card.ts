@@ -23,8 +23,6 @@ import {Component, Input} from '@angular/core';
   templateUrl: './greetings_card.ng.html',
 })
 export class GreetingsCardComponent {
-  @Input() dueDate: Date;
   @Input() userDisplayName: string;
-  @Input() numberOfAssignedDevices = 1;
-  @Input() pendingReturn = false;
+  @Input() hasDevices: boolean;
 }

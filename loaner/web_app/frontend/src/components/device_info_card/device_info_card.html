@@ -2,7 +2,7 @@
   <div fxFlex>
     <ng-container *ngIf="loanedDevices">
       <loaner-greetings-card [userDisplayName]="user ? user.givenName : 'there'"
-                             [numberOfAssignedDevices]="loanedDevices ? loanedDevices.length : 0">
+                             [hasDevices]="hasDevices">
       </loaner-greetings-card>
       <mat-tab-group [selectedIndex]="selectedTab">
         <mat-tab *ngFor="let device of loanedDevices">
