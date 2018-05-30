@@ -117,20 +117,20 @@ configure a Google Cloud Platform project:
 
 1.  **Set up your permissions groups**
 
-    Users roles are managed using Google Groups. We will need to create 3 Google
-    groups that will contain users with elevated privileges in the Grab n Go
-    application. For example:
-
-    *   Technical Admins e.g. “technical-admins@example.com”
-    *   Operational Admins e.g. “operational-admins@example.com”
-    *   Technicians. e.g. “technicians@example.com”
-
-    Remember these group names as we will need to set them in our constants file
-    later on. You can [add the appropriate users to each
+    By default users only have permission to view and manage their own loans. To
+    give users elevated permissions to manage devices and shelves you must
+    assign them roles. User's roles are managed using Google Groups. You must
+    provide at least one group for superadmins - users that have all permissions
+    by default. Additional roles can be created by calling the role API with
+    a custom set of permissions depending on what access you'd like to give. You
+    can provide different Google Groups to manage the users in these roles and
+    they will sync automatically. You can also manually add users to roles if
+    you do not provide a group. You can [add the appropriate users to each
     group.](https://support.google.com/groups/answer/2465464?hl=en&ref_topic=2458761)
 
-    Note: Make sure to add yourself in the technical-admins group in order to
-    get the highest elevated permissions for the application.
+    Note: Make sure to add yourself in the superadmins group in order to
+    get the highest elevated permissions for the application. You will not be
+    able to set up the application without those permissions.
 
 1.  **Create an Authorized Email Sender**
 
@@ -242,17 +242,8 @@ Before you deploy GnG, the following constants must be configured:
 +   **`EMAIL_FROM`** is the email address within the G Suite Domain that GnG app
     email notifications will be sent from.
 
-+   **`TECHNICAL_ADMINS_GROUP`**: The Google Groups email address that contains
-    at least one Technical Admin in charge of configuring the app.
-
-+   **`OPERATIONAL_ADMINS_GROUP`**: The Google Groups email address that
-    contains at least one Operational Admin charge of the operational health of
-    the program.
-
-+   **`TECHNICIANS_GROUP`**: The Google Groups email address that contains at
-    least one Technician responsible for the day-to-day running of the program
-    (e.g., check in, auditing, enrolling, etc.) and who can view historical
-    information.
++   **`SUPERADMINS_GROUP`**: The Google Groups email address that contains
+    at least one Superadmin in charge of configuring the app.
 
 Within the `if ON_PROD` block are the required constants to be configured on the
 Google Cloud Project you will be using to host the production version of GnG:
