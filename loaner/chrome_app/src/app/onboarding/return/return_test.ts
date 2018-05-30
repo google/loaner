@@ -96,6 +96,14 @@ describe('ReturnComponent', () => {
     fixture.detectChanges();
     app.newReturnDate = moment().add(1, 'd').toDate();
     returnService.updateNewReturnDate(app.newReturnDate);
+    const attributes = fixture.debugElement.nativeElement
+                           .querySelector('input.mat-input-element')
+                           .attributes as NamedNodeMap;
+    expect(attributes.getNamedItem('min')!.value)
+        .toEqual(moment(app.getMinimumReturnDate()).format('YYYY[-]MM[-]DD'));
+    expect(attributes.getNamedItem('max')!.value)
+        .toEqual(
+            moment(testDeviceInfo.max_extend_date!).format('YYYY[-]MM[-]DD'));
     expect(returnService.changeReturnDate()).toBeTruthy();
   });
 
@@ -105,6 +113,14 @@ describe('ReturnComponent', () => {
     fixture.detectChanges();
     app.newReturnDate = moment().add(2, 'w').toDate();
     returnService.updateNewReturnDate(app.newReturnDate);
+    const attributes = fixture.debugElement.nativeElement
+                           .querySelector('input.mat-input-element')
+                           .attributes as NamedNodeMap;
+    expect(attributes.getNamedItem('min')!.value)
+        .toEqual(moment(app.getMinimumReturnDate()).format('YYYY[-]MM[-]DD'));
+    expect(attributes.getNamedItem('max')!.value)
+        .toEqual(
+            moment(testDeviceInfo.max_extend_date!).format('YYYY[-]MM[-]DD'));
     expect(returnService.changeReturnDate()).toBeFalsy();
   });
 });

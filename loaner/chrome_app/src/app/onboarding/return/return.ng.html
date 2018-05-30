@@ -18,7 +18,7 @@
                [(ngModel)]="newReturnDate"
                (ngModelChange)="returnService(newReturnDate)"
                [min]="getMinimumReturnDate()"
-               [max]="device.maxReturnDate"
+               [max]="device.maxExtendDate"
                [maxlength]="10"
                (keypress)="validateField($event)"
                required>
