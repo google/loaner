@@ -15,15 +15,17 @@
 
 
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
+import {map, switchMap, tap} from 'rxjs/operators';
+
 import * as moment from 'moment';
-import {switchMap} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
 import {ResumeLoan} from '../../../../../shared/components/resume_loan';
+import {CONFIG} from '../../app.config';
 import {Device} from '../../models/device';
 import {User} from '../../models/user';
 import {DeviceService} from '../../services/device';
@@ -48,10 +50,26 @@ export class DeviceInfoCard implements OnInit {
   loanedDevices: Device[];
   /* Index of the tab to focus on landing when coming from route with id. */
   selectedTab = 0;
+  /* String defining what user is being requested for imitation. */
+  imitatedUser: string|undefined;
 
   /** Boolean property if the current user has any devices assigned to them. */
   get hasDevices() {
     return this.loanedDevices && Boolean(this.loanedDevices.length);
+  }
+
+  /* Boolean stating whether a user is being imitated. */
+  get isImitatingUser(): boolean {
+    return Boolean(this.imitatedUser);
+  }
+
+  /* Handles the logic for what user/name to display in the greeting card */
+  get userToDisplay(): string {
+    if (this.isImitatingUser) {
+      return this.hasDevices ? this.loanedDevices[0].assignedUser :
+                               this.imitatedUser!;
+    }
+    return this.user ? this.user.givenName : 'there';
   }
 
   constructor(
@@ -62,20 +80,31 @@ export class DeviceInfoCard implements OnInit {
       private readonly lostService: Lost,
       private readonly resumeService: ResumeLoan,
       private readonly route: ActivatedRoute,
-      private readonly userService: UserService) {}
+      private readonly router: Router,
+      private readonly userService: UserService,
+  ) {}
 
   ngOnInit() {
     this.userService.whenUserLoaded()
-        .pipe(switchMap((user) => {
-          this.user = user;
-          return this.deviceService.listUserDevices();
-        }))
+        .pipe(
+            tap(user => this.user = user),
+            switchMap(() => this.route.queryParams),
+            map(params => params.user),
+            switchMap(
+                (userToImitate: string|undefined) =>
+                    this.getDevicesForUser(userToImitate)),
+            )
         .subscribe(userDevices => {
+          if (this.imitatedUser && !userDevices.length) {
+            this.backToSearch();
+            return;
+          }
           this.loanedDevices = userDevices.sort((a, b) => {
             if (!a.id || !b.id) return 0;
             return Number(b.id) - Number(a.id);
           });
 
+          // Represents the device ID to be highlighted if given.
           this.route.params.subscribe((params) => {
             if (params.id) {
               this.selectedTab = this.loanedDevices.findIndex(
@@ -84,6 +113,24 @@ export class DeviceInfoCard implements OnInit {
           });
         });
   }
+
+  /**
+   * Handles deciding whether to imitate a user or display the viewing users
+   * loans.
+   * @param userToImitate represents the user to imitate if provided.
+   */
+  private getDevicesForUser(userToImitate?: string) {
+    if (userToImitate &&
+        this.user.hasPermission(CONFIG.appPermissions.ADMINISTRATE_LOAN)) {
+      const request = {
+        'assigned_user': userToImitate,
+      };
+      this.imitatedUser = userToImitate;
+      return this.deviceService.list(request);
+    }
+    return this.deviceService.listUserDevices();
+  }
+
   /**
    * Calls the deviceService to enable guest mode.
    *
@@ -167,5 +214,19 @@ export class DeviceInfoCard implements OnInit {
       this.resumeService.finished();
       device.pendingReturn = false;
     });
+  }
+
+  /** Takes the user back to the default user view if imitating a user. */
+  stopImitatingUser() {
+    this.router.navigate(['user']);
+    this.imitatedUser = undefined;
+  }
+
+  /**
+   * This takes the user back to the search results if the user they searched
+   * for has no devices.
+   */
+  backToSearch() {
+    this.router.navigate([`/search/user/`, this.imitatedUser]);
   }
 }

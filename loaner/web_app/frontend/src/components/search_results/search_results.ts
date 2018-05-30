@@ -78,27 +78,40 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
       this.searchForDevice(query);
     } else if (model === 'shelf') {
       this.searchForShelf(query);
+    } else if (model === 'user') {
+      this.searchForDevice(query, true);
     } else {
       throw new TypeError(`Unsupported search type ${model}`);
     }
   }
 
   /**
-   * Searches for a given device.
+   * Searches for a given device or user with assigned devices.
    * @param queryString Represents the string to search for in devices.
+   * @param userSearch Indicates if the search type is for a user or not.
    */
-  private searchForDevice(queryString: string) {
-    const request: DeviceApiParams = {
-      query: {
-        'query_string': queryString,
-      },
-    };
+  private searchForDevice(queryString: string, userSearch?: boolean) {
+    let request: string|DeviceApiParams;
+    if (userSearch) {
+      request = {
+        'assigned_user': queryString,
+      };
+    } else {
+      request = {
+        'query': {
+          'query_string': queryString,
+        },
+      };
+    }
     this.deviceService.list(request).subscribe(devices => {
-      if (devices.length === 1 && devices[0].id) {
+      if (userSearch && devices.length >= 1) {
+        this.router.navigate(
+            ['user'], {queryParams: {'user': devices[0].assignedUser}});
+      } else if (devices.length === 1 && devices[0].id) {
         this.router.navigate([`/device/${devices[0].id}`]);
       } else {
         this.results = devices;
-        this.location.replaceState(`/search/device/${queryString}`);
+        this.location.replaceState(`/search/${this.model}/${queryString}`);
       }
       this.loading = false;
     });

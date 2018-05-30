@@ -16,8 +16,9 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/co
 import {RouterTestingModule} from '@angular/router/testing';
 import {ConfigService} from '../../services/config';
 import {DeviceService} from '../../services/device';
+import {SearchService} from '../../services/search';
 import {UserService} from '../../services/user';
-import {ConfigServiceMock, DeviceServiceMock, UserServiceMock} from '../../testing/mocks';
+import {ConfigServiceMock, DeviceServiceMock, SearchServiceMock, UserServiceMock} from '../../testing/mocks';
 
 import {UserView, UserViewModule} from '.';
 
@@ -33,6 +34,7 @@ describe('UserView', () => {
           providers: [
             {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
+            {provide: SearchService, useClass: SearchServiceMock},
             {provide: UserService, useClass: UserServiceMock},
           ],
         })

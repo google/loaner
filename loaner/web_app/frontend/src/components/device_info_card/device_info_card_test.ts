@@ -16,7 +16,7 @@ import {Component} from '@angular/core';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {ActivatedRoute, Params} from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import {BehaviorSubject, Observable, of} from 'rxjs';
 
@@ -29,7 +29,7 @@ import {Device} from '../../models/device';
 import {User} from '../../models/user';
 import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
-import {DEVICE_1, DEVICE_2, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
 import {DeviceInfoCard, DeviceInfoCardModule} from '.';
 
@@ -44,8 +44,13 @@ describe('DeviceInfoCardComponent', () => {
   let fixture: ComponentFixture<DummyComponent>;
   let testComponent: DummyComponent;
   let deviceInfoCard: DeviceInfoCard;
-  const params = new BehaviorSubject<Params>({
+  let router: Router;
+  const mockParams = new BehaviorSubject<Params>({
     id: DEVICE_2.serialNumber,
+  });
+  // By default, we leave this view query parameter empty, but initialized.
+  const mockQueryParams = new BehaviorSubject<Params>({
+    user: undefined,
   });
   // Month array for testing devices.
   const monthNames = [
@@ -73,7 +78,13 @@ describe('DeviceInfoCardComponent', () => {
             DeviceInfoCardModule,
           ],
           providers: [
-            {provide: ActivatedRoute, useValue: {params}},
+            {
+              provide: ActivatedRoute,
+              useValue: {
+                params: mockParams,
+                queryParams: mockQueryParams,
+              }
+            },
             {provide: Damaged, useClass: DamagedMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
             {provide: Extend, useClass: ExtendMock},
@@ -88,6 +99,7 @@ describe('DeviceInfoCardComponent', () => {
 
     fixture = TestBed.createComponent(DummyComponent);
     testComponent = fixture.debugElement.componentInstance;
+    router = TestBed.get(Router);
 
     deviceInfoCard = fixture.debugElement.query(By.directive(DeviceInfoCard))
                          .componentInstance;
@@ -106,7 +118,7 @@ describe('DeviceInfoCardComponent', () => {
     expect(tabListContent).toContain(DEVICE_WITHOUT_ASSET_TAG.serialNumber);
   });
 
-  it('should display the username on the card.', () => {
+  it('displays the username on the card.', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const usernameText =
@@ -114,7 +126,7 @@ describe('DeviceInfoCardComponent', () => {
     expect(usernameText).toContain(TEST_USER.givenName);
   });
 
-  it('should show a due date if the device is not marked for return', () => {
+  it('shows a due date if the device is not marked for return', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices')
         .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
@@ -131,7 +143,7 @@ describe('DeviceInfoCardComponent', () => {
     expect(tabGroupText).toContain(dateStringToExpect);
   });
 
-  it('should hide "...buttons below" text when no devices are assigned', () => {
+  it('hides "...buttons below" text when no devices are assigned', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices').and.returnValue(of([]));
     fixture.detectChanges();
@@ -141,13 +153,13 @@ describe('DeviceInfoCardComponent', () => {
     expect(greetingCardText).not.toContain('buttons below');
   });
 
-  it('should select the correct tab when route is provided', () => {
+  it('selects the correct tab when route is provided', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices').and.returnValue(of([
       DEVICE_1,
       DEVICE_2,
     ]));
-    params.next({id: DEVICE_2.assetTag});
+    mockParams.next({id: DEVICE_2.assetTag});
     fixture.detectChanges();
     let compiled = fixture.debugElement.nativeElement;
     let selectedTab =
@@ -155,12 +167,42 @@ describe('DeviceInfoCardComponent', () => {
             .textContent;
     expect(selectedTab).toContain(DEVICE_2.assetTag);
 
-    params.next({id: DEVICE_1.assetTag});
+    mockParams.next({id: DEVICE_1.assetTag});
     deviceInfoCard.ngOnInit();
     fixture.detectChanges();
     compiled = fixture.debugElement.nativeElement;
     selectedTab = compiled.querySelector('.mat-tab-label[aria-selected=true]')
                       .textContent;
     expect(selectedTab).toContain(DEVICE_1.assetTag);
+  });
+
+  it('goes to the search results page for user magic with no devices assigned',
+     () => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of([]));
+       spyOn(router, 'navigate');
+       mockParams.next({id: ''});
+       mockQueryParams.next({user: 'magic'});
+       fixture.detectChanges();
+       expect(router.navigate).toHaveBeenCalledWith(['/search/user/', 'magic']);
+     });
+
+  it('shows the user search for test_user with an assigned device', () => {
+    const deviceService: DeviceService = TestBed.get(DeviceService);
+    spyOn(deviceService, 'list').and.returnValue(of([
+      DEVICE_ASSIGNED,
+    ]));
+    mockParams.next({id: ''});
+    mockQueryParams.next({user: 'test_user'});
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const imitatingUserCardText =
+        compiled.querySelector('mat-card').textContent;
+    const selectedTab =
+        compiled.querySelector('.mat-tab-label[aria-selected=true]')
+            .textContent;
+    expect(selectedTab).toContain(DEVICE_ASSIGNED.serialNumber);
+    expect(imitatingUserCardText)
+        .toContain('You are viewing devices on behalf of test_user');
   });
 });

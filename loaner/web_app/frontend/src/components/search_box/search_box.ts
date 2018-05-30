@@ -17,13 +17,17 @@ import {MatAutocompleteTrigger, MatDialog, MatDialogRef, MatOptionSelectionChang
 import {DomSanitizer} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 
-import {SearchService} from '../../services/search';
+import {CONFIG} from '../../app.config';
 import * as marked from 'marked';
 
+import {SearchService} from '../../services/search';
 import {LoanerSnackBar} from '../../services/snackbar';
+import {UserService} from '../../services/user';
+
+export type SearchModel = 'device'|'shelf'|'user';
 
 export declare interface SearchType {
-  model: string;
+  model: SearchModel;
   name: string;
 }
 
@@ -37,7 +41,8 @@ export declare interface SearchType {
 })
 export class SearchBox implements OnInit {
   isFocused: boolean;
-  searchType: SearchType[] = [
+  /* Defines the default search options. */
+  defaultSearchType: SearchType[] = [
     {
       model: 'device',
       name: 'Device',
@@ -45,8 +50,17 @@ export class SearchBox implements OnInit {
     {
       model: 'shelf',
       name: 'Shelf',
-    }
+    },
   ];
+  /* Defines the priveleged search options. */
+  privilegedSearchType: SearchType[] = [
+    ...this.defaultSearchType,
+    {
+      model: 'user',
+      name: 'User',
+    },
+  ];
+  searchType: SearchType[];
   searchText: string;
   @ViewChild('searchBox') searchInputElement: ElementRef;
   @ViewChild(MatAutocompleteTrigger)
@@ -57,29 +71,39 @@ export class SearchBox implements OnInit {
       private readonly router: Router,
       private readonly searchService: SearchService,
       private readonly snackBar: LoanerSnackBar,
+      private readonly userService: UserService,
       public dialog: MatDialog,
   ) {}
 
   ngOnInit() {
     this.searchService.searchText.subscribe(query => this.searchText = query);
+    this.userService.whenUserLoaded().subscribe(user => {
+      if (user.hasPermission(CONFIG.appPermissions.ADMINISTRATE_LOAN)) {
+        this.searchType = this.privilegedSearchType;
+      } else {
+        this.searchType = this.defaultSearchType;
+      }
+    });
   }
 
   /**
    * Forwards the search request to the results component.
-   * @param model represents the model (device/shelf) to search through.
+   * @param model represents the model (device/shelf/user) to search through.
    */
   search(model: string) {
     if (!this.searchText) {
       this.snackBar.open(`You haven't searched for anything!`);
-    } else if (model === 'device' && this.searchText) {
-      this.router.navigate(
-          ['/search/device/', this.searchText], {skipLocationChange: true});
-      this.blurInput();
-    } else if (model === 'shelf' && this.searchText) {
-      this.router.navigate(
-          ['/search/shelf/', this.searchText], {skipLocationChange: true});
-      this.blurInput();
+    } else {
+      this.navigateToSearchRoute(model);
     }
+  }
+
+  /** Navigates to specified search results with a model in the route. */
+  private navigateToSearchRoute(searchRoute: string) {
+    this.router.navigate(
+        [`/search/${searchRoute}/`, this.searchText],
+        {skipLocationChange: true});
+    this.blurInput();
   }
 
   /**

@@ -29,7 +29,7 @@ import {ShelfDetailView, ShelfDetailViewModule} from './views/shelf_detail_view'
 import {ShelfListView, ShelfListViewModule} from './views/shelf_list_view';
 import {UserView, UserViewModule} from './views/user_view';
 
-/** Defines the required permission to see/use the search. */
+/** Defines the required permission to see/use the search for shelf/devices. */
 export const SEARCH_PERMISSIONS: string[] = [
   CONFIG.appPermissions.READ_DEVICES,
   CONFIG.appPermissions.READ_SHELVES,

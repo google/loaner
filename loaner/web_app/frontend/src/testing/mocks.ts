@@ -395,6 +395,7 @@ export class AuthServiceMock {
 
 export const TEST_USER = new User({
   permissions: [
+    CONFIG.appPermissions.ADMINISTRATE_LOAN,
     CONFIG.appPermissions.READ_SHELVES,
     CONFIG.appPermissions.READ_DEVICES,
     CONFIG.appPermissions.MODIFY_DEVICE,
@@ -403,6 +404,17 @@ export const TEST_USER = new User({
 });
 TEST_USER.email = 'daredevil@example.com';
 TEST_USER.givenName = 'Daredevil';
+
+export const TEST_USER_WITHOUT_ADMINISTRATE_LOAN = new User({
+  permissions: [
+    CONFIG.appPermissions.READ_SHELVES,
+    CONFIG.appPermissions.READ_DEVICES,
+    CONFIG.appPermissions.MODIFY_DEVICE,
+    CONFIG.appPermissions.MODIFY_SHELF,
+  ],
+});
+TEST_USER_WITHOUT_ADMINISTRATE_LOAN.givenName = 'Test User';
+TEST_USER_WITHOUT_ADMINISTRATE_LOAN.email = 'test_user@example.com';
 
 export class UserServiceMock {
   user = TEST_USER;
@@ -436,5 +448,21 @@ export const TEST_SHELF = new Shelf({
 export class ActivatedRouteMock {
   get params(): Observable<{[key: string]: {}}> {
     return of({id: 'Location 1'});
+  }
+}
+
+export class SearchServiceMock {
+  searchText: Observable<string> = of('magical');
+
+  changeSearchText(query: string) {
+    this.searchText = of(query);
+  }
+
+  getHelp(): Observable<string> {
+    return of(`# Testing
+    ## 123
+    ### 456
+    Regular text.
+    `);
   }
 }

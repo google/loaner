@@ -22,10 +22,12 @@ import {of} from 'rxjs';
 
 import {SearchService} from '../../services/search';
 import {LoanerSnackBar} from '../../services/snackbar';
+import {UserService} from '../../services/user';
+import {TEST_USER_WITHOUT_ADMINISTRATE_LOAN, UserServiceMock} from '../../testing/mocks';
 
 import {SearchBox, SearchBoxModule} from './index';
 
-const MARKDOWN_EXAMPLE = `# Testing
+export const MARKDOWN_EXAMPLE = `# Testing
 ## 123
 ### 456
 Regular text.
@@ -51,6 +53,7 @@ describe('SearchBox', () => {
             {provide: ComponentFixtureAutoDetect, useValue: true},
             LoanerSnackBar,
             SearchService,
+            {provide: UserService, useClass: UserServiceMock},
           ],
         })
         .compileComponents();
@@ -260,5 +263,44 @@ describe('SearchBox', () => {
              overlayContainerElement.querySelector('button#close')!.textContent)
              .toContain('Close');
        });
+     }));
+
+  it('properly works when using the autocomplete to search for a user of test_user',
+     async(() => {
+       spyOn(router, 'navigate');
+       searchBox.searchText = 'test_user';
+       searchBox.autocompleteTrigger.openPanel();
+       fixture.detectChanges();
+       // tslint:disable-next-line:no-unnecessary-type-assertion Type undefined.
+       const autocompleteOptions = overlayContainerElement.querySelectorAll(
+                                       'mat-option') as NodeListOf<HTMLElement>;
+       autocompleteOptions[2].click();  // We expect this to be the user option.
+       fixture.detectChanges();
+
+       expect(router.navigate)
+           .toHaveBeenCalledWith(
+               ['/search/user/', 'test_user'],
+               Object({skipLocationChange: true}));
+       expect(fixture.debugElement.nativeElement.querySelector(
+                  'input.search-box-focused'))
+           .toBeFalsy();
+       expect(fixture.debugElement.nativeElement.querySelector(
+                  'input.search-box-unfocused'))
+           .toBeTruthy();
+     }));
+
+  it('does not allow an unprivileged user to see the user option', async(() => {
+       const userService: UserService = TestBed.get(UserService);
+       spyOn(userService, 'whenUserLoaded')
+           .and.returnValue(of(TEST_USER_WITHOUT_ADMINISTRATE_LOAN));
+       searchBox.ngOnInit();
+       fixture.detectChanges();
+       searchBox.autocompleteTrigger.openPanel();
+       // tslint:disable-next-line:no-unnecessary-type-assertion Type undefined.
+       const autocompleteOptions = overlayContainerElement.querySelectorAll(
+                                       'mat-option') as NodeListOf<HTMLElement>;
+       fixture.detectChanges();
+
+       expect(autocompleteOptions[2]).not.toBeTruthy();
      }));
 });
