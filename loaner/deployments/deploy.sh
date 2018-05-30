@@ -92,7 +92,7 @@ if [[ -z "${DEPLOY_SH__}" ]]; then
     case "${UNAME}" in
       Linux*) PLATFORM="${_LINUX}";;
       Darwin*) PLATFORM="${_MAC}";;
-      *) error_message "This platfrom is not recognized";;
+      *) error_message "This platform is not recognized";;
     esac
   }
 
@@ -181,25 +181,25 @@ auth login"
   }
 
   # Check that the script was executed from within the loaner directory and goto
-  # the loaner directory.
+  # the loaner directory. Also, make sure the bazel BUILD files exist to build
+  # deploy_impl.py.
   function goto_loaner_dir() {
     info_message "Going to the loaner directory..."
-    local pwd=$(pwd -P)
-    case "${pwd}" in
-      */loaner/loaner)
-        ;;
-      */loaner/loaner/*)
-        cd "${pwd%%/loaner/loaner/*}/loaner/loaner"
-        ;;
-      */loaner)
-        ;;
-      */loaner/*)
-        cd "${pwd%%/loaner/*}/loaner"
-        ;;
-      *)
-        error_message "This script must be run within the loaner directory."
-        ;;
-    esac
+    # Resolve current directory of the script and any symbolic links
+    DEPLOY_PATH="$(dirname "$(readlink -f "${0}")")"
+    # cd to the 'loaner/loaner/' directory.
+    cd "${DEPLOY_PATH}" && cd ..
+
+    # Make sure we are in the loaner directory.
+    if [[ ${PWD##*/} != "loaner" ]]; then
+      error_message "This script must be located in the loaner/deployments \
+      directory."
+    fi
+
+    # Check for the WORKSPACE file and that the requisite BUILD files exist.
+    if [[ ! -f ../WORKSPACE || ! -f BUILD || ! -f deployments/BUILD ]]; then
+      error_message "The Bazel BUILD files appear to be missing."
+    fi
   }
 
   # Check that the required binaries are on PATH and above the minimum version.
