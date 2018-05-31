@@ -25,7 +25,7 @@
   </mat-icon>
 </button>
 
-<mat-autocomplete #auto="matAutocomplete">
+<mat-autocomplete autoActiveFirstOption #auto="matAutocomplete">
   <mat-option *ngFor="let option of searchType"
               [value]="searchText"
               (onSelectionChange)="searchTypeSelected($event, option.model)">
