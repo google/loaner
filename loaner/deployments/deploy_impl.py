@@ -215,9 +215,19 @@ class LoanerConfig(object):
     return os.path.abspath(self._loaner_path)
 
   @property
+  def node_modules_path(self):
+    """Retrieve the node_modules path as a string."""
+    return os.path.join(self.npm_path, 'node_modules')
+
+  @property
   def on_local(self):
     """Returns whether or not this is to be deployed locally."""
     return self._deployment_type == _LOCAL
+
+  @property
+  def on_google_cloud_shell(self):
+    """Returns whether or not we are on Google Cloud Shell."""
+    return os.environ.get('CLOUD_SHELL') == 'true'
 
 
 class AppEngineServerConfig(LoanerConfig):
@@ -293,24 +303,22 @@ class AppEngineServerConfig(LoanerConfig):
     """Retrieve the path to the bundled Frontend as a string."""
     return os.path.join(self.app_path, 'loaner', 'web_app', 'frontend', 'src')
 
-  def _BuildWebAppBackend(self):
-    """Build the Web Application's backend services."""
-    logging.debug('Building the backend using Bazel...')
-    _ExecuteCommand([
-        'bazel', 'build', '//{}:{}'.format(
-            self._web_app_dir, self._build_target)])
+  def _DeleteAppEngExtDepDir(self):
+    """Deletes the GAE external dependencies directory."""
+    if os.path.isdir(self.app_engine_deps_path):
+      logging.info('Removing the local copy of the App Engine dependencies.')
+      shutil.rmtree(self.app_engine_deps_path)
 
-  def _BuildWebAppFrontend(self):
-    """Build the Web Application's frontend services."""
-    logging.debug('Building the frontend using npm...')
-    os.chdir(self.npm_path)
-    _ExecuteCommand(['npm', 'install'])
-    _ExecuteCommand(['npm', 'run', 'build:frontend'])
+  def _DeleteNodeModulesDir(self):
+    """Deletes the node_modules directory."""
+    if os.path.isdir(self.node_modules_path):
+      logging.info(
+          'Removing the node_modules directory because we are building on '
+          'Google Cloud Shell.')
+      shutil.rmtree(self.node_modules_path)
 
-  def _BundleWebApp(self):
-    """Bundle the web application using bazel and npm."""
-    self._BuildWebAppBackend()
-    self._BuildWebAppFrontend()
+  def _MoveWebAppFrontendBundle(self):
+    """Prepare frontend bundle destination and move the build there."""
     if os.path.isdir(self.frontend_bundle_path):
       logging.info(
           'The bundled frontend exists, we are replacing it with a new build.')
@@ -318,6 +326,36 @@ class AppEngineServerConfig(LoanerConfig):
     logging.debug('Moving the frontend bundle into the web app bundle.')
     shutil.move(
         os.path.join(self.frontend_src_path, 'dist'), self.frontend_bundle_path)
+
+  def _CleanWebAppBackend(self):
+    """Run bazel clean --expunge in order to reduce filesystem utilziation."""
+    logging.info('Running bazel clean --expunge_async because we are building '
+                 'on Google Cloud Shell')
+    _ExecuteCommand(['bazel', 'clean', '--expunge_async'])
+
+  def _BuildWebAppBackend(self):
+    """Build the Web Application's backend services."""
+    logging.debug('Building the backend using Bazel...')
+    _ExecuteCommand([
+        'bazel', 'build', '//{}:{}'.format(
+            self._web_app_dir, self._build_target)])
+    if not self.on_local:
+      self._DeleteAppEngExtDepDir()
+
+  def _BuildWebAppFrontend(self):
+    """Build the Web Application's frontend services."""
+    logging.debug('Building the frontend using npm...')
+    os.chdir(self.npm_path)
+    _ExecuteCommand(['npm', 'install'])
+    _ExecuteCommand(['npm', 'run', 'build:frontend'])
+    if self.on_google_cloud_shell:
+      self._DeleteNodeModulesDir()
+
+  def _BundleWebApp(self):
+    """Bundle the web application using bazel and npm."""
+    self._BuildWebAppFrontend()
+    self._BuildWebAppBackend()
+    self._MoveWebAppFrontendBundle()
 
   def _GetYamlFile(self, yaml_filename):
     """Returns the full path for a given yaml file in the bundle.
@@ -333,12 +371,10 @@ class AppEngineServerConfig(LoanerConfig):
   def DeployWebApp(self):
     """Bundle then deploy (or run locally) the web application."""
     self._BundleWebApp()
+
     if self.on_local:
       print('Run locally...')
     else:
-      if os.path.isdir(self.app_engine_deps_path):
-        logging.info('Removing the local copy of the App Engine dependencies.')
-        shutil.rmtree(self.app_engine_deps_path)
       cmds = [
           'gcloud', 'app', 'deploy', '--no-promote', '--project={}'.format(
               self.project_id), '--version={}'.format(self.version)]
@@ -348,6 +384,9 @@ class AppEngineServerConfig(LoanerConfig):
           'Deploying to the Google Cloud project: %s using gcloud...',
           self.project_id)
       _ExecuteCommand(cmds)
+
+    if self.on_google_cloud_shell:
+      self._CleanWebAppBackend()
 
 
 class ChromeAppConfig(LoanerConfig):
