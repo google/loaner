@@ -94,7 +94,14 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    app.newReturnDate = moment().add(1, 'd').toDate();
+    app.newReturnDate = moment()
+                            .set({
+                              hour: 0,
+                              minute: 0,
+                              second: 0,
+                            })
+                            .add(1, 'd')
+                            .toDate();
     returnService.updateNewReturnDate(app.newReturnDate);
     const attributes = fixture.debugElement.nativeElement
                            .querySelector('input.mat-input-element')
@@ -111,7 +118,14 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    app.newReturnDate = moment().add(2, 'w').toDate();
+    app.newReturnDate = moment()
+                            .set({
+                              hour: 0,
+                              minute: 0,
+                              second: 0,
+                            })
+                            .add(2, 'w')
+                            .toDate();
     returnService.updateNewReturnDate(app.newReturnDate);
     const attributes = fixture.debugElement.nativeElement
                            .querySelector('input.mat-input-element')

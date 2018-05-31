@@ -72,7 +72,8 @@ describe('SearchResultsComponent', () => {
         .toContain('321653');
     expect(fixture.nativeElement.querySelectorAll('mat-list-item')[1].innerText)
         .toContain('236135');
-    expect(searchResults.resultsLength).toEqual(4);
+    expect(searchResults.resultsLength)
+        .toEqual(TestBed.get(DeviceService).dataChange.getValue().length);
   });
 
   it('should retrieve and display the mock shelfs.', () => {

@@ -280,8 +280,11 @@ export const DEVICE_LOST_AND_MORE = new Device({
 });
 
 export class DeviceServiceMock {
-  dataChange = new BehaviorSubject<Device[]>(
-      [DEVICE_1, DEVICE_2, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG]);
+  dataChange = new BehaviorSubject<Device[]>([
+    DEVICE_1, DEVICE_2, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG,
+    DEVICE_MARKED_FOR_RETURN, DEVICE_UNASSIGNED, DEVICE_ASSIGNED, DEVICE_LOST,
+    DEVICE_DAMAGED, DEVICE_LOCKED, DEVICE_OVERDUE
+  ]);
 
   create() {
     return;
@@ -304,7 +307,13 @@ export class DeviceServiceMock {
   }
 
   getDevice(deviceId: string): Observable<Device> {
-    return of(this.data[0]);
+    const foundDevice = this.dataChange.value.find(mockDevice => {
+      return mockDevice.id === deviceId;
+    });
+    if (foundDevice === undefined) {
+      throw new Error(`Could not find device in mock with id ${deviceId}`);
+    }
+    return of(foundDevice);
   }
 
   checkReadyForAudit(deviceId: string): Observable<string> {

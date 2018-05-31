@@ -44,7 +44,7 @@ export class DeviceDetails implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
-      this.refreshDevice(params.id);
+      if (params.id !== undefined) this.refreshDevice(params.id);
     });
   }
 
