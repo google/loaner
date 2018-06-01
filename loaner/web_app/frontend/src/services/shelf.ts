@@ -17,7 +17,7 @@ import {Response} from '@angular/http';
 import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
-import {ListShelfResponse, Shelf, ShelfApiParams} from '../models/shelf';
+import {ListShelfResponse, ListShelfResponseApiParams, Shelf, ShelfApiParams} from '../models/shelf';
 
 import {ApiService} from './api';
 
@@ -70,12 +70,16 @@ export class ShelfService extends ApiService {
   /**
    * Lists all shelves enrolled in the program.
    */
-  list(filters: ShelfApiParams = {}): Observable<Shelf[]> {
-    return this.post<ListShelfResponse>('list', filters).pipe(map(res => {
-      const retrievedShelves = res;
-      return (retrievedShelves['shelves'] || [])
-          .map((retrievedShelf: ShelfApiParams) => new Shelf(retrievedShelf));
-    }));
+  list(filters: ShelfApiParams = {}): Observable<ListShelfResponse> {
+    return this.post<ListShelfResponseApiParams>('list', filters)
+        .pipe(map(res => {
+          const retrievedShelves: ListShelfResponse = {
+            shelves: res.shelves.map(s => new Shelf(s)),
+            totalResults: res.total_results,
+            totalPages: res.total_pages,
+          };
+          return retrievedShelves;
+        }));
   }
 
   /**

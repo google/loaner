@@ -179,7 +179,11 @@ describe('DeviceInfoCardComponent', () => {
   it('goes to the search results page for user magic with no devices assigned',
      () => {
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       spyOn(deviceService, 'list').and.returnValue(of([]));
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [],
+         totalResults: 0,
+         totalPages: 1,
+       }));
        spyOn(router, 'navigate');
        mockParams.next({id: ''});
        mockQueryParams.next({user: 'magic'});
@@ -189,9 +193,11 @@ describe('DeviceInfoCardComponent', () => {
 
   it('shows the user search for test_user with an assigned device', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([
-      DEVICE_ASSIGNED,
-    ]));
+    spyOn(deviceService, 'list').and.returnValue(of({
+      devices: [DEVICE_ASSIGNED],
+      totalResults: 0,
+      totalPages: 1,
+    }));
     mockParams.next({id: ''});
     mockQueryParams.next({user: 'test_user'});
     fixture.detectChanges();

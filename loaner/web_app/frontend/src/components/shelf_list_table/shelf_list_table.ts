@@ -59,8 +59,8 @@ export class ShelfListTable implements OnInit, OnDestroy {
         .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
                 return this.pauseLoading ? NEVER : this.shelfService.list();
               }))
-        .subscribe(shelves => {
-          this.dataSource.data = shelves;
+        .subscribe(response => {
+          this.dataSource.data = response.shelves;
         });
   }
 

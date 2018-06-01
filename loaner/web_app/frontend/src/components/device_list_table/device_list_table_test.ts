@@ -209,7 +209,11 @@ describe('DeviceListTableComponent', () => {
   it('does not show the return and damaged chips if device is lost',
      fakeAsync(() => {
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       spyOn(deviceService, 'list').and.returnValue(of([DEVICE_LOST_AND_MORE]));
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_LOST_AND_MORE],
+         totalResults: 1,
+         totalPages: 1,
+       }));
        deviceListTable.ngOnInit();
        tick();
        fixture.detectChanges();

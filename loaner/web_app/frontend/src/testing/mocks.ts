@@ -17,8 +17,8 @@ import {BehaviorSubject, Observable, of} from 'rxjs';
 import {CONFIG} from '../app.config';
 import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
-import {Device} from '../models/device';
-import {Shelf, ShelfRequestParams} from '../models/shelf';
+import {Device, ListDevicesResponse} from '../models/device';
+import {ListShelfResponse, Shelf, ShelfRequestParams} from '../models/shelf';
 import {User} from '../models/user';
 
 
@@ -98,8 +98,12 @@ export class ShelfServiceMock {
     });
   }
 
-  list(): Observable<Shelf[]> {
-    return this.dataChange;
+  list(): Observable<ListShelfResponse> {
+    return of({
+      shelves: this.data,
+      totalResults: this.data.length,
+      totalPages: 1,
+    });
   }
 
   getShelf(): Observable<Shelf> {
@@ -298,8 +302,12 @@ export class DeviceServiceMock {
     });
   }
 
-  list(): Observable<Device[]> {
-    return this.dataChange;
+  list(): Observable<ListDevicesResponse> {
+    return of({
+      devices: this.data,
+      totalResults: this.data.length,
+      totalPages: 1,
+    });
   }
 
   listUserDevices(): Observable<Device[]> {

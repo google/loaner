@@ -103,7 +103,8 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
         },
       };
     }
-    this.deviceService.list(request).subscribe(devices => {
+    this.deviceService.list(request).subscribe(response => {
+      const devices = response.devices;
       if (userSearch && devices.length >= 1) {
         this.router.navigate(
             ['user'], {queryParams: {'user': devices[0].assignedUser}});
@@ -127,7 +128,8 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
         'query_string': queryString,
       }
     };
-    this.shelfService.list(request).subscribe(shelves => {
+    this.shelfService.list(request).subscribe(response => {
+      const shelves = response.shelves;
       if (shelves.length === 1 && shelves[0].location) {
         this.router.navigate([`/shelf/${shelves[0].location}/details`]);
       } else {

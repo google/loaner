@@ -16,7 +16,6 @@ import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {DeviceInfoCardModule} from '../../components/device_info_card';
-import {UserLoansTableModule} from '../../components/user_loans_table';
 import {UserView} from './user_view';
 
 export * from './user_view';
@@ -31,7 +30,6 @@ export * from './user_view';
   imports: [
     BrowserModule,
     DeviceInfoCardModule,
-    UserLoansTableModule,
   ],
 })
 export class UserViewModule {}

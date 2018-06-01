@@ -19,8 +19,7 @@ import {MatSort} from '@angular/material';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
-import {Device, DeviceRequestApiParams, ExtendDeviceRequestApiParams, MarkAsDamagedRequestApiParams} from '../models/device';
-import {DeviceApiParams, ListDeviceResponse} from '../models/device';
+import {Device, DeviceApiParams, DeviceRequestApiParams, ExtendDeviceRequestApiParams, ListDevicesResponse, ListDevicesResponseApiParams, MarkAsDamagedRequestApiParams} from '../models/device';
 
 import {ApiService} from './api';
 
@@ -33,9 +32,8 @@ export class DeviceService extends ApiService {
   /** Checks if whether a particular device is ready to be checked in. */
   checkReadyForAudit(id: string): Observable<string> {
     return new Observable(observer => {
-      this.post(
-              'auditable', {'unknown_identifier': id},
-              false /* showSnackbarOnFailure */)
+      const request: DeviceRequestApiParams = {'unknown_identifier': id};
+      this.post('auditable', request, false /* showSnackbarOnFailure */)
           .subscribe(
               () => {
                 observer.next(`Device ready for audit.`);
@@ -51,7 +49,8 @@ export class DeviceService extends ApiService {
    * @param id Device identifier to be gotten from the backend.
    */
   getDevice(id: string) {
-    return this.post('user/get', {'unknown_identifier': id})
+    const request: DeviceRequestApiParams = {'unknown_identifier': id};
+    return this.post('user/get', request)
         .pipe(map(
             (retrievedDevice: DeviceApiParams) => new Device(retrievedDevice)));
   }
@@ -59,27 +58,30 @@ export class DeviceService extends ApiService {
   /**
    * Returns all the device data as a list of devices.
    */
-  list(filters: DeviceApiParams = {}): Observable<Device[]> {
-    return this.post<ListDeviceResponse>('list', filters).pipe(map(res => {
-      const retrievedDevices = res;
-      return (retrievedDevices['devices'] || [])
-          .map(
-              (retrievedDevice: DeviceApiParams) =>
-                  new Device(retrievedDevice));
-    }));
+  list(filters: DeviceApiParams = {}): Observable<ListDevicesResponse> {
+    return this.post<ListDevicesResponseApiParams>('list', filters)
+        .pipe(map(res => {
+          const retrievedDevices: ListDevicesResponse = {
+            devices: res.devices.map(d => new Device(d)),
+            totalResults: res.total_results,
+            totalPages: res.total_pages
+          };
+          return retrievedDevices;
+        }));
   }
 
   /**
    * Returns assigned devices based on the current user.
    */
   listUserDevices(): Observable<Device[]> {
-    return this.post<ListDeviceResponse>('user/devices').pipe(map(res => {
-      const retrievedDevices = res;
-      return (retrievedDevices['devices'] || [])
-          .map(
-              (retrievedDevice: DeviceApiParams) =>
-                  new Device(retrievedDevice));
-    }));
+    return this.post<ListDevicesResponseApiParams>('user/devices')
+        .pipe(map(res => {
+          const retrievedDevices = res;
+          return (retrievedDevices['devices'] || [])
+              .map(
+                  (retrievedDevice: DeviceApiParams) =>
+                      new Device(retrievedDevice));
+        }));
   }
 
   /**

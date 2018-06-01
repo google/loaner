@@ -38,6 +38,18 @@ export declare interface ShelfApiParams {
   query?: {query_string?: string;};
 }
 
+export declare interface ListShelfResponseApiParams {
+  shelves: ShelfApiParams[];
+  total_results: number;
+  total_pages: number;
+}
+
+export interface ListShelfResponse {
+  shelves: Shelf[];
+  totalResults: number;
+  totalPages: number;
+}
+
 export class Shelf {
   /** The friendly name of a given shelf. */
   friendlyName = '';
@@ -97,10 +109,4 @@ export class Shelf {
       shelf_request: this.shelfRequest,
     };
   }
-}
-
-export declare interface ListShelfResponse {
-  additional_results: boolean;
-  page_token: string;
-  shelves: ShelfApiParams[];
 }

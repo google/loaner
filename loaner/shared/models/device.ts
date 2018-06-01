@@ -62,6 +62,19 @@ export declare interface MarkAsDamagedRequestApiParams {
   damaged_reason?: string;
 }
 
+export declare interface ListDevicesResponseApiParams {
+  devices: DeviceApiParams[];
+  total_results: number;
+  total_pages: number;
+}
+
+export interface ListDevicesResponse {
+  devices: Device[];
+  totalResults: number;
+  totalPages: number;
+}
+
+
 /** A device model with all its properties and methods. */
 export class Device {
   /** Serial number of the device. */
@@ -288,10 +301,4 @@ export interface DeviceChip {
   label: string;
   status: DeviceChipStatus;
   tooltip: string;
-}
-
-export declare interface ListDeviceResponse {
-  additional_details: boolean;
-  devices: DeviceApiParams[];
-  page_token: string;
 }

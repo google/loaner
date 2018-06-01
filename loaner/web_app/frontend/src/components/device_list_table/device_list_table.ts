@@ -151,8 +151,8 @@ export class DeviceListTable implements OnInit {
   }
 
   private refresh(filters: DeviceApiParams = {}) {
-    return this.deviceService.list(filters).subscribe(devices => {
-      this.dataSource.data = devices;
+    return this.deviceService.list(filters).subscribe(response => {
+      this.dataSource.data = response.devices;
     });
   }
 }

@@ -126,7 +126,7 @@ export class DeviceInfoCard implements OnInit {
         'assigned_user': userToImitate,
       };
       this.imitatedUser = userToImitate;
-      return this.deviceService.list(request);
+      return this.deviceService.list(request).pipe(map(r => r.devices));
     }
     return this.deviceService.listUserDevices();
   }
