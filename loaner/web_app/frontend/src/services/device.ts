@@ -51,7 +51,7 @@ export class DeviceService extends ApiService {
    * @param id Device identifier to be gotten from the backend.
    */
   getDevice(id: string) {
-    return this.post('/user/get', {'unknown_identifier': id})
+    return this.post('user/get', {'unknown_identifier': id})
         .pipe(map(
             (retrievedDevice: DeviceApiParams) => new Device(retrievedDevice)));
   }
