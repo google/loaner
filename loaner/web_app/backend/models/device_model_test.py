@@ -344,6 +344,25 @@ class DeviceModelTest(loanertest.TestCase):
     self.testbed.mock_raiseevent.assert_any_call('device_enroll', device=device)
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_enroll_unenrolled_damaged_device(
+      self, mock_directoryclass):
+    mock_directoryclient = mock_directoryclass.return_value
+    mock_directoryclient.get_chrome_device_by_serial.return_value = (
+        loanertest.TEST_DIR_DEVICE_DEFAULT)
+    device = device_model.Device()
+    device.damaged = True
+    device.enrolled = False
+    device.serial_number = '123456'
+    device.put()
+
+    device = device_model.Device.enroll(
+        user_email=loanertest.USER_EMAIL, serial_number='123456')
+
+    retrieved_device = device_model.Device.get(serial_number='123456')
+    self.assertTrue(retrieved_device.enrolled)
+    self.assertFalse(retrieved_device.damaged)
+
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_move_ou_error(self, mock_directoryclass):
     device = device_model.Device()
     device.enrolled = False
