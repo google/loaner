@@ -16,7 +16,7 @@
         <input matInput [matDatepicker]="picker"
                placeholder="Choose your return date"
                [(ngModel)]="newReturnDate"
-               (ngModelChange)="returnService(newReturnDate)"
+               (ngModelChange)="returnService.updateNewReturnDate(newReturnDate)"
                [min]="getMinimumReturnDate()"
                [max]="device.maxExtendDate"
                [maxlength]="10"

@@ -37,8 +37,8 @@ describe('ReturnComponent', () => {
 
   // Mock response of device info
   const testDeviceInfo: DeviceApiParams = {
-    due_date: moment().toDate(),
-    max_extend_date: moment().add(1, 'w').toDate(),
+    due_date: moment('2018-06-04').toDate(),
+    max_extend_date: moment('2018-06-17').toDate(),
     given_name: 'John',
     guest_enabled: false,
     guest_permitted: true,
@@ -68,6 +68,9 @@ describe('ReturnComponent', () => {
     returnService = TestBed.get(ReturnDateService);
     fixture = TestBed.createComponent(ReturnComponent);
     app = fixture.debugElement.componentInstance;
+
+    const today = moment('2018-06-04').toDate();
+    jasmine.clock().mockDate(today);
   });
 
   it('renders the page as loading', () => {
@@ -94,14 +97,7 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    app.newReturnDate = moment()
-                            .set({
-                              hour: 0,
-                              minute: 0,
-                              second: 0,
-                            })
-                            .add(1, 'd')
-                            .toDate();
+    app.newReturnDate = moment().add(1, 'd').toDate();
     returnService.updateNewReturnDate(app.newReturnDate);
     const attributes = fixture.debugElement.nativeElement
                            .querySelector('input.mat-input-element')
@@ -118,14 +114,7 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    app.newReturnDate = moment()
-                            .set({
-                              hour: 0,
-                              minute: 0,
-                              second: 0,
-                            })
-                            .add(2, 'w')
-                            .toDate();
+    app.newReturnDate = moment().add(2, 'w').toDate();
     returnService.updateNewReturnDate(app.newReturnDate);
     const attributes = fixture.debugElement.nativeElement
                            .querySelector('input.mat-input-element')

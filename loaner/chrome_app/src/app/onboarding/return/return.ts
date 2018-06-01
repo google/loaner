@@ -67,6 +67,7 @@ export class ReturnComponent extends LoaderView implements OnInit {
             this.newReturnDate = newReturnDate!;
           }
         });
+    this.returnService.updateMaxReturnDate(device.maxExtendDate);
 
     // Do validation checks on changes.
     this.returnService.validationChecks().subscribe(val => {
