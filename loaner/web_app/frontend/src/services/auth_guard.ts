@@ -84,7 +84,7 @@ const isAllowedAccess =
       const intersectedPermissions =
           currentPermissions
               .reduce(
-                  (acc, curr) =>
+                  (acc: string[], curr) =>
                       [...acc,
                        ...permissionsAllowed.filter(
                            permission => permission.trim().toUpperCase() ===
