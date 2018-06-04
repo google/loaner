@@ -73,8 +73,10 @@ export class ShelfService extends ApiService {
   list(filters: ShelfApiParams = {}): Observable<ListShelfResponse> {
     return this.post<ListShelfResponseApiParams>('list', filters)
         .pipe(map(res => {
+          const shelves =
+              res.shelves && res.shelves.map(s => new Shelf(s)) || [];
           const retrievedShelves: ListShelfResponse = {
-            shelves: res.shelves.map(s => new Shelf(s)),
+            shelves,
             totalResults: res.total_results,
             totalPages: res.total_pages,
           };

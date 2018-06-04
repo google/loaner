@@ -61,8 +61,10 @@ export class DeviceService extends ApiService {
   list(filters: DeviceApiParams = {}): Observable<ListDevicesResponse> {
     return this.post<ListDevicesResponseApiParams>('list', filters)
         .pipe(map(res => {
+          const devices =
+              res.devices && res.devices.map(d => new Device(d)) || [];
           const retrievedDevices: ListDevicesResponse = {
-            devices: res.devices.map(d => new Device(d)),
+            devices,
             totalResults: res.total_results,
             totalPages: res.total_pages
           };
