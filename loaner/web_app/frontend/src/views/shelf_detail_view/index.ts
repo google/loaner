@@ -15,8 +15,10 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 
+import {DeviceHeaderModule} from '../../components/device_header';
 import {DeviceListTableModule} from '../../components/device_list_table';
 import {ShelfDetailsModule} from '../../components/shelf_details';
+
 import {ShelfDetailView} from './shelf_detail_view';
 
 export * from './shelf_detail_view';
@@ -31,6 +33,7 @@ export * from './shelf_detail_view';
   imports: [
     BrowserModule,
     DeviceListTableModule,
+    DeviceHeaderModule,
     ShelfDetailsModule,
   ],
 })

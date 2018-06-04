@@ -18,16 +18,16 @@ import {BrowserModule} from '@angular/platform-browser';
 import {DeviceHeaderModule} from '../../components/device_header';
 import {DeviceListTableModule} from '../../components/device_list_table';
 
-import {DeviceListView} from './device_list_view';
+import {DeviceActionsView} from './device_actions_view';
 
-export * from './device_list_view';
+export * from './device_actions_view';
 
 @NgModule({
   declarations: [
-    DeviceListView,
+    DeviceActionsView,
   ],
   exports: [
-    DeviceListView,
+    DeviceActionsView,
   ],
   imports: [
     DeviceListTableModule,
@@ -35,5 +35,5 @@ export * from './device_list_view';
     BrowserModule,
   ],
 })
-export class DeviceListViewModule {
+export class DeviceActionsViewModule {
 }

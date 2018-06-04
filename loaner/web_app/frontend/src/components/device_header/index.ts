@@ -14,26 +14,30 @@
 
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
+import {RouterModule} from '@angular/router';
 
-import {DeviceHeaderModule} from '../../components/device_header';
-import {DeviceListTableModule} from '../../components/device_list_table';
+import {MaterialModule} from '../../core/material_module';
+import {DeviceActionBoxModule} from '../device_action_box';
+import {DeviceButtonsModule} from '../device_buttons';
 
-import {DeviceListView} from './device_list_view';
+import {DeviceHeader} from './device_header';
 
-export * from './device_list_view';
+export * from './device_header';
 
 @NgModule({
   declarations: [
-    DeviceListView,
+    DeviceHeader,
   ],
   exports: [
-    DeviceListView,
+    DeviceHeader,
   ],
   imports: [
-    DeviceListTableModule,
-    DeviceHeaderModule,
     BrowserModule,
+    DeviceActionBoxModule,
+    DeviceButtonsModule,
+    MaterialModule,
+    RouterModule,
   ],
 })
-export class DeviceListViewModule {
+export class DeviceHeaderModule {
 }

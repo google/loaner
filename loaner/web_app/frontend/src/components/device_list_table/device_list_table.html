@@ -1,15 +1,5 @@
 <mat-card class="loaner-table">
-  <mat-card-title>
-    <span class="title">
-      {{ cardTitle }}
-    </span>
-    <loaner-device-buttons *ngIf="showButtons"></loaner-device-buttons>
-  </mat-card-title>
-  <mat-card-content>
-    <loaner-device-action-box *ngIf="currentAction"
-                              [action]="currentAction"
-                              (takeAction)="takeActionOnDevice($event)">
-    </loaner-device-action-box>
+    <mat-card-content>
     <mat-table #table [dataSource]="dataSource" matSort>
       <ng-container cdkColumnDef="identifier">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
@@ -17,7 +7,6 @@
         </mat-header-cell>
         <mat-cell *cdkCellDef="let device">{{device.id}}</mat-cell>
       </ng-container>
-
       <ng-container cdkColumnDef="assignedUser">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Assigned to

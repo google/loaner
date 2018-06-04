@@ -57,9 +57,6 @@ export class DeviceListTable implements OnInit {
   /** Type of data source that will be used on this implementation. */
   dataSource = new MatTableDataSource<Device>();
 
-  /** Current action that will be used in the device-action-box if rendered. */
-  currentAction: string;
-
   /* When true, pauseLoading will prevent auto refresh on the table. */
   pauseLoading = false;
 
@@ -118,36 +115,11 @@ export class DeviceListTable implements OnInit {
             }),
             )
         .subscribe();
-
-    this.route.params.subscribe((params) => {
-      this.currentAction = '';
-      for (const key in Actions) {
-        if (params.action === Actions[key]) {
-          this.currentAction = Actions[key];
-        }
-      }
-    });
   }
 
   ngOnDestroy() {
     this.dataSource.data = [];
     this.onDestroy.next();
-  }
-
-  /** Callback that's called once the device-action-box emits a device event. */
-  takeActionOnDevice(device: Device) {
-    let action: Observable<void>;
-    switch (this.currentAction) {
-      case Actions.ENROLL:
-        action = this.deviceService.enroll(device);
-        break;
-      case Actions.UNENROLL:
-        action = this.deviceService.unenroll(device);
-        break;
-      default:
-        throw new Error('Device action not recognized.');
-    }
-    action.pipe(tap(() => this.refresh())).subscribe();
   }
 
   private refresh(filters: DeviceApiParams = {}) {

@@ -12,28 +12,3 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {NgModule} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
-
-import {DeviceHeaderModule} from '../../components/device_header';
-import {DeviceListTableModule} from '../../components/device_list_table';
-
-import {DeviceListView} from './device_list_view';
-
-export * from './device_list_view';
-
-@NgModule({
-  declarations: [
-    DeviceListView,
-  ],
-  exports: [
-    DeviceListView,
-  ],
-  imports: [
-    DeviceListTableModule,
-    DeviceHeaderModule,
-    BrowserModule,
-  ],
-})
-export class DeviceListViewModule {
-}

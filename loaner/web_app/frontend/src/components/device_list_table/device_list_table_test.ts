@@ -57,21 +57,6 @@ describe('DeviceListTableComponent', () => {
     expect(DeviceListTable).toBeDefined();
   });
 
-  it('renders the default card title in a mat-card-title', () => {
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.mat-card-title').innerText)
-        .toContain('Device List');
-  });
-
-  it('renders the overwritten card title in a mat-card-title', () => {
-    deviceListTable.cardTitle = 'Company X Device List';
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.mat-card-title').innerText)
-        .toContain('Company X Device List');
-  });
-
   it('renders title field "Identifier" inside mat-header-row ', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -238,5 +223,4 @@ describe('DeviceListTableComponent', () => {
       expect(matChipListContent).toContain('Unassigned');
     });
   });
-
 });
