@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {OverlayContainer} from '@angular/cdk/overlay';
 import {Component} from '@angular/core';
 import {ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
@@ -26,7 +27,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_LOST, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
@@ -43,6 +44,8 @@ class DummyComponent {
 describe('DeviceActionsMenu', () => {
   let fixture: ComponentFixture<DummyComponent>;
   let deviceActionsMenu: DeviceActionsMenu;
+  let dummyComponent: DummyComponent;
+  let overlayContainerElement: HTMLElement;
 
   beforeEach(fakeAsync(() => {
     TestBed
@@ -64,6 +67,9 @@ describe('DeviceActionsMenu', () => {
 
     fixture = TestBed.createComponent(DummyComponent);
     deviceActionsMenu = fixture.debugElement.componentInstance;
+    dummyComponent = fixture.debugElement.componentInstance;
+    overlayContainerElement =
+        TestBed.get(OverlayContainer).getContainerElement();
   }));
 
   it('creates the DeviceActionsMenu', () => {
@@ -126,14 +132,11 @@ describe('DeviceActionsMenu', () => {
   });
 
   it('renders the Unlock button after more is clicked', () => {
-    fixture.detectChanges();
+    dummyComponent.testDevice = DEVICE_LOST;
     const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
     actionsButton.triggerEventHandler('click', null);
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-unlock'))
-                       .nativeElement as HTMLElement;
-    expect(button.textContent).toContain('Unlock');
+    expect(overlayContainerElement.textContent).toContain('Unlock');
   });
 
   it('renders the Unenroll button after more is clicked', () => {
@@ -168,6 +171,7 @@ describe('DeviceActionsMenu', () => {
   });
 
   it('calls returnDevice when Return is clicked.', () => {
+    dummyComponent.testDevice = DEVICE_ASSIGNED;
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'returnDevice');
     const actionsButton = fixture.debugElement.query(By.css('.icon-more'));

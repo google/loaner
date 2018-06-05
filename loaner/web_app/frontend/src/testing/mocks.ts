@@ -233,6 +233,7 @@ export const DEVICE_LOST = new Device({
   due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
   lost: true,
+  locked: true,
 });
 
 export const DEVICE_DAMAGED = new Device({

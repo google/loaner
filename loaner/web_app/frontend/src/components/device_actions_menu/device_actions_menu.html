@@ -15,35 +15,36 @@
     Extend
   </button>
   <button mat-menu-item
-          [disabled]="device.pendingReturn"
+          [disabled]="device.pendingReturn || !device.assignedUser"
           (click)="onReturned(device)"
           class="button-return">
      <mat-icon>exit_to_app</mat-icon>
     Return
   </button>
   <button mat-menu-item
-          [disabled]="device.guestAllowed && device.guestEnabled"
+          [disabled]="(device.guestAllowed && device.guestEnabled) || !device.assignedUser ||
+                      device.lost"
           (click)="enableGuestMode(device)"
           class="button-guest">
     <mat-icon>account_circle</mat-icon>
     Enable guest
   </button>
-  <button mat-menu-item
-          [disabled]="device.damaged"
+  <button *ngIf="!device.damaged"
+          mat-menu-item
           (click)="onDamaged(device)"
           class="button-damaged">
     <mat-icon>build</mat-icon>
     Mark as damaged
   </button>
-  <button mat-menu-item
-          [disabled]="device.lost"
+  <button *ngIf="!device.lost"
+          mat-menu-item
           (click)="onLost(device)"
           class="button-lost">
     <mat-icon>gps_off</mat-icon>
     Mark as lost
   </button>
-  <button mat-menu-item
-          [disabled]="!device.locked"
+  <button *ngIf="device.locked"
+          mat-menu-item
           (click)="unlock(device)"
           class="button-unlock">
     <mat-icon>lock_open</mat-icon>

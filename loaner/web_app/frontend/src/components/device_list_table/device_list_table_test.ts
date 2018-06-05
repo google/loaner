@@ -105,19 +105,6 @@ describe('DeviceListTableComponent', () => {
     expect(deviceListTable.pauseLoading).toBe(false);
   });
 
-  it('has opened guest dialog after Enable Guest is clicked.', () => {
-    const guestModeService: GuestMode = TestBed.get(GuestMode);
-    spyOn(guestModeService, 'openDialog');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const buttonGuest = fixture.debugElement.query(By.css('.actions-menu'))
-                            .query(By.css('.button-guest'));
-    buttonGuest.triggerEventHandler('click', null);
-
-    expect(guestModeService.openDialog).toHaveBeenCalled();
-  });
-
   it('shows the assigned chip when device is assigned', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'list').and.returnValue(of([DEVICE_ASSIGNED]));
