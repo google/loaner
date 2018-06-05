@@ -1,0 +1,49 @@
+@import '../../shared/themes/standard';
+
+.chips-cell {
+  overflow: visible;
+}
+
+mat-basic-chip.status {
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin: 0 1px;
+  cursor: default;
+
+  &:first-of-type {
+    margin: 0 1px 0 0;
+  }
+
+  mat-icon {
+    vertical-align: middle;
+    transform: scale(.85);
+  }
+
+  &.accent {
+    color: mat-color($accent, 800) !important;
+    background: mat-color($accent, 100);
+  }
+
+  &.primary {
+    color: mat-color($primary, 500) !important;
+    background: mat-color($primary, 50);
+  }
+
+  &.warn {
+    color: mat-color($warn, 500) !important;
+    background: mat-color($warn, 50);
+  }
+
+  &.ok {
+    color: mat-color(mat-palette($mat-green), 500) !important;
+    background: mat-color(mat-palette($mat-green), 50);
+  }
+}
+
+@media (max-width: 1500px) {
+  mat-basic-chip {
+    span {
+      display: none;
+    }
+  }
+}

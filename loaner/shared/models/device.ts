@@ -180,7 +180,7 @@ export class Device {
    * A negative value indicates that the device is overdue.
    */
   get timeUntilDue(): number {
-    return this.dueDate.valueOf() - (Date.now());
+    return moment(this.dueDate).diff(moment(), 'ms');
   }
 
   /** Translates the Device model object to the API message. */

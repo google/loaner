@@ -20,7 +20,16 @@
       <mat-tab-group [selectedIndex]="selectedTab" *ngIf="hasDevices">
         <mat-tab *ngFor="let device of loanedDevices">
           <ng-template mat-tab-label>
-            <mat-icon>laptop_chromebook</mat-icon>
+            <mat-icon *ngIf="device.isOverdue"
+                      matBadge=""
+                      matBadgeSize="small"
+                      matBadgePosition="above before"
+                      matBadgeColor="warn">
+              laptop_chromebook
+            </mat-icon>
+            <mat-icon *ngIf="!device.isOverdue">
+              laptop_chromebook
+            </mat-icon>
             {{ device.id }}
           </ng-template>
           <div fxLayout="column" fxLayoutAlign="center center">

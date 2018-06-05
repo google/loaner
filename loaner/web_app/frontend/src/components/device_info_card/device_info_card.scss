@@ -31,7 +31,7 @@ loaner-greetings-card {
 }
 
 ::ng-deep .mat-tab-list .mat-tab-labels .mat-tab-label-active {
-  background-color: mat-color($primary, 50);
+  background-color: mat-color($primary, lighter, .3);
   opacity: 1;
 }
 

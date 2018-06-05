@@ -8,8 +8,21 @@
         This device is marked as being returned. If you would like to resume
         your loan, please click the button below.
       </ng-container>
-      <ng-container *ngIf="device.dueDate && !device.pendingReturn">
+
+      <ng-container *ngIf="!device.pendingReturn && !device.isOverdue && device.dueDate">
         <div class="mat-small">Please return this device by:</div>
+        <span class="mat-title">{{ device.dueDate | date: 'fullDate' }}</span>
+      </ng-container>
+
+      <ng-container *ngIf="device.isOverdue">
+    <mat-basic-chip *ngFor="let chip of device.chips"
+                    class="status {{chip.color}}"
+                    [matTooltip]="chip.tooltip"
+                    [attr.aria-label]="chip.tooltip">
+      <mat-icon>{{chip.icon}}</mat-icon>
+      <span>{{chip.label}}</span>
+    </mat-basic-chip>
+        <div class="mat-small">This device should have been returned on:</div>
         <span class="mat-title">{{ device.dueDate | date: 'fullDate' }}</span>
       </ng-container>
     </p>

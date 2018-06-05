@@ -14,7 +14,6 @@
 
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {MatTooltipModule} from '@angular/material';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {DamagedModule} from '../../../../../shared/components/damaged';
@@ -47,7 +46,6 @@ export * from './device_info_card';
     LoanActionsCardModule,
     LostModule,
     MaterialModule,
-    MatTooltipModule,
     ResumeLoanModule,
   ],
 })

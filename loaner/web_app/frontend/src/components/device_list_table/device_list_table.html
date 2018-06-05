@@ -12,7 +12,7 @@
           Assigned to
         </mat-header-cell>
         <mat-cell *cdkCellDef="let device">
-          {{ device.assignedUser }}
+          {{device.assignedUser}}
         </mat-cell>
       </ng-container>
 
@@ -44,8 +44,8 @@
                             (focus)="pauseLoading=true;"
                             (blur)="pauseLoading=false;"
                             [attr.aria-label]="chip.tooltip">
-              <mat-icon>{{ chip.icon }}</mat-icon>
-              <span>{{ chip.label }}</span>
+              <mat-icon>{{chip.icon}}</mat-icon>
+              <span>{{chip.label}}</span>
             </mat-basic-chip>
           </mat-chip-list>
         </mat-cell>

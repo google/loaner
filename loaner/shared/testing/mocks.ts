@@ -47,6 +47,9 @@ export class DamagedMock extends DeviceActionsDialogService {
   get onDamaged(): Observable<string> {
     return of('damagedReason');
   }
+  get overdue(): boolean {
+    return true;
+  }
 }
 
 export class ExtendMock extends DeviceActionsDialogService {
