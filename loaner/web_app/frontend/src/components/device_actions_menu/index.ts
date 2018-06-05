@@ -19,6 +19,7 @@ import {DamagedModule} from '../../../../../shared/components/damaged';
 import {ExtendModule} from '../../../../../shared/components/extend';
 import {GuestModeModule} from '../../../../../shared/components/guest';
 import {LostModule} from '../../../../../shared/components/lost';
+import {UndamagedModule} from '../../../../../shared/components/undamaged';
 import {UnenrollModule} from '../../../../../shared/components/unenroll';
 import {UnlockModule} from '../../../../../shared/components/unlock';
 import {MaterialModule} from '../../core/material_module';
@@ -42,6 +43,7 @@ export * from './device_actions_menu';
     ExtendModule,
     GuestModeModule,
     LostModule,
+    UndamagedModule,
     UnenrollModule,
     UnlockModule,
     MaterialModule,

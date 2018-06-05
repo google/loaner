@@ -749,6 +749,17 @@ class DeviceModelTest(loanertest.TestCase):
     self.assertTrue(self.test_device.damaged)
     self.assertEqual(self.test_device.damaged_reason, reason)
 
+  def test_mark_undamaged(self):
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.test_device.mark_damaged(user_email=loanertest.USER_EMAIL)
+    self.assertTrue(self.test_device.damaged)
+    with mock.patch.object(
+        self.test_device, 'stream_to_bq', autospec=True) as mock_stream_to_bq:
+      self.test_device.mark_undamaged(user_email=loanertest.USER_EMAIL)
+      datastore_device = device_model.Device.get(serial_number='123456')
+      self.assertFalse(datastore_device.damaged)
+      assert mock_stream_to_bq.call_count == 1
+
   def test_mark_lost(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     with mock.patch.object(

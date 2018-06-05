@@ -528,6 +528,23 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
           device=device_message.DeviceRequest(urlkey=self.device.key.urlsafe()),
           damaged_reason='Foo'))
 
+  def test_mark_undamaged(self):
+    with mock.patch.object(self.device, 'mark_undamaged') as mock_markundamaged:
+      self.service.mark_undamaged(device_message.DeviceRequest(
+          urlkey=self.device.key.urlsafe()))
+      mock_markundamaged.assert_called_once_with(
+          user_email=loanertest.SUPER_ADMIN_EMAIL)
+
+  @mock.patch.object(device_model.Device, 'mark_undamaged')
+  def test_mark_undamaged__unauthorized(self, mock_markundamaged):
+    self.login_endpoints_user()
+    with mock.patch.object(self.service, 'check_xsrf_token') as mock_xsrf:
+      mock_markundamaged.side_effect = device_model.UnauthorizedError()
+      with self.assertRaises(endpoints.UnauthorizedException):
+        self.service.mark_undamaged(device_message.DeviceRequest(
+            urlkey=self.device.key.urlsafe()))
+      assert mock_xsrf.call_count == 1
+
   @mock.patch('__main__.device_model.Device.mark_lost')
   @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_mark_lost(self, mock_xsrf_token, mock_marklost):

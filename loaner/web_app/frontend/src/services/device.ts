@@ -173,6 +173,17 @@ export class DeviceService extends ApiService {
   }
 
   /**
+   * Clears a device's damaged state.
+   * @param device Device to be marked as undamaged.
+   */
+  markAsUndamaged(device: Device) {
+    return this.post('undamaged', device.toApiMessage()).pipe(tap(() => {
+      this.snackBar.open(
+          `Device ${device.id} is not longer marked as damaged.`);
+    }));
+  }
+
+  /**
    * Enrolls a particular device into the Grab n Go Loaners program.
    * @param newDevice Device that will be enrolled in the program.
    */

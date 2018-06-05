@@ -27,7 +27,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_LOST, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_LOST, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
@@ -129,6 +129,18 @@ describe('DeviceActionsMenu', () => {
                        .query(By.css('.button-lost'))
                        .nativeElement as HTMLElement;
     expect(button.textContent).toContain('Mark as lost');
+  });
+
+  it('renders the Mark as Repaired button after more is clicked', () => {
+    dummyComponent.testDevice = DEVICE_DAMAGED;
+    fixture.detectChanges();
+    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
+    actionsButton.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('.actions-menu'))
+                       .query(By.css('.button-undamaged'))
+                       .nativeElement as HTMLElement;
+    expect(button.textContent).toContain('Mark as Repaired');
   });
 
   it('renders the Unlock button after more is clicked', () => {

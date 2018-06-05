@@ -295,6 +295,22 @@ class DeviceApi(root_api.Service):
   @auth.method(
       device_message.DeviceRequest,
       message_types.VoidMessage,
+      name='undamaged',
+      path='undamaged',
+      http_method='POST')
+  def mark_undamaged(self, request):
+    """Clears a device's damaged state."""
+    self.check_xsrf_token(self.request_state)
+    device = _get_device(request)
+    try:
+      device.mark_undamaged(user_email=user_lib.get_user_email())
+    except device_model.UnauthorizedError as err:
+      raise endpoints.UnauthorizedException(str(err))
+    return message_types.VoidMessage()
+
+  @auth.method(
+      device_message.DeviceRequest,
+      message_types.VoidMessage,
       name='mark_lost',
       path='user/mark_lost',
       http_method='POST')

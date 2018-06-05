@@ -688,6 +688,17 @@ class Device(base_model.BaseModel):
     self.put()
 
   @validate_assignee_or_admin
+  def mark_undamaged(self, user_email):
+    """Resets a device's damaged state.
+
+    Args:
+      user_email: string, the user that is marking a device as undamaged
+    """
+    self.damaged = False
+    self.stream_to_bq(user_email, "Clearning the device's damaged state.")
+    self.put()
+
+  @validate_assignee_or_admin
   def mark_lost(self, user_email):
     """Marks a device as lost.
 

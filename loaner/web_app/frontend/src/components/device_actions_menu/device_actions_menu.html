@@ -36,6 +36,13 @@
     <mat-icon>build</mat-icon>
     Mark as damaged
   </button>
+  <button *ngIf="device.damaged"
+          mat-menu-item
+          (click)="onUndamaged(device)"
+          class="button-undamaged">
+    <mat-icon>check</mat-icon>
+    Mark as Repaired
+  </button>
   <button *ngIf="!device.lost"
           mat-menu-item
           (click)="onLost(device)"

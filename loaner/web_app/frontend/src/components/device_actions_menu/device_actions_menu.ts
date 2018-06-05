@@ -19,6 +19,7 @@ import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
+import {Undamaged} from '../../../../../shared/components/undamaged';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {Unlock} from '../../../../../shared/components/unlock';
 import {Device} from '../../models/device';
@@ -44,6 +45,7 @@ export class DeviceActionsMenu {
       private readonly extendService: Extend,
       private readonly guestModeService: GuestMode,
       private readonly lostService: Lost,
+      private readonly undamagedService: Undamaged,
       private readonly unenrollService: Unenroll,
       private readonly unlockService: Unlock,
   ) {}
@@ -138,6 +140,25 @@ export class DeviceActionsMenu {
             },
             () => {
               this.damagedService.close();
+            });
+  }
+
+  /**
+   * Calls the deviceService to clear a device's as damaged state.
+   * @param device The device to take action on.
+   */
+  onUndamaged(device: Device) {
+    this.undamagedService.openDialog(device.id);
+    this.undamagedService.onUndamaged
+        .pipe(switchMap(
+            damagedReason => this.deviceService.markAsUndamaged(device)))
+        .subscribe(
+            () => {
+              this.undamagedService.finished();
+              this.refreshDevice.emit(device.id);
+            },
+            () => {
+              this.undamagedService.close();
             });
   }
 
