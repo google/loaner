@@ -48,6 +48,7 @@ describe('ShelfListTableComponent', () => {
     shelfListTable = fixture.debugElement.componentInstance;
 
     discardPeriodicTasks();
+    fixture.detectChanges();
   }));
 
   it('should create the ShelfList', () => {

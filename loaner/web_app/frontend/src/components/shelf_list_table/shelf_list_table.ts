@@ -12,12 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, ElementRef, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
-import {MatSort, MatTableDataSource} from '@angular/material';
-import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
+import {ChangeDetectorRef, Component, Input, OnDestroy, ViewChild} from '@angular/core';
+import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import {interval, merge, NEVER, Subject} from 'rxjs';
 import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
 
-import {Shelf} from '../../models/shelf';
+import {Shelf, ShelfApiParams} from '../../models/shelf';
 import {ShelfService} from '../../services/shelf';
 
 /**
@@ -30,7 +30,7 @@ import {ShelfService} from '../../services/shelf';
   styleUrls: ['shelf_list_table.scss'],
   templateUrl: 'shelf_list_table.html',
 })
-export class ShelfListTable implements OnInit, OnDestroy {
+export class ShelfListTable implements OnDestroy {
   /** Title of the table to be displayed. */
   @Input() cardTitle = 'Shelf List';
 
@@ -38,29 +38,50 @@ export class ShelfListTable implements OnInit, OnDestroy {
   private onDestroy = new Subject<void>();
   /** Columns that should be rendered on the frontend table */
   displayedColumns = [
-    'name',
+    'id',
     'capacity',
-    'lastAuditTime',
-    'lastAuditBy',
+    'last_audit_time',
+    'last_audit_by',
     'icons',
   ];
   /** Type of data source that will be used on this implementation. */
   dataSource = new MatTableDataSource<Shelf>();
+  /** Total number of shelves returned from the back end */
+  totalResults = 0;
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   pauseLoading = false;
 
-  constructor(private shelfService: ShelfService) {}
+  constructor(
+      private readonly changeDetector: ChangeDetectorRef,
+      private readonly shelfService: ShelfService) {}
 
-  ngOnInit() {
-    this.dataSource.sort = this.sort;
-    interval(60000)  // 1 minute.
-        .pipe(startWith(0), takeUntil(this.onDestroy), switchMap(() => {
-                return this.pauseLoading ? NEVER : this.shelfService.list();
-              }))
-        .subscribe(response => {
-          this.dataSource.data = response.shelves;
+  ngAfterViewInit() {
+    const intervalObservable = interval(60000).pipe(startWith(0));
+
+    merge(intervalObservable, this.sort.sortChange, this.paginator.page)
+        .pipe(
+            takeUntil(this.onDestroy),
+            switchMap(() => {
+              if (this.pauseLoading) return NEVER;
+
+              const filters: ShelfApiParams = {
+                page_number: this.paginator.pageIndex + 1,
+                page_size: this.paginator.pageSize,
+              };
+              const sort = this.sort.active || 'id';
+              const sortDirection = this.sort.direction || 'asc';
+              return this.shelfService.list(filters, sort, sortDirection);
+            }),
+            )
+        .subscribe(listReponse => {
+          this.totalResults = listReponse.totalResults;
+          this.dataSource.data = listReponse.shelves;
+          // We need to manually call change detection here because of
+          // https://github.com/angular/angular/issues/14748
+          this.changeDetector.detectChanges();
         });
   }
 

@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {SearchQuery} from './search';
+
 /**
  * Interface with fields for a shelf request.
  */
@@ -35,7 +37,9 @@ export declare interface ShelfApiParams {
   responsible_for_audit?: string;
   device_identifiers?: string[];
   shelf_request?: ShelfRequestParams;
-  query?: {query_string?: string;};
+  page_size?: number;
+  page_number?: number;
+  query?: SearchQuery;
 }
 
 export declare interface ListShelfResponseApiParams {

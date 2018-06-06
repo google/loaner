@@ -19,9 +19,28 @@ import {MatSort} from '@angular/material';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
+import {SortDirection, translateSortDirectionToApi} from '../../../../shared/models/search';
 import {Device, DeviceApiParams, DeviceRequestApiParams, ExtendDeviceRequestApiParams, ListDevicesResponse, ListDevicesResponseApiParams, MarkAsDamagedRequestApiParams} from '../models/device';
 
 import {ApiService} from './api';
+
+function setupQueryFilters(
+    filters: DeviceApiParams,
+    activeSortField: string,
+    sortDirection: SortDirection,
+) {
+  const expressions = {
+    expression: activeSortField,
+    direction: translateSortDirectionToApi(sortDirection),
+  };
+
+  if (filters.query && filters.query.query_string) {
+    filters.query = {query_string: filters.query.query_string, expressions};
+  } else {
+    filters.query = {expressions};
+  }
+  return filters;
+}
 
 /** Class to connect to the backend's Device Service API methods. */
 @Injectable()
@@ -58,7 +77,13 @@ export class DeviceService extends ApiService {
   /**
    * Returns all the device data as a list of devices.
    */
-  list(filters: DeviceApiParams = {}): Observable<ListDevicesResponse> {
+  list(
+      filters: DeviceApiParams = {},
+      activeSortField = 'id',
+      sortDirection: SortDirection = 'asc',
+      ): Observable<ListDevicesResponse> {
+    filters = setupQueryFilters(filters, activeSortField, sortDirection);
+
     return this.post<ListDevicesResponseApiParams>('list', filters)
         .pipe(map(res => {
           const devices =

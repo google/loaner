@@ -14,6 +14,7 @@
 
 import * as moment from 'moment';
 
+import {SearchQuery} from './search';
 import {Shelf, ShelfApiParams} from './shelf';
 
 /**
@@ -41,7 +42,9 @@ export declare interface DeviceApiParams {
   given_name?: string;
   guest_enabled?: boolean;
   guest_permitted?: boolean;
-  query?: {query_string?: string;};
+  page_size?: number;
+  page_number?: number;
+  query?: SearchQuery;
 }
 
 export declare interface DeviceRequestApiParams {

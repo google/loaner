@@ -6,8 +6,13 @@
     <loaner-shelf-buttons></loaner-shelf-buttons>
   </mat-card-title>
   <mat-card-content>
-    <mat-table #table [dataSource]="dataSource" matSort>
-      <ng-container cdkColumnDef="name">
+    <mat-table #table
+               [dataSource]="dataSource"
+               matSort
+               matSortDisableClear="true"
+               matSortActive="name"
+               matSortDirection="asc">
+      <ng-container cdkColumnDef="id">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header> Name </mat-header-cell>
         <mat-cell *cdkCellDef="let shelf"> {{shelf.name}} </mat-cell>
       </ng-container>
@@ -19,7 +24,7 @@
         <mat-cell *cdkCellDef="let shelf"> {{shelf.capacity}} </mat-cell>
       </ng-container>
 
-      <ng-container cdkColumnDef="lastAuditTime">
+      <ng-container cdkColumnDef="last_audit_time">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Last Audit Time
         </mat-header-cell>
@@ -28,7 +33,7 @@
         </mat-cell>
       </ng-container>
 
-      <ng-container cdkColumnDef="lastAuditBy">
+      <ng-container cdkColumnDef="last_audit_by">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Last Audit By
         </mat-header-cell>
@@ -54,5 +59,9 @@
                (focus)="pauseLoading=true;"
                (blur)="pauseLoading=false;"></mat-row>
     </mat-table>
+    <mat-paginator #paginator
+                   [length]="totalResults"
+                   [pageSizeOptions]="[10, 20, 50, 100]">
+    </mat-paginator>
   </mat-card-content>
 </mat-card>

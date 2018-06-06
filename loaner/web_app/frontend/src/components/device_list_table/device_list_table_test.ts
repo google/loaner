@@ -187,6 +187,7 @@ describe('DeviceListTableComponent', () => {
          totalPages: 1,
        }));
        deviceListTable.ngOnInit();
+       deviceListTable.ngAfterViewInit();
        tick();
        fixture.detectChanges();
        const matChipListContent =

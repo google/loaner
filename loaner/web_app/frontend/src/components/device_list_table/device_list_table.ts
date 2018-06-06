@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
-import {MatSort, MatTableDataSource} from '@angular/material';
+import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {ActivatedRoute} from '@angular/router';
-import {fromEvent, interval, NEVER, Observable, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, startWith, takeUntil, tap} from 'rxjs/operators';
+import {interval, merge, NEVER, Subject} from 'rxjs';
+import {startWith, switchMap, takeUntil} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
@@ -47,20 +47,19 @@ export class DeviceListTable implements OnInit {
   @Input() showStatus = true;
   /** The shelf that is being used to filter devices. */
   @Input() shelf: Shelf;
-
   /** Observable that iterates once the component is about to be destroyed. */
   private onDestroy = new Subject<void>();
-
   /** Columns that should be rendered on the frontend table */
   displayedColumns: string[];
-
   /** Type of data source that will be used on this implementation. */
   dataSource = new MatTableDataSource<Device>();
-
+  /** Total number of shelves returned from the back end */
+  totalResults = 0;
   /* When true, pauseLoading will prevent auto refresh on the table. */
   pauseLoading = false;
 
   @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   constructor(
       private readonly damagedService: Damaged,
@@ -69,14 +68,15 @@ export class DeviceListTable implements OnInit {
       private readonly deviceService: DeviceService,
       private readonly route: ActivatedRoute,
       private readonly guestModeService: GuestMode,
+      private readonly changeDetector: ChangeDetectorRef,
   ) {}
 
   setDisplayColumns() {
     this.displayedColumns = [
-      'identifier',
-      'assignedUser',
-      'dueDate',
-      'deviceModel',
+      'id',
+      'assigned_user',
+      'due_date',
+      'device_model',
     ];
 
     if (this.showStatus) {
@@ -90,31 +90,36 @@ export class DeviceListTable implements OnInit {
 
   ngOnInit() {
     this.setDisplayColumns();
-    this.dataSource.sort = this.sort;
+  }
 
-    interval(60000)  // 1 minute.
+  ngAfterViewInit() {
+    const intervalObservable = interval(60000).pipe(startWith(0));
+
+    merge(intervalObservable, this.sort.sortChange, this.paginator.page)
         .pipe(
-            startWith(0),
             takeUntil(this.onDestroy),
-            tap(() => {
+            switchMap(() => {
               if (this.pauseLoading) return NEVER;
 
-              let filters: DeviceApiParams = {};
-              if (this.shelf) {
-                filters = {
-                  shelf: {
-                    shelf_request: {
-                      location: this.shelf.shelfRequest.location,
-                      urlsafe_key: this.shelf.shelfRequest.urlsafe_key
-                    }
-                  }
-                };
-              }
+              let filters: DeviceApiParams = {
+                page_number: this.paginator.pageIndex + 1,
+                page_size: this.paginator.pageSize,
+              };
+              const sort = this.sort.active;
+              const sortDirection = this.sort.direction || 'asc';
 
-              return this.refresh(filters);
+              filters = this.setupShelfFilters(filters);
+
+              return this.deviceService.list(filters, sort, sortDirection);
             }),
             )
-        .subscribe();
+        .subscribe(response => {
+          this.totalResults = response.totalResults;
+          this.dataSource.data = response.devices;
+          // We need to manually call change detection here because of
+          // https://github.com/angular/angular/issues/14748
+          this.changeDetector.detectChanges();
+        });
   }
 
   ngOnDestroy() {
@@ -122,9 +127,15 @@ export class DeviceListTable implements OnInit {
     this.onDestroy.next();
   }
 
-  private refresh(filters: DeviceApiParams = {}) {
-    return this.deviceService.list(filters).subscribe(response => {
-      this.dataSource.data = response.devices;
-    });
+  private setupShelfFilters(filters: DeviceApiParams) {
+    if (this.shelf) {
+      filters.shelf = {
+        shelf_request: {
+          location: this.shelf.shelfRequest.location,
+          urlsafe_key: this.shelf.shelfRequest.urlsafe_key
+        }
+      };
+    }
+    return filters;
   }
 }

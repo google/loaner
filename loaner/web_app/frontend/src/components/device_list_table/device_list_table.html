@@ -1,13 +1,18 @@
 <mat-card class="loaner-table">
     <mat-card-content>
-    <mat-table #table [dataSource]="dataSource" matSort>
-      <ng-container cdkColumnDef="identifier">
+      <mat-table #table
+                 [dataSource]="dataSource"
+                 matSort
+                 matSortDisableClear="true"
+                 matSortActive="identifier"
+                 matSortDirection="asc">
+      <ng-container cdkColumnDef="id">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Identifier
         </mat-header-cell>
         <mat-cell *cdkCellDef="let device">{{device.id}}</mat-cell>
       </ng-container>
-      <ng-container cdkColumnDef="assignedUser">
+      <ng-container cdkColumnDef="assigned_user">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Assigned to
         </mat-header-cell>
@@ -16,16 +21,16 @@
         </mat-cell>
       </ng-container>
 
-      <ng-container cdkColumnDef="dueDate">
+      <ng-container cdkColumnDef="due_date">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Due date
         </mat-header-cell>
         <mat-cell *cdkCellDef="let device">
-          {{device.assignedUser ? (device.dueDate | date) : ""}}
+          {{device.dueDate ? (device.dueDate | date) : ""}}
         </mat-cell>
       </ng-container>
 
-      <ng-container cdkColumnDef="deviceModel">
+      <ng-container cdkColumnDef="device_model">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Device Model
         </mat-header-cell>
@@ -70,5 +75,9 @@
                (blur)="pauseLoading=false;">
       </mat-row>
     </mat-table>
+    <mat-paginator #paginator
+                   [length]="totalResults"
+                   [pageSizeOptions]="[10, 20, 50, 100]">
+    </mat-paginator>
   </mat-card-content>
 </mat-card>

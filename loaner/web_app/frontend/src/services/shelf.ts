@@ -17,9 +17,28 @@ import {Response} from '@angular/http';
 import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
+import {SortDirection, translateSortDirectionToApi} from '../../../../shared/models/search';
 import {ListShelfResponse, ListShelfResponseApiParams, Shelf, ShelfApiParams} from '../models/shelf';
 
 import {ApiService} from './api';
+
+function setupQueryFilters(
+    filters: ShelfApiParams,
+    activeSortField: string,
+    sortDirection: SortDirection,
+) {
+  const expressions = {
+    expression: activeSortField,
+    direction: translateSortDirectionToApi(sortDirection),
+  };
+
+  if (filters.query && filters.query.query_string) {
+    filters.query = {query_string: filters.query.query_string, expressions};
+  } else {
+    filters.query = {expressions};
+  }
+  return filters;
+}
 
 @Injectable()
 /** Class to connect to the backend's Shelf Service API methods. */
@@ -41,9 +60,9 @@ export class ShelfService extends ApiService {
    * @param newShelf Shelf that will be created in the program.
    */
   create(newShelf: Shelf) {
-    this.post('enroll', newShelf.toApiMessage()).subscribe(res => {
+    return this.post('enroll', newShelf.toApiMessage()).pipe(tap(res => {
       this.snackBar.open(`Shelf ${newShelf.name} created.`);
-    });
+    }));
   }
 
   /**
@@ -70,7 +89,13 @@ export class ShelfService extends ApiService {
   /**
    * Lists all shelves enrolled in the program.
    */
-  list(filters: ShelfApiParams = {}): Observable<ListShelfResponse> {
+  list(
+      filters: ShelfApiParams = {},
+      activeSortField = 'id',
+      sortDirection: SortDirection = 'asc',
+      ): Observable<ListShelfResponse> {
+    filters = setupQueryFilters(filters, activeSortField, sortDirection);
+
     return this.post<ListShelfResponseApiParams>('list', filters)
         .pipe(map(res => {
           const shelves =
