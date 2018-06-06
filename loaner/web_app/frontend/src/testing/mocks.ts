@@ -81,7 +81,7 @@ export class ShelfServiceMock {
     }),
   ]);
   create() {
-    return;
+    return of(new Shelf());
   }
   update() {
     return;

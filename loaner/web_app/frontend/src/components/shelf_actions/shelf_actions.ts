@@ -77,9 +77,10 @@ export class ShelfActionsCard implements OnInit {
 
   /** Creates a new shelf based on the input fields on the template. */
   create() {
-    this.shelfService.create(this.shelf);
-    this.shelf = new Shelf();
-    this.backToShelves();
+    this.shelfService.create(this.shelf).subscribe(() => {
+      this.shelf = new Shelf();
+      this.backToShelves();
+    });
   }
 
   /**
