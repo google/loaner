@@ -35,4 +35,9 @@
       </mat-list-item>
     </mat-nav-list>
   </mat-card-content>
+  <mat-paginator #paginator
+                 [length]="totalResults"
+                 [pageSizeOptions]="[10, 25, 50, 100]"
+                 (page)="changePage($event)">
+  </mat-paginator>
 </mat-card>

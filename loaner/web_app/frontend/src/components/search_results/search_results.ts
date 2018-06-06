@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {Location} from '@angular/common';
-import {Component, OnDestroy, OnInit} from '@angular/core';
+import {Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {MatPaginator, PageEvent} from '@angular/material';
 import {ActivatedRoute, Router} from '@angular/router';
 
 import {Device, DeviceApiParams} from '../../models/device';
@@ -36,6 +37,11 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
   model: string;
   query: string;
   results: Device[]|Shelf[];
+
+  /** Represents the total number of results received via search. */
+  totalResults: number;
+
+  @ViewChild(MatPaginator) paginator: MatPaginator;
 
   get resultsLength(): number {
     return this.results ? this.results.length : 0;
@@ -91,20 +97,10 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
    * @param userSearch Indicates if the search type is for a user or not.
    */
   private searchForDevice(queryString: string, userSearch?: boolean) {
-    let request: string|DeviceApiParams;
-    if (userSearch) {
-      request = {
-        'assigned_user': queryString,
-      };
-    } else {
-      request = {
-        'query': {
-          'query_string': queryString,
-        },
-      };
-    }
+    const request = this.buildRequest(queryString, userSearch);
     this.deviceService.list(request).subscribe(response => {
       const devices = response.devices;
+      this.totalResults = response.totalResults;
       if (userSearch && devices.length >= 1) {
         this.router.navigate(
             ['user'], {queryParams: {'user': devices[0].assignedUser}});
@@ -123,12 +119,9 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
    * @param queryString Represents the string to search for in shelves.
    */
   private searchForShelf(queryString: string) {
-    const request: ShelfApiParams = {
-      query: {
-        'query_string': queryString,
-      }
-    };
+    const request = this.buildRequest(queryString);
     this.shelfService.list(request).subscribe(response => {
+      this.totalResults = response.totalResults;
       const shelves = response.shelves;
       if (shelves.length === 1 && shelves[0].location) {
         this.router.navigate([`/shelf/${shelves[0].location}/details`]);
@@ -138,6 +131,48 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
       }
       this.loading = false;
     });
+  }
+
+  /**
+   * Builds the request paramaters for making the request.
+   * @param queryString represents the string to search for.
+   * @param userSearch represents if the search is for a user.
+   */
+  private buildRequest(queryString: string, userSearch?: boolean):
+      DeviceApiParams|ShelfApiParams {
+    if (userSearch) {
+      return {assigned_user: queryString};
+    } else {
+      return {
+        query: {
+          query_string: queryString,
+        },
+        // Sets the default page to 1 if paginator doesn't exist.
+        page_number: this.paginator ? this.paginator.pageIndex + 1 : 1,
+        // Defaults to 10 if the paginator doesn't exist.
+        page_size: this.paginator ? this.paginator.pageSize : 10,
+      };
+    }
+  }
+
+  /**
+   * Handles the change page events that the paginator emits.
+   * @param event Represents the paginators emitted event.
+   */
+  changePage(event: PageEvent) {
+    switch (this.model) {
+      case 'device':
+        this.searchForDevice(this.query);
+        break;
+      case 'shelf':
+        this.searchForShelf(this.query);
+        break;
+      case 'user':
+        this.searchForDevice(this.query, true);
+        break;
+      default:
+        break;
+    }
   }
 
   /** Goes back to the previous view. */
