@@ -21,7 +21,7 @@ from __future__ import print_function
 import mock
 
 from loaner.web_app import constants
-from loaner.web_app.backend.clients import directory
+from loaner.web_app.backend.lib import group_service
 from loaner.web_app.backend.lib import sync_users
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
@@ -35,12 +35,12 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
         name='technician',
         associated_group='technicians@{}'.format(loanertest.USER_DOMAIN))
 
-    mock_directory = mock.patch.object(
-        directory, 'DirectoryApiClient', autospec=True)
-    self.addCleanup(mock_directory.stop)
-    mock_directory_client = mock_directory.start()
+    mock_group_service = mock.patch.object(
+        group_service, 'get_users_for_group', autospec=True)
+    self.addCleanup(mock_group_service.stop)
+    mock_users_for_group = mock_group_service.start()
 
-    def directory_client_side_effect(*args, **kwargs):  # pylint: disable=unused-argument
+    def group_client_side_effect(*args, **kwargs):  # pylint: disable=unused-argument
       if args[0] == constants.SUPERADMINS_GROUP:
         return [
             'need-superadmin@{}'.format(loanertest.USER_DOMAIN),
@@ -51,9 +51,7 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
             'need-technician@{}'.format(loanertest.USER_DOMAIN),
             'keep-technician@{}'.format(loanertest.USER_DOMAIN),
         ]
-    mock_directory_client = mock_directory_client.return_value
-    mock_directory_client.get_all_users_in_group.side_effect = (
-        directory_client_side_effect)
+    mock_users_for_group.side_effect = group_client_side_effect
 
   def test_sync_user_roles__standard_user(self):
     user_model.User.get_user('standard-user@{}'.format(loanertest.USER_DOMAIN))
