@@ -40,7 +40,7 @@
           <mat-list-item fxFlex>
             <p mat-line>Due date</p>
             <p *ngIf="device.assignedUser"
-               mat-line class="secondary-text">{{device.dueDate}}</p>
+               mat-line class="secondary-text">{{device.dueDate ? (device.dueDate | date) : ""}}</p>
           </mat-list-item>
         </section>
         <section fxLayout="row" fxLayout.xs="column">
