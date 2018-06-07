@@ -36,9 +36,6 @@ import {UserService} from '../../services/user';
  */
 @Component({
   preserveWhitespaces: true,
-  host: {
-    'class': 'mat-typography',
-  },
   selector: 'loaner-device-info-card',
   styleUrls: ['device_info_card.scss'],
   templateUrl: 'device_info_card.html',
