@@ -79,6 +79,8 @@ export class ConfigService {
   LOGGING = false;
 
   // Shared variables
+  analyticsEnabled = false;
+  analyticsId = '';
   apiPath = '/_ah/api';
   devTrack: boolean;
   private standardEndpoint: string;

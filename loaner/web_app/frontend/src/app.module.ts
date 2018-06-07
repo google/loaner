@@ -18,6 +18,7 @@ import {BrowserModule, DomSanitizer, Title} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {LoaderModule} from '../../../shared/components/loader';
+import {ConfigService as Config} from '../../../shared/config';
 
 import {AppComponent} from './app';
 import {LoanerRouterModule} from './app.routing';
@@ -55,6 +56,7 @@ import {UserService} from './services/user';
     AuthGuard,
     BootstrapService,
     CanDeactivateGuard,
+    Config,
     ConfigService,
     DeviceService,
     LoanerSnackBar,

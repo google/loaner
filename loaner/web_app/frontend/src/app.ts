@@ -15,8 +15,10 @@
 import {Location} from '@angular/common';
 import {Component, NgZone, ViewEncapsulation} from '@angular/core';
 import {Title} from '@angular/platform-browser';
+import {NavigationEnd, Router} from '@angular/router';
 
 import {LoaderService, LoaderView} from '../../../shared/components/loader';
+import {ConfigService} from '../../../shared/config';
 
 import {CONFIG} from './app.config';
 import {SEARCH_PERMISSIONS} from './app.routing';
@@ -99,7 +101,9 @@ export class AppComponent extends LoaderView {
       readonly loaderService: LoaderService,
       readonly userService: UserService,
       readonly ngZone: NgZone,
+      private readonly config: ConfigService,
       private readonly location: Location,
+      private readonly router: Router,
       private readonly titleService: Title,
   ) {
     super(true);
@@ -116,6 +120,20 @@ export class AppComponent extends LoaderView {
       this.user = user;
       this.ready();
     });
+
+    // Handles the content pushes to Google Analytics if enabled.
+    if (this.config.analyticsEnabled) {
+      this.router.events.subscribe(event => {
+        if (event instanceof NavigationEnd) {
+          // tslint:disable:no-any DefinitelyTyped does not yet support gtag so
+          // we must cast a type of any.
+          (window as any).gtag('config', this.config.analyticsId, {
+            'page_title': this.titleService.getTitle(),
+            'page_path': event.urlAfterRedirects,
+          });
+        }
+      });
+    }
   }
 
   ngOnInit() {
