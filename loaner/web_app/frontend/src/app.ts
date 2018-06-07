@@ -127,7 +127,7 @@ export class AppComponent extends LoaderView {
         if (event instanceof NavigationEnd) {
           // tslint:disable:no-any DefinitelyTyped does not yet support gtag so
           // we must cast a type of any.
-          (window as any).gtag('config', this.config.analyticsId, {
+          (window as any)['gtag']('config', this.config.analyticsId, {
             'page_title': this.titleService.getTitle(),
             'page_path': event.urlAfterRedirects,
           });
