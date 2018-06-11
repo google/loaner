@@ -231,6 +231,12 @@ class Device(base_model.BaseModel):
     return bool(self.shelf)
 
   @property
+  def overdue(self):
+    if self.due_date:
+      return bool(self.due_date < datetime.datetime.utcnow())
+    return False
+
+  @property
   def identifier(self):
     return self.asset_tag or self.serial_number
 

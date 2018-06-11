@@ -117,6 +117,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         guest_permitted=True,
         guest_enabled=True,
         max_extend_date=test_device.calculate_return_dates().max,
+        overdue=True,
     )
     actual_message = api_utils.build_device_message_from_model(
         test_device, True)

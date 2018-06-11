@@ -512,6 +512,24 @@ class DeviceModelTest(loanertest.TestCase):
             unknown_identifier='serial_number_1').serial_number,
         'serial_number_1')
 
+  def test_is_overdue(self):
+    now = datetime.datetime(year=2017, month=1, day=1)
+    with freezegun.freeze_time(now):
+      self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+      self.test_device.assigned_user = loanertest.USER_EMAIL
+      self.test_device.assignment_date = now + datetime.timedelta(days=-2)
+      self.test_device.due_date = now + datetime.timedelta(days=-1)
+      self.assertTrue(self.test_device.overdue)
+
+  def test_is_not_overdue(self):
+    now = datetime.datetime(year=2017, month=1, day=1)
+    with freezegun.freeze_time(now):
+      self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+      self.test_device.assigned_user = loanertest.USER_EMAIL
+      self.test_device.assignment_date = now
+      self.test_device.due_date = now + datetime.timedelta(days=2)
+      self.assertFalse(self.test_device.overdue)
+
   def test_calculate_return_dates(self):
     now = datetime.datetime.utcnow()
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)

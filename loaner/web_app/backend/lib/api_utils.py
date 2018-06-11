@@ -62,6 +62,7 @@ def build_device_message_from_model(device, guest_permitted):
       damaged_reason=device.damaged_reason,
       guest_enabled=device.guest_enabled,
       guest_permitted=guest_permitted,
+      overdue=device.overdue,
   )
   if device.last_reminder:
     message.last_reminder = build_reminder_message_from_model(

@@ -45,6 +45,7 @@ export declare interface DeviceApiParams {
   page_size?: number;
   page_number?: number;
   query?: SearchQuery;
+  overdue?: boolean;
 }
 
 export declare interface DeviceRequestApiParams {
@@ -122,6 +123,8 @@ export class Device {
   givenName = 'there';
   /** List of flags relevant to this device. */
   chips: DeviceChip[] = [];
+  /** Indicates an overdue device. */
+  overdue = false;
 
   constructor(device: DeviceApiParams = {}) {
     this.serialNumber = device.serial_number || this.serialNumber;
@@ -144,8 +147,8 @@ export class Device {
     this.guestEnabled = device.guest_enabled || this.guestEnabled;
     this.guestAllowed = device.guest_permitted || this.guestAllowed;
     this.givenName = device.given_name || this.givenName;
-
     this.chips = this.makeChips();
+    this.overdue = !!device.overdue || this.overdue;
   }
 
 
@@ -169,13 +172,6 @@ export class Device {
   get canExtend(): boolean {
     return !this.pendingReturn &&
         moment(this.dueDate).diff(this.maxExtendDate, 'days') <= -1;
-  }
-
-  /**
-   * Property to determine if a device is overdue.
-   */
-  get isOverdue(): boolean {
-    return (!!this.assignedUser) && this.timeUntilDue < 0;
   }
 
   /**
@@ -222,7 +218,7 @@ export class Device {
         color: DeviceChipColor.OK,
         status: DeviceChipStatus.UNASSIGNED,
       });
-    } else if (this.isOverdue) {
+    } else if (this.overdue) {
       chipsToReturn.push({
         icon: 'event_busy',
         label: 'Overdue',

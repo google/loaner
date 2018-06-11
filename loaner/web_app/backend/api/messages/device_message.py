@@ -90,6 +90,7 @@ class Device(messages.Message):
     given_name: str, The given name for the user.
     query: shared_message.SearchRequest, a message containing query options to
         conduct a search on an index.
+    overdue: bool, Indicates that the due date has passed.
   """
   serial_number = messages.StringField(1)
   asset_tag = messages.StringField(2)
@@ -119,6 +120,7 @@ class Device(messages.Message):
   guest_permitted = messages.BooleanField(26)
   given_name = messages.StringField(27)
   query = messages.MessageField(shared_messages.SearchRequest, 28)
+  overdue = messages.BooleanField(29)
 
 
 class ListDevicesResponse(messages.Message):

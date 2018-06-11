@@ -48,7 +48,7 @@
             <p mat-line>Status</p>
             <p mat-line class="secondary-text">
               {{device.assignedUser ? 'Assigned' : 'Unassigned'}}</p>
-            <p *ngIf="device.isOverdue"
+            <p *ngIf="device.overdue"
                mat-line class="secondary-text">Overdue</p>
             <p *ngIf="device.pendingReturn"
                mat-line class="secondary-text">Pending return</p>

@@ -29,13 +29,15 @@ describe('Device', () => {
     serial_number: 'fakeserial1',
     assigned_user: 'fakeuser1',
     device_model: 'fakemodel1',
-    due_date: moment(today).add(1, 'w').toDate()
+    due_date: moment(today).add(1, 'w').toDate(),
+    overdue: false,
   });
   const overdueDevice = new Device({
     serial_number: 'fakeserial2',
     assigned_user: 'fakeuser2',
     device_model: 'fakemodel2',
-    due_date: moment(today).subtract(1, 'w').toDate()
+    due_date: moment(today).subtract(1, 'w').toDate(),
+    overdue: true,
   });
   const assetTagDevice = new Device({
     serial_number: '123',
@@ -50,15 +52,6 @@ describe('Device', () => {
     max_extend_date: moment(today).toDate()
   });
   const serialNumberDevice = new Device({serial_number: '456', asset_tag: ''});
-
-  it('is overdue when the current date/time is after the due date/time', () => {
-    expect(overdueDevice.isOverdue).toBe(true);
-  });
-
-  it('isn\'t overdue when the current date/time is before the due date/time',
-     () => {
-       expect(underdueDevice.isOverdue).toBe(false);
-     });
 
   it('returns a value < 0 when a device is overdue', () => {
     expect(overdueDevice.timeUntilDue).toBeLessThan(0);

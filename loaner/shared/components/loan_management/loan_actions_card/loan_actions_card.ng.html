@@ -9,12 +9,12 @@
         your loan, please click the button below.
       </ng-container>
 
-      <ng-container *ngIf="!device.pendingReturn && !device.isOverdue && device.dueDate">
+      <ng-container *ngIf="!device.pendingReturn && !device.overdue && device.dueDate">
         <div class="mat-small">Please return this device by:</div>
         <span class="mat-title">{{ device.dueDate | date: 'fullDate' }}</span>
       </ng-container>
 
-      <ng-container *ngIf="device.isOverdue">
+      <ng-container *ngIf="device.overdue">
     <mat-basic-chip *ngFor="let chip of device.chips"
                     class="status {{chip.color}}"
                     [matTooltip]="chip.tooltip"
