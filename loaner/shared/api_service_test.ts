@@ -14,7 +14,8 @@
 
 import {Injectable} from '@angular/core';
 import {TestBed} from '@angular/core/testing';
-import {ConfigService} from './config';
+
+import {CHROME_MODE, ConfigService} from './config';
 
 describe('ConfigService', () => {
   let config: ConfigService;
@@ -49,8 +50,7 @@ describe('ConfigService', () => {
     expect(config.chromeApiUrl)
         .toBe('https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');
     expect(config.endpointsApiUrl)
-        .toBe(
-            'https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
+        .toBe('https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
   });
 
   it('provides the correct link for chrome/endpoints apis if on dev', () => {
@@ -85,7 +85,7 @@ describe('ConfigService', () => {
        config.ON_QA = false;
        config.ON_PROD = false;
        config.IS_FRONTEND = false;
-       config.CHROME_DEV_MODE = false;
+       config.chromeMode = CHROME_MODE.PROD;
        config.calculateApiUrls();
        expect(config.chromeApiUrl)
            .toBe('https://chrome-dot-prod-app-engine-project.appspot.com/_ah/api');
@@ -100,11 +100,26 @@ describe('ConfigService', () => {
        config.ON_QA = false;
        config.ON_PROD = false;
        config.IS_FRONTEND = false;
-       config.CHROME_DEV_MODE = true;
+       config.chromeMode = CHROME_MODE.DEV;
        config.calculateApiUrls();
        expect(config.chromeApiUrl)
            .toBe('https://chrome-dot-dev-app-engine-project.appspot.com/_ah/api');
        expect(config.endpointsApiUrl)
            .toBe('https://endpoints-dot-dev-app-engine-project.appspot.com/_ah/api');
+     });
+
+  it('provides the correct link for chrome/endpoints apis if the chrome app and on QA',
+     () => {
+       config.ON_LOCAL = false;
+       config.ON_DEV = false;
+       config.ON_QA = false;
+       config.ON_PROD = false;
+       config.IS_FRONTEND = false;
+       config.chromeMode = CHROME_MODE.QA;
+       config.calculateApiUrls();
+       expect(config.chromeApiUrl)
+           .toBe('https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');
+       expect(config.endpointsApiUrl)
+           .toBe('https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
      });
 });

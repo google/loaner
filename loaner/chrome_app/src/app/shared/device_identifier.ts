@@ -15,7 +15,7 @@
 
 import {Observable, of} from 'rxjs';
 
-import {ConfigService} from '../../../../shared/config';
+import {CHROME_MODE, ConfigService} from '../../../../shared/config';
 
 const CONFIG = new ConfigService();
 export function id(): Observable<string> {
@@ -27,7 +27,7 @@ export function id(): Observable<string> {
       });
     });
   } catch (error) {
-    if (CONFIG.CHROME_DEV_MODE) {
+    if (CONFIG.chromeMode === CHROME_MODE.DEV) {
       console.warn(`The Chrome App is currently running in developer/testing
 mode and using a device id of ${CONFIG.DEV_DEVICE_ID}.`);
       return of(CONFIG.DEV_DEVICE_ID);

@@ -88,9 +88,6 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.enableGuestMode().subscribe(
         response => {
           this.guestMode.finished();
-          if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
-            console.info(response);
-          }
           this.device.guestEnabled = true;
         },
         error => {
@@ -146,9 +143,6 @@ export class StatusComponent extends LoaderView implements OnInit {
     this.loan.resumeLoan().subscribe(
         response => {
           this.resumeService.finished();
-          if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
-            console.info(response);
-          }
           this.device.pendingReturn = false;
         },
         error => {

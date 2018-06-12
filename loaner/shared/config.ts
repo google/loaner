@@ -21,6 +21,21 @@ export interface EnvironmentsVariable {
   prod: string;
 }
 
+/** Defines the Chrome Modes for deployment. */
+export enum CHROME_MODE {
+  DEV,
+  QA,
+  PROD,
+}
+
+/** Represents the types of environments for the application. */
+export enum ENVIRONMENTS {
+  LOCAL,
+  DEV,
+  QA,
+  PROD,
+}
+
 /**
  * ########################################################################
  * Everything in this comment block must be configured before the app can be
@@ -74,7 +89,7 @@ export class ConfigService {
   IS_FRONTEND = this.ON_LOCAL || this.ON_DEV || this.ON_QA || this.ON_PROD;
 
   // Chrome App specific variables
-  CHROME_DEV_MODE = false;
+  chromeMode = CHROME_MODE.PROD;
   DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
   LOGGING = false;
 
@@ -86,23 +101,39 @@ export class ConfigService {
   private standardEndpoint: string;
   private chromeEndpoint: string;
 
+  // Checks what environment the app is running in.
+  get appMode() {
+    if (this.IS_FRONTEND) {
+      if (this.ON_DEV) return ENVIRONMENTS.DEV;
+      if (this.ON_LOCAL) return ENVIRONMENTS.LOCAL;
+      if (this.ON_PROD) return ENVIRONMENTS.PROD;
+      if (this.ON_QA) return ENVIRONMENTS.QA;
+    } else {
+      if (this.chromeMode === CHROME_MODE.DEV) return ENVIRONMENTS.DEV;
+      if (this.chromeMode === CHROME_MODE.PROD) return ENVIRONMENTS.PROD;
+      if (this.chromeMode === CHROME_MODE.QA) return ENVIRONMENTS.QA;
+    }
+    // If all of the checks above fail, failover to local by default.
+    return ENVIRONMENTS.LOCAL;
+  }
+
   constructor() {
     this.calculateApiUrls();
   }
 
   /** Decides which API URLs should be used. */
   calculateApiUrls() {
-    if ((!this.IS_FRONTEND && !this.CHROME_DEV_MODE) || this.ON_PROD) {
+    if (this.appMode === ENVIRONMENTS.PROD) {
       this.webClientId = WEB_APP_CLIENT_IDS.prod;
       this.devTrack = false;
       this.chromeEndpoint = CHROME_ENDPOINTS.prod;
       this.standardEndpoint = STANDARD_ENDPOINTS.prod;
-    } else if (this.ON_QA) {
+    } else if (this.appMode === ENVIRONMENTS.QA) {
       this.webClientId = WEB_APP_CLIENT_IDS.qa;
       this.devTrack = false;
       this.chromeEndpoint = CHROME_ENDPOINTS.qa;
       this.standardEndpoint = STANDARD_ENDPOINTS.qa;
-    } else if ((!this.IS_FRONTEND && this.CHROME_DEV_MODE) || this.ON_DEV) {
+    } else if (this.appMode === ENVIRONMENTS.DEV) {
       this.webClientId = WEB_APP_CLIENT_IDS.dev;
       this.chromeEndpoint = CHROME_ENDPOINTS.dev;
       this.standardEndpoint = STANDARD_ENDPOINTS.dev;

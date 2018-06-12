@@ -89,7 +89,7 @@ export class Failure {
       this.openDialog(message, FailAction.Ignore);
     }
 
-    if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
+    if (this.config.LOGGING) {
       console.error(rawError);
     }
   }

@@ -260,11 +260,8 @@ continue using the app as normal.`;
   completeReturn() {
     if (!this.returnCompleted) {
       this.loan.return().subscribe(
-          res => {
+          () => {
             this.returnCompleted = true;
-            if (this.config.CHROME_DEV_MODE && this.config.LOGGING) {
-              console.info(res);
-            }
           },
           error => {
             const message = `Something went wrong when marking the device
