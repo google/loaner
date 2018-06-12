@@ -337,16 +337,16 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_list_devices_with_search_constraints(self):
     expressions = shared_messages.SearchExpression(expression='serial_number')
     expected_response = device_message.ListDevicesResponse(
-        devices=[device_message.Device(serial_number='6789')])
+        devices=[device_message.Device(
+            serial_number='6789', guest_permitted=True)],
+        total_results=1, total_pages=1)
     request = device_message.Device(
         query=shared_messages.SearchRequest(
             query_string='sn:6789',
             expressions=[expressions],
             returned_fields=['serial_number']))
     response = self.service.list_devices(request)
-    self.assertEqual(
-        response.devices[0].serial_number,
-        expected_response.devices[0].serial_number)
+    self.assertEqual(response, expected_response)
 
   def test_list_devices_with_filter_message(self):
     message = device_message.Device(
@@ -354,8 +354,19 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     filters = api_utils.to_dict(message, device_model.Device)
     request = device_message.Device(**filters)
     response = self.service.list_devices(request)
-    self.assertEqual(1, len(response.devices))
-    self.assertEqual(response.devices[0].serial_number, '6789')
+    expected_response = device_message.ListDevicesResponse(
+        devices=[device_message.Device(
+            serial_number='6789',
+            enrolled=True,
+            device_model='HP Chromebook 13 G1',
+            current_ou='/',
+            locked=False,
+            lost=False,
+            chrome_device_id='unique_id_2',
+            damaged=False,
+            guest_permitted=True)],
+        total_results=1, total_pages=1)
+    self.assertEqual(response, expected_response)
 
   @mock.patch('__main__.device_api.shelf_api.get_shelf')
   def test_list_devices_with_shelf_filter(
@@ -374,19 +385,30 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = device_message.Device(page_size=1, page_number=1)
     response = self.service.list_devices(request)
     self.assertEqual(1, len(response.devices))
-    previous_device_serial = response.devices[0].serial_number
+    previouse_response = response
 
     # Get next page results and make sure it's not the same as last.
     request = device_message.Device(page_size=1, page_number=2)
     response = self.service.list_devices(request)
     self.assertEqual(1, len(response.devices))
     self.assertNotEqual(
-        response.devices[0].serial_number, previous_device_serial)
+        response, previouse_response)
 
   def test_list_devices_inactive_no_shelf(self):
     request = device_message.Device(enrolled=False, page_size=1)
     response = self.service.list_devices(request)
-    self.assertEqual(1, len(response.devices))
+    expected_response = device_message.ListDevicesResponse(
+        devices=[device_message.Device(
+            serial_number=self.unenrolled_device.serial_number,
+            enrolled=self.unenrolled_device.enrolled,
+            device_model=self.unenrolled_device.device_model,
+            current_ou=self.unenrolled_device.current_ou,
+            locked=self.unenrolled_device.locked,
+            lost=self.unenrolled_device.lost,
+            chrome_device_id=self.unenrolled_device.chrome_device_id,
+            damaged=self.unenrolled_device.damaged,
+            guest_permitted=True)], total_results=1, total_pages=1)
+    self.assertEqual(expected_response, response)
 
   @mock.patch('__main__.device_model.Device.list_by_user')
   @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)

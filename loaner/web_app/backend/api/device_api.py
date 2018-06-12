@@ -201,9 +201,10 @@ class DeviceApi(root_api.Service):
     guest_permitted = config_model.Config.get('allow_guest_mode')
     messages = []
     for document in search_results.results:
-      device = api_utils.get_ndb_key(document.doc_id).get()
-      messages.append(
-          api_utils.build_device_message_from_model(device, guest_permitted))
+      message = search_utils.document_to_message(
+          document, device_message.Device())
+      message.guest_permitted = guest_permitted
+      messages.append(message)
 
     return device_message.ListDevicesResponse(
         devices=messages,
