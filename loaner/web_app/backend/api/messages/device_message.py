@@ -61,6 +61,8 @@ class Device(messages.Message):
   Attributes:
     serial_number: str, The serial number of the Chrome device.
     asset_tag: str, The asset tag of the Chrome device.
+    identifier: str, the computed identifier for a device. Serial number if
+        asset tag is not provided.
     enrolled: bool, Indicates the enrollment status of the device.
     device_model: int, Identifies the model name of the device.
     due_date: datetime, The date that device is due for return.
@@ -94,33 +96,34 @@ class Device(messages.Message):
   """
   serial_number = messages.StringField(1)
   asset_tag = messages.StringField(2)
-  urlkey = messages.StringField(3)
-  enrolled = messages.BooleanField(4, default=True)
-  device_model = messages.StringField(5)
-  due_date = message_types.DateTimeField(6)
-  last_known_healthy = message_types.DateTimeField(7)
-  shelf = messages.MessageField(shelf_messages.Shelf, 8)
-  assigned_user = messages.StringField(9)
-  assignment_date = message_types.DateTimeField(10)
-  current_ou = messages.StringField(11)
-  ou_changed_date = message_types.DateTimeField(12)
-  locked = messages.BooleanField(13)
-  lost = messages.BooleanField(14)
-  mark_pending_return_date = message_types.DateTimeField(15)
-  chrome_device_id = messages.StringField(16)
-  last_heartbeat = message_types.DateTimeField(17)
-  damaged = messages.BooleanField(18)
-  damaged_reason = messages.StringField(19)
-  last_reminder = messages.MessageField(Reminder, 20)
-  next_reminder = messages.MessageField(Reminder, 21)
-  page_size = messages.IntegerField(22, default=10)
-  page_number = messages.IntegerField(23, default=1)
-  max_extend_date = message_types.DateTimeField(24)
-  guest_enabled = messages.BooleanField(25)
-  guest_permitted = messages.BooleanField(26)
-  given_name = messages.StringField(27)
-  query = messages.MessageField(shared_messages.SearchRequest, 28)
-  overdue = messages.BooleanField(29)
+  identifier = messages.StringField(3)
+  urlkey = messages.StringField(4)
+  enrolled = messages.BooleanField(5, default=True)
+  device_model = messages.StringField(6)
+  due_date = message_types.DateTimeField(7)
+  last_known_healthy = message_types.DateTimeField(8)
+  shelf = messages.MessageField(shelf_messages.Shelf, 9)
+  assigned_user = messages.StringField(10)
+  assignment_date = message_types.DateTimeField(11)
+  current_ou = messages.StringField(12)
+  ou_changed_date = message_types.DateTimeField(13)
+  locked = messages.BooleanField(14)
+  lost = messages.BooleanField(15)
+  mark_pending_return_date = message_types.DateTimeField(16)
+  chrome_device_id = messages.StringField(17)
+  last_heartbeat = message_types.DateTimeField(18)
+  damaged = messages.BooleanField(19)
+  damaged_reason = messages.StringField(20)
+  last_reminder = messages.MessageField(Reminder, 21)
+  next_reminder = messages.MessageField(Reminder, 22)
+  page_size = messages.IntegerField(23, default=10)
+  page_number = messages.IntegerField(24, default=1)
+  max_extend_date = message_types.DateTimeField(25)
+  guest_enabled = messages.BooleanField(26)
+  guest_permitted = messages.BooleanField(27)
+  given_name = messages.StringField(28)
+  query = messages.MessageField(shared_messages.SearchRequest, 29)
+  overdue = messages.BooleanField(30)
 
 
 class ListDevicesResponse(messages.Message):

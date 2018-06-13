@@ -59,6 +59,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         enabled=True,
         friendly_name='test_friendly_name',
         location='test_location',
+        identifier='test_friendly_name',
         latitude=10.10,
         longitude=20.20,
         altitude=1.1,
@@ -96,6 +97,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
     expected_message = device_message.Device(
         serial_number='test_serial_value',
         asset_tag='test_asset_tag_value',
+        identifier='test_asset_tag_value',
         enrolled=True,
         device_model='test model value',
         due_date=datetime.datetime(year=2018, month=1, day=1),

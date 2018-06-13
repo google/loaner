@@ -43,6 +43,8 @@ class Shelf(messages.Message):
     enabled: bool, Indicates if the shelf is enabled or not.
     friendly_name: str, The friendly name of the shelf.
     location: str, The location of the shelf.
+    identifier: str, the computed identifier for a shelf. Location if
+        Friendly name is not provided.
     latitude: float, A geographical point represented by floating-point.
     longitude: float, A geographical point represented by floating-point.
     altitude: float, Indicates the floor.
@@ -63,19 +65,20 @@ class Shelf(messages.Message):
   enabled = messages.BooleanField(1, default=True)
   friendly_name = messages.StringField(2)
   location = messages.StringField(3)
-  latitude = messages.FloatField(4)
-  longitude = messages.FloatField(5)
-  altitude = messages.FloatField(6)
-  capacity = messages.IntegerField(7)
-  audit_notification_enabled = messages.BooleanField(8)
-  audit_requested = messages.BooleanField(9)
-  responsible_for_audit = messages.StringField(10)
-  last_audit_time = message_types.DateTimeField(11)
-  last_audit_by = messages.StringField(12)
-  page_size = messages.IntegerField(13, default=10)
-  page_number = messages.IntegerField(14, default=1)
-  shelf_request = messages.MessageField(ShelfRequest, 15)
-  query = messages.MessageField(shared_messages.SearchRequest, 16)
+  identifier = messages.StringField(4)
+  latitude = messages.FloatField(5)
+  longitude = messages.FloatField(6)
+  altitude = messages.FloatField(7)
+  capacity = messages.IntegerField(8)
+  audit_notification_enabled = messages.BooleanField(9)
+  audit_requested = messages.BooleanField(10)
+  responsible_for_audit = messages.StringField(11)
+  last_audit_time = message_types.DateTimeField(12)
+  last_audit_by = messages.StringField(13)
+  page_size = messages.IntegerField(14, default=10)
+  page_number = messages.IntegerField(15, default=1)
+  shelf_request = messages.MessageField(ShelfRequest, 16)
+  query = messages.MessageField(shared_messages.SearchRequest, 17)
 
 
 class EnrollShelfRequest(messages.Message):

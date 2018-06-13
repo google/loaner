@@ -222,6 +222,13 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
     for property_name in self._properties:  # pylint: disable=protected-access
       value = getattr(self, property_name, None)
       document_fields.extend(self._to_search_fields(property_name, value))
+    try:
+      document_fields.extend(
+          self._to_search_fields('identifier', self.identifier))
+    except AttributeError:
+      # No need to do anything if the model does not have an identifier
+      # property.
+      pass
     return document_fields
 
   def to_document(self):

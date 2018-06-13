@@ -357,6 +357,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     expected_response = device_message.ListDevicesResponse(
         devices=[device_message.Device(
             serial_number='6789',
+            identifier='6789',
             enrolled=True,
             device_model='HP Chromebook 13 G1',
             current_ou='/',
@@ -400,6 +401,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     expected_response = device_message.ListDevicesResponse(
         devices=[device_message.Device(
             serial_number=self.unenrolled_device.serial_number,
+            identifier=self.unenrolled_device.serial_number,
             enrolled=self.unenrolled_device.enrolled,
             device_model=self.unenrolled_device.device_model,
             current_ou=self.unenrolled_device.current_ou,

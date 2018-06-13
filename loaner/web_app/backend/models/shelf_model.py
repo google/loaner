@@ -106,7 +106,7 @@ class Shelf(base_model.BaseModel):
   }
 
   @property
-  def name(self):
+  def identifier(self):
     return self.friendly_name or self.location
 
   @property
@@ -181,7 +181,7 @@ class Shelf(base_model.BaseModel):
       if latitude is not None and longitude is not None:
         shelf.lat_long = ndb.GeoPt(latitude, longitude)
       shelf.audit_interval_override = audit_interval_override
-      logging.info(_REACTIVATE_MSG, shelf.name)
+      logging.info(_REACTIVATE_MSG, shelf.identifier)
     else:
       shelf = cls(
           location=location,
@@ -193,10 +193,10 @@ class Shelf(base_model.BaseModel):
           audit_interval_override=audit_interval_override)
       if latitude is not None and longitude is not None:
         shelf.lat_long = ndb.GeoPt(latitude, longitude)
-      logging.info(_CREATE_NEW_SHELF_MSG, shelf.name)
+      logging.info(_CREATE_NEW_SHELF_MSG, shelf.identifier)
     shelf = events.raise_event('shelf_enroll', shelf=shelf)
     shelf.put()
-    shelf.stream_to_bq(user_email, _ENROLL_MSG % shelf.name)
+    shelf.stream_to_bq(user_email, _ENROLL_MSG % shelf.identifier)
     return shelf
 
   @classmethod
@@ -225,7 +225,7 @@ class Shelf(base_model.BaseModel):
     """
     self.populate(**params)
     self.put()
-    self.stream_to_bq(user_email, _EDIT_MSG % self.name)
+    self.stream_to_bq(user_email, _EDIT_MSG % self.identifier)
 
   def audit(self, user_email):
     """Marks a shelf audited.
@@ -236,18 +236,18 @@ class Shelf(base_model.BaseModel):
     self.last_audit_time = datetime.datetime.utcnow()
     self.last_audit_by = user_email
     self.audit_requested = False
-    logging.info(_AUDIT_MSG, self.name)
+    logging.info(_AUDIT_MSG, self.identifier)
     self = events.raise_event('shelf_audited', shelf=self)
     self.put()
-    self.stream_to_bq(user_email, _AUDIT_MSG % self.name)
+    self.stream_to_bq(user_email, _AUDIT_MSG % self.identifier)
 
   def request_audit(self):
     """Requests an audit by marking a shelf as audit_requested."""
     self.audit_requested = True
-    logging.info(_AUDIT_REQUEST_MSG, self.name)
+    logging.info(_AUDIT_REQUEST_MSG, self.identifier)
     self.put()
     self.stream_to_bq(
-        constants.DEFAULT_ACTING_USER, _AUDIT_REQUEST_MSG % self.name)
+        constants.DEFAULT_ACTING_USER, _AUDIT_REQUEST_MSG % self.identifier)
 
   def enable(self, user_email):
     """Marks a shelf as enabled.
@@ -256,9 +256,9 @@ class Shelf(base_model.BaseModel):
       user_email: str, email of the user enabling the shelf.
     """
     self.enabled = True
-    logging.info(_ENABLE_MSG, self.name)
+    logging.info(_ENABLE_MSG, self.identifier)
     self.put()
-    self.stream_to_bq(user_email, _ENABLE_MSG % self.name)
+    self.stream_to_bq(user_email, _ENABLE_MSG % self.identifier)
 
   def disable(self, user_email):
     """Marks a shelf as disabled.
@@ -267,7 +267,7 @@ class Shelf(base_model.BaseModel):
       user_email: str, email of the user disabling the shelf.
     """
     self.enabled = False
-    logging.info(_DISABLE_MSG, self.name)
+    logging.info(_DISABLE_MSG, self.identifier)
     self = events.raise_event('shelf_disable', shelf=self)
     self.put()
-    self.stream_to_bq(user_email, _DISABLE_MSG % self.name)
+    self.stream_to_bq(user_email, _DISABLE_MSG % self.identifier)

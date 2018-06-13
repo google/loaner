@@ -45,6 +45,7 @@ def build_device_message_from_model(device, guest_permitted):
   message = device_message.Device(
       serial_number=device.serial_number,
       asset_tag=device.asset_tag,
+      identifier=device.identifier,
       enrolled=device.enrolled,
       device_model=device.device_model,
       due_date=device.due_date,
@@ -107,6 +108,7 @@ def build_shelf_message_from_model(shelf):
       enabled=shelf.enabled,
       friendly_name=shelf.friendly_name,
       location=shelf.location,
+      identifier=shelf.identifier,
       latitude=shelf.latitude,
       longitude=shelf.longitude,
       altitude=shelf.altitude,

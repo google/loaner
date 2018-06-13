@@ -96,17 +96,17 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
       self.assertTrue(retrieved_shelf.audited)
 
   @mock.patch.object(shelf_model.Shelf, 'to_document', autospec=True)
-  def test_name(self, mock_to_document):
-    """Test the name property."""
+  def test_identifier(self, mock_to_document):
+    """Test the identifier property."""
     # Name is friendly name.
-    self.assertEqual(self.test_shelf.name, self.original_friendly_name)
+    self.assertEqual(self.test_shelf.identifier, self.original_friendly_name)
 
     # Name is location.
     self.test_shelf.friendly_name = None
     shelf_key = self.test_shelf.put()
     assert mock_to_document.call_count == 1
     retrieved_shelf = shelf_model.Shelf.get_by_id(shelf_key.id())
-    self.assertEqual(retrieved_shelf.name, self.original_location)
+    self.assertEqual(retrieved_shelf.identifier, self.original_location)
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
@@ -128,10 +128,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(new_shelf.latitude, lat)
     self.assertEqual(new_shelf.longitude, lon)
     mock_logging.info.assert_called_once_with(
-        shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.name)
+        shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.identifier)
     mock_stream.assert_called_once_with(
         new_shelf, loanertest.USER_EMAIL,
-        shelf_model._ENROLL_MSG % new_shelf.name)
+        shelf_model._ENROLL_MSG % new_shelf.identifier)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=new_shelf)
 
@@ -152,10 +152,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertIsNone(new_shelf.latitude)
     self.assertIsNone(new_shelf.longitude)
     mock_logging.info.assert_called_once_with(
-        shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.name)
+        shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.identifier)
     mock_stream.assert_called_once_with(
         new_shelf, loanertest.USER_EMAIL,
-        shelf_model._ENROLL_MSG % new_shelf.name)
+        shelf_model._ENROLL_MSG % new_shelf.identifier)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=new_shelf)
 
@@ -177,10 +177,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(new_capacity, reactivated_shelf.capacity)
     self.assertEqual(reactivated_shelf.lat_long, ndb.GeoPt(lat, lon))
     mock_logging.info.assert_called_once_with(
-        shelf_model._REACTIVATE_MSG, self.test_shelf.name)
+        shelf_model._REACTIVATE_MSG, self.test_shelf.identifier)
     mock_stream.assert_called_once_with(
         reactivated_shelf, loanertest.USER_EMAIL,
-        shelf_model._ENROLL_MSG % reactivated_shelf.name)
+        shelf_model._ENROLL_MSG % reactivated_shelf.identifier)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=reactivated_shelf)
 
@@ -226,7 +226,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(retrieved_shelf.friendly_name, new_friendly_name)
     mock_stream.assert_called_once_with(
         retrieved_shelf, loanertest.USER_EMAIL,
-        shelf_model._EDIT_MSG % retrieved_shelf.name)
+        shelf_model._EDIT_MSG % retrieved_shelf.identifier)
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
@@ -236,10 +236,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.audit_requested)
     mock_logging.info.assert_called_once_with(
-        shelf_model._AUDIT_MSG, self.test_shelf.name)
+        shelf_model._AUDIT_MSG, self.test_shelf.identifier)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
-        shelf_model._AUDIT_MSG % self.test_shelf.name)
+        shelf_model._AUDIT_MSG % self.test_shelf.identifier)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_audited', shelf=self.test_shelf)
 
@@ -251,10 +251,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     retrieved_shelf = self.test_shelf.key.get()
     self.assertTrue(retrieved_shelf.audit_requested)
     mock_logging.info.assert_called_once_with(
-        shelf_model._AUDIT_REQUEST_MSG, self.test_shelf.name)
+        shelf_model._AUDIT_REQUEST_MSG, self.test_shelf.identifier)
     mock_stream.assert_called_once_with(
         self.test_shelf, constants.DEFAULT_ACTING_USER,
-        shelf_model._AUDIT_REQUEST_MSG % self.test_shelf.name)
+        shelf_model._AUDIT_REQUEST_MSG % self.test_shelf.identifier)
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
@@ -270,10 +270,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     # Ensure that the shelf is now re-enabled
     self.assertTrue(retrieved_shelf.enabled)
     mock_logging.info.assert_called_once_with(
-        shelf_model._ENABLE_MSG, self.test_shelf.name)
+        shelf_model._ENABLE_MSG, self.test_shelf.identifier)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
-        shelf_model._ENABLE_MSG % self.test_shelf.name)
+        shelf_model._ENABLE_MSG % self.test_shelf.identifier)
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
@@ -283,10 +283,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.enabled)
     mock_logging.info.assert_called_once_with(
-        shelf_model._DISABLE_MSG, self.test_shelf.name)
+        shelf_model._DISABLE_MSG, self.test_shelf.identifier)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
-        shelf_model._DISABLE_MSG % self.test_shelf.name)
+        shelf_model._DISABLE_MSG % self.test_shelf.identifier)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_disable', shelf=self.test_shelf)
 

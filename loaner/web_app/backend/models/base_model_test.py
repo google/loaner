@@ -36,6 +36,10 @@ class Test(base_model.BaseModel):
   text_field = ndb.StringProperty()
   _INDEX_NAME = 'TestIndex'
 
+  @property
+  def identifier(self):
+    return 'name'
+
 
 class TestSubEntity(base_model.BaseModel):
   """A test class used for TestEntity structured property."""
@@ -250,10 +254,24 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
   @mock.patch.object(base_model.BaseModel, '_to_search_fields')
   def test_get_document_fields(self, mock_to_search_fields):
     test_model = Test(text_field='item_1')
-    expected_result = [search.TextField(name='text_field', value='item_1')]
-    mock_to_search_fields.side_effect = [expected_result]
+    text_field1 = search.TextField(name='text_field', value='item_1')
+    test_field2 = search.TextField(name='identifier', value='name')
+    expected_result = [text_field1, test_field2]
+    mock_to_search_fields.side_effect = [[text_field1], [test_field2]]
     document_fields = test_model._get_document_fields()
     self.assertCountEqual(expected_result, document_fields)
+    assert mock_to_search_fields.call_count == 2
+
+  @mock.patch.object(base_model.BaseModel, '_to_search_fields')
+  def test_get_document_fields_no_identifier(self, mock_to_search_fields):
+    test_model = TestSubEntity(test_substring='item_1')
+    text_field1 = search.TextField(name='test_substring', value='item_1')
+    test_field2 = search.TextField(name='test_subdatetime', value='name')
+    expected_result = [text_field1, test_field2]
+    mock_to_search_fields.side_effect = [[text_field1], [test_field2]]
+    document_fields = test_model._get_document_fields()
+    self.assertCountEqual(expected_result, document_fields)
+    assert mock_to_search_fields.call_count == 2
 
   @mock.patch.object(
       base_model.BaseModel, '_get_document_fields', autospec=True)
