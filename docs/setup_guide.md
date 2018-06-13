@@ -317,7 +317,7 @@ settings without deploying a new version of GnG:
 +   **maximum_loan_duration**: The maximum number of days a loaner can be
     loaned.
 +   **loan_duration_email**: Send a duration email to the user.
-+   **reminder_email_throtting**: Do not send emails to a user when a reminder
++   **reminder_email_throttling**: Do not send emails to a user when a reminder
     appears in the loaner's Chrome app.
 +   **reminder_delay**: Number of hours after which GnG will send a reminder
     email for a device identified as needing a reminder.

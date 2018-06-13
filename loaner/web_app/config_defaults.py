@@ -40,9 +40,9 @@ DEFAULTS = {
     # loan_duration_email: bool, Whether email should be sent.
     'loan_duration_email': True,
 
-    # reminder_email_throtting: bool, Whether to skip emails when a user sees a
+    # reminder_email_throttling: bool, Whether to skip emails when a user sees a
     # Chrome app reminder.
-    'reminder_email_throtting': True,
+    'reminder_email_throttling': True,
 
     # reminder_delay: int, Hours after which the app will send a reminder e-mail
     # for a Device it identifies as worthy of a reminder.
