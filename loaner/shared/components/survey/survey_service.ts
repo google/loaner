@@ -60,7 +60,7 @@ export declare interface SurveyResponse {
 export class Survey {
   apiBaseUrl: string;
   answer = new Subject<SurveyAnswer>();
-  retrievedSurvey: SurveyResponse;
+  retrievedSurvey!: SurveyResponse;
   surveySent = new BehaviorSubject<boolean>(false);
 
   constructor(

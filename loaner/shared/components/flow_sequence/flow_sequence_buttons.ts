@@ -44,7 +44,7 @@ export class LoanerFlowSequenceButtons implements OnInit {
   /** FlowState provided by the flowSequence. */
   @Input() flowState = new Subject<FlowState>();
   /** Array of steps in the flow sequence. */
-  @Input() steps: Step[];
+  @Input() steps!: Step[];
   /** Emits an event when forward button is pressed. */
   @Output() forward = new Subject<boolean>();
   /** Emits an event when back button is pressed. */
@@ -52,7 +52,7 @@ export class LoanerFlowSequenceButtons implements OnInit {
   /** Emits an event when finished button is pressed. */
   @Output() finished = new Subject<boolean>();
   /** Defines the aria and toolTip labels for the butons. */
-  @Input() navLabels: NavigationLabels;
+  @Input() navLabels!: NavigationLabels;
   /** Defines whether the flow can proceed forward.  */
   @Input() canProceed = true;
 

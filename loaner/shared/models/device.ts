@@ -88,25 +88,25 @@ export class Device {
   /** Urlsafe Key identifier for the device. */
   urlkey = '';
   /** Device that's not known upfront by the frontend. */
-  unknownIdentifier: string;
+  unknownIdentifier!: string;
   /** Computer model of the device. */
   deviceModel = 'Unknown Device Model';
   /** Which shelf the device is currently assigned to. */
-  shelf: Shelf;
+  shelf!: Shelf;
   /** Which user the device is currently assigned to. */
   assignedUser = '';
   /** Which date the device was assigned to the user. */
-  assignmentDate: Date;
+  assignmentDate!: Date;
   /** If the device is marked as damaged. */
   damaged = false;
   /** Which date the device should be returned to the shelf. */
-  dueDate: Date;
+  dueDate!: Date;
   /** Which OU the device is currently in. Eg: Root, Guest. */
-  currentOu: string;
+  currentOu!: string;
   /** The last heartbeat from the device to the backend. */
-  lastHeartbeat: Date;
+  lastHeartbeat!: Date;
   /** The last check in of the device at a shelf. */
-  lastKnownHealthy: Date;
+  lastKnownHealthy!: Date;
   /** If the device is in a lost state for the program. */
   lost = false;
   /** If the device is in a locked state for the program. */
@@ -118,7 +118,7 @@ export class Device {
   /** If guest has been enabled allowed for this device. */
   guestAllowed = false;
   /** The maximum date this device can be extended. */
-  maxExtendDate: Date;
+  maxExtendDate!: Date;
   /** Given name on this loan. */
   givenName = 'there';
   /** List of flags relevant to this device. */

@@ -33,7 +33,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
   surveyAnswer?: SurveyResponseAnswer;
   surveyData?: SurveyResponse;
   surveySent?: boolean;
-  userInput: string;
+  userInput!: string;
   @Output() surveyError = new Subject<Error>();
 
   constructor(private readonly survey: Survey) {

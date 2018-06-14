@@ -27,8 +27,8 @@ Take care and have a great day!`;
 /** Creates the actual dialog for the lost flow. */
 @Injectable()
 export class Lost {
-  private dialogRef: MatDialogRef<LostDialogComponent>;
-  private lostComponent: LostDialogComponent;
+  private dialogRef!: MatDialogRef<LostDialogComponent>;
+  private lostComponent!: LostDialogComponent;
 
   constructor(private readonly dialog: MatDialog) {}
 

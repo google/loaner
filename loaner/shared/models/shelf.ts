@@ -66,15 +66,15 @@ export class Shelf {
   /** Altitude on which the shelf is located. */
   altitude? = 0;
   /** How many devices the shelf can have assigned to it. */
-  capacity: number;
+  capacity!: number;
   /** The last time the shelf was audited. */
-  lastAuditTime: Date;
+  lastAuditTime!: Date;
   /** The username of the last person who audited the shelf. */
   lastAuditBy = '';
   /** The group responsible for auditing the shelf. */
   responsibleForAudit = '';
   /** The representation of a shelf request. */
-  shelfRequest: ShelfRequestParams;
+  shelfRequest!: ShelfRequestParams;
 
   /**
    * Property for the shelf name, which is preferred to be it's friendly

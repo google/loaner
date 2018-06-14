@@ -27,5 +27,5 @@ export interface NavTab {
   templateUrl: './bottom_nav.ng.html',
 })
 export class BottomNavComponent {
-  @Input() tabs: NavTab[];
+  @Input() tabs!: NavTab[];
 }

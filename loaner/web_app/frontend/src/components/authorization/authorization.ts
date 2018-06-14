@@ -34,7 +34,7 @@ export class Authorization extends LoaderView implements OnInit {
   /** Title for the component. */
   private readonly title = `Authorization - ${CONFIG.appName}`;
   /** Url to be redirected after login. */
-  private returnUrl: string;
+  private returnUrl!: string;
 
   constructor(
       private readonly authService: AuthService,

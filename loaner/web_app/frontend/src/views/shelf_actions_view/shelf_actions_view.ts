@@ -32,7 +32,7 @@ export class ShelfActionsView implements OnInit {
   private readonly createShelfTitle = `Create Shelf - ${CONFIG.appName}`;
   private readonly updateShelfTitle = `Update Shelf - ${CONFIG.appName}`;
 
-  @ViewChild('shelfAction') shelfAction: ShelfActionsCard;
+  @ViewChild('shelfAction') shelfAction!: ShelfActionsCard;
   constructor(
       private titleService: Title, private readonly route: ActivatedRoute) {}
 

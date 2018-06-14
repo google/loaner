@@ -20,7 +20,7 @@ import {mergeMap} from 'rxjs/operators';
 
 @Injectable()
 export class OAuthHttpInterceptor implements HttpInterceptor {
-  private accessToken: string;
+  private accessToken!: string;
   constructor(private zone: NgZone) {}
 
   intercept(originalRequest: HttpRequest<{}>, next: HttpHandler):

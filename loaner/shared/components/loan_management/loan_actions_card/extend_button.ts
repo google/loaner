@@ -41,8 +41,8 @@ import {Extend} from '../../extend';
 })
 export class ExtendButton {
   @Input() canExtend = false;
-  @Input() dueDate: Date;
-  @Input() maxExtendDate: Date;
+  @Input() dueDate!: Date;
+  @Input() maxExtendDate!: Date;
   @Output() done = new Subject<string>();
 
   constructor(private readonly extendService: Extend) {}

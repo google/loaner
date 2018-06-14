@@ -58,9 +58,9 @@ import {GuestButton} from './guest_button';
 })
 export class LoanActionsCardComponent {
   @Input() additionalManagementText = '';
-  @Input() device: Device;
-  @ContentChild(ExtendButton) extendButton: ExtendButton;
-  @ContentChild(GuestButton) guestButton: GuestButton;
+  @Input() device!: Device;
+  @ContentChild(ExtendButton) extendButton!: ExtendButton;
+  @ContentChild(GuestButton) guestButton!: GuestButton;
 
   ngOnInit() {
     if (!this.device) {

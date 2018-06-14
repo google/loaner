@@ -83,19 +83,19 @@ export class AppRoot implements OnInit {
   currentStep = 0;
   maxStep = 0;
   readonly steps = STEPS;
-  @ViewChild(LoanerFlowSequence) flowSequence: LoanerFlowSequence;
+  @ViewChild(LoanerFlowSequence) flowSequence!: LoanerFlowSequence;
   @ViewChild(LoanerFlowSequenceButtons)
-  flowSequenceButtons: LoanerFlowSequenceButtons;
+  flowSequenceButtons!: LoanerFlowSequenceButtons;
 
-  surveyAnswer: SurveyAnswer;
+  surveyAnswer!: SurveyAnswer;
   surveySent = false;
 
   // Flow components to be manipulated.
-  @ViewChild(WelcomeComponent) welcomeComponent: WelcomeComponent;
-  @ViewChild(SurveyComponent) surveyComponent: SurveyComponent;
-  @ViewChild(ReturnComponent) returnComponent: ReturnComponent;
+  @ViewChild(WelcomeComponent) welcomeComponent!: WelcomeComponent;
+  @ViewChild(SurveyComponent) surveyComponent!: SurveyComponent;
+  @ViewChild(ReturnComponent) returnComponent!: ReturnComponent;
   @ViewChild(LoanerReturnInstructions)
-  returnInstructions: LoanerReturnInstructions;
+  returnInstructions!: LoanerReturnInstructions;
 
 
   constructor(

@@ -44,8 +44,8 @@ const EXCLUDED_INTERCEPT_URLS: string[] = [
  */
 @Injectable()
 export class LoanerOAuthInterceptor implements HttpInterceptor {
-  private authToken: string;
-  private authExpirationTime: number;
+  private authToken!: string;
+  private authExpirationTime!: number;
   private urlsToIntercept: string[];
   private excludedUrlsToIntercept: string[];
   private counter = 0;

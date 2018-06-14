@@ -23,6 +23,6 @@ import {Component, Input} from '@angular/core';
   templateUrl: './greetings_card.ng.html',
 })
 export class GreetingsCardComponent {
-  @Input() userDisplayName: string;
-  @Input() hasDevices: boolean;
+  @Input() userDisplayName!: string;
+  @Input() hasDevices!: boolean;
 }

@@ -30,9 +30,9 @@ export class UserService extends ApiService {
   /** Implements ApiService's apiEndpoint requirement. */
   apiEndpoint = 'user';
   /** User instance of the current logged in user. */
-  user: User;
+  user!: User;
   /** Get Roles subscription that's stored to be unsubscribed when needed. */
-  private roleSubscription: Subscription;
+  private roleSubscription!: Subscription;
   /** A subject sending the loaded user. */
   private userLoadedSubject = new ReplaySubject<User>(1);
 

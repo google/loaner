@@ -20,8 +20,8 @@ import {Component, Input} from '@angular/core';
   templateUrl: './progress.ng.html',
 })
 export class ProgressComponent {
-  @Input() current: number;
-  @Input() max: number;
+  @Input() current!: number;
+  @Input() max!: number;
 
   // Get the current progress and turn it into a percentage.
   get progress() {

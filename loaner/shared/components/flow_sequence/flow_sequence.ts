@@ -43,7 +43,7 @@ export class LoanerFlowSequenceChild {
 })
 export class LoanerFlowSequence implements OnInit, AfterViewInit {
   /** Steps in order of when they are to appear. */
-  @Input() steps: Step[];
+  @Input() steps!: Step[];
   /** Emits the current step the flow is on. */
   @Output() activeStep = new Subject<Step>();
   /** Emits the previous step from the flow. */
@@ -64,7 +64,7 @@ export class LoanerFlowSequence implements OnInit, AfterViewInit {
    * Query list of all children elements to be used in the flow sequence.
    */
   @ContentChildren(LoanerFlowSequenceChild)
-  flowChildren: QueryList<LoanerFlowSequenceChild>;
+  flowChildren!: QueryList<LoanerFlowSequenceChild>;
 
   /** Optional input for flowSequence buttons. */
   @Input() flowSequenceButtons?: LoanerFlowSequenceButtons;

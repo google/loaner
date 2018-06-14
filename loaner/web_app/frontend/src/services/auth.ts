@@ -36,9 +36,9 @@ export class AuthService {
   /** Whether the user is currently signed into OAuth. */
   isSignedIn = false;
   /** Logged in user token ID. */
-  token: string;
+  token!: string;
   /** Time at which token will expire in the next 5 minutes. */
-  tokenExpirationTime: number;
+  tokenExpirationTime!: number;
   /** Whether the API has completed loading. */
   loaded = false;
   /** A subject the latest token id retrieved from gapi. */
@@ -48,9 +48,9 @@ export class AuthService {
   /** A subject sending a the client that's signed in. */
   private isSignedInSubject = new ReplaySubject<gapi.auth2.GoogleUser>(1);
   /** The GoogleAuth instance. */
-  private authInstance: gapi.auth2.GoogleAuth;
+  private authInstance!: gapi.auth2.GoogleAuth;
   /** The GoogleUser instance of the current user logged in. */
-  private currentUser: gapi.auth2.GoogleUser;
+  private currentUser!: gapi.auth2.GoogleUser;
 
   constructor(
       private readonly ngZone: NgZone,

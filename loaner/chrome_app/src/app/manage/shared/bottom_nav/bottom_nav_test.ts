@@ -63,7 +63,7 @@ describe('BottomNavComponent', () => {
   `
 })
 class SimpleBottomNavTestApp {
-  @ViewChild(BottomNavComponent) bottomNav: BottomNavComponent;
+  @ViewChild(BottomNavComponent) bottomNav!: BottomNavComponent;
   readonly navTabs = [
     {
       ariaLabel: 'Troubleshoot your device',
