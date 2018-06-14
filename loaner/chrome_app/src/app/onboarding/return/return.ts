@@ -29,7 +29,7 @@ import {ReturnDateService} from '../../shared/return_date_service';
 })
 export class ReturnComponent extends LoaderView implements OnInit {
   device = new Device();
-  newReturnDate: Date;
+  newReturnDate!: Date;
   toBeSubmitted = true;
   validDate = true;
 

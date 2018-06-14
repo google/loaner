@@ -37,9 +37,9 @@ export class Bootstrap implements OnInit, OnDestroy {
   /** Whether or not the bootstrap is in progress. */
   inProgress = false;
   /** This will be populated with the bootstrap status from the backend. */
-  bootstrapStatus: bootstrap.Status;
+  bootstrapStatus!: bootstrap.Status;
   /** This gets flipped on ngInit depending on whether bootstrap is enabled. */
-  bootstrapEnabled: boolean;
+  bootstrapEnabled!: boolean;
 
   constructor(
       private readonly bootstrapService: BootstrapService,

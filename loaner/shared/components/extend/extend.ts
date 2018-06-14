@@ -22,8 +22,8 @@ import {LoaderView} from '../loader';
 /** Creates the actual dialog for the extend flow. */
 @Injectable()
 export class Extend {
-  private component: ExtendDialogComponent;
-  private dialogRef: MatDialogRef<ExtendDialogComponent>;
+  private component!: ExtendDialogComponent;
+  private dialogRef!: MatDialogRef<ExtendDialogComponent>;
 
   constructor(private readonly dialog: MatDialog) {}
 

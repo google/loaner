@@ -26,7 +26,7 @@ import * as marked from 'marked';
   templateUrl: './faq.ng.html',
 })
 export class FaqComponent implements OnInit {
-  sanitizedFaqContent: string|null;
+  sanitizedFaqContent!: string|null;
 
   constructor(
       private readonly http: HttpClient,

@@ -29,8 +29,8 @@ have a great day!`;
 /** Creates the actual dialog for the damaged flow. */
 @Injectable()
 export class Damaged {
-  private dialogRef: MatDialogRef<DamagedDialogComponent>;
-  private damagedComponent: DamagedDialogComponent;
+  private dialogRef!: MatDialogRef<DamagedDialogComponent>;
+  private damagedComponent!: DamagedDialogComponent;
 
   constructor(private readonly dialog: MatDialog) {}
 
@@ -69,7 +69,7 @@ export class Damaged {
 })
 export class DamagedDialogComponent extends LoaderView {
   toBeSubmitted = true;
-  damagedReason: string;
+  damagedReason!: string;
   damagedReturnMessage = DAMAGED_RETURN_MESSAGE;
   onDamaged = new Subject<string>();
 

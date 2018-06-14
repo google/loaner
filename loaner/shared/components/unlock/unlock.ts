@@ -21,8 +21,8 @@ import {LoaderView} from '../loader';
 /** Creates the actual dialog for the unlock flow. */
 @Injectable()
 export class Unlock {
-  private dialogRef: MatDialogRef<UnlockDialogComponent>;
-  private unlockComponent: UnlockDialogComponent;
+  private dialogRef!: MatDialogRef<UnlockDialogComponent>;
+  private unlockComponent!: UnlockDialogComponent;
 
   constructor(private readonly dialog: MatDialog) {}
 
@@ -62,7 +62,7 @@ export class Unlock {
 })
 export class UnlockDialogComponent extends LoaderView {
   toBeSubmitted = true;
-  deviceId: string;
+  deviceId!: string;
   onUnlock = new Subject<boolean>();
 
 

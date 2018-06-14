@@ -24,9 +24,9 @@ import {IT_CONTACT_EMAIL, IT_CONTACT_PHONE, IT_CONTACT_WEBSITE, TROUBLESHOOTING_
   styleUrls: ['./troubleshoot.scss'],
 })
 export class TroubleshootComponent {
-  contactEmail: string;
-  contactPhone: string;
-  contactWebsite: string;
+  contactEmail!: string;
+  contactPhone!: string;
+  contactWebsite!: string;
   troubleshootingInformation: string;
 
   constructor() {

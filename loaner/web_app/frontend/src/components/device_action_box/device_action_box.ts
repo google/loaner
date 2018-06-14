@@ -64,9 +64,9 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   /** Actions that can be taken on devices and displayed on the template. */
   actions = Actions;
   /** Current action that wil be taken on the device. */
-  @Input() action: Actions;
+  @Input() action!: Actions;
   /** Current state of the ActionBox component. */
-  state: ExpansionState;
+  state!: ExpansionState;
   /** Device model that will be added. */
   device = new Device();
   /** Which device identifier mode the app is currently configured to use. */
@@ -85,10 +85,10 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
         this.deviceIdentifierMode === DeviceIdentifierMode.BOTH_REQUIRED;
   }
 
-  @ViewChild('mainIdentifier') mainIdentifier: ElementRef;
-  @ViewChild('serialNumber') serialNumber: ElementRef;
-  @ViewChild('assetTag') assetTag: ElementRef;
-  @ViewChild('actionForm') actionForm: NgForm;
+  @ViewChild('mainIdentifier') mainIdentifier!: ElementRef;
+  @ViewChild('serialNumber') serialNumber!: ElementRef;
+  @ViewChild('assetTag') assetTag!: ElementRef;
+  @ViewChild('actionForm') actionForm!: NgForm;
 
   /** Emits a device when an action is ready to be taken. */
   @Output() takeAction = new EventEmitter<Device>();

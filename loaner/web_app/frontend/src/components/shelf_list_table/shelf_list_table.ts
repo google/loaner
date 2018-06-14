@@ -49,8 +49,8 @@ export class ShelfListTable implements OnDestroy {
   /** Total number of shelves returned from the back end */
   totalResults = 0;
 
-  @ViewChild(MatSort) sort: MatSort;
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   pauseLoading = false;
 

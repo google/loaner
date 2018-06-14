@@ -44,7 +44,7 @@ export class DeviceInfoCard implements OnInit {
   // Component's core variables.
   user = new User();
   /* List of devices assigned to the user. */
-  loanedDevices: Device[];
+  loanedDevices!: Device[];
   /* Index of the tab to focus on landing when coming from route with id. */
   selectedTab = 0;
   /* String defining what user is being requested for imitation. */

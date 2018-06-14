@@ -21,8 +21,8 @@ import {LoaderView} from '../loader';
 /** Creates the actual dialog for the unenroll flow. */
 @Injectable()
 export class Unenroll {
-  private dialogRef: MatDialogRef<UnenrollDialogComponent>;
-  private unenrollComponent: UnenrollDialogComponent;
+  private dialogRef!: MatDialogRef<UnenrollDialogComponent>;
+  private unenrollComponent!: UnenrollDialogComponent;
 
   constructor(private readonly dialog: MatDialog) {}
 
@@ -62,7 +62,7 @@ export class Unenroll {
 })
 export class UnenrollDialogComponent extends LoaderView {
   toBeSubmitted = true;
-  deviceId: string;
+  deviceId!: string;
   onUnenroll = new Subject<boolean>();
 
 

@@ -21,8 +21,8 @@ import {LoaderView} from '../loader';
 /** Creates the actual dialog for the undamaged flow. */
 @Injectable()
 export class Undamaged {
-  private dialogRef: MatDialogRef<UndamagedDialogComponent>;
-  private undamagedComponent: UndamagedDialogComponent;
+  private dialogRef!: MatDialogRef<UndamagedDialogComponent>;
+  private undamagedComponent!: UndamagedDialogComponent;
 
   constructor(private readonly dialog: MatDialog) {}
 
@@ -62,7 +62,7 @@ export class Undamaged {
 })
 export class UndamagedDialogComponent extends LoaderView {
   toBeSubmitted = true;
-  deviceId: string;
+  deviceId!: string;
   onUndamaged = new Subject<boolean>();
 
 

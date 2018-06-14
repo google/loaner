@@ -34,14 +34,14 @@ import {LoanerSnackBar} from '../../services/snackbar';
 })
 export class SearchResultsComponent implements OnDestroy, OnInit {
   loading = true;
-  model: string;
-  query: string;
-  results: Device[]|Shelf[];
+  model!: string;
+  query!: string;
+  results!: Device[]|Shelf[];
 
   /** Represents the total number of results received via search. */
-  totalResults: number;
+  totalResults!: number;
 
-  @ViewChild(MatPaginator) paginator: MatPaginator;
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   get resultsLength(): number {
     return this.results ? this.results.length : 0;

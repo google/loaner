@@ -93,7 +93,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
 export class AppComponent extends LoaderView {
   readonly title = `${CONFIG.appName} Application`;
   readonly navigationItems: NavigationItem[] = NAVIGATION_ITEMS;
-  user: User;
+  user!: User;
   pending = false;
 
   constructor(

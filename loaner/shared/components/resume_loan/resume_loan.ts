@@ -21,8 +21,8 @@ import {LoaderView} from '../loader';
 /** Service that communicates with the resume loan dialog. */
 @Injectable()
 export class ResumeLoan {
-  private component: ResumeLoanDialog;
-  private dialogRef: MatDialogRef<ResumeLoanDialog>;
+  private component!: ResumeLoanDialog;
+  private dialogRef!: MatDialogRef<ResumeLoanDialog>;
 
   constructor(private readonly dialog: MatDialog) {}
 

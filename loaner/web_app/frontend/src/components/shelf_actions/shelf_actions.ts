@@ -36,15 +36,15 @@ export class ShelfActionsCard implements OnInit {
   /** Shelf that will be displayed in the template and created. */
   shelf = new Shelf();
   /** A bool indicating of a shelf already exists. */
-  editing: boolean;
+  editing!: boolean;
   /** List of possible teams that are responsible for a shelf. */
-  responsiblesForAuditList: string[];
+  responsiblesForAuditList!: string[];
   /** Controls the capacity input for validation. */
   capacityFormControl = new FormControl('', [
     Validators.min(1),
   ]);
   /** Access properties in the form. */
-  @ViewChild('shelfActionsForm') shelfActionsForm: NgForm;
+  @ViewChild('shelfActionsForm') shelfActionsForm!: NgForm;
 
   constructor(
       private readonly configService: ConfigService,

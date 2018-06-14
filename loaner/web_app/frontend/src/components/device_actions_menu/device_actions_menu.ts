@@ -35,7 +35,7 @@ import {DeviceService} from '../../services/device';
   templateUrl: 'device_actions_menu.html',
 })
 export class DeviceActionsMenu {
-  @Input() device: Device;
+  @Input() device!: Device;
   @Output() refreshDevice = new EventEmitter<string>();
   @Output() unenrolled = new EventEmitter<void>();
 

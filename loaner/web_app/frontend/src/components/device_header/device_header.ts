@@ -36,7 +36,7 @@ export class DeviceHeader implements OnInit {
   @Input() showButtons = true;
 
   /** Current action that will be used in the device-action-box if rendered. */
-  currentAction: string;
+  currentAction!: string;
 
   constructor(
       private readonly route: ActivatedRoute,

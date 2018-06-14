@@ -21,8 +21,8 @@ import {LoaderView} from '../loader';
 /** Creates the actual dialog for the guest flow. */
 @Injectable()
 export class GuestMode {
-  private component: GuestComponentDialog;
-  private dialogRef: MatDialogRef<GuestComponentDialog>;
+  private component!: GuestComponentDialog;
+  private dialogRef!: MatDialogRef<GuestComponentDialog>;
 
   constructor(private readonly dialog: MatDialog) {}
 

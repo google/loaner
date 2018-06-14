@@ -31,7 +31,7 @@ import {ShelfService} from '../../services/shelf';
 })
 export class ShelfDetails implements OnInit {
   /** Shelf that will have the details displayed in the template. */
-  @Input() shelf: Shelf;
+  @Input() shelf!: Shelf;
 
   constructor(
       private readonly shelfService: ShelfService,
