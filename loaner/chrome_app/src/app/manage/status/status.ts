@@ -41,7 +41,7 @@ be sure to check out our Troubleshoot and FAQ buttons below.`;
 export class StatusComponent extends LoaderView implements OnInit {
   additionalText = ADDITIONAL_MANAGEMENT_TEXT;
   device = new Device();
-  newReturnDate: Date;
+  newReturnDate!: Date;
 
   /** If the device model data is populated. */
   get hasDevices() {

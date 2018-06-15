@@ -81,7 +81,7 @@ export const CHROME_ENDPOINTS: EnvironmentsVariable = {
 @Injectable()
 export class ConfigService {
   // Frontend specific variables
-  webClientId: string;
+  webClientId!: string;
   ON_PROD = this.hasOrigin(PROD);
   ON_DEV = this.hasOrigin(DEV);
   ON_QA = this.hasOrigin(QA);
@@ -97,9 +97,9 @@ export class ConfigService {
   analyticsEnabled = false;
   analyticsId = '';
   apiPath = '/_ah/api';
-  devTrack: boolean;
-  private standardEndpoint: string;
-  private chromeEndpoint: string;
+  devTrack!: boolean;
+  private standardEndpoint!: string;
+  private chromeEndpoint!: string;
 
   // Checks what environment the app is running in.
   get appMode() {

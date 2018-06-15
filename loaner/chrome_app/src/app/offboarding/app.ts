@@ -86,19 +86,19 @@ export class AppRoot implements OnInit {
   currentStep = 0;
   maxStep = 0;
   readonly steps = STEPS;
-  @ViewChild(LoanerFlowSequence) flowSequence: LoanerFlowSequence;
+  @ViewChild(LoanerFlowSequence) flowSequence!: LoanerFlowSequence;
   @ViewChild(LoanerFlowSequenceButtons)
-  flowSequenceButtons: LoanerFlowSequenceButtons;
+  flowSequenceButtons!: LoanerFlowSequenceButtons;
 
-  surveyAnswer: SurveyAnswer;
+  surveyAnswer!: SurveyAnswer;
   surveySent = false;
 
   returnCompleted = false;
 
   // Flow components to be manipulated.
-  @ViewChild(SurveyComponent) surveyComponent: SurveyComponent;
+  @ViewChild(SurveyComponent) surveyComponent!: SurveyComponent;
   @ViewChild(LoanerReturnInstructions)
-  returnInstructions: LoanerReturnInstructions;
+  returnInstructions!: LoanerReturnInstructions;
 
   // Text to be populated on an info card for logout step.
   logoutPage = {
