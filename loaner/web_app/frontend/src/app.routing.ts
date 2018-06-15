@@ -152,6 +152,7 @@ const routes: Routes = [
         pathMatch: 'full',
         component: ShelfActionsView,
         canActivate: [AuthGuard],
+        canDeactivate: [CanDeactivateGuard],
         data: {
           'requiredPermissions': [
             CONFIG.appPermissions.MODIFY_SHELF,

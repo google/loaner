@@ -109,11 +109,11 @@ export class ShelfActionsCard implements OnInit {
 
   /** Can deactivate route checking. */
   canDeactivate(): Observable<boolean> {
-    if (this.editing && this.shelfActionsForm.dirty) {
+    if (this.shelfActionsForm.dirty) {
       return this.dialogBox
           .confirm(
               'Discard changes?',
-              'Moving away will not save the current changes!')
+              'Leaving this page will not save current changes!')
           .pipe(map(result => Boolean(result)));
     }
     return of(true);
