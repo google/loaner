@@ -54,8 +54,8 @@ DEFAULTS = {
     # shelf_audit_email: bool, Whether email should be sent for audits.
     'shelf_audit_email': False,
 
-    # shelf_audit_email_to: list, Users who should get the email.
-    'shelf_audit_email_to': [''],
+    # shelf_audit_email_to: list, Groups which will be sent the email.
+    'shelf_audit_email_to': [],
 
     # shelf_audit_interval: int, The number of hours to allow a shelf to remain
     # unaudited, overridable via a shelf's audit_interval_override property.

@@ -323,7 +323,7 @@ settings without deploying a new version of GnG:
     email for a device identified as needing a reminder.
 +   **shelf_audit**: Enable shelf audit.
 +   **shelf_audit_email**: Whether email should be sent for audits.
-+   **shelf_audit_email_to**: Users who should get the email.
++   **shelf_audit_email_to**: List of email addresses to receive a notification.
 +   **shelf_audit_interval**: The number of hours to allow a shelf to remain
     unaudited. Can be overwritten via the audit_interval_override property for a
     shelf.
