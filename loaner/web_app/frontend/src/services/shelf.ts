@@ -17,7 +17,7 @@ import {Response} from '@angular/http';
 import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
-import {SortDirection, translateSortDirectionToApi} from '../../../../shared/models/search';
+import {SearchExpression, SortDirection, translateSortDirectionToApi} from '../../../../shared/models/search';
 import {ListShelfResponse, ListShelfResponseApiParams, Shelf, ShelfApiParams} from '../models/shelf';
 
 import {ApiService} from './api';
@@ -27,7 +27,7 @@ function setupQueryFilters(
     activeSortField: string,
     sortDirection: SortDirection,
 ) {
-  const expressions = {
+  const expressions: SearchExpression = {
     expression: activeSortField,
     direction: translateSortDirectionToApi(sortDirection),
   };

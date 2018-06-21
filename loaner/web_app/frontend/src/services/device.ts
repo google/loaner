@@ -19,7 +19,7 @@ import {MatSort} from '@angular/material';
 import {BehaviorSubject, Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
-import {SortDirection, translateSortDirectionToApi} from '../../../../shared/models/search';
+import {SearchExpression, SortDirection, translateSortDirectionToApi} from '../../../../shared/models/search';
 import {Device, DeviceApiParams, DeviceRequestApiParams, ExtendDeviceRequestApiParams, ListDevicesResponse, ListDevicesResponseApiParams, MarkAsDamagedRequestApiParams} from '../models/device';
 
 import {ApiService} from './api';
@@ -29,7 +29,7 @@ function setupQueryFilters(
     activeSortField: string,
     sortDirection: SortDirection,
 ) {
-  const expressions = {
+  const expressions: SearchExpression = {
     expression: activeSortField,
     direction: translateSortDirectionToApi(sortDirection),
   };
