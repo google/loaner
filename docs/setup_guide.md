@@ -132,13 +132,6 @@ configure a Google Cloud Platform project:
     get the highest elevated permissions for the application. You will not be
     able to set up the application without those permissions.
 
-1.  **Create an Authorized Email Sender**
-
-    You need to configure an authorized email sender that GnG emails will be
-    sent from, e.g. loaner@example.com. To do that, add an [Email API Authorized
-    Senders](https://console.cloud.google.com/appengine/settings) in the GCP
-    Console.
-
 1.  **Set up a development computer**
 
     You’ll modify the code and build and upload GnG from this device.
@@ -279,26 +272,20 @@ versions to test deployments before promoting them to the production version.
 
 #### shared/config.ts
 
-+   **`PROD`** is the Google Cloud Project ID the production version of GnG
-    will run in. You need to replace the string 'prod-app-engine-project' with
-    the ID of your project. This is the same ID than used on ON_PROD line on
-    loaner/web_app/constants.py
++   **`PROD`** is the Google Cloud Project ID that the production version of GnG
+    will operate in. You will need to replace the string
+    'prod-app-engine-project' with the ID of your project. This is the same ID
+    used for ON_PROD in loaner/web_app/constants.py.
 
 +   **`WEB_APP_CLIENT_IDS`** is the OAuth2 Client ID you created previously that
-    the Web App frontend will use to authenticate to the production version of
-    GnG. This is the same ID than used on WEB_APP_CLIENT_ID line on
-    loaner/web_app/constants.py
-
-    *   (*optional*) If you are deploying a single instance of the application,
-        use that value for all fields. Otherwise, specify your separate prod, qa
-        and dev Client IDs.
+    the Web App frontend will use to authenticate to the backend. This is the
+    same ID that was used for the WEB_APP_CLIENT_ID in
+    loaner/web_app/constants.py. If you are deploying a single instance of the
+    application, fill in the PROD value with the Client ID.
 
 +   **`STANDARD_ENDPOINTS`** is the Google Endpoints URL the frontend uses to
     access your backend API. If necessary, update the `prod`, `qa` and `dev`
     values.
-
-    *   You can find these URLs in the Google Cloud console by going to
-        App Engine > Versions and changing the service from the menu.
 
     *   (*optional*) If you are deploying a single instance of the application,
         use that value for all fields. Otherwise, specify your separate prod, qa
@@ -508,8 +495,14 @@ accidentally overwrite your configuration.
 
 **Note**: The bootstrap process may take a few minutes to complete.
 
-## Deploy the Chrome App
+### Create an Authorized Email Sender
 
+You need to configure an authorized email sender that GnG emails will be sent
+from, e.g. loaner@example.com. To do that, add an [Email API Authorized
+Senders](https://console.cloud.google.com/appengine/settings) in the GCP
+Console.
+
+## Deploy the Chrome App
 After bootstrapping is complete, you will need to set up the GnG Chrome App.
 This app helps configure the Chromebooks you will be using as loaners and
 provides the bulk of the user-facing experience. Continue on to [deploying the

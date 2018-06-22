@@ -17,24 +17,7 @@
 Chrome Apps use a public/private key pair to maintain a static ID in the Chrome
 Web Store and during testing. This process requires that you use Google Chrome
 to pack the Chrome App before deployment. Part of the process involves
-pre-building the Chrome App, which is described below:
-
-1.  Clone the repository from GitHub and `cd` into the project directory, if you
-    haven't already.
-
-    ```
-    git clone https://github.com/google/loaner
-    cd loaner
-    ```
-
-**Note**: The rest of this setup guide assumes that your working directory will
-be the root of the Git repository.
-
-1.  `cd` to the `loaner` directory inside of the root of the Git repository:
-
-    ```
-    cd loaner
-    ```
+pre-building the Chrome App, which is described below.
 
 1.  Install the node packages required to build the Chrome App:
 
@@ -214,6 +197,12 @@ To define the OAuth client:
     bash deploy.sh web prod
     ```
 
+    **Reminder:** While you are editing this file change BOOTSTRAP_ENABLED to
+    `False`. Be sure to do this only *after* you complete the initial bootstrap
+    (which you should have done in the Setup Guide). Setting this constant to
+    `False` will prevent unexpected bootstraps in the future (a bootstrap will
+    cause data loss).
+
 **NOTE:** You will need to migrate all of your traffic in the [App
 Engine>Versions](https://console.cloud.google.com/appengine/versions) menu to
 the newest version every time you re-deploy the app. You can do so by selecting
@@ -251,27 +240,9 @@ Chrome App.
 **View of the default troubleshooting page for the Chrome App:** ![Chrome App's
 troubleshooting page](images/ca_troubleshoot.png)
 
-> **Important Requirements**
->
-> *   You must have deployed the backend and completed the steps in the [Setup
->     Guide](setup_guide.md).
-> *   You must have the backend API URL(s) for Chrome and Endpoints.
-
-With these requirements completed, edit the configuration file:
+Edit the configuration file:
 
 1.  Open `shared/config.ts` in an editor.
-1.  Edit the endpoints URLs:
-
-    *   In this file, you'll see the `CHROME_ENDPOINTS` and `STANDARD_ENDPOINTS`
-        variables with `prod`, `qa`, and `dev` values.
-
-    *   Update these values with the endpoint URLs uploaded when deploying the
-        backend. You can find these URLs in the Google Cloud console by going to
-        App Engine > Versions and changing the service from the menu.
-
-    *   (*optional*) If you are deploying a single instance of the application,
-        use that value for all fields. Otherwise, specify your separate `prod`,
-        `qa`, and `dev` endpoint URLs.
 
 1.  In the `shared/config.ts` file, find the variable named
     `TROUBLESHOOTING_INFORMATION`:
