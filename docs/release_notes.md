@@ -38,12 +38,12 @@ navigate to Datastore > Entities.
   actions can be attached to.
 
 #### Known issues
+* You must manually [create the GSuite Chrome organizational units](gsuite_config.md)
+  as the app cannot yet create them.
 * There is no configuration view. Configurations must be changed by calling
   the configuration API manually.
 * There may be additional incompatibilities with older versions of this app. If
   you experience any problems please use GitHub's issue tracker.
-* You must manually [create the GSuite Chrome organizational units](gsuite_config.md)
-  as the app cannot yet create them.
 
 ## [Alpha 0.5a](https://github.com/google/loaner/tree/Alpha-(0.5))
 Released 03/30/18
