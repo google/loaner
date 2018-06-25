@@ -41,10 +41,8 @@ export class Configuration implements OnInit {
   ngOnInit() {
     this.configService.list().subscribe(config => {
       this.config = new Config(config);
-      console.log(config);
       this.shelfAuditEmailToList =
           this.arrayToCsv(this.config.shelfAuditEmailTo!);
-      console.log(this.config);
     });
   }
 
@@ -56,7 +54,6 @@ export class Configuration implements OnInit {
    * Converts a string array to a comma-separated string (CSV).
    */
   arrayToCsv(array: string[]): string {
-    console.log(array);
     let emailString = '';
     for (const email of array) {
       emailString += `${email.trim()},\n`;
