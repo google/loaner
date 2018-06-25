@@ -367,6 +367,37 @@ export class DeviceServiceMock {
   }
 }
 
+export const CONFIG_RESPONSE_MOCK = [
+  {boolean_value: false, name: 'shelf_audit_email'},
+  {integer_value: '3', name: 'loan_duration'},
+  {boolean_value: true, name: 'allow_guest_mode'},
+  {name: 'device_identifier_mode', string_value: 'serial_number'},
+  {list_value: ['technicians@test.domain'], name: 'responsible_for_audit'},
+  {boolean_value: true, name: 'bootstrap_completed'},
+  {boolean_value: false, name: 'use_asset_tags'},
+  {name: 'unenroll_ou', string_value: '/'},
+  {boolean_value: true, name: 'loan_duration_email'},
+  {name: 'img_banner_primary', 'string_value': 'images/testbanner.png'},
+  {integer_value: '1000', name: 'sync_roles_user_query_size'},
+  {boolean_value: true, name: 'shelf_audit'},
+  {integer_value: '24', name: 'audit_interval'},
+  {boolean_value: true, name: 'timeout_guest_mode'},
+  {boolean_value: true, name: 'bootstrap_started'},
+  {boolean_value: true, name: 'reminder_email_throttling'},
+  {list_value: [''], name: 'shelf_audit_email_to'},
+  {integer_value: '14', name: 'maximum_loan_duration'},
+  {name: 'org_unit_prefix', string_value: ''},
+  {integer_value: '12', name: 'guest_mode_timeout_in_hours'},
+  {integer_value: '15', name: 'return_grace_period'},
+  {name: 'support_contact', string_value: 'File a ticket!'},
+  {boolean_value: false, name: 'require_surveys'},
+  {integer_value: '1', name: 'reminder_delay'},
+  {name: 'img_button_manage', string_value: 'images/testbutton.png'},
+  {integer_value: '24', name: 'shelf_audit_interval'},
+  {integer_value: '1', name: 'datastore_version'},
+  {boolean_value: true, name: 'anonymous_surveys'}
+];
+
 export class ConfigServiceMock {
   getStringConfig(name: string) {
     return of('');
@@ -384,7 +415,9 @@ export class ConfigServiceMock {
     return of([]);
   }
 
-  list() {}
+  list() {
+    return of(CONFIG_RESPONSE_MOCK);
+  }
 
   update(
       name: string, configType: config.ConfigType,

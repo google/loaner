@@ -15,39 +15,26 @@
 import {CdkTableModule} from '@angular/cdk/table';
 import {NgModule} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {MatAutocompleteModule, MatBadgeModule, MatButtonModule, MatCardModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatGridListModule, MatIconModule, MatIconRegistry, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule,} from '@angular/material';
+import {MatAutocompleteModule, MatBadgeModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatGridListModule, MatIconModule, MatIconRegistry, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatSlideToggleModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule,} from '@angular/material';
 
 const MATERIAL_MODULES = [
-  CdkTableModule,
-  FlexLayoutModule,
-  MatAutocompleteModule,
-  MatBadgeModule,
-  CdkTableModule,
-  FlexLayoutModule,
-  MatAutocompleteModule,
-  MatButtonModule,
-  MatCardModule,
-  MatDialogModule,
-  MatExpansionModule,
-  MatGridListModule,
-  MatIconModule,
-  MatInputModule,
-  MatListModule,
-  MatMenuModule,
-  MatPaginatorModule,
-  MatProgressBarModule,
-  MatProgressSpinnerModule,
-  MatSelectModule,
-  MatSidenavModule,
-  MatSnackBarModule,
-  MatSortModule,
-  MatTableModule,
-  MatTabsModule,
-  MatToolbarModule,
-  MatTooltipModule,
-  MatDatepickerModule,
-  MatNativeDateModule,
-  MatChipsModule,
+  CdkTableModule,        FlexLayoutModule,
+  MatAutocompleteModule, MatBadgeModule,
+  CdkTableModule,        FlexLayoutModule,
+  MatAutocompleteModule, MatButtonModule,
+  MatCardModule,         MatCheckboxModule,
+  MatDialogModule,       MatExpansionModule,
+  MatGridListModule,     MatIconModule,
+  MatInputModule,        MatListModule,
+  MatMenuModule,         MatPaginatorModule,
+  MatProgressBarModule,  MatProgressSpinnerModule,
+  MatSelectModule,       MatSidenavModule,
+  MatSlideToggleModule,  MatSnackBarModule,
+  MatSortModule,         MatTableModule,
+  MatTabsModule,         MatToolbarModule,
+  MatTooltipModule,      MatDatepickerModule,
+  MatNativeDateModule,   MatChipsModule,
+  MatSlideToggleModule,
 ];
 
 @NgModule({

@@ -21,6 +21,7 @@ import {AuthGuard} from './services/auth_guard';
 import {CanDeactivateGuard} from './services/can_deactivate_guard';
 import {AuditView, AuditViewModule} from './views/audit_view';
 import {BootstrapView, BootstrapViewModule} from './views/bootstrap_view';
+import {ConfigurationView, ConfigurationViewModule} from './views/configuration_view';
 import {DeviceActionsView, DeviceActionsViewModule} from './views/device_actions_view';
 import {DeviceDetailView, DeviceDetailViewModule} from './views/device_detail_view';
 import {DeviceListView, DeviceListViewModule} from './views/device_list_view';
@@ -49,6 +50,18 @@ const routes: Routes = [
         CONFIG.appPermissions.READ_CONFIGS,
       ],
     },
+  },
+  {
+    path: 'configuration',
+    component: ConfigurationView,
+    canActivate: [AuthGuard],
+    data: {
+      'requiredPermissions': [
+        CONFIG.appPermissions.BOOTSTRAP,
+        CONFIG.appPermissions.READ_CONFIGS,
+        CONFIG.appPermissions.MODIFY_CONFIG,
+      ]
+    }
   },
   {
     path: 'search',
@@ -206,6 +219,7 @@ const routes: Routes = [
     AuthorizationModule,
     AuditViewModule,
     BootstrapViewModule,
+    ConfigurationViewModule,
     ShelfActionsViewModule,
     DeviceActionsViewModule,
     DeviceDetailViewModule,

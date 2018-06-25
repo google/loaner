@@ -1,0 +1,57 @@
+@import '../../app';
+
+.configuration-container {
+  display: flex;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+mat-card {
+  margin: 12px 0;
+}
+
+.control-set {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px 0;
+
+  .label {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+
+    .sublabel {
+      display: inline-block;
+      width: 100%;
+      color: $gray;
+      font-size: 12px;
+
+      em {
+        display: inline;
+      }
+    }
+  }
+
+  .control {
+    display: flex;
+    width: 50%;
+    justify-content: flex-end;
+
+    .loan-duration-value {
+      width: 25%;
+    }
+  }
+
+  .email-value {
+    width: 75%;
+  }
+}
+
+.submit-section {
+  display: flex;
+  width: 100%;
+  flex-direction: row-reverse;
+}

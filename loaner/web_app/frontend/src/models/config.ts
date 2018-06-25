@@ -45,3 +45,124 @@ export declare interface UpdateConfigRequest {
   boolean_value?: boolean;
   list_value?: string[];
 }
+
+export class Config {
+  allowGuestMode?: boolean;
+  anonymousSurveys?: boolean;
+  auditInterval?: number;
+  bootstrapCompleted?: boolean;
+  bootstrapStarted?: boolean;
+  datastoreVersion?: number;
+  deviceIdentifierMode?: string;  // 'serial_number' could be enum
+  guestModeTimeoutInHours?: number;
+  imgBannerPrimary?: string;
+  imgButtonManage?: string;
+  loanDuration?: number;
+  loanDurationEmail?: boolean;
+  maximumLoanDuration?: number;
+  orgUnitPrefix?: string;
+  reminderDelay?: number;
+  reminderEmailThrottling?: boolean;
+  requireSurveys?: boolean;
+  responsibleForAudit?: string[];
+  returnGracePeriod?: number;
+  syncRolesUserQuerySize?: number;
+  shelfAudit?: boolean;
+  shelfAuditEmail?: boolean;
+  shelfAuditEmailTo?: string[];
+  shelfAuditInterval?: number;  // in hours
+  supportContact?: string;
+  timeoutGuestMode?: boolean;
+  unenrollOU?: string;
+  useAssetTags?: boolean;
+
+  constructor(response: ConfigResponse[]) {
+    // tslint:disable:no-unnecessary-type-assertion Fix after b/110225001
+    this.allowGuestMode =
+        response.find(a => a.name === 'allow_guest_mode')!.boolean_value as
+        boolean;
+    this.anonymousSurveys =
+        response.find(a => a.name === 'anonymous_surveys')!.boolean_value as
+        boolean;
+    this.auditInterval =
+        response.find(a => a.name === 'audit_interval')!.integer_value as
+        number;
+    this.bootstrapCompleted =
+        response.find(a => a.name === 'bootstrap_completed')!.boolean_value as
+        boolean;
+    this.bootstrapStarted =
+        response.find(a => a.name === 'bootstrap_started')!.boolean_value as
+        boolean;
+    this.datastoreVersion =
+        response.find(a => a.name === 'datastore_version')!.integer_value as
+        number;
+    this.deviceIdentifierMode =
+        response.find(a => a.name === 'device_identifier_mode')!.string_value as
+        string;
+    this.guestModeTimeoutInHours =
+        response.find(
+                    a => a.name ===
+                        'guest_mode_timeout_in_hours')!.integer_value as number;
+    this.imgBannerPrimary =
+        response.find(a => a.name === 'img_banner_primary')!.string_value as
+        string;
+    this.imgButtonManage =
+        response.find(a => a.name === 'img_button_manage')!.string_value as
+        string;
+    this.loanDuration =
+        response.find(a => a.name === 'loan_duration')!.integer_value as number;
+    this.loanDurationEmail =
+        response.find(a => a.name === 'loan_duration_email')!.boolean_value as
+        boolean;
+    this.maximumLoanDuration =
+        response.find(a => a.name === 'maximum_loan_duration')!.integer_value as
+        number;
+    this.orgUnitPrefix =
+        response.find(a => a.name === 'org_unit_prefix')!.string_value as
+        string;
+    this.reminderDelay =
+        response.find(a => a.name === 'reminder_delay')!.integer_value as
+        number;
+    this.reminderEmailThrottling =
+        response.find(
+                    a => a.name ===
+                        'reminder_email_throttling')!.boolean_value as boolean;
+    this.requireSurveys =
+        response.find(a => a.name === 'require_surveys')!.boolean_value as
+        boolean;
+    this.responsibleForAudit =
+        response.find(a => a.name === 'responsible_for_audit')!.list_value as
+        string[];
+    this.returnGracePeriod =
+        response.find(a => a.name === 'return_grace_period')!.integer_value as
+        number;
+    this.syncRolesUserQuerySize =
+        response.find(
+                    a => a.name ===
+                        'sync_roles_user_query_size')!.integer_value as number;
+    this.shelfAudit =
+        response.find(a => a.name === 'shelf_audit')!.boolean_value as boolean;
+    this.shelfAuditEmail =
+        response.find(a => a.name === 'shelf_audit_email')!.boolean_value as
+        boolean;
+    this.shelfAuditEmailTo =
+        response.find(a => a.name === 'shelf_audit_email_to')!.list_value as
+            string[] ||
+        [];
+    this.shelfAuditInterval =
+        response.find(a => a.name === 'shelf_audit_interval')!.integer_value as
+        number;
+    this.supportContact =
+        response.find(a => a.name === 'support_contact')!.string_value as
+        string;
+    this.timeoutGuestMode =
+        response.find(a => a.name === 'timeout_guest_mode')!.boolean_value as
+        boolean;
+    this.unenrollOU =
+        response.find(a => a.name === 'unenroll_ou')!.string_value as string;
+    this.useAssetTags =
+        response.find(a => a.name === 'use_asset_tags')!.boolean_value as
+        boolean;
+    // tslint:enable:no-unnecessary-type-assertion
+  }
+}

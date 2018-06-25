@@ -75,6 +75,17 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
     ]
   },
   {
+    icon: 'developer_board',
+    name: 'Configuration',
+    routerLink: 'configuration',
+    requiredPermission: [
+      CONFIG.appPermissions.MODIFY_CONFIG,
+    ],
+    hideOnRoutes: [
+      '/authorization',
+    ]
+  },
+  {
     icon: 'bug_report',
     name: 'Report issues',
     url: 'https://github.com/google/loaner/issues',
