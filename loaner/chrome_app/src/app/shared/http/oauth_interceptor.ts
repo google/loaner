@@ -26,6 +26,11 @@ export class OAuthHttpInterceptor implements HttpInterceptor {
   intercept(originalRequest: HttpRequest<{}>, next: HttpHandler):
       Observable<HttpEvent<{}>> {
     let request: HttpRequest<{}>;
+    // If the request is heading to Google Analytics, do not modify the original
+    // request as otherwise it would send the authorization token.
+    if (originalRequest.url.match('google-analytics.com')) {
+      return next.handle(originalRequest);
+    }
     return this.prepareRequest(originalRequest)
         .pipe(mergeMap((req: HttpRequest<{}>) => {
           request = req;

@@ -16,6 +16,8 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
+
 import {AppModule, AppRoot} from './app';
 
 describe('AppRoot offboarding', () => {
@@ -26,6 +28,12 @@ describe('AppRoot offboarding', () => {
     TestBed
         .configureTestingModule({
           imports: [RouterTestingModule, AppModule],
+          providers: [
+            {
+              provide: AnalyticsService,
+              useClass: AnalyticsServiceMock,
+            },
+          ],
         })
         .compileComponents();
   });

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {PlatformLocation} from '@angular/common';
-import {Component, NgModule, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Component, NgModule, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserModule, Title} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -24,6 +24,7 @@ import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
+import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
 import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED,
 ConfigService, PROGRAM_NAME,
 TOOLBAR_ICON,
@@ -67,7 +68,7 @@ const STEPS: Step[] = [
   styleUrls: ['./app.scss'],
   templateUrl: './app.ng.html',
 })
-export class AppRoot implements OnInit {
+export class AppRoot implements AfterViewInit, OnInit {
   readonly backgroundLogo = BACKGROUND_LOGO;
   readonly backgroundLogoEnabled = BACKGROUND_LOGO_ENABLED;
   readonly toolbarIcon = TOOLBAR_ICON;
@@ -100,6 +101,9 @@ export class AppRoot implements OnInit {
   @ViewChild(LoanerReturnInstructions)
   returnInstructions!: LoanerReturnInstructions;
 
+  // Represents the analytics image in the body.
+  @ViewChild('analytics') analyticsImg!: HTMLImageElement|null;
+
   // Text to be populated on an info card for logout step.
   logoutPage = {
     title: 'Your loaner is now set to be returned.',
@@ -116,12 +120,35 @@ device to your nearest shelf as soon as possible.`,
   };
 
   constructor(
-      private readonly bg: Background, private readonly config: ConfigService,
-      private readonly failure: Failure, private readonly loan: Loan,
-      private readonly survey: Survey, public readonly title: Title) {
+      private readonly analyticsService: AnalyticsService,
+      private readonly bg: Background,
+      private readonly config: ConfigService,
+      private readonly failure: Failure,
+      private readonly loan: Loan,
+      private readonly survey: Survey,
+      readonly title: Title,
+  ) {
     title.setTitle(`Return your ${PROGRAM_NAME} loaner`);
     this.survey.answer.subscribe(val => this.surveyAnswer = val);
     this.survey.surveySent.subscribe(val => this.surveySent = val);
+  }
+
+  /**
+   * Updates the analytics view and changes the analytics img src to match.
+   * @param view represents the current page/view.
+   */
+  private updateAnalytics(view: string) {
+    if (this.config.analyticsEnabled) {
+      this.analyticsService.sendView('offboarding', view).subscribe(url => {
+        if (this.analyticsImg) {
+          this.analyticsImg.src = window.URL.createObjectURL(url);
+        }
+      });
+    }
+  }
+
+  ngAfterViewInit() {
+    this.updateAnalytics('/return');
   }
 
   ngOnInit() {
@@ -162,14 +189,20 @@ device to your nearest shelf as soon as possible.`,
       // Actions to be taken when certain active/next step is shown.
       switch (state.activeStep.id) {
         case 'logout':
+          this.updateAnalytics('/logout');
           this.completeReturn();
           break;
         case 'return':
+          this.updateAnalytics('/return');
           // Ensure that can proceed isn't disabled because of a previous check.
           this.flowSequenceButtons.canProceed = true;
           break;
+        case 'return_instructions':
+          this.updateAnalytics('/return_instructions');
+          break;
         // Checks if surveys are required and if so that they are filled out.
         case 'survey':
+          this.updateAnalytics('/survey');
           if (this.surveyAnswer == null &&
               this.surveyComponent.answerRequired) {
             this.flowSequenceButtons.canProceed = false;
@@ -278,6 +311,7 @@ rest.`;
   bootstrap: [AppRoot],
   declarations: [AppRoot],
   imports: [
+    AnalyticsModule,
     BrowserAnimationsModule,
     BrowserModule,
     FlexLayoutModule,

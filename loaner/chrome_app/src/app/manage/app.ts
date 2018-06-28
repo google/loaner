@@ -13,15 +13,16 @@
 // limitations under the License.
 
 import {PlatformLocation} from '@angular/common';
-import {Component, NgModule, ViewEncapsulation} from '@angular/core';
+import {Component, NgModule, ViewChild, ViewEncapsulation} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {RouterModule, Routes} from '@angular/router';
+import {NavigationEnd, Router, RouterModule, Routes} from '@angular/router';
 
 import {DamagedModule} from '../../../../shared/components/damaged';
 import {ExtendModule} from '../../../../shared/components/extend';
 import {GuestModeModule} from '../../../../shared/components/guest';
 import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, ConfigService} from '../../../../shared/config';
+import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
 import {ChromeAppPlatformLocation,} from '../shared/chrome_app_platform_location';
 import {HttpModule} from '../shared/http/http_module';
 
@@ -40,6 +41,9 @@ import {TroubleshootComponent, TroubleshootModule} from './troubleshoot';
 export class AppRoot {
   backgroundLogo = BACKGROUND_LOGO;
   backgroundLogoEnabled = BACKGROUND_LOGO_ENABLED;
+
+  // Represents the analytics image in the body.
+  @ViewChild('analytics') analyticsImg!: HTMLImageElement|null;
 
   navBarTabs: NavTab[] = [
     {
@@ -61,6 +65,28 @@ export class AppRoot {
       title: 'FAQ',
     },
   ];
+
+  constructor(
+      private readonly analyticsService: AnalyticsService,
+      private readonly config: ConfigService,
+      private readonly router: Router,
+  ) {}
+
+  ngAfterViewInit() {
+    if (this.config.analyticsEnabled) {
+      this.router.events.subscribe(route => {
+        if (route instanceof NavigationEnd) {
+          this.analyticsService
+              .sendView('manage', route.url === '/' ? '/status' : route.url)
+              .subscribe(url => {
+                if (this.analyticsImg) {
+                  this.analyticsImg.src = window.URL.createObjectURL(url);
+                }
+              });
+        }
+      });
+    }
+  }
 }
 
 /** Base route definition for the application. */
@@ -75,6 +101,7 @@ const APP_ROUTES: Routes = [
   bootstrap: [AppRoot],
   declarations: [AppRoot],
   imports: [
+    AnalyticsModule,
     BottomNavModule,
     BrowserAnimationsModule,
     BrowserModule,

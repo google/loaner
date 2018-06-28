@@ -17,6 +17,7 @@ import {By} from '@angular/platform-browser';
 
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
 import {PROGRAM_NAME} from '../../../../shared/config';
+import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
 import {Background, BackgroundMock} from '../shared/background_service';
 
 import {AppModule, AppRoot} from './app';
@@ -31,13 +32,17 @@ describe('Onboarding AppRoot', () => {
           imports: [AppModule],
           providers: [
             {
+              provide: AnalyticsService,
+              useClass: AnalyticsServiceMock,
+            },
+            {
               provide: Background,
               useClass: BackgroundMock,
             },
             {
               provide: Survey,
               useClass: SurveyMock,
-            }
+            },
           ],
         })
         .compileComponents();

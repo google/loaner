@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {PlatformLocation} from '@angular/common';
-import {Component, NgModule, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Component, NgModule, OnInit, ViewChild, ViewEncapsulation} from '@angular/core';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserModule, Title} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -23,6 +23,7 @@ import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
+import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
 import {BACKGROUND_LOGO, ConfigService,
 BACKGROUND_LOGO_ENABLED, PROGRAM_NAME, TOOLBAR_ICON,
 TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
@@ -62,7 +63,7 @@ const STEPS: Step[] = [
   styleUrls: ['./app.scss'],
   templateUrl: './app.ng.html',
 })
-export class AppRoot implements OnInit {
+export class AppRoot implements AfterViewInit, OnInit {
   readonly backgroundLogo = BACKGROUND_LOGO;
   readonly backgroundLogoEnabled = BACKGROUND_LOGO_ENABLED;
   readonly toolbarIcon = TOOLBAR_ICON;
@@ -97,14 +98,39 @@ export class AppRoot implements OnInit {
   @ViewChild(LoanerReturnInstructions)
   returnInstructions!: LoanerReturnInstructions;
 
+  // Represents the analytics image in the body.
+  @ViewChild('analytics') analyticsImg!: HTMLImageElement|null;
 
   constructor(
-      private readonly bg: Background, private readonly failure: Failure,
+      private readonly analyticsService: AnalyticsService,
+      private readonly bg: Background,
+      private readonly config: ConfigService,
+      private readonly failure: Failure,
       private readonly returnService: ReturnDateService,
-      private readonly survey: Survey, public readonly title: Title) {
+      private readonly survey: Survey,
+      readonly title: Title,
+  ) {
     this.title.setTitle(`Welcome to ${PROGRAM_NAME}`);
     this.survey.answer.subscribe(val => this.surveyAnswer = val);
     this.survey.surveySent.subscribe(val => this.surveySent = val);
+  }
+
+  /**
+   * Updates the analytics view and changes the analytics img src to match.
+   * @param view represents the current page/view.
+   */
+  private updateAnalytics(view: string) {
+    if (this.config.analyticsEnabled) {
+      this.analyticsService.sendView('onboarding', view).subscribe(url => {
+        if (this.analyticsImg) {
+          this.analyticsImg.src = window.URL.createObjectURL(url);
+        }
+      });
+    }
+  }
+
+  ngAfterViewInit() {
+    this.updateAnalytics('/welcome');
   }
 
   ngOnInit() {
@@ -161,11 +187,13 @@ export class AppRoot implements OnInit {
       // Actions to be taken when certain active/next step is show.
       switch (state.activeStep.id) {
         case 'welcome':
+          this.updateAnalytics('/welcome');
           // Ensure that can proceed isn't disabled because of a previous check.
           this.flowSequenceButtons.canProceed = true;
           break;
         // Checks if surveys are required and if so that they are filled out.
         case 'survey':
+          this.updateAnalytics('/survey');
           if (this.surveyAnswer == null &&
               this.surveyComponent.answerRequired) {
             this.flowSequenceButtons.canProceed = false;
@@ -181,11 +209,13 @@ export class AppRoot implements OnInit {
           break;
         // Ensure that the button has been properly set with view changes.
         case 'return':
+          this.updateAnalytics('/return');
           this.returnService.validDate.subscribe(val => {
             this.flowSequenceButtons.canProceed = val;
           });
           break;
         case 'return_instructions':
+          this.updateAnalytics('/return_instructions');
           this.bg.onboardingComplete();
           break;
         default:
@@ -258,6 +288,7 @@ continue using the app as normal.`;
   bootstrap: [AppRoot],
   declarations: [AppRoot],
   imports: [
+    AnalyticsModule,
     BrowserAnimationsModule,
     BrowserModule,
     FlexLayoutModule,

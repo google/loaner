@@ -4,6 +4,7 @@
   "manifest_version": 2,
   "name": "GnG Loaner App",
   "permissions": [
+    "https://www.google-analytics.com/",
     "alarms",
     "enterprise.deviceAttributes",
     "identity",
