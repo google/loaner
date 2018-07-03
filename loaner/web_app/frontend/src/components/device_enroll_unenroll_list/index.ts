@@ -13,31 +13,31 @@
 // limitations under the License.
 
 import {NgModule} from '@angular/core';
+import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 
-import {DeviceActionBoxModule} from '../../components/device_action_box';
-import {DeviceEnrollUnenrollListModule} from '../../components/device_enroll_unenroll_list';
-import {DeviceHeaderModule} from '../../components/device_header';
 import {MaterialModule} from '../../core/material_module';
+import {Dialog, DialogsModule} from '../../services/dialog';
+import {DeviceEnrollUnenrollList} from './device_enroll_unenroll_list';
 
-import {DeviceActionsView} from './device_actions_view';
-
-export * from './device_actions_view';
+export * from './device_enroll_unenroll_list';
 
 @NgModule({
   declarations: [
-    DeviceActionsView,
+    DeviceEnrollUnenrollList,
   ],
   exports: [
-    DeviceActionsView,
+    DeviceEnrollUnenrollList,
   ],
   imports: [
-    DeviceActionBoxModule,
-    DeviceEnrollUnenrollListModule,
-    DeviceHeaderModule,
     BrowserModule,
+    DialogsModule,
+    FormsModule,
     MaterialModule,
   ],
+  providers: [
+    Dialog,
+  ],
 })
-export class DeviceActionsViewModule {
+export class DeviceEnrollUnenrollListModule {
 }

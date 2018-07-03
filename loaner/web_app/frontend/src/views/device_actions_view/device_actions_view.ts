@@ -12,9 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, OnInit} from '@angular/core';
+import {Component, OnInit, ViewChild} from '@angular/core';
 import {Title} from '@angular/platform-browser';
+import {ActivatedRoute} from '@angular/router';
+import {Observable} from 'rxjs';
+
 import {CONFIG} from '../../app.config';
+import {DeviceEnrollUnenrollList} from '../../components/device_enroll_unenroll_list';
+import {Actions, Device} from '../../models/device';
 
 @Component({
   selector: 'loaner-device-actions-view',
@@ -25,10 +30,34 @@ import {CONFIG} from '../../app.config';
 export class DeviceActionsView implements OnInit {
   /** Title for the component. */
   private readonly title = `Devices - ${CONFIG.appName}`;
+  /** Current action that will be used in the device-action-box if rendered. */
+  currentAction = '';
 
-  constructor(private titleService: Title) {}
+  /**
+   * Device being (un)enrolled which will be inputed on
+   * device_enroll_unenroll_list component.
+   */
+  device = new Device();
+  @ViewChild('deviceEnrollUnenroll')
+  deviceEnrollUnenroll!: DeviceEnrollUnenrollList;
+
+  constructor(
+      private titleService: Title, private readonly route: ActivatedRoute) {}
 
   ngOnInit() {
     this.titleService.setTitle(this.title);
+    this.route.params.subscribe(params => {
+      this.currentAction = '';
+      for (const key in Actions) {
+        if (params.action === Actions[key]) {
+          this.currentAction = Actions[key];
+        }
+      }
+    });
+  }
+
+  /** Can deactivate route checking. */
+  canDeactivate(): Observable<boolean> {
+    return this.deviceEnrollUnenroll.canDeactivate();
   }
 }

@@ -125,6 +125,7 @@ const routes: Routes = [
         path: ':action',
         component: DeviceActionsView,
         canActivate: [AuthGuard],
+        canDeactivate: [CanDeactivateGuard],
         data: {
           'requiredPermissions': [
             CONFIG.appPermissions.MODIFY_DEVICE,

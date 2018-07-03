@@ -1,65 +1,69 @@
-<div [@bodyExpansion]="state"
-     (@bodyExpansion.done)="animationDone($event)"
-     class="action-box"
-     *ngIf="action == actions.ENROLL || action == actions.UNENROLL">
-  <div class="action-box-content">
-    <div class="action-box-header">
-      <h2>{{action == actions.ENROLL ? 'Add device:' : 'Remove device:'}}</h2>
-      <div fxFlex></div>
-      <button class="close-button" mat-icon-button (click)=collapse()>
-        <mat-icon>close</mat-icon>
-      </button>
+<mat-card class="loaner-table">
+  <mat-card-content>
+    <div [@bodyExpansion]="state"
+         (@bodyExpansion.done)="animationDone($event)"
+         class="action-box"
+         *ngIf="action == actions.ENROLL || action == actions.UNENROLL">
+      <div class="action-box-content">
+        <div class="action-box-header">
+          <h2>{{action == actions.ENROLL ? 'Add device:' : 'Remove device:'}}</h2>
+          <div fxFlex></div>
+          <button class="close-button" mat-icon-button (click)=collapse()>
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+        <form #actionForm=ngForm>
+          <section fxLayout="row"
+                   fxLayout.xs="column"
+                   *ngIf="action == actions.ENROLL">
+            <mat-form-field *ngIf="useSerialNumber" fxFlex class="serial-number">
+              <input loanerRemoveWhitespaces
+                     #serialNumber
+                     matInput
+                     (keyup.enter)="takeActionOnDevice()"
+                     placeholder="Serial number"
+                     [(ngModel)]="device.serialNumber"
+                     name="serialNumber"
+                     required>
+            </mat-form-field>
+            <mat-form-field *ngIf="useAssetTag" fxFlex class="asset-tag">
+              <input loanerRemoveWhitespaces
+                     #assetTag
+                     matInput
+                     (keyup.enter)="takeActionOnDevice()"
+                     placeholder="Asset tag"
+                     [(ngModel)]="device.assetTag"
+                     name="assetTag"
+                     required>
+            </mat-form-field>
+          </section>
+          <section fxLayout="row"
+                   fxLayout.xs="column"
+                   *ngIf="action == actions.UNENROLL">
+            <mat-form-field fxFlex class="serial-number">
+              <input loanerRemoveWhitespaces
+                     #mainIdentifier
+                     matInput
+                     (keyup.enter)="takeActionOnDevice()"
+                     [placeholder]="mainIdentifierName"
+                     [(ngModel)]="device.id"
+                     name="mainIdentifier"
+                     required>
+            </mat-form-field>
+          </section>
+          <section>
+            <div fxFlex></div>
+            <button mat-button
+                    #actionButton
+                    type="button"
+                    (click)="takeActionOnDevice()"
+                    class="action-button"
+                    [disabled]="!actionForm.valid">
+              {{ action == actions.ENROLL ? 'ADD' : 'REMOVE' }}
+            </button>
+          </section>
+        </form>
+      </div>
     </div>
-    <form #actionForm=ngForm>
-      <section fxLayout="row"
-               fxLayout.xs="column"
-               *ngIf="action == actions.ENROLL">
-        <mat-form-field *ngIf="useSerialNumber" fxFlex class="serial-number">
-          <input loanerRemoveWhitespaces
-                 #serialNumber
-                 matInput
-                 (keyup.enter)="takeActionOnDevice()"
-                 placeholder="Serial number"
-                 [(ngModel)]="device.serialNumber"
-                 name="serialNumber"
-                 required>
-        </mat-form-field>
-        <mat-form-field *ngIf="useAssetTag" fxFlex class="asset-tag">
-          <input loanerRemoveWhitespaces
-                 #assetTag
-                 matInput
-                 (keyup.enter)="takeActionOnDevice()"
-                 placeholder="Asset tag"
-                 [(ngModel)]="device.assetTag"
-                 name="assetTag"
-                 required>
-        </mat-form-field>
-      </section>
-      <section fxLayout="row"
-               fxLayout.xs="column"
-               *ngIf="action == actions.UNENROLL">
-        <mat-form-field fxFlex class="serial-number">
-          <input loanerRemoveWhitespaces
-                 #mainIdentifier
-                 matInput
-                 (keyup.enter)="takeActionOnDevice()"
-                 [placeholder]="mainIdentifierName"
-                 [(ngModel)]="device.id"
-                 name="mainIdentifier"
-                 required>
-        </mat-form-field>
-      </section>
-      <section>
-        <div fxFlex></div>
-        <button mat-button
-                #actionButton
-                type="button"
-                (click)="takeActionOnDevice()"
-                class="action-button"
-                [disabled]="!actionForm.valid">
-          {{ action == actions.ENROLL ? 'ADD' : 'REMOVE' }}
-        </button>
-      </section>
-    </form>
-  </div>
-</div>
+  </mat-card-content>
+</mat-card>

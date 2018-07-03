@@ -1,3 +1,8 @@
 <loaner-device-header cardTitle="Device List"></loaner-device-header>
-<loaner-device-list-table [showButtons]="true" [showStatus]="true">
-</loaner-device-list-table>
+<loaner-device-action-box *ngIf="currentAction"
+                          [action]="currentAction"
+                          (takeAction)="deviceEnrollUnenroll.deviceAction($event)">
+</loaner-device-action-box>
+<loaner-device-enroll-unenroll-list #deviceEnrollUnenroll
+                                    [currentAction]="currentAction">
+</loaner-device-enroll-unenroll-list>

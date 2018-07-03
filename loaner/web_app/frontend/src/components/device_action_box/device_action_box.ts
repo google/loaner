@@ -18,15 +18,9 @@ import {NgForm} from '@angular/forms';
 import {NavigationEnd, Router} from '@angular/router';
 import {fromEvent} from 'rxjs';
 
-import {Device} from '../../models/device';
+import {Actions, Device} from '../../models/device';
 import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
-
-/** Possible actions that can be taken on devices in this component. */
-export enum Actions {
-  ENROLL = 'enroll',
-  UNENROLL = 'unenroll',
-}
 
 /**
  * Device identifier supported modes, needs to match modes on
@@ -206,7 +200,12 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
 
   animationDone(event: AnimationEvent) {
     if (event.toState === 'collapsed') {
-      this.router.navigate(['devices']);
+      this.router.navigate(['devices']).then(res => {
+        if (!res) {
+          this.state = 'expanded';
+          this.setUpInput();
+        }
+      });
     }
   }
 }

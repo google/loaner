@@ -25,7 +25,6 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Device, DeviceApiParams} from '../../models/device';
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
-import {Actions} from '../device_action_box';
 
 /**
  * Implements the mat-table component. Implementation details:

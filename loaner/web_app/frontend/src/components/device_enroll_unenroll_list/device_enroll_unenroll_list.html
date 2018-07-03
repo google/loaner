@@ -1,0 +1,42 @@
+<mat-card class="loaner-table">
+  <span class="header-row">
+    <span>Identifier</span>
+  </span>
+  <mat-card-content>
+    <mat-list>
+      <mat-list-item *ngFor="let device of devices">
+        <span>{{device.deviceId}}</span>
+        <span fxFlex></span>
+        <mat-progress-spinner *ngIf="device.status === status.IN_PROGRESS"
+                              [diameter]="24" [strokeWidth]="24 / 10"
+                              color="accent"
+                              mode="indeterminate">
+        </mat-progress-spinner>
+
+        <!-- Action taken successfully -->
+        <mat-icon *ngIf="device.status === status.READY"
+                  matTooltip="{{device.message}}"
+                  aria-hidden="false"
+                  aria-label="Action taken successfully"
+                  class="status ready">
+          check
+        </mat-icon>
+
+        <!-- Error on action performed -->
+        <div *ngIf="device.status === status.ERROR">
+          <mat-icon matTooltip="{{device.message}}"
+                    aria-hidden="true"
+                    class="status error">
+            error
+          </mat-icon>
+          <span class="cdk-visually-hidden">
+            Error adding device: {{device.message}}
+          </span>
+        </div>
+      </mat-list-item>
+    </mat-list>
+    <div class="no-devices" *ngIf="isEmpty">
+      There are no devices to be {{currentAction}}ed.
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -5,10 +5,4 @@
     </span>
     <loaner-device-buttons *ngIf="showButtons"></loaner-device-buttons>
   </mat-card-title>
-  <mat-card-content>
-    <loaner-device-action-box *ngIf="currentAction"
-                              [action]="currentAction"
-                              (takeAction)="takeActionOnDevice($event)">
-    </loaner-device-action-box>
-  </mat-card-content>
 </mat-card>

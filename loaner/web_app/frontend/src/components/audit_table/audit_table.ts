@@ -14,31 +14,12 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
+import {DeviceOnAction, Status} from '../../models/device';
 
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
-
-/**
- * Device status for when being checked in into a shelf, depending on the
- * backend response.
- */
-export enum Status {
-  READY = 1,
-  ERROR,
-  IN_PROGRESS,
-}
-
-/**
- * Properties for a device to be checked in such as its current status and
- * error/success message, if any.
- */
-export interface DeviceToBeCheckedIn {
-  deviceId: string;
-  status: Status;
-  message?: string;
-}
 
 @Component({
   preserveWhitespaces: true,
@@ -51,7 +32,7 @@ export class AuditTable implements OnInit {
   /** Status to be checked and displayed on the template */
   status = Status;
   /** List of devices that are in the pool to be checked in. */
-  devicesToBeCheckedIn: DeviceToBeCheckedIn[] = [];
+  devicesToBeCheckedIn: DeviceOnAction[] = [];
   /** Current shelf that the devices are being checked into. */
   shelf = new Shelf();
 
@@ -90,7 +71,7 @@ export class AuditTable implements OnInit {
    */
   addDevice(input: HTMLInputElement) {
     const deviceId = input.value;
-    let deviceToBeCheckedIn: DeviceToBeCheckedIn;
+    let deviceToBeCheckedIn: DeviceOnAction;
     if (deviceId) {
       deviceToBeCheckedIn = {
         deviceId,
@@ -130,7 +111,7 @@ export class AuditTable implements OnInit {
    * @param deviceToBeCheckedIn Device that will be checked in or replaced in
    *     the list.
    */
-  private updateDeviceInList(deviceToBeCheckedIn: DeviceToBeCheckedIn) {
+  private updateDeviceInList(deviceToBeCheckedIn: DeviceOnAction) {
     const deviceToBeRemoved = this.devicesToBeCheckedIn.find(
         device => device.deviceId === deviceToBeCheckedIn.deviceId);
     const index = this.devicesToBeCheckedIn.indexOf(deviceToBeRemoved);
@@ -146,7 +127,7 @@ export class AuditTable implements OnInit {
    *
    * @param device Device element to be removed from the pool.
    */
-  removeDevice(device: DeviceToBeCheckedIn) {
+  removeDevice(device: DeviceOnAction) {
     const index = this.devicesToBeCheckedIn.indexOf(device);
     if (index > -1) {
       this.devicesToBeCheckedIn.splice(index, 1);

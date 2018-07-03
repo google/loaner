@@ -277,6 +277,29 @@ export class Device {
   }
 }
 
+/**
+ * Properties for a device to be enrolled/unenrolled/audited such as its
+ * current status and error/success message.
+ */
+export interface DeviceOnAction {
+  deviceId: string;
+  status: Status;
+  message?: string;
+}
+
+/** Device status to be showed in the view during actions */
+export enum Status {
+  READY = 1,
+  ERROR,
+  IN_PROGRESS,
+}
+
+/** Possible actions that can be taken on devices. */
+export enum Actions {
+  ENROLL = 'enroll',
+  UNENROLL = 'unenroll',
+}
+
 export enum DeviceChipColor {
   PRIMARY = 'primary',
   ACCENT = 'accent',

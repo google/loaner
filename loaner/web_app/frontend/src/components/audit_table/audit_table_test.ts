@@ -17,13 +17,14 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import {Observable, of} from 'rxjs';
+import {Status} from '../../models/device';
 
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {ActivatedRouteMock, DeviceServiceMock, ShelfServiceMock} from '../../testing/mocks';
 
-import {AuditTable, AuditTableModule, Status} from '.';
+import {AuditTable, AuditTableModule} from '.';
 
 describe('AuditTableComponent', () => {
   let fixture: ComponentFixture<AuditTable>;
