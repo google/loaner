@@ -79,6 +79,7 @@ export class ShelfActionsCard implements OnInit {
   create() {
     this.shelfService.create(this.shelf).subscribe(() => {
       this.shelf = new Shelf();
+      this.shelfActionsForm.form.markAsPristine();
       this.backToShelves();
     });
   }
@@ -92,7 +93,7 @@ export class ShelfActionsCard implements OnInit {
         .pipe(switchMap(() => this.shelfService.getShelf(this.shelf.location)))
         .subscribe(shelf => {
           this.shelf = shelf;
-          this.editing = false;
+          this.shelfActionsForm.form.markAsPristine();
           this.backToShelfDetails();
         });
   }
