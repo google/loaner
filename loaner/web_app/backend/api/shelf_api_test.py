@@ -114,7 +114,8 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     """Test Enroll with mock methods."""
     request = shelf_messages.EnrollShelfRequest(
         location='nyc', capacity=100, friendly_name='test', latitude=12.5,
-        longitude=12.5, altitude=2.0, responsible_for_audit='precise')
+        longitude=12.5, altitude=2.0, responsible_for_audit='precise',
+        audit_interval_override=33, audit_notification_enabled=True)
     response = self.service.enroll(request)
     assert mock_xsrf_token.call_count == 1
     self.assertIsInstance(response, message_types.VoidMessage)

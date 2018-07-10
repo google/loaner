@@ -69,7 +69,9 @@ class ShelfApi(root_api.Service):
           altitude=request.altitude,
           capacity=request.capacity,
           audit_notification_enabled=request.audit_notification_enabled,
-          responsible_for_audit=request.responsible_for_audit)
+          responsible_for_audit=request.responsible_for_audit,
+          audit_interval_override=request.audit_interval_override,
+      )
     except (shelf_model.EnrollmentError, datastore_errors.BadValueError) as err:
       raise endpoints.BadRequestException(str(err))
 

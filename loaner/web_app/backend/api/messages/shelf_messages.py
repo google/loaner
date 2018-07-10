@@ -61,6 +61,7 @@ class Shelf(messages.Message):
         be used to retrieve the shelf.
     query: shared_message.SearchRequest, a message containing query options to
         conduct a search on an index.
+    audit_interval_override: str, The audit interval override (in hours).
   """
   enabled = messages.BooleanField(1, default=True)
   friendly_name = messages.StringField(2)
@@ -79,6 +80,7 @@ class Shelf(messages.Message):
   page_number = messages.IntegerField(15, default=1)
   shelf_request = messages.MessageField(ShelfRequest, 16)
   query = messages.MessageField(shared_messages.SearchRequest, 17)
+  audit_interval_override = messages.IntegerField(18)
 
 
 class EnrollShelfRequest(messages.Message):
@@ -94,6 +96,7 @@ class EnrollShelfRequest(messages.Message):
     audit_notification_enabled: bool, Indicates if an audit is enabled for
         the shelf.
     responsible_for_audit: str, The party responsible for audits.
+    audit_interval_override: int, The audit interval override (in hours).
   """
   friendly_name = messages.StringField(1)
   location = messages.StringField(2, required=True)
@@ -103,6 +106,7 @@ class EnrollShelfRequest(messages.Message):
   capacity = messages.IntegerField(6, required=True)
   audit_notification_enabled = messages.BooleanField(7)
   responsible_for_audit = messages.StringField(8)
+  audit_interval_override = messages.IntegerField(9)
 
 
 class UpdateShelfRequest(messages.Message):
@@ -117,6 +121,10 @@ class UpdateShelfRequest(messages.Message):
     latitude: float, A geographical point represented by floating-point.
     longitude: float, A geographical point represented by floating-point.
     altitude: float, Indicates the floor.
+    audit_interval_override: int, The audit interval override (in hours).
+    responsible_for_audit: str, The party responsible for audits.
+    audit_notification_enabled: bool, Indicates if an audit is enabled for
+        the shelf.
   """
   shelf_request = messages.MessageField(ShelfRequest, 1)
   friendly_name = messages.StringField(2)
@@ -125,6 +133,9 @@ class UpdateShelfRequest(messages.Message):
   latitude = messages.FloatField(5)
   longitude = messages.FloatField(6)
   altitude = messages.FloatField(7)
+  audit_interval_override = messages.IntegerField(8)
+  responsible_for_audit = messages.StringField(9)
+  audit_notification_enabled = messages.BooleanField(10)
 
 
 class ListShelfResponse(messages.Message):
