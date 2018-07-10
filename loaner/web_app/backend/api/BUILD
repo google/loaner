@@ -58,7 +58,7 @@ loaner_appengine_library(
         ":auth",
         ":permissions",
         ":root_api",
-        "//loaner/web_app/backend/api/messages:bootstrap_message",
+        "//loaner/web_app/backend/api/messages:bootstrap_messages",
         "//loaner/web_app/backend/lib:bootstrap",
     ],
 )
@@ -72,7 +72,7 @@ loaner_appengine_library(
         ":auth",
         ":permissions",
         ":root_api",
-        "//loaner/web_app/backend/api/messages:chrome_message",
+        "//loaner/web_app/backend/api/messages:chrome_messages",
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:device_model",
         "@endpoints_archive//:endpoints",
@@ -89,7 +89,7 @@ loaner_appengine_library(
         ":permissions",
         ":root_api",
         "//loaner/web_app:config_defaults",
-        "//loaner/web_app/backend/api/messages:config_message",
+        "//loaner/web_app/backend/api/messages:config_messages",
         "//loaner/web_app/backend/models:config_model",
         "@endpoints_archive//:endpoints",
     ],
@@ -104,7 +104,7 @@ loaner_appengine_library(
         ":auth",
         ":permissions",
         ":root_api",
-        "//loaner/web_app/backend/api/messages:datastore_message",
+        "//loaner/web_app/backend/api/messages:datastore_messages",
         "//loaner/web_app/backend/lib:datastore_yaml",
     ],
 )
@@ -119,7 +119,7 @@ loaner_appengine_library(
         ":permissions",
         ":root_api",
         ":shelf_api",
-        "//loaner/web_app/backend/api/messages:device_message",
+        "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:search_utils",
@@ -252,7 +252,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":bootstrap_api",
-        "//loaner/web_app/backend/api/messages:bootstrap_message",
+        "//loaner/web_app/backend/api/messages:bootstrap_messages",
         "//loaner/web_app/backend/testing:loanertest",
     ],
 )
@@ -264,7 +264,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":chrome_api",
-        "//loaner/web_app/backend/api/messages:chrome_message",
+        "//loaner/web_app/backend/api/messages:chrome_messages",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/testing:loanertest",
@@ -281,7 +281,7 @@ loaner_appengine_test(
     deps = [
         ":config_api",
         "//loaner/web_app:config_defaults",
-        "//loaner/web_app/backend/api/messages:config_message",
+        "//loaner/web_app/backend/api/messages:config_messages",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@mock_archive//:mock",
@@ -296,7 +296,7 @@ loaner_appengine_test(
     deps = [
         ":datastore_api",
         "//loaner/web_app:constants",
-        "//loaner/web_app/backend/api/messages:bootstrap_message",
+        "//loaner/web_app/backend/api/messages:bootstrap_messages",
         "//loaner/web_app/backend/testing:loanertest",
     ],
 )
@@ -309,7 +309,7 @@ loaner_appengine_test(
     deps = [
         ":device_api",
         ":root_api",
-        "//loaner/web_app/backend/api/messages:device_message",
+        "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shared_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
         "//loaner/web_app/backend/clients:directory",

@@ -22,7 +22,7 @@ import endpoints
 
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import chrome_message
+from loaner.web_app.backend.api.messages import chrome_messages
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import device_model
 
@@ -34,8 +34,8 @@ class ChromeApi(root_api.Service):
   """Google Endpoints Frameworks API service class for the GnG Chrome App."""
 
   @auth.method(
-      chrome_message.HeartbeatRequest,
-      chrome_message.HeartbeatResponse,
+      chrome_messages.HeartbeatRequest,
+      chrome_messages.HeartbeatResponse,
       name='heartbeat',
       path='heartbeat',
       http_method='GET')
@@ -66,5 +66,5 @@ class ChromeApi(root_api.Service):
         raise endpoints.NotFoundException(str(e))
 
     device.record_heartbeat()
-    return chrome_message.HeartbeatResponse(
+    return chrome_messages.HeartbeatResponse(
         is_enrolled=is_enrolled, start_assignment=start_assignment)

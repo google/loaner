@@ -23,7 +23,7 @@ from protorpc import message_types
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import datastore_message
+from loaner.web_app.backend.api.messages import datastore_messages
 from loaner.web_app.backend.lib import datastore_yaml
 
 
@@ -32,7 +32,7 @@ class DatastoreApi(root_api.Service):
   """Datastore API service class."""
 
   @auth.method(
-      datastore_message.ImportYamlRequest,
+      datastore_messages.ImportYamlRequest,
       message_types.VoidMessage,
       name='import',
       path='import',

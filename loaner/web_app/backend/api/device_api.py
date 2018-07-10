@@ -28,7 +28,7 @@ from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
-from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import search_utils
@@ -52,7 +52,7 @@ class DeviceApi(root_api.Service):
   """This class is for the Device API."""
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='enroll',
       path='enroll',
@@ -74,7 +74,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='unenroll',
       path='unenroll',
@@ -92,7 +92,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='unlock',
       path='unlock',
@@ -112,7 +112,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='auditable',
       path='auditable',
@@ -131,13 +131,13 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
-      device_message.Device,
+      device_messages.DeviceRequest,
+      device_messages.Device,
       name='get',
       path='user/get',
       http_method='POST')
   def get_device(self, request):
-    """Gets a device using any identifier in device_message.DeviceRequest."""
+    """Gets a device using any identifier in device_messages.DeviceRequest."""
     device = _get_device(request)
     if not device.enrolled:
       raise endpoints.BadRequestException(
@@ -163,8 +163,8 @@ class DeviceApi(root_api.Service):
     return message
 
   @auth.method(
-      device_message.Device,
-      device_message.ListDevicesResponse,
+      device_messages.Device,
+      device_messages.ListDevicesResponse,
       name='list',
       path='list',
       http_method='POST',
@@ -202,18 +202,18 @@ class DeviceApi(root_api.Service):
     messages = []
     for document in search_results.results:
       message = search_utils.document_to_message(
-          document, device_message.Device())
+          document, device_messages.Device())
       message.guest_permitted = guest_permitted
       messages.append(message)
 
-    return device_message.ListDevicesResponse(
+    return device_messages.ListDevicesResponse(
         devices=messages,
         total_results=search_results.number_found,
         total_pages=total_pages)
 
   @auth.method(
       message_types.VoidMessage,
-      device_message.ListUserDeviceResponse,
+      device_messages.ListUserDeviceResponse,
       name='user_devices',
       path='user/devices',
       http_method='POST')
@@ -222,14 +222,14 @@ class DeviceApi(root_api.Service):
     self.check_xsrf_token(self.request_state)
     user = user_lib.get_user_email()
     guest_permitted = config_model.Config.get('allow_guest_mode')
-    device_messages = []
+    device_message_list = []
     for device in device_model.Device.list_by_user(user):
-      device_messages.append(
+      device_message_list.append(
           api_utils.build_device_message_from_model(device, guest_permitted))
-    return device_message.ListUserDeviceResponse(devices=device_messages)
+    return device_messages.ListUserDeviceResponse(devices=device_message_list)
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='enable_guest_mode',
       path='user/enable_guest_mode',
@@ -252,7 +252,7 @@ class DeviceApi(root_api.Service):
       return message_types.VoidMessage()
 
   @auth.method(
-      device_message.ExtendLoanRequest,
+      device_messages.ExtendLoanRequest,
       message_types.VoidMessage,
       name='extend_loan',
       path='user/extend_loan',
@@ -275,7 +275,7 @@ class DeviceApi(root_api.Service):
       raise endpoints.UnauthorizedException(str(err))
 
   @auth.method(
-      device_message.DamagedRequest,
+      device_messages.DamagedRequest,
       message_types.VoidMessage,
       name='mark_damaged',
       path='user/mark_damaged',
@@ -294,7 +294,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='undamaged',
       path='undamaged',
@@ -310,7 +310,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='mark_lost',
       path='user/mark_lost',
@@ -327,7 +327,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='mark_pending_return',
       path='user/mark_pending_return',
@@ -346,7 +346,7 @@ class DeviceApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      device_message.DeviceRequest,
+      device_messages.DeviceRequest,
       message_types.VoidMessage,
       name='resume_loan',
       path='user/resume_loan',
@@ -367,7 +367,7 @@ def _get_identifier_from_request(device_request):
   """Parses the DeviceMessage for an identifier to use to get a Device entity.
 
   Args:
-    device_request: device_message.DeviceRequest message.
+    device_request: device_messages.DeviceRequest message.
 
   Returns:
     The name of the usable device identifier as a string.
@@ -392,7 +392,7 @@ def _get_device(device_request):
   serial_number.
 
   Args:
-    device_request: device_message.DeviceRequest message.
+    device_request: device_messages.DeviceRequest message.
 
   Returns:
     A device model, or None if one could not be found.

@@ -26,7 +26,7 @@ from loaner.web_app import config_defaults
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import config_message
+from loaner.web_app.backend.api.messages import config_messages
 from loaner.web_app.backend.models import config_model
 
 _FIELD_MISSING_MSG = 'Please double-check you provided all necessary fields.'
@@ -38,8 +38,8 @@ class ConfigAPI(root_api.Service):
   """Endpoints API service class for Config config resource."""
 
   @auth.method(
-      config_message.GetConfigRequest,
-      config_message.ConfigResponse,
+      config_messages.GetConfigRequest,
+      config_messages.ConfigResponse,
       name='get',
       path='get',
       http_method='GET',
@@ -55,22 +55,23 @@ class ConfigAPI(root_api.Service):
     except KeyError as error:
       raise endpoints.BadRequestException(str(error))
 
-    if request.config_type == config_message.ConfigType.STRING:
-      response_message = config_message.ConfigResponse(
+    if request.config_type == config_messages.ConfigType.STRING:
+      response_message = config_messages.ConfigResponse(
           string_value=setting_value)
-    elif request.config_type == config_message.ConfigType.INTEGER:
-      response_message = config_message.ConfigResponse(
+    elif request.config_type == config_messages.ConfigType.INTEGER:
+      response_message = config_messages.ConfigResponse(
           integer_value=setting_value)
-    elif request.config_type == config_message.ConfigType.BOOLEAN:
-      response_message = config_message.ConfigResponse(
+    elif request.config_type == config_messages.ConfigType.BOOLEAN:
+      response_message = config_messages.ConfigResponse(
           boolean_value=setting_value)
-    elif request.config_type == config_message.ConfigType.LIST:
-      response_message = config_message.ConfigResponse(list_value=setting_value)
+    elif request.config_type == config_messages.ConfigType.LIST:
+      response_message = config_messages.ConfigResponse(
+          list_value=setting_value)
     return response_message
 
   @auth.method(
       message_types.VoidMessage,
-      config_message.ListConfigsResponse,
+      config_messages.ListConfigsResponse,
       name='list',
       path='list',
       http_method='GET',
@@ -83,22 +84,22 @@ class ConfigAPI(root_api.Service):
     for setting in config_defaults.DEFAULTS:
       setting_value = config_model.Config.get(setting)
       if isinstance(setting_value, basestring):
-        response_message.append(config_message.ConfigResponse(
+        response_message.append(config_messages.ConfigResponse(
             name=setting, string_value=setting_value))
       if (isinstance(setting_value, int) and not isinstance(setting_value, bool)
           or isinstance(setting_value, float)):
-        response_message.append(config_message.ConfigResponse(
+        response_message.append(config_messages.ConfigResponse(
             name=setting, integer_value=setting_value))
       if isinstance(setting_value, bool) and isinstance(setting_value, int):
-        response_message.append(config_message.ConfigResponse(
+        response_message.append(config_messages.ConfigResponse(
             name=setting, boolean_value=setting_value))
       if isinstance(setting_value, list):
-        response_message.append(config_message.ConfigResponse(
+        response_message.append(config_messages.ConfigResponse(
             name=setting, list_value=setting_value))
-    return config_message.ListConfigsResponse(configs=response_message)
+    return config_messages.ListConfigsResponse(configs=response_message)
 
   @auth.method(
-      config_message.UpdateConfigRequest,
+      config_messages.UpdateConfigRequest,
       message_types.VoidMessage,
       name='update',
       path='update',
@@ -110,16 +111,16 @@ class ConfigAPI(root_api.Service):
     if not request.config_type or not request.name:
       raise endpoints.BadRequestException(_FIELD_MISSING_MSG)
     try:
-      if request.config_type == config_message.ConfigType.STRING:
+      if request.config_type == config_messages.ConfigType.STRING:
         config_model.Config.set(
             name=request.name, value=request.string_value)
-      elif request.config_type == config_message.ConfigType.INTEGER:
+      elif request.config_type == config_messages.ConfigType.INTEGER:
         config_model.Config.set(
             name=request.name, value=request.integer_value)
-      elif request.config_type == config_message.ConfigType.BOOLEAN:
+      elif request.config_type == config_messages.ConfigType.BOOLEAN:
         config_model.Config.set(
             name=request.name, value=request.boolean_value)
-      elif request.config_type == config_message.ConfigType.LIST:
+      elif request.config_type == config_messages.ConfigType.LIST:
         config_model.Config.set(
             name=request.name, value=request.list_value)
     except KeyError as error:

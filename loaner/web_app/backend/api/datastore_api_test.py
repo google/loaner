@@ -23,7 +23,7 @@ import mock
 import endpoints
 
 from loaner.web_app.backend.api import datastore_api
-from loaner.web_app.backend.api.messages import datastore_message
+from loaner.web_app.backend.api.messages import datastore_messages
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -43,7 +43,7 @@ class DatastoreEndpointsTest(loanertest.EndpointsTestCase):
   @mock.patch('__main__.datastore_api.root_api.Service.check_xsrf_token')
   def test_import(self, mock_xsrf_token, mock_importyaml):
     self.login_admin_endpoints_user()
-    request = datastore_message.ImportYamlRequest(yaml='fake_yaml')
+    request = datastore_messages.ImportYamlRequest(yaml='fake_yaml')
 
     self.service.datastore_import(request)
     assert mock_xsrf_token.call_count == 1
@@ -54,7 +54,7 @@ class DatastoreEndpointsTest(loanertest.EndpointsTestCase):
   @mock.patch('__main__.datastore_api.root_api.Service.check_xsrf_token')
   def test_import_not_admin(self, mock_xsrf_token, mock_importyaml):
     self.login_endpoints_user()
-    request = datastore_message.ImportYamlRequest(yaml='fake_yaml')
+    request = datastore_messages.ImportYamlRequest(yaml='fake_yaml')
 
     self.assertRaises(
         endpoints.ForbiddenException, self.service.datastore_import, request)

@@ -27,7 +27,7 @@ from google.appengine.ext import ndb
 import endpoints
 
 from loaner.web_app import constants
-from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.models import device_model
@@ -94,7 +94,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         last_reminder=device_model.Reminder(level=1),
         next_reminder=device_model.Reminder(level=2),
     ).put().get()
-    expected_message = device_message.Device(
+    expected_message = device_messages.Device(
         serial_number='test_serial_value',
         asset_tag='test_asset_tag_value',
         identifier='test_asset_tag_value',
@@ -114,8 +114,8 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         last_heartbeat=datetime.datetime(year=2018, month=1, day=6),
         damaged=None,
         damaged_reason='Not damaged',
-        last_reminder=device_message.Reminder(level=1),
-        next_reminder=device_message.Reminder(level=2),
+        last_reminder=device_messages.Reminder(level=1),
+        next_reminder=device_messages.Reminder(level=2),
         guest_permitted=True,
         guest_enabled=True,
         max_extend_date=test_device.calculate_return_dates().max,
@@ -135,7 +135,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
     """Test the construction of a reminder message from a reminder entity."""
     test_reminder = device_model.Reminder(
         level=test_level, time=test_datetime, count=test_count).put().get()
-    expected_message = device_message.Reminder(
+    expected_message = device_messages.Reminder(
         level=test_level, time=test_datetime, count=test_count)
     returned_message = api_utils.build_reminder_message_from_model(
         test_reminder)

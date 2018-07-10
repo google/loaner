@@ -25,7 +25,7 @@ import mock
 from protorpc import message_types
 
 from loaner.web_app.backend.api import bootstrap_api
-from loaner.web_app.backend.api.messages import bootstrap_message
+from loaner.web_app.backend.api.messages import bootstrap_messages
 from loaner.web_app.backend.testing import loanertest
 
 
@@ -49,17 +49,17 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     mock_runbootstrap.return_value = {
         'task1': 'Running a task.',
         'task2': 'Running another task'}
-    request = bootstrap_message.RunBootstrapRequest()
+    request = bootstrap_messages.RunBootstrapRequest()
 
-    task1 = bootstrap_message.BootstrapTask(name='task1')
+    task1 = bootstrap_messages.BootstrapTask(name='task1')
     task1.kwargs = [
-        bootstrap_message.BootstrapTaskKwarg(name='kwarg1', value='42'),
-        bootstrap_message.BootstrapTaskKwarg(
+        bootstrap_messages.BootstrapTaskKwarg(name='kwarg1', value='42'),
+        bootstrap_messages.BootstrapTaskKwarg(
             name='kwarg2', value='This must be Thursday.'),
     ]
-    task2 = bootstrap_message.BootstrapTask(name='task2')
+    task2 = bootstrap_messages.BootstrapTask(name='task2')
     task2.kwargs = [
-        bootstrap_message.BootstrapTaskKwarg(name='kwarg1', value='1024'),
+        bootstrap_messages.BootstrapTaskKwarg(name='kwarg1', value='1024'),
     ]
     request.requested_tasks = [task1, task2]
 

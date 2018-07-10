@@ -23,7 +23,7 @@ from protorpc import message_types
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
-from loaner.web_app.backend.api.messages import bootstrap_message
+from loaner.web_app.backend.api.messages import bootstrap_messages
 from loaner.web_app.backend.lib import bootstrap
 
 
@@ -32,8 +32,8 @@ class BootstrapApi(root_api.Service):
   """Bootstrap API service class."""
 
   @auth.method(
-      bootstrap_message.RunBootstrapRequest,
-      bootstrap_message.BootstrapStatusResponse,
+      bootstrap_messages.RunBootstrapRequest,
+      bootstrap_messages.BootstrapStatusResponse,
       name='run',
       path='run',
       http_method='POST',
@@ -49,15 +49,15 @@ class BootstrapApi(root_api.Service):
 
     run_status_dict = bootstrap.run_bootstrap(requested_tasks)
 
-    response_message = bootstrap_message.BootstrapStatusResponse()
+    response_message = bootstrap_messages.BootstrapStatusResponse()
     for name, description in run_status_dict.iteritems():
       response_message.tasks.append(
-          bootstrap_message.BootstrapTask(name=name, description=description))
+          bootstrap_messages.BootstrapTask(name=name, description=description))
     return response_message
 
   @auth.method(
       message_types.VoidMessage,
-      bootstrap_message.BootstrapStatusResponse,
+      bootstrap_messages.BootstrapStatusResponse,
       name='get_status',
       path='get_status',
       http_method='GET',
@@ -65,13 +65,13 @@ class BootstrapApi(root_api.Service):
   def get_status(self, request):
     """Gets general bootstrap status, and task status if not yet completed."""
     self.check_xsrf_token(self.request_state)
-    response_message = bootstrap_message.BootstrapStatusResponse()
+    response_message = bootstrap_messages.BootstrapStatusResponse()
     response_message.enabled = bootstrap.is_bootstrap_enabled()
     response_message.started = bootstrap.is_bootstrap_started()
     response_message.completed = bootstrap.is_bootstrap_completed()
     for name, status in bootstrap.get_bootstrap_task_status().iteritems():
       response_message.tasks.append(
-          bootstrap_message.BootstrapTask(
+          bootstrap_messages.BootstrapTask(
               name=name,
               description=status.get('description'),
               success=status.get('success'),

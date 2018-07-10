@@ -17,37 +17,37 @@ load(
 # ==============================================================================
 
 loaner_appengine_library(
-    name = "config_message",
+    name = "config_messages",
     srcs = [
-        "config_message.py",
+        "config_messages.py",
     ],
 )
 
 loaner_appengine_library(
-    name = "bootstrap_message",
+    name = "bootstrap_messages",
     srcs = [
-        "bootstrap_message.py",
+        "bootstrap_messages.py",
     ],
 )
 
 loaner_appengine_library(
-    name = "chrome_message",
+    name = "chrome_messages",
     srcs = [
-        "chrome_message.py",
+        "chrome_messages.py",
     ],
 )
 
 loaner_appengine_library(
-    name = "datastore_message",
+    name = "datastore_messages",
     srcs = [
-        "datastore_message.py",
+        "datastore_messages.py",
     ],
 )
 
 loaner_appengine_library(
-    name = "device_message",
+    name = "device_messages",
     srcs = [
-        "device_message.py",
+        "device_messages.py",
     ],
     deps = [
         ":shared_messages",

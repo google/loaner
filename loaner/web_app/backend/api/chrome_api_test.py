@@ -23,7 +23,7 @@ import mock
 import endpoints
 
 from loaner.web_app.backend.api import chrome_api
-from loaner.web_app.backend.api.messages import chrome_message
+from loaner.web_app.backend.api.messages import chrome_messages
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import loanertest
@@ -44,7 +44,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     self.addCleanup(self.patcher_directory.stop)
     self.service = chrome_api.ChromeApi()
     self.login_endpoints_user()
-    self.chrome_request = chrome_message.HeartbeatRequest(device_id=UNIQUE_ID)
+    self.chrome_request = chrome_messages.HeartbeatRequest(device_id=UNIQUE_ID)
 
   def tearDown(self):
     super(ChromeEndpointsTest, self).tearDown()
@@ -73,14 +73,14 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     with self.assertRaisesRegexp(
         endpoints.BadRequestException,
         chrome_api._NO_DEVICE_ID_MSG):
-      self.service.heartbeat(chrome_message.HeartbeatRequest())
+      self.service.heartbeat(chrome_messages.HeartbeatRequest())
 
   def test_heartbeat_unassigned_device(self):
     """Tests heartbeat processing for a unassigned, enrolled device."""
     self.create_device()
 
     response = self.service.heartbeat(self.chrome_request)
-    self.assertIsInstance(response, chrome_message.HeartbeatResponse)
+    self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
     self.assertEqual(response.is_enrolled, True)
     self.assertEqual(response.start_assignment, True)
     assert not self.mock_loan_resumes_if_late.called
@@ -91,7 +91,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
         assigned_user='previous-user{}'.format(loanertest.USER_DOMAIN))
 
     response = self.service.heartbeat(self.chrome_request)
-    self.assertIsInstance(response, chrome_message.HeartbeatResponse)
+    self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
     self.assertEqual(response.is_enrolled, True)
     self.assertEqual(response.start_assignment, True)
     device = device_model.Device.get(chrome_device_id=UNIQUE_ID)
@@ -103,7 +103,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     self.create_device(assigned_user=loanertest.USER_EMAIL)
 
     response = self.service.heartbeat(self.chrome_request)
-    self.assertIsInstance(response, chrome_message.HeartbeatResponse)
+    self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
     self.assertEqual(response.is_enrolled, True)
     self.assertEqual(response.start_assignment, False)
     self.mock_loan_resumes_if_late.assert_called_once_with(
@@ -114,7 +114,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     self.create_device(enrolled=False)
 
     response = self.service.heartbeat(self.chrome_request)
-    self.assertIsInstance(response, chrome_message.HeartbeatResponse)
+    self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
     self.assertEqual(response.is_enrolled, False)
     self.assertEqual(response.start_assignment, False)
     device = device_model.Device.get(chrome_device_id=UNIQUE_ID)
@@ -127,7 +127,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
         loanertest.TEST_DIR_DEVICE1)
 
     response = self.service.heartbeat(self.chrome_request)
-    self.assertIsInstance(response, chrome_message.HeartbeatResponse)
+    self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
     self.assertEqual(response.is_enrolled, False)
     self.assertEqual(response.start_assignment, False)
 

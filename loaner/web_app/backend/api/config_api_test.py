@@ -24,7 +24,7 @@ from protorpc import message_types
 
 from loaner.web_app import config_defaults
 from loaner.web_app.backend.api import config_api
-from loaner.web_app.backend.api.messages import config_message
+from loaner.web_app.backend.api.messages import config_messages
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -62,9 +62,9 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
     self.service = None
 
   def test_get_config_invalid_setting(self):
-    request = config_message.GetConfigRequest(
+    request = config_messages.GetConfigRequest(
         name='Not Valid',
-        config_type=config_message.ConfigType.STRING)
+        config_type=config_messages.ConfigType.STRING)
     self.assertRaisesRegexp(
         config_api.endpoints.BadRequestException,
         'No such name',
@@ -72,41 +72,41 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
         request)
 
   def test_get_config_missing_fields(self):
-    request = config_message.GetConfigRequest()
+    request = config_messages.GetConfigRequest()
     with self.assertRaises(config_api.endpoints.BadRequestException):
       self.service.get_config(request)
 
   def test_get_config_string_setting(self):
-    request = config_message.GetConfigRequest(
+    request = config_messages.GetConfigRequest(
         name='test_config_string',
-        config_type=config_message.ConfigType.STRING)
+        config_type=config_messages.ConfigType.STRING)
     response = self.service.get_config(request)
     self.assertEqual(
         self.existing_string_config_in_datastore.string_value,
         response.string_value)
 
   def test_get_config_bool_setting(self):
-    request = config_message.GetConfigRequest(
+    request = config_messages.GetConfigRequest(
         name='test_config_bool',
-        config_type=config_message.ConfigType.BOOLEAN)
+        config_type=config_messages.ConfigType.BOOLEAN)
     response = self.service.get_config(request)
     self.assertEqual(
         self.existing_bool_config_in_datastore.bool_value,
         response.boolean_value)
 
   def test_get_config_int_setting(self):
-    request = config_message.GetConfigRequest(
+    request = config_messages.GetConfigRequest(
         name='test_config_int',
-        config_type=config_message.ConfigType.INTEGER)
+        config_type=config_messages.ConfigType.INTEGER)
     response = self.service.get_config(request)
     self.assertEqual(
         self.existing_int_config_in_datastore.integer_value,
         response.integer_value)
 
   def test_get_config_list_setting(self):
-    request = config_message.GetConfigRequest(
+    request = config_messages.GetConfigRequest(
         name='test_config_list',
-        config_type=config_message.ConfigType.LIST)
+        config_type=config_messages.ConfigType.LIST)
     response = self.service.get_config(request)
     self.assertEqual(
         self.existing_list_config_in_datastore.list_value,
@@ -127,14 +127,14 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
           config_defaults.DEFAULTS)
 
   def test_update_config_bad_request(self):
-    request = config_message.UpdateConfigRequest()
+    request = config_messages.UpdateConfigRequest()
     with self.assertRaises(config_api.endpoints.BadRequestException):
       self.service.update_config(request)
 
   def test_update_config_value_does_not_exist(self):
-    request = config_message.UpdateConfigRequest(
+    request = config_messages.UpdateConfigRequest(
         name='Does not exist!',
-        config_type=config_message.ConfigType.BOOLEAN,
+        config_type=config_messages.ConfigType.BOOLEAN,
         boolean_value=False)
     self.assertRaisesRegexp(
         config_api.endpoints.BadRequestException,
@@ -146,9 +146,9 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
     mock_config = 'test_config_bool'
     mock_config_value = False
     config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_message.UpdateConfigRequest(
+    request = config_messages.UpdateConfigRequest(
         name=mock_config,
-        config_type=config_message.ConfigType.BOOLEAN,
+        config_type=config_messages.ConfigType.BOOLEAN,
         boolean_value=mock_config_value)
     response = self.service.update_config(request)
     self.assertIsInstance(response, message_types.VoidMessage)
@@ -159,9 +159,9 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
     mock_config = 'test_config_string'
     mock_config_value = 'File a ticket!'
     config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_message.UpdateConfigRequest(
+    request = config_messages.UpdateConfigRequest(
         name=mock_config,
-        config_type=config_message.ConfigType.STRING,
+        config_type=config_messages.ConfigType.STRING,
         string_value=mock_config_value)
     response = self.service.update_config(request)
     self.assertIsInstance(response, message_types.VoidMessage)
@@ -172,9 +172,9 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
     mock_config = 'test_config_integer'
     mock_config_value = 5
     config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_message.UpdateConfigRequest(
+    request = config_messages.UpdateConfigRequest(
         name=mock_config,
-        config_type=config_message.ConfigType.INTEGER,
+        config_type=config_messages.ConfigType.INTEGER,
         integer_value=mock_config_value)
     response = self.service.update_config(request)
     self.assertIsInstance(response, message_types.VoidMessage)
@@ -185,9 +185,9 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
     mock_config = 'test_config_list'
     mock_config_value = ['email1', 'email2']
     config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_message.UpdateConfigRequest(
+    request = config_messages.UpdateConfigRequest(
         name=mock_config,
-        config_type=config_message.ConfigType.LIST,
+        config_type=config_messages.ConfigType.LIST,
         list_value=mock_config_value)
     response = self.service.update_config(request)
     self.assertIsInstance(response, message_types.VoidMessage)

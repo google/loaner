@@ -24,7 +24,7 @@ from google.appengine.ext import ndb
 
 import endpoints
 
-from loaner.web_app.backend.api.messages import device_message
+from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 
 _CORRUPT_KEY_MSG = 'The key provided for submission was not found.'
@@ -32,7 +32,7 @@ _MALFORMED_PAGE_TOKEN_MSG = 'The page token provided is incorrect.'
 
 
 def build_device_message_from_model(device, guest_permitted):
-  """Builds a device_message.Device ProtoRPC message.
+  """Builds a device_messages.Device ProtoRPC message.
 
   Args:
     device: device_model.Device, a device entity to convert into a message.
@@ -40,9 +40,9 @@ def build_device_message_from_model(device, guest_permitted):
         organization.
 
   Returns:
-    A populated device_message.Device ProtoRPC message.
+    A populated device_messages.Device ProtoRPC message.
   """
-  message = device_message.Device(
+  message = device_messages.Device(
       serial_number=device.serial_number,
       asset_tag=device.asset_tag,
       identifier=device.identifier,
@@ -85,9 +85,9 @@ def build_reminder_message_from_model(reminder):
     reminder: device_model.Reminder, the reminder from a device.
 
   Returns:
-    A device_message.Reminder message with the respective properties.
+    A device_messages.Reminder message with the respective properties.
   """
-  return device_message.Reminder(
+  return device_messages.Reminder(
       level=reminder.level,
       time=reminder.time,
       count=reminder.count)

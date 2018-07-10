@@ -50,7 +50,7 @@ loaner_appengine_library(
         "api_utils.py",
     ],
     deps = [
-        "//loaner/web_app/backend/api/messages:device_message",
+        "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
         "@endpoints_archive//:endpoints",
     ],
@@ -205,7 +205,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":api_utils",
-        "//loaner/web_app/backend/api/messages:device_message",
+        "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
