@@ -15,7 +15,7 @@
             <mat-slide-toggle name="allow_guest_mode_boolean" [(ngModel)]="config.allowGuestMode"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.timeoutGuestMode">
+        <section class="control-set">
           <div class="label">
             Timeout guest mode
             <div class="sublabel">
@@ -26,7 +26,7 @@
             <mat-slide-toggle name="timeout_guest_mode_number" [(ngModel)]="config.timeoutGuestMode"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.guestModeTimeoutInHours">
+        <section class="control-set">
           <div class="label">
             Guest mode timeout
             <div class="sublabel">The number of hours to allow guest mode to be in use.</div>
@@ -38,7 +38,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.loanDuration">
+        <section class="control-set">
           <div class="label">
             Default loan duration
             <div class="sublabel">The default length of time for new loans to be borrowed.</div>
@@ -50,7 +50,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.maximumLoanDuration">
+        <section class="control-set">
           <div class="label">
             Maximum loan duration
             <div class="sublabel">The maximum length of time a loan can be borrowed.</div>
@@ -62,7 +62,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.loanDurationReminderEmail">
+        <section class="control-set">
           <div class="label">
             Loan duration reminder email
             <div class="sublabel">
@@ -73,7 +73,7 @@
             <mat-slide-toggle name="loan_duration_email_boolean" [(ngModel)]="config.loanDurationReminderEmail"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.reminderEmailThrottling">
+        <section class="control-set">
           <div class="label">
             Reminder email throttling
             <div class="sublabel">
@@ -84,7 +84,7 @@
             <mat-slide-toggle name="reminder_email_throttling_boolean" [(ngModel)]="config.reminderEmailThrottling"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.reminderDelay">
+        <section class="control-set">
           <div class="label">
             Reminder email delay
             <div class="sublabel">
@@ -98,7 +98,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.returnGracePeriod">
+        <section class="control-set">
           <div class="label">
             Return grace period
             <div class="sublabel">
@@ -120,13 +120,13 @@
       <mat-card-title>Shelves</mat-card-title>
       <mat-card-subtitle>Configure shelf settings</mat-card-subtitle>
       <mat-card-content>
-        <section class="control-set" *ngIf="config.shelfAudit">
+        <section class="control-set">
           <div class="label">Enable shelf auditing</div>
           <div class="control">
             <mat-slide-toggle name="shelf_audit_boolean" [(ngModel)]="config.shelfAudit"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.shelfAuditEmail">
+        <section class="control-set">
           <div class="label">
             Enable shelf audit email
             <div class="sublabel">Send an email reminder if a shelf needs to be audited.</div>
@@ -135,7 +135,7 @@
             <mat-slide-toggle name="shelf_audit_email_boolean" [(ngModel)]="config.shelfAuditEmail"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.shelfAuditInterval">
+        <section class="control-set">
           <div class="label">
             Shelf audit interval
             <div class="sublabel">
@@ -151,7 +151,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.shelfAuditEmailTo">
+        <section class="control-set">
           <div class="label">
             Shelf audit email recipients
             <div class="sublabel">Recipients to send a shelf audit email reminder.</div>
@@ -165,7 +165,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.responsibleForAudit">
+        <section class="control-set">
           <div class="label">
             Group responsible for audit
             <div class="sublabel">
@@ -187,7 +187,7 @@
       <mat-card-title>Organization</mat-card-title>
       <mat-card-subtitle>Configure org settings</mat-card-subtitle>
       <mat-card-content>
-        <section class="control-set" *ngIf="config.supportContact">
+        <section class="control-set">
           <div class="label">
             Support contact
             <div class="sublabel">The text shown as the support contact.</div>
@@ -198,7 +198,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.orgUnitPrefix">
+        <section class="control-set">
           <div class="label">
             Org unit prefix
             <div class="sublabel">
@@ -212,7 +212,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.auditInterval">
+        <section class="control-set">
           <div class="label">
             Audit interval (threshold)
             <div class="sublabel">The shelf audit threshold in hours.</div>
@@ -224,7 +224,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.syncRolesUserQuerySize">
+        <section class="control-set">
           <div class="label">
             Sync roles query size
             <div class="sublabel">
@@ -238,7 +238,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.anonymousSurveys">
+        <section class="control-set">
           <div class="label">
             Anonymous surveys
             <div class="sublabel">Record surveys anonymously.</div>
@@ -247,7 +247,7 @@
             <mat-slide-toggle name="anonymous_surveys_boolean" [(ngModel)]="config.anonymousSurveys"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.useAssetTags">
+        <section class="control-set">
           <div class="label">
             Use asset tags
             <div class="sublabel">
@@ -258,7 +258,7 @@
             <mat-slide-toggle name="use_asset_tags_boolean" [(ngModel)]="config.useAssetTags"></mat-slide-toggle>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.imgBannerPrimary">
+        <section class="control-set">
           <div class="label">
             Banner image
             <div class="sublabel">
@@ -271,7 +271,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.imgButtonManage">
+        <section class="control-set">
           <div class="label">
             Manage button image
             <div class="sublabel">
@@ -284,7 +284,7 @@
             </mat-form-field>
           </div>
         </section>
-        <section class="control-set" *ngIf="config.unenrollOU">
+        <section class="control-set">
           <div class="label">
             Unenroll OU
             <div class="sublabel">
