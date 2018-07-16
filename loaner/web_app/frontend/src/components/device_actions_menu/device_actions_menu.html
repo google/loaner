@@ -22,8 +22,8 @@
     Return
   </button>
   <button mat-menu-item
-          [disabled]="(device.guestAllowed && device.guestEnabled) || !device.assignedUser ||
-                      device.lost"
+          [disabled]="!device.guestAllowed || (device.guestAllowed && device.guestEnabled) ||
+                      !device.assignedUser || device.lost"
           (click)="enableGuestMode(device)"
           class="button-guest">
     <mat-icon>account_circle</mat-icon>

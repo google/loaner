@@ -225,6 +225,32 @@ export const DEVICE_ASSIGNED = new Device({
   max_extend_date: new Date(2018, 1, 4),
 });
 
+export const DEVICE_GUEST_NOT_PERMITTED = new Device({
+  assigned_user: 'test_user',
+  device_model: 'chromebook',
+  serial_number: '777006',
+  pending_return: false,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
+  current_ou: 'ROOT',
+  max_extend_date: new Date(2018, 1, 4),
+  guest_permitted: false,
+});
+
+export const DEVICE_GUEST_PERMITTED = new Device({
+  assigned_user: 'test_user',
+  device_model: 'chromebook',
+  serial_number: '777006',
+  pending_return: false,
+  assignment_date: new Date(2018, 1, 1),
+  last_known_healthy: new Date(2018, 1, 1),
+  due_date: new Date(2018, 1, 1),
+  current_ou: 'ROOT',
+  max_extend_date: new Date(2018, 1, 4),
+  guest_permitted: true,
+});
+
 export const DEVICE_LOST = new Device({
   device_model: 'chromebook',
   serial_number: '777007',

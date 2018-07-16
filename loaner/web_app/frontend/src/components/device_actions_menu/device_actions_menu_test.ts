@@ -27,7 +27,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_LOST, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, DEVICE_GUEST_PERMITTED, DEVICE_LOST, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
@@ -150,6 +150,31 @@ describe('DeviceActionsMenu', () => {
     fixture.detectChanges();
     expect(overlayContainerElement.textContent).toContain('Unlock');
   });
+
+  it('renders a disabled Enable Guest button after more is clicked', () => {
+    dummyComponent.testDevice = DEVICE_GUEST_NOT_PERMITTED;
+    fixture.detectChanges();
+    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
+    actionsButton.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('.actions-menu'))
+                       .query(By.css('.button-guest'))
+                       .nativeElement as HTMLButtonElement;
+    expect(button.disabled).toBeTruthy();
+  });
+
+  it('renders an enabled Enable Guest button after more is clicked', () => {
+    dummyComponent.testDevice = DEVICE_GUEST_PERMITTED;
+    fixture.detectChanges();
+    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
+    actionsButton.triggerEventHandler('click', null);
+    fixture.detectChanges();
+    const button = fixture.debugElement.query(By.css('.actions-menu'))
+                       .query(By.css('.button-guest'))
+                       .nativeElement as HTMLButtonElement;
+    expect(button.disabled).toBeFalsy();
+  });
+
 
   it('renders the Unenroll button after more is clicked', () => {
     fixture.detectChanges();
