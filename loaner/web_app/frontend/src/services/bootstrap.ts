@@ -27,16 +27,16 @@ export class BootstrapService extends ApiService {
   apiEndpoint = 'bootstrap';
 
   run(tasks?: bootstrap.Task[]): Observable<bootstrap.Status> {
-    return this.post('run', tasks).pipe(tap(() => {
+    return this.post<bootstrap.Status>('run', tasks).pipe(tap(() => {
       this.snackBar.open(`Setup requested.`);
-    })) as Observable<bootstrap.Status>;
+    }));
   }
 
   /**
    * Retrieves current Bootstrap status from the backend.
    */
   getStatus(): Observable<bootstrap.Status> {
-    return this.get('get_status')
+    return this.get<bootstrap.Status>('get_status')
         .pipe(
             tap((status: bootstrap.Status) => {
               if (status.completed) {
