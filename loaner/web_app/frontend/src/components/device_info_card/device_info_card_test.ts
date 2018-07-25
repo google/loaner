@@ -211,4 +211,18 @@ describe('DeviceInfoCardComponent', () => {
     expect(imitatingUserCardText)
         .toContain('You are viewing devices on behalf of test_user');
   });
+
+  it('updates list of devices after marking a device as lost', () => {
+    const deviceService: DeviceService = TestBed.get(DeviceService);
+    spyOn(deviceService, 'markAsLost').and.returnValue(of([
+      DEVICE_1,
+    ]));
+    spyOn(deviceService, 'list').and.returnValue(of({
+      devices: [DEVICE_ASSIGNED],
+      totalResults: 0,
+      totalPages: 1,
+    }));
+    deviceInfoCard.onLost(DEVICE_1);
+    expect(deviceService.list).toHaveBeenCalled();
+  });
 });

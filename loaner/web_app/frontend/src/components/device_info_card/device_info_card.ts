@@ -82,6 +82,14 @@ export class DeviceInfoCard implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.getDevices();
+  }
+
+  /**
+   * Load current user or perform the impersonating to get the list of devices
+   * for user.
+   */
+  private getDevices() {
     this.userService.whenUserLoaded()
         .pipe(
             tap(user => this.user = user),
@@ -199,6 +207,7 @@ export class DeviceInfoCard implements OnInit {
     this.deviceService.markAsLost(device).subscribe(
         () => {
           this.lostService.finished();
+          this.getDevices();
         },
         () => {
           this.lostService.close();
