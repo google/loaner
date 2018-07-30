@@ -7,9 +7,10 @@
     </button>
     <span>Shelf Details</span>
     <span fxFlex></span>
-    <button mat-icon-button>
-      <mat-icon class="icon-more"
-                [matMenuTriggerFor]="actionsMenu">more_vert</mat-icon>
+    <button mat-icon-button
+            [matMenuTriggerFor]="actionsMenu"
+            class="actionsMenuButton">
+      <mat-icon class="icon-more">more_vert</mat-icon>
     </button>
     <mat-menu #actionsMenu="matMenu" class="actions-menu">
       <button routerLink="/shelf/{{shelf.location}}/audit" mat-menu-item>
@@ -45,8 +46,14 @@
         </loaner-viewonly-label>
       </section>
       <section fxLayout="row" fxLayout.xs="column">
-        <loaner-viewonly-label topLabel="Responsible" class="responsible"
-                  text="{{shelf.responsibleForAudit}}" fxFlex>
+        <loaner-viewonly-label class="auditNotificationEnabled"
+                               text="Audit notification is {{shelf.auditNotificationEnabled ? 'enabled' : 'disabled'}}"
+                               fxFlex="50%">
+        </loaner-viewonly-label>
+        <loaner-viewonly-label topLabel="Responsible"
+                               class="responsible"
+                               text="{{shelf.responsibleForAudit}}"
+                               fxFlex="50%">
           </loaner-viewonly-label>
       </section>
     </div>

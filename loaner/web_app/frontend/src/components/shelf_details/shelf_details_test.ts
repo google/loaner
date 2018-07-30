@@ -122,6 +122,17 @@ describe('ShelfDetailsComponent', () => {
         .toContain('Responsible');
   });
 
+  it('renders the shelf audit notifications inside loaner-viewonly-label',
+     () => {
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       expect(
+           compiled
+               .querySelector('loaner-viewonly-label.auditNotificationEnabled')
+               .textContent)
+           .toContain('Audit notification');
+     });
+
   it('should call openDialog when button is clicked.',
      () => {
      });

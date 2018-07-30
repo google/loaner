@@ -46,10 +46,15 @@
         </mat-form-field>
       </section>
       <section fxLayout="row" fxLayout.xs="column">
+        <mat-slide-toggle [(ngModel)]="shelf.auditNotificationEnabled"
+                          name="auditNotificationEnabled"
+                          fxFlex="50%">
+          Enable shelf audit notifications
+        </mat-slide-toggle>
         <mat-select placeholder="Responsible for Audit"
                    [(ngModel)]="shelf.responsibleForAudit"
                    name="responsibleForAudit"
-                   fxFlex="24%">
+                   fxFlex="50%">
           <mat-option *ngFor="let responsible of responsiblesForAuditList"
                       [value]="responsible">{{responsible}}</mat-option>
         </mat-select>

@@ -31,6 +31,7 @@ export declare interface ShelfApiParams {
   latitude?: number;
   longitude?: number;
   altitude?: number;
+  audit_notification_enabled?: boolean;
   capacity?: number;
   last_audit_time?: Date;
   last_audit_by?: string;
@@ -75,6 +76,8 @@ export class Shelf {
   responsibleForAudit = '';
   /** The representation of a shelf request. */
   shelfRequest!: ShelfRequestParams;
+  /** Enable audit notifications. */
+  auditNotificationEnabled = true;
 
   /**
    * Property for the shelf name, which is preferred to be it's friendly
@@ -96,6 +99,10 @@ export class Shelf {
     this.responsibleForAudit =
         shelf.responsible_for_audit || this.responsibleForAudit;
     this.shelfRequest = shelf.shelf_request || this.shelfRequest;
+    this.auditNotificationEnabled =
+        shelf.audit_notification_enabled === undefined ?
+        this.auditNotificationEnabled :
+        shelf.audit_notification_enabled;
   }
 
   /** Translates the Shelf model object to the API message. */
@@ -111,6 +118,7 @@ export class Shelf {
       responsible_for_audit: this.responsibleForAudit,
       capacity: this.capacity,
       shelf_request: this.shelfRequest,
+      audit_notification_enabled: this.auditNotificationEnabled,
     };
   }
 }

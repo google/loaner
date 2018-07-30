@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -122,6 +122,56 @@ describe('ShelfActionsComponent', () => {
     const input = compiled.querySelector('input[name="altitude"]');
     expect(input).toBeTruthy();
   });
+
+  it('has an Enable shelf audit notifications slide toggle', () => {
+    componentInstance.editing = true;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const input =
+        compiled.querySelector('input[name="auditNotificationEnabled"]');
+    expect(input).toBeTruthy();
+  });
+
+  it('sets the audit notifications toggle to checked appropriately',
+     fakeAsync(() => {
+       componentInstance.editing = true;
+       fixture.detectChanges();
+       tick();
+       componentInstance.shelf = TEST_SHELF;
+       componentInstance.shelf.auditNotificationEnabled = true;
+       fixture.detectChanges();
+       tick();
+
+       const compiled = fixture.debugElement.nativeElement;
+       const slideToggleChecked = compiled.querySelector(
+           'mat-slide-toggle[name="auditNotificationEnabled"].mat-checked');
+       expect(slideToggleChecked).toBeTruthy();
+     }));
+
+  it('sets the audit notifications toggle to unchecked appropriately',
+     fakeAsync(() => {
+       componentInstance.editing = true;
+       componentInstance.shelf = TEST_SHELF;
+       componentInstance.shelf.auditNotificationEnabled = false;
+       fixture.detectChanges();
+       tick();
+
+       const compiled = fixture.debugElement.nativeElement;
+       const slideToggleUnchecked = compiled.querySelector(
+           'mat-slide-toggle[name="auditNotificationEnabled"]');
+       expect(slideToggleUnchecked).toBeTruthy();
+       const slideToggleChecked = compiled.querySelector(
+           'mat-slide-toggle[name="auditNotificationEnabled"].mat-checked');
+       expect(slideToggleChecked).toBeFalsy();
+     }));
+
+  it('changes audit notifications on the model when toggled false to true',
+     () => {
+     });
+
+  it('changes audit notifications on the model when toggled true to false',
+     () => {
+     });
 
   it('calls the shelf api when creating a shelf', () => {
     const shelfService: ShelfService = TestBed.get(ShelfService);

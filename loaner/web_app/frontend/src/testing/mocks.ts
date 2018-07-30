@@ -33,7 +33,8 @@ export class ShelfServiceMock {
       shelf_request: {
         location: 'Location 1',
         urlsafe_key: 'urlsafekey1',
-      }
+      },
+      audit_notification_enabled: true,
     }),
     new Shelf({
       friendly_name: 'Friendly name 2',
