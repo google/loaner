@@ -56,6 +56,7 @@ export class ReturnDateService {
   updateNewReturnDate(date: Date): Observable<undefined|Date> {
     this.newReturnDate = date;
     this.newReturnDateSource.next(date);
+    this.validDateSource.next(this.validateDate(moment(date).format()));
     return this.newReturnDateSource.asObservable();
   }
 
