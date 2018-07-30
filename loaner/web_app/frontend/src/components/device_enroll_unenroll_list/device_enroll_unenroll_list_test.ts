@@ -18,7 +18,6 @@ import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {of} from 'rxjs';
 
-// import {Device, DeviceOnAction} from '../../models/device';
 import {DeviceService} from '../../services/device';
 import {DEVICE_1, DEVICE_2} from '../../testing/mocks';
 import {DeviceServiceMock} from '../../testing/mocks';
@@ -95,7 +94,6 @@ describe('DeviceEnrollUnenrollList', () => {
     deviceEnrollUnenrollList.deviceAction(DEVICE_1);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    console.log(compiled);
     expect(compiled.querySelector('.mat-list-item').textContent)
         .toContain('device1');
     expect(compiled.querySelector('.mat-list-item').textContent)

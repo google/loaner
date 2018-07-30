@@ -12,10 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Location} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {DeviceOnAction, Status} from '../../models/device';
 
+import {DeviceOnAction, Status} from '../../models/device';
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
@@ -39,6 +40,7 @@ export class AuditTable implements OnInit {
   constructor(
       private readonly deviceService: DeviceService,
       private readonly dialog: Dialog,
+      private readonly location: Location,
       private readonly route: ActivatedRoute,
       private readonly router: Router,
       private readonly shelfService: ShelfService,
@@ -58,8 +60,13 @@ export class AuditTable implements OnInit {
   }
 
   /** Navigates to the previous expected page. */
-  back() {
+  backToShelves() {
     this.router.navigate(['/shelves']);
+  }
+
+  /** Navigates to the previous visited page. */
+  backToLast() {
+    this.location.back();
   }
 
   /**
@@ -157,6 +164,7 @@ export class AuditTable implements OnInit {
         this.devicesToBeCheckedIn.map(device => device.deviceId);
     this.shelfService.audit(this.shelf, deviceIdList).subscribe(() => {
       this.devicesToBeCheckedIn = [];
+      this.backToShelves();
     });
   }
 
@@ -167,7 +175,9 @@ export class AuditTable implements OnInit {
         this.shelf.location} as empty ? `;
     this.dialog.confirm(dialogTitle, dialogContent).subscribe(result => {
       if (result) {
-        this.shelfService.audit(this.shelf).subscribe();
+        this.shelfService.audit(this.shelf).subscribe(() => {
+          this.backToShelves();
+        });
       }
     });
   }

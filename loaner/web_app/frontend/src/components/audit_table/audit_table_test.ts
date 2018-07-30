@@ -14,7 +14,7 @@
 
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {ActivatedRoute} from '@angular/router';
+import {ActivatedRoute, Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import {Observable, of} from 'rxjs';
 import {Status} from '../../models/device';
@@ -29,6 +29,7 @@ import {AuditTable, AuditTableModule} from '.';
 describe('AuditTableComponent', () => {
   let fixture: ComponentFixture<AuditTable>;
   let auditTable: AuditTable;
+  let router: Router;
 
   beforeEach(fakeAsync(() => {
     TestBed
@@ -50,6 +51,7 @@ describe('AuditTableComponent', () => {
 
     fixture = TestBed.createComponent(AuditTable);
     auditTable = fixture.debugElement.componentInstance;
+    router = TestBed.get(Router);
   }));
 
   it('creates the AuditTable', () => {
@@ -122,63 +124,66 @@ describe('AuditTableComponent', () => {
     expect(auditButton.getAttribute('disabled')).toBe('');
   });
 
-  it('calls shelf service when audit button is clicked', () => {
-    auditTable.devicesToBeCheckedIn = [
-      {
-        deviceId: '321653',
-        status: Status.READY,
-      },
-    ];
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
+  it('calls shelf service with deviceId when audit button is clicked',
+     fakeAsync(() => {
+       auditTable.devicesToBeCheckedIn = [
+         {
+           deviceId: '321653',
+           status: Status.READY,
+         },
+       ];
+       expect(auditTable.isEmpty).not.toBeTruthy();
 
-    expect(auditTable.devicesToBeCheckedIn.length).toBe(1);
-    const matCard = compiled.querySelector('.mat-card');
-    const matCardContent = matCard.querySelector('.mat-card-content');
-    const auditButton = compiled.querySelector('button.audit');
-    const shelfService = TestBed.get(ShelfService);
-    spyOn(shelfService, 'audit').and.callThrough();
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const auditButton = compiled.querySelector('button.audit');
 
-    auditButton.dispatchEvent(new Event('click'));
+       const shelfService = TestBed.get(ShelfService);
+       spyOn(shelfService, 'audit').and.callThrough();
+       spyOn(router, 'navigate');
+       auditButton.click();
+       flushMicrotasks();
+       expect(shelfService.audit).toHaveBeenCalledWith(auditTable.shelf, [
+         '321653'
+       ]);
+     }));
 
-    fixture.detectChanges();
-    expect(auditTable.devicesToBeCheckedIn.length).toBe(0);
-    expect(matCardContent.querySelectorAll('.mat-list > .mat-list-item').length)
-        .toBe(0);
-    expect(shelfService.audit).toHaveBeenCalledWith(auditTable.shelf, [
-      '321653'
-    ]);
-  });
+  it('calls shelf service without deviceId when audit button is clicked and dialog is confirmed',
+     fakeAsync(() => {
+       auditTable.devicesToBeCheckedIn = [];
+       expect(auditTable.isEmpty).toBeTruthy();
 
-  it('calls shelf service when audit empty button is clicked', () => {
-    auditTable.devicesToBeCheckedIn = [];
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const auditButton = compiled.querySelector('button.audit');
+       const shelfService = TestBed.get(ShelfService);
+       spyOn(shelfService, 'audit').and.callThrough();
 
-    expect(auditTable.devicesToBeCheckedIn.length).toBe(0);
-    const matCard = compiled.querySelector('.mat-card');
-    const matCardContent = matCard.querySelector('.mat-card-content');
-    const auditEmptyButton = compiled.querySelector('button.audit');
-    const shelfService = TestBed.get(ShelfService);
-    spyOn(shelfService, 'audit').and.callThrough();
+       const dialog: Dialog = TestBed.get(Dialog);
+       spyOn(dialog, 'confirm').and.returnValue(of(true));
+       spyOn(router, 'navigate');
+       auditButton.click();
+       flushMicrotasks();
+       expect(shelfService.audit).toHaveBeenCalledWith(auditTable.shelf);
+     }));
 
-    auditEmptyButton.dispatchEvent(new Event('click'));
-    fixture.detectChanges();
-    const dialog: Dialog = TestBed.get(Dialog);
-    spyOn(dialog, 'confirm').and.returnValue(of(true));
-    fakeAsync(() => {
-      auditTable.audit();
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(shelfService.audit).toHaveBeenCalledWith(auditTable.shelf);
-    });
+  it('does NOT call shelf service when audit button is clicked and dialog is NOT confirmed',
+     fakeAsync(() => {
+       auditTable.devicesToBeCheckedIn = [];
+       expect(auditTable.isEmpty).toBeTruthy();
 
-    expect(auditTable.devicesToBeCheckedIn.length).toBe(0);
-    expect(matCardContent.querySelectorAll('.mat-list > .mat-list-item').length)
-        .toBe(0);
-  });
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const auditButton = compiled.querySelector('button.audit');
+       const shelfService = TestBed.get(ShelfService);
+       spyOn(shelfService, 'audit').and.callThrough();
+
+       const dialog: Dialog = TestBed.get(Dialog);
+       spyOn(dialog, 'confirm').and.returnValue(of(false));
+       auditButton.click();
+       flushMicrotasks();
+       expect(shelfService.audit).not.toHaveBeenCalled();
+     }));
 
   it('increment devicesToBeChecked when Add button is clicked', () => {
     fixture.detectChanges();
