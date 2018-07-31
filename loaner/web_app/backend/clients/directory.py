@@ -84,7 +84,7 @@ class DirectoryApiClient(object):
     Raises:
       UnauthorizedUserError: If a user email is not provided.
     """
-    if user_email and user_email.split('@')[1] == constants.APP_DOMAIN:
+    if user_email and user_email.split('@')[1] in constants.APP_DOMAIN:
       credentials = service_account.Credentials.from_service_account_file(
           filename=constants.SECRETS_FILE,
           scopes=constants.DIRECTORY_SCOPES,

@@ -50,7 +50,7 @@ ON_GAE = (
 APP_NAME = 'Grab n Go'
 
 # The top level domain for the GSuite accounts used in this application.
-APP_DOMAIN = 'example.com'
+APP_DOMAIN = ['example.com']
 
 # The GSuite Customer ID this application will interact with, if nothing is
 # provided it will default to the helper string 'my_customer'.

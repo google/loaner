@@ -131,7 +131,7 @@ def _forbid_non_domain_users(user_email):
   Raises:
     UnauthorizedException: An error will occur when user is not from app domain.
   """
-  if user_email.split('@')[1] != constants.APP_DOMAIN:
+  if user_email.split('@')[1] not in constants.APP_DOMAIN:
     raise endpoints.UnauthorizedException(
         '{} is not an authorized user for the {} domain.'.format(
             user_email, constants.APP_DOMAIN))

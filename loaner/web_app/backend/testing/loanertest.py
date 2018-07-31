@@ -34,7 +34,7 @@ from loaner.web_app.backend.lib import action_loader
 from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import user_model
 
-USER_DOMAIN = constants.APP_DOMAIN
+USER_DOMAIN = constants.APP_DOMAIN[0]
 USER_EMAIL = 'user@{}'.format(USER_DOMAIN)
 SUPER_ADMIN_EMAIL = 'super_admin@{}'.format(USER_DOMAIN)
 TECHNICAL_ADMIN_EMAIL = 'technical-admin@{}'.format(USER_DOMAIN)
