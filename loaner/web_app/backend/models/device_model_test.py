@@ -59,7 +59,7 @@ class DeviceModelTest(loanertest.TestCase):
         shelf=self.shelf.key, chrome_device_id='unique_id_2',
         damaged=False).put()
     device_model.Device(
-        serial_number='Void', enrolled=False,
+        serial_number='VOID', enrolled=False,
         device_model='HP Chromebook 13 G1', current_ou='/',
         shelf=self.shelf.key, chrome_device_id='unique_id_8',
         damaged=False).put()
@@ -482,9 +482,9 @@ class DeviceModelTest(loanertest.TestCase):
   def test_get(self):
     test_devices = [
         device_model.Device(
-            asset_tag='asset_tag_{}'.format(str(number)),
+            asset_tag='ASSET_TAG_{}'.format(str(number)),
             chrome_device_id='chrome_id_{}'.format(str(number)),
-            serial_number='serial_number_{}'.format(str(number))
+            serial_number='SERIAL_NUMBER_{}'.format(str(number))
         ) for number in xrange(3)]
 
     for device in test_devices:
@@ -495,22 +495,22 @@ class DeviceModelTest(loanertest.TestCase):
 
     self.assertEqual(
         device_model.Device.get(asset_tag='asset_tag_0').serial_number,
-        'serial_number_0')
+        'SERIAL_NUMBER_0')
     self.assertEqual(
         device_model.Device.get(serial_number='serial_number_1').asset_tag,
-        'asset_tag_1')
+        'ASSET_TAG_1')
     self.assertEqual(
         device_model.Device.get(chrome_device_id='chrome_id_2').asset_tag,
-        'asset_tag_2')
+        'ASSET_TAG_2')
 
     # Unknown_identifier is can take either an asset tag or serial number.
     self.assertEqual(
         device_model.Device.get(unknown_identifier='asset_tag_0').asset_tag,
-        'asset_tag_0')
+        'ASSET_TAG_0')
     self.assertEqual(
         device_model.Device.get(
             unknown_identifier='serial_number_1').serial_number,
-        'serial_number_1')
+        'SERIAL_NUMBER_1')
 
   def test_is_overdue(self):
     now = datetime.datetime(year=2017, month=1, day=1)

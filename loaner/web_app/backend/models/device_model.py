@@ -282,6 +282,10 @@ class Device(base_model.BaseModel):
           directory API responds with incomplete information or if the device is
           not found in the directory API.
     """
+    if serial_number:
+      serial_number = serial_number.upper()
+    if asset_tag:
+      asset_tag = asset_tag.upper()
     device_identifier_mode = config_model.Config.get('device_identifier_mode')
     if not asset_tag and device_identifier_mode in (
         config_defaults.DeviceIdentifierMode.BOTH_REQUIRED,
@@ -409,7 +413,7 @@ class Device(base_model.BaseModel):
       raise DeviceCreationError('Device ID not found in org.')
     try:
       device = cls(
-          serial_number=directory_info[directory.SERIAL_NUMBER],
+          serial_number=directory_info[directory.SERIAL_NUMBER].upper(),
           enrolled=False,
           device_model=directory_info.get(directory.MODEL),
           current_ou=directory_info[directory.ORG_UNIT_PATH],
@@ -441,15 +445,15 @@ class Device(base_model.BaseModel):
           invalid URL-safe key is supplied.
     """
     if asset_tag:
-      return cls.query(cls.asset_tag == asset_tag).get()
+      return cls.query(cls.asset_tag == asset_tag.upper()).get()
     elif chrome_device_id:
       return cls.query(cls.chrome_device_id == chrome_device_id).get()
     elif serial_number:
-      return cls.query(cls.serial_number == serial_number).get()
+      return cls.query(cls.serial_number == serial_number.upper()).get()
     elif unknown_identifier:
       return (
-          cls.query(cls.serial_number == unknown_identifier).get() or
-          cls.query(cls.asset_tag == unknown_identifier).get())
+          cls.query(cls.serial_number == unknown_identifier.upper()).get() or
+          cls.query(cls.asset_tag == unknown_identifier.upper()).get())
     else:
       raise DeviceIdentifierError('No identifier supplied to get device.')
 
@@ -859,6 +863,8 @@ def _update_existing_device(device, user_email, asset_tag=None):
     A modified device model.
   """
   logging.info('Previous device found, re-enrolling.')
+  if asset_tag:
+    asset_tag = asset_tag.upper()
   try:
     device.move_to_default_ou(user_email=user_email)
   except UnableToMoveToDefaultOUError as err:
