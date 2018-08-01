@@ -41,7 +41,7 @@ import {WelcomeComponent, WelcomeModule} from './welcome';
 const STEPS: Step[] = [
   {
     id: 'welcome',
-    title: 'Welcome to Grab n Go',
+    title: `Welcome to ${PROGRAM_NAME}`,
   },
   {
     id: 'survey',
