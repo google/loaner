@@ -12,15 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {DatePipe} from '@angular/common';
 import {ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {Observable, of} from 'rxjs';
 
-
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
-import {DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceDetails, DeviceDetailsModule} from '.';
 
@@ -53,29 +53,26 @@ describe('DeviceDetails', () => {
     expect(deviceDetails).toBeTruthy();
   });
 
-  it('should render the serial as title in a .mat-card-title',
-     () => {
-       fixture.detectChanges();
-       const compiled = fixture.debugElement.nativeElement;
-       expect(compiled.querySelector('.mat-card-title').textContent)
-           .toContain('Serial No:');
-     });
+  it('should render the serial as title in a .mat-card-title', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-card-title').textContent)
+        .toContain('Serial No:');
+  });
 
-  it('should render the asset tag inside .mat-list',
-     () => {
-       fixture.detectChanges();
-       const compiled = fixture.debugElement.nativeElement;
-       expect(compiled.querySelector('.mat-list').textContent)
-           .toContain('Asset tag');
-     });
+  it('should render the asset tag inside .mat-list', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .toContain('Asset tag');
+  });
 
-  it('should render device model inside .mat-list',
-     () => {
-       fixture.detectChanges();
-       const compiled = fixture.debugElement.nativeElement;
-       expect(compiled.querySelector('.mat-list').textContent)
-           .toContain('Device model');
-     });
+  it('should render device model inside .mat-list', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .toContain('Device model');
+  });
 
   it('should render current shelf inside .mat-list', () => {
     fixture.detectChanges();
@@ -109,5 +106,17 @@ describe('DeviceDetails', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent).toContain('Status');
+  });
+
+  it('renders the last known healthy datetime inside .mat-list', () => {
+    deviceDetails.device = DEVICE_1;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .toContain('Last known healthy');
+    const datePipe = new DatePipe('en');
+    expect(compiled.querySelector('.lastKnownHealthy').textContent)
+        .toContain(datePipe.transform(
+            deviceDetails.device.lastKnownHealthy, 'medium'));
   });
 });

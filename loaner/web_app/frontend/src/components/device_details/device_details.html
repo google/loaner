@@ -59,6 +59,13 @@
             <p *ngIf="device.lost"
                mat-line class="secondary-text">Marked as lost</p>
           </mat-list-item>
+          <mat-list-item fxFlex></mat-list-item>
+          <mat-list-item class="lastKnownHealthy" fxFlex>
+            <p mat-line>Last known healthy</p>
+            <p mat-line class="secondary-text">
+              {{ device.lastKnownHealthy | date:'medium' }}
+            </p>
+          </mat-list-item>
         </section>
       </mat-list>
   </mat-card-content>
