@@ -12,9 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {HttpClient, HttpErrorResponse} from '@angular/common/http';
+import {HttpClient, HttpErrorResponse, HttpParams} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {URLSearchParams} from '@angular/http';
 import {Observable, throwError} from 'rxjs';
 import {catchError} from 'rxjs/operators';
 
@@ -94,11 +93,11 @@ export abstract class ApiService {
 /** Builds a URL-safe query string from a generic object. */
 // tslint:disable-next-line:no-any Data could be any object to be parsed.
 const buildQueryStringFromObject = (data: any) => {
-  const queryParams = new URLSearchParams();
+  let params = new HttpParams();
   for (const key in data) {
     if (data.hasOwnProperty(key)) {
-      queryParams.set(key, data[key]);
+      params = params.append(key, data[key]);
     }
   }
-  return queryParams.toString();
+  return params.toString();
 };
