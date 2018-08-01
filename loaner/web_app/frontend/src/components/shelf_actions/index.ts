@@ -16,8 +16,11 @@ import {NgModule} from '@angular/core';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
+
+import {MinValidatorModule} from '../../../../../shared/directives/min_validator';
 import {MaterialModule} from '../../core/material_module';
 import {DialogsModule} from '../../services/dialog';
+
 import {ShelfActionsCard} from './shelf_actions';
 
 export * from './shelf_actions';
@@ -35,6 +38,7 @@ export * from './shelf_actions';
     FormsModule,
     ReactiveFormsModule,
     MaterialModule,
+    MinValidatorModule,
     RouterModule,
   ],
 })

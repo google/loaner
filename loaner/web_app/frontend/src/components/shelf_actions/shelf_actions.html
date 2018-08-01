@@ -25,9 +25,9 @@
       <section fxLayout="row" fxLayout.xs="column">
         <mat-form-field fxFlex>
           <input matInput required type="number" step="1.0" min="1" placeholder="Capacity"
-                [(ngModel)]="shelf.capacity" [formControl]="capacityFormControl" name="capacity"
-                 id="capacity">
-          <mat-error *ngIf="capacityFormControl.hasError('min')">Capacity should be 1+</mat-error>
+                 [(ngModel)]="shelf.capacity" #capacityControl="ngModel" name="capacity"
+                 loanerMinValidator="1">
+          <mat-error *ngIf="!capacityControl.valid">Capacity should be 1 or more</mat-error>
         </mat-form-field>
         <mat-form-field fxFlex>
             <input matInput type="number" step="0.1" placeholder="Latitude"
@@ -61,7 +61,9 @@
       </section>
       <p>
         <button mat-raised-button type="submit" color="primary"
-                [disabled]="(!shelfActionsForm.form.valid) || (!capacityFormControl.valid)">Submit</button>
+                [disabled]="!shelfActionsForm.form.valid || !capacityControl.valid">
+          Submit
+        </button>
       </p>
     </form>
   </mat-card-content>

@@ -39,10 +39,6 @@ export class ShelfActionsCard implements OnInit {
   editing!: boolean;
   /** List of possible teams that are responsible for a shelf. */
   responsiblesForAuditList!: string[];
-  /** Controls the capacity input for validation. */
-  capacityFormControl = new FormControl('', [
-    Validators.min(1),
-  ]);
   /** Access properties in the form. */
   @ViewChild('shelfActionsForm') shelfActionsForm!: NgForm;
 
@@ -50,8 +46,9 @@ export class ShelfActionsCard implements OnInit {
       private readonly configService: ConfigService,
       private readonly dialogBox: Dialog,
       private readonly shelfService: ShelfService,
-      private readonly router: Router, private readonly route: ActivatedRoute) {
-  }
+      private readonly router: Router,
+      private readonly route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
