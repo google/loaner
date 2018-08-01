@@ -1,8 +1,5 @@
 @import '../../themes/standard';
 
-.centered {
-  text-align: center;
-}
 
 .full-width {
   width: 100%;
@@ -10,11 +7,10 @@
 
 .question {
   line-height: 300%;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.survey-card {
-  left: 50%;
-  position: absolute;
-  top: 50%;
-  transform: translate(-50%, -50%);
+.flex-1 {
+  flex: 1;
 }

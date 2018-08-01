@@ -1,32 +1,34 @@
 <img id="analytics" class="hidden" />
-<mat-toolbar color="primary">
-  <span>{{ steps[currentStep].title }}</span>
-  <span fxFlex></span>
-  <img *ngIf="toolbarIconEnabled" class="toolbar-icon" [src]="toolbarIcon.url"
-       [alt]="toolbarIcon.altText" role="presentation" />
-</mat-toolbar>
-<loaner-flow-sequence>
-  <loaner-return-instructions [flow]="flows.OFFBOARDING" loanerFlowChild>
-  </loaner-return-instructions>
-  <survey loanerFlowChild></survey>
-  <loaner-text-card loanerFlowChild
-                    [title]="returnPage.title"
-                    [body]="returnPage.body">
-  </loaner-text-card>
-  <loaner-text-card loanerFlowChild
-                    [title]="logoutPage.title"
-                    [body]="logoutPage.body">
-  </loaner-text-card>
-</loaner-flow-sequence>
-<div class="navigation-progress">
-  <loaner-flow-sequence-buttons [steps]="steps" [navLabels]="labels">
-    <button returnButton mat-mini-fab color="primary" (click)="backToManage()"
-            matTooltip="Return to the management window."
-            matTooltipPosition="right">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-  </loaner-flow-sequence-buttons>
-  <loaner-progress [current]="currentStep" [max]="maxStep"></loaner-progress>
+<div class="offboarding-container">
+  <mat-toolbar color="primary">
+    <span>{{ steps[currentStep].title }}</span>
+    <span fxFlex></span>
+    <img *ngIf="toolbarIconEnabled" class="toolbar-icon" [src]="toolbarIcon.url"
+         [alt]="toolbarIcon.altText" role="presentation" />
+  </mat-toolbar>
+    <loaner-flow-sequence class="flow-container">
+      <loaner-return-instructions [flow]="flows.OFFBOARDING" loanerFlowChild>
+      </loaner-return-instructions>
+      <survey loanerFlowChild></survey>
+      <loaner-text-card loanerFlowChild
+                        [title]="returnPage.title"
+                        [body]="returnPage.body">
+      </loaner-text-card>
+      <loaner-text-card loanerFlowChild
+                        [title]="logoutPage.title"
+                        [body]="logoutPage.body">
+      </loaner-text-card>
+    </loaner-flow-sequence>
+  <div>
+    <loaner-flow-sequence-buttons [steps]="steps" [navLabels]="labels">
+      <button returnButton mat-mini-fab color="primary" (click)="backToManage()"
+              matTooltip="Return to the management window."
+              matTooltipPosition="right">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </loaner-flow-sequence-buttons>
+    <loaner-progress [current]="currentStep" [max]="maxStep"></loaner-progress>
+  </div>
 </div>
 <img *ngIf="backgroundLogoEnabled" [src]="backgroundLogo.url"
      class="logo-background" aria-hidden="true"

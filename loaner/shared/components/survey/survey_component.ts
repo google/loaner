@@ -36,6 +36,19 @@ export class SurveyComponent extends LoaderView implements OnInit {
   userInput!: string;
   @Output() surveyError = new Subject<Error>();
 
+  get surveyAnswered(): boolean|undefined {
+    return this.surveySent && !this.loading;
+  }
+
+  get surveyNew(): boolean|undefined {
+    return this.surveyData && !this.surveySent && !this.loading;
+  }
+
+  get surveyNotGiven(): boolean|undefined {
+    return !this.surveyType && !this.surveySent && !this.surveyData &&
+        !this.loading;
+  }
+
   constructor(private readonly survey: Survey) {
     super(true);
   }

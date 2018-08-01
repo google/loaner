@@ -2,7 +2,7 @@
   <loaner-loader></loaner-loader>
 </div>
 
-<div *ngIf="surveySent && !loading" class="survey-card">
+<div *ngIf="surveyAnswered">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       You have already answered this question
@@ -15,7 +15,7 @@
   </mat-card>
 </div>
 
-<div *ngIf="surveyData && !surveySent && !loading" class="survey-card">
+<div *ngIf="surveyNew">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       {{ surveyData.question_text }}
@@ -23,8 +23,9 @@
     <p *ngIf="surveyDescription" class="card-description">
       {{ surveyDescription }}
     </p>
-    <mat-radio-group fxLayout="column" fxLayoutAlign="space-between none" [(ngModel)]="surveyAnswer"
-                     (ngModelChange)="onChange()" class="mat-subheading-1 question">
+    <mat-radio-group [(ngModel)]="surveyAnswer"
+                     (ngModelChange)="onChange()"
+                     class="mat-subheading-1 question">
       <div *ngFor="let question of surveyData.answers">
         <ng-template [ngIf]="!question.more_info_enabled">
           <mat-radio-button [value]="question">
@@ -38,9 +39,9 @@
           <ng-template [ngIf]="surveyAnswer && (surveyAnswer.text === question.text)">
             <br />
             <mat-form-field class="full-width">
-              <input matInput (ngModelChange)="onChange($event)"
+              <input matInput class="flex-1" (ngModelChange)="onChange($event)"
                      [placeholder]="question.placeholder_text"
-                     [(ngModel)]="userInput" fxFlex>
+                     [(ngModel)]="userInput">
             </mat-form-field>
           </ng-template>
         </ng-template>
@@ -48,7 +49,7 @@
     </mat-radio-group>
   </mat-card>
 </div>
-<div *ngIf="!surveyType && !surveySent && !surveyData && !loading" class="survey-card">
+<div *ngIf="surveyNotGiven">
   <mat-card tabindex="0" loaner-focus>
     <p>
       Sorry, looks like we don't have a survey for you. Continue through to the next step.
