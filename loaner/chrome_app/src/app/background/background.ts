@@ -40,16 +40,8 @@ chrome.app.runtime.onLaunched.addListener((launchData) => {
     } else {
       const offlineNotification = 'You have no internet connection so the ' +
           PROGRAM_NAME + ' app is unavailable.';
-      const notificationID = 'noInternet-management';
-      const options: ChromeNotificationOptions = {
-        iconUrl: 'assets/icons/gng128.png',
-        message: offlineNotification,
-        requireInteraction: true,
-        title: `You're offline!`,
-        type: 'basic',
-      };
-
-      chrome.notifications.create(notificationID, options);
+      createNotification(
+          'noInternet-management', offlineNotification, 'You\'re offline');
     }
   }
 });
@@ -72,19 +64,68 @@ chrome.runtime.onStartup.addListener(() => {
  * Launches the GnG Management application.
  */
 function launchManage() {
-  checkEnrollmentStatus().subscribe(status => {
-    if (status) {
-      const options: ChromeWindowOptions = {
-        bounds: {
-          height: APP_HEIGHT,
-          width: APP_WIDTH,
-        },
-        id: 'manage',
-        resizable: false,
-      };
-      chrome.app.window.create('manage.html', (options));
-    }
-  });
+  let enrollment: string;
+  checkEnrollmentStatus()
+      .pipe(switchMap(enrollmentStatus => {
+        enrollment = enrollmentStatus;
+        return checkOnboardingStatus();
+      }))
+      .subscribe(onboarding => {
+        if (enrollment === 'true' && onboarding === 'complete') {
+          const options: ChromeWindowOptions = {
+            bounds: {
+              height: APP_HEIGHT,
+              width: APP_WIDTH,
+            },
+            id: 'manage',
+            resizable: false,
+          };
+          chrome.app.window.create('manage.html', (options));
+        } else if (enrollment !== 'true') {
+          const notEnrolledNotification = 'This device is not enrolled in ' +
+              'the ' + PROGRAM_NAME + ' program. Please contact your ' +
+              'administrator.';
+          createNotification(
+              'notEnrolled', notEnrolledNotification,
+              'This device is not enrolled');
+          console.error('Enrollment status: ', enrollment);
+        } else if (onboarding !== 'complete') {
+          const notOnboardedNotification = 'Please try again after ' +
+              'completing the onboarding process.';
+          createNotification(
+              'notOnboarded', notOnboardedNotification,
+              'Please complete the onboarding process first');
+          console.error('Onboarding status: ', onboarding);
+        } else {
+          const unhandledNotification = 'Oh no! Something unusual appears to ' +
+              'have happened. Please contact your administrator for ' +
+              'additional support.';
+          createNotification(
+              'unhandledError', unhandledNotification, 'Something happened');
+          console.error('Enrollment status: ', enrollment);
+          console.error('Onboarding status: ', onboarding);
+        }
+      });
+}
+
+/**
+ * Creates a notification for the user based on criteria that is passed in.
+ * @param notificationID represents a unique name for the notification.
+ * @param message the message to be passed into the notification.
+ * @param title the title of the notification.
+ * @param type string that defines what type of notification to be.
+ */
+function createNotification(
+    notificationID: string, message: string, title: string, type = 'basic') {
+  const options: ChromeNotificationOptions = {
+    iconUrl: 'assets/icons/gng128.png',
+    message: `${message}`,
+    requireInteraction: true,
+    title: `${title}`,
+    type: 'basic',
+  };
+
+  chrome.notifications.create(notificationID, options);
 }
 
 /**
@@ -164,16 +205,8 @@ function reportOffline() {
   const offlineNotification = 'Oh no! You have no internet connection. ' +
       'As soon as you have internet once again, we\'ll launch the onboarding ' +
       'process.';
-  const notificationID = 'noInternet-onboarding';
-  const options: ChromeNotificationOptions = {
-    iconUrl: 'assets/icons/gng128.png',
-    message: offlineNotification,
-    requireInteraction: true,
-    title: `You're offline!`,
-    type: 'basic',
-  };
-
-  chrome.notifications.create(notificationID, options);
+  createNotification(
+      'noInternet-onboarding', offlineNotification, 'You\'re offline!');
 }
 
 /**
@@ -234,7 +267,7 @@ function checkOnboardingStatus(): Observable<string> {
   return storage.local.get('onboardingStatus')
       .pipe(take(1), tap(status => {
               if (!status) {
-                throw new Error('Unable to obtain onboarding status value.');
+                console.warn('Unable to obtain local onboarding status value.');
               }
             }));
 }
@@ -247,7 +280,7 @@ function checkEnrollmentStatus(): Observable<string> {
   return storage.local.get('loanerEnrollment')
       .pipe(take(1), tap(status => {
               if (!status) {
-                throw new Error('Unable to obtain enrollment status value.');
+                console.warn('Unable to obtain local enrollment status value.');
               }
             }));
 }
@@ -263,8 +296,8 @@ function checkInternetConnectivity(): boolean {
  */
 function disableApp() {
   const storage = new Storage();
-  storage.local.set('loanerEnrollment', false);
-  storage.local.set('onboardingStatus', 'complete');
+  storage.local.set('loanerEnrollment', 'false');
+  storage.local.set('onboardingStatus', 'disabled');
   chrome.alarms.clearAll();
 }
 
@@ -332,7 +365,7 @@ function onboarding(
     if (!heartbeatExists) {
       enableHeartbeat();
     }
-    storage.local.set('loanerEnrollment', true);
+    storage.local.set('loanerEnrollment', 'true');
     if (startAssignment) {
       launchOnboardingFlow();
       // If online, report online.
