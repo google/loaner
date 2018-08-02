@@ -28,6 +28,7 @@ import {Unenroll, UnenrollDialogComponent} from './unenroll';
   imports: [
     BrowserAnimationsModule,
     CommonModule,
+    FocusModule,
     LoaderModule,
     MaterialModule,
   ],

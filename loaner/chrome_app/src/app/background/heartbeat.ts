@@ -49,8 +49,10 @@ export function disableHeartbeat() {
 export function sendHeartbeat(): Observable<HeartbeatResponse> {
   const heartbeatUrl = `${CONFIG.chromeApiUrl}${HEARTBEAT.url}`;
   return DeviceIdentifier.id().pipe(
-      switchMap(deviceId => from(Http.get(`${heartbeatUrl}${deviceId}`))),
-      switchMap((res: HeartbeatResponse) => {
+      switchMap(
+          deviceId =>
+              from(Http.get<HeartbeatResponse>(`${heartbeatUrl}${deviceId}`))),
+      switchMap(res => {
         if (CONFIG.LOGGING) {
           console.info(`Heartbeat response: ${res}`);
         }

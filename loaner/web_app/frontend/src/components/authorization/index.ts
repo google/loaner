@@ -17,7 +17,6 @@ import {NgModule} from '@angular/core';
 
 import {LoaderModule} from '../../../../../shared/components/loader';
 import {MaterialModule} from '../../core/material_module';
-import {AuthService} from '../../services/auth';
 
 import {Authorization} from './authorization';
 

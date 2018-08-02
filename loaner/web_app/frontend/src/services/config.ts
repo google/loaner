@@ -116,15 +116,13 @@ export class ConfigService extends ApiService {
       }
       default: {
         throw new TypeError(`Config type ${
-            config.ConfigType
-                [configType]} is not valid for updating config ${
+            config.ConfigType[configType]} is not valid for updating config ${
             name}.`);
       }
     }
 
     this.post('update', request).subscribe(() => {
-      this.snackBar.open(
-          `Config ${name} updated with the value ${value}.`);
+      this.snackBar.open(`Config ${name} updated with the value ${value}.`);
     });
   }
 }

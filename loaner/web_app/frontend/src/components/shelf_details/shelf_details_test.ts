@@ -14,12 +14,10 @@
 
 import {Component} from '@angular/core';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Observable, of} from 'rxjs';
+import {of} from 'rxjs';
 
-import {Shelf} from '../../models/shelf';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {ShelfServiceMock} from '../../testing/mocks';

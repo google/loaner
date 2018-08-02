@@ -15,8 +15,8 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 
 import {Router} from '@angular/router';
-import {interval, NEVER, Subject} from 'rxjs';
-import {finalize, switchMap, takeUntil} from 'rxjs/operators';
+import {interval, Subject} from 'rxjs';
+import {switchMap, takeUntil} from 'rxjs/operators';
 
 import {CONFIG} from '../../app.config';
 import * as bootstrap from '../../models/bootstrap';
@@ -63,21 +63,21 @@ export class Bootstrap implements OnInit, OnDestroy {
       this.bootstrapStatus = status;
     });
 
-    const repeater = interval(5000)
-                         .pipe(
-                             takeUntil(this.onDestroy),
-                             switchMap(() => this.bootstrapService.getStatus()),
-                             )
-                         .subscribe((status: bootstrap.Status) => {
-                           this.bootstrapStatus = status;
+    const repeater =
+        interval(5000)
+            .pipe(
+                takeUntil(this.onDestroy),
+                switchMap(() => this.bootstrapService.getStatus()),
+                )
+            .subscribe((status: bootstrap.Status) => {
+              this.bootstrapStatus = status;
 
-                           if (this.bootstrapStatus.completed ||
-                               this.bootstrapTasksFinished ||
-                               this.failedTasks) {
-                             this.inProgress = false;
-                             repeater.unsubscribe();
-                           }
-                         });
+              if (this.bootstrapStatus.completed ||
+                  this.bootstrapTasksFinished || this.failedTasks) {
+                this.inProgress = false;
+                repeater.unsubscribe();
+              }
+            });
   }
 
   ngOnDestroy() {

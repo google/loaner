@@ -14,7 +14,7 @@
 
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';
-import {map, tap} from 'rxjs/operators';
+import {tap} from 'rxjs/operators';
 
 import * as bootstrap from '../models/bootstrap';
 
@@ -37,16 +37,14 @@ export class BootstrapService extends ApiService {
    */
   getStatus(): Observable<bootstrap.Status> {
     return this.get<bootstrap.Status>('get_status')
-        .pipe(
-            tap((status: bootstrap.Status) => {
-              if (status.completed) {
-                this.snackBar.open(`Bootstrap completed successfully.`);
-              } else if (
-                  status.tasks &&
-                  status.tasks.every((task) => !!task.timestamp) &&
-                  status.tasks.some((task) => !task.success)) {
-                this.snackBar.open(`One or more tasks failed.`);
-              }
-            }));
+        .pipe(tap((status: bootstrap.Status) => {
+          if (status.completed) {
+            this.snackBar.open(`Bootstrap completed successfully.`);
+          } else if (
+              status.tasks && status.tasks.every((task) => !!task.timestamp) &&
+              status.tasks.some((task) => !task.success)) {
+            this.snackBar.open(`One or more tasks failed.`);
+          }
+        }));
   }
 }

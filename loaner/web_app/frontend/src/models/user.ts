@@ -14,8 +14,6 @@
 
 
 
-import {CONFIG} from '../app.config';
-
 /**
  * Interface with fields that come from our User API.
  */

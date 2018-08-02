@@ -15,7 +15,6 @@
 import {ComponentFixture, ComponentFixtureAutoDetect, discardPeriodicTasks, fakeAsync, TestBed, tick,} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {Shelf} from '../../models/shelf';
 import {ShelfService} from '../../services/shelf';
 
 import {ShelfServiceMock} from '../../testing/mocks';

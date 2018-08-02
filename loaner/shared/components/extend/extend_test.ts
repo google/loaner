@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {NgModule} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDialogRef} from '@angular/material';
 import * as moment from 'moment';
 
 import {ExtendDialogComponent, ExtendModule} from './index';
-import {MaterialModule} from './material_module';
 
 /** Mock material DialogRef. */
 class MatDialogRefMock {}

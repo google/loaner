@@ -19,7 +19,6 @@ import {ActivatedRoute, Router} from '@angular/router';
 import {LoaderView} from '../../../../../shared/components/loader';
 import {CONFIG} from '../../app.config';
 import {AuthService} from '../../services/auth';
-import {UserService} from '../../services/user';
 
 /**
  * Component that renders the Authorization flow of the application.
@@ -38,7 +37,6 @@ export class Authorization extends LoaderView implements OnInit {
 
   constructor(
       private readonly authService: AuthService,
-      private readonly userService: UserService,
       private readonly route: ActivatedRoute,
       private readonly router: Router,
       private readonly titleService: Title,

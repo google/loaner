@@ -18,7 +18,7 @@ import {BrowserModule} from '@angular/platform-browser';
 import {RouterModule} from '@angular/router';
 import {ViewonlyLabelModule} from '../../components/viewonly_label';
 import {MaterialModule} from '../../core/material_module';
-import {Dialog, DialogsModule} from '../../services/dialog';
+import {DialogsModule} from '../../services/dialog';
 
 import {ShelfDetails} from './shelf_details';
 

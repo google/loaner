@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {DataSource} from '@angular/cdk/table';
 import {Injectable} from '@angular/core';
 import {MatSort} from '@angular/material';
 import {BehaviorSubject, Observable} from 'rxjs';

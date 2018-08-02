@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {HttpClientTestingModule, HttpTestingController} from '@angular/common/http/testing';
-import {fakeAsync, getTestBed, TestBed} from '@angular/core/testing';
+import {fakeAsync, TestBed} from '@angular/core/testing';
 
 import {ApiConfig, apiConfigFactory} from '../../services/api_config';
 

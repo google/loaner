@@ -20,12 +20,11 @@ import {FormsModule} from '@angular/forms';
 import {MatRadioButton} from '@angular/material';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
-import {of} from 'rxjs';
 
 import {ApiConfig, apiConfigFactory} from '../../services/api_config';
 import {LoaderModule} from '../loader';
 
-import {SurveyComponent, SurveyModule} from './index';
+import {SurveyComponent} from './index';
 import {MaterialModule} from './material_module';
 import {Survey, SurveyResponse, SurveyType} from './survey_service';
 
@@ -126,13 +125,12 @@ describe('SurveyComponent', () => {
         .not.toContain('This is a description');
   });
 
-  it('should not display a question if survey is sent',
-     () => {
-       app.surveySent = true;
-       fixture.detectChanges();
-       expect(fixture.nativeElement.textContent)
-           .toContain('You have already answered this question');
-     });
+  it('should not display a question if survey is sent', () => {
+    app.surveySent = true;
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent)
+        .toContain('You have already answered this question');
+  });
 
   it('should display \'no survey\' text when no survey data is populated',
      () => {

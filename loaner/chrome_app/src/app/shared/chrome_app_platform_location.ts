@@ -19,27 +19,27 @@ import {LocationChangeListener, PlatformLocation} from '@angular/common';
  * to history.
  */
 export class ChromeAppPlatformLocation extends PlatformLocation {
-  private location_: Location;
+  private appLocation: Location;
 
   constructor() {
     super();
-    this.location_ = window.location;
+    this.appLocation = window.location;
   }
 
   get location() {
-    return this.location_;
+    return this.appLocation;
   }
   get search(): string {
-    return this.location_.search;
+    return this.appLocation.search;
   }
   get hash(): string {
-    return this.location_.hash;
+    return this.appLocation.hash;
   }
   get pathname(): string {
-    return this.location_.pathname;
+    return this.appLocation.pathname;
   }
   set pathname(newPath: string) {
-    this.location_.pathname = newPath;
+    this.appLocation.pathname = newPath;
   }
 
   getBaseHrefFromDOM() {

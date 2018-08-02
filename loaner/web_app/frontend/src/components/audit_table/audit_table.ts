@@ -121,6 +121,12 @@ export class AuditTable implements OnInit {
   private updateDeviceInList(deviceToBeCheckedIn: DeviceOnAction) {
     const deviceToBeRemoved = this.devicesToBeCheckedIn.find(
         device => device.deviceId === deviceToBeCheckedIn.deviceId);
+    // Early return since if it's not found in devicesToBeCheckedIn then an
+    // index value cannot be obtained later on.
+    if (deviceToBeRemoved === undefined) {
+      this.devicesToBeCheckedIn.push(deviceToBeCheckedIn);
+      return;
+    }
     const index = this.devicesToBeCheckedIn.indexOf(deviceToBeRemoved);
     if (index !== -1) {
       this.devicesToBeCheckedIn[index] = deviceToBeCheckedIn;

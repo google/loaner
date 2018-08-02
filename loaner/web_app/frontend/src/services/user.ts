@@ -14,11 +14,10 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable, of, ReplaySubject, Subscription, throwError} from 'rxjs';
+import {Observable, of, ReplaySubject, throwError} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
-import {CONFIG} from '../app.config';
-import {User, UserApiParams} from '../models/user';
+import {User} from '../models/user';
 
 import {ApiService} from './api';
 import {AuthService} from './auth';
@@ -31,8 +30,6 @@ export class UserService extends ApiService {
   apiEndpoint = 'user';
   /** User instance of the current logged in user. */
   user!: User;
-  /** Get Roles subscription that's stored to be unsubscribed when needed. */
-  private roleSubscription!: Subscription;
   /** A subject sending the loaded user. */
   private userLoadedSubject = new ReplaySubject<User>(1);
 

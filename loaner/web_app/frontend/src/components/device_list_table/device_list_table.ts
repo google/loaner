@@ -14,14 +14,9 @@
 
 import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
-import {ActivatedRoute} from '@angular/router';
 import {interval, merge, NEVER, Subject} from 'rxjs';
 import {startWith, switchMap, takeUntil} from 'rxjs/operators';
 
-import {Damaged} from '../../../../../shared/components/damaged';
-import {Extend} from '../../../../../shared/components/extend';
-import {GuestMode} from '../../../../../shared/components/guest';
-import {Lost} from '../../../../../shared/components/lost';
 import {Device, DeviceApiParams} from '../../models/device';
 import {Shelf} from '../../models/shelf';
 import {DeviceService} from '../../services/device';
@@ -61,13 +56,8 @@ export class DeviceListTable implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
   constructor(
-      private readonly damagedService: Damaged,
-      private readonly lostService: Lost,
-      private readonly extendService: Extend,
-      private readonly deviceService: DeviceService,
-      private readonly route: ActivatedRoute,
-      private readonly guestModeService: GuestMode,
       private readonly changeDetector: ChangeDetectorRef,
+      private readonly deviceService: DeviceService,
   ) {}
 
   setDisplayColumns() {

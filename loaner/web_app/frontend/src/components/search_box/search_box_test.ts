@@ -251,10 +251,10 @@ describe('SearchBox', () => {
        fixture.whenStable().then(() => {
          const headingTwoElements = overlayContainerElement.querySelectorAll(
                                         'h2') as NodeListOf<HTMLElement>;
-         expect(headingTwoElements[0]!.textContent).toContain('Search helper');
+         expect(headingTwoElements[0].textContent).toContain('Search helper');
          expect(overlayContainerElement.querySelector('h1')!.textContent)
              .toContain('Testing');
-         expect(headingTwoElements[1]!.textContent).toContain('123');
+         expect(headingTwoElements[1].textContent).toContain('123');
          expect(overlayContainerElement.querySelector('h3')!.textContent)
              .toContain('456');
          expect(overlayContainerElement.querySelector('p')!.textContent)

@@ -15,7 +15,7 @@
 import {ChangeDetectorRef, Component, Input, OnDestroy, ViewChild} from '@angular/core';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {interval, merge, NEVER, Subject} from 'rxjs';
-import {debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil} from 'rxjs/operators';
+import {startWith, switchMap, takeUntil} from 'rxjs/operators';
 
 import {Shelf, ShelfApiParams} from '../../models/shelf';
 import {ShelfService} from '../../services/shelf';

@@ -14,7 +14,7 @@
 
 import {Location} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
-import {ActivatedRoute, Params, Router} from '@angular/router';
+import {Router} from '@angular/router';
 
 import {Shelf} from '../../models/shelf';
 import {Dialog} from '../../services/dialog';
@@ -34,10 +34,11 @@ export class ShelfDetails implements OnInit {
   @Input() shelf!: Shelf;
 
   constructor(
+      private readonly dialogBox: Dialog,
+      private readonly location: Location,
+      private readonly router: Router,
       private readonly shelfService: ShelfService,
-      private readonly router: Router, private readonly route: ActivatedRoute,
-      private readonly dialogBox: Dialog, private readonly location: Location) {
-  }
+  ) {}
 
   ngOnInit() {
     if (!this.shelf) {

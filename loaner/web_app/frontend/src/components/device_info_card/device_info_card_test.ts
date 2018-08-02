@@ -18,15 +18,13 @@ import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, Params, Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, of} from 'rxjs';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {Lost} from '../../../../../shared/components/lost';
 import {DamagedMock, ExtendMock, GuestModeMock, LostMock} from '../../../../../shared/testing/mocks';
-import {Device} from '../../models/device';
-import {User} from '../../models/user';
 import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
 import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
@@ -57,14 +55,6 @@ describe('DeviceInfoCardComponent', () => {
     'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August',
     'September', 'October', 'November', 'December'
   ];
-
-  // tslint:disable:no-any Jasmine returns any for the nativeElement
-  const getCorrectButton = (compiled: any, buttonText: string) => {
-    const buttons: any[] = Array.from(compiled.querySelectorAll('button'));
-
-    return buttons.find(b => b.textContent!.indexOf(buttonText) > -1);
-  };
-  // tslint:enable:no-any
 
   beforeEach(fakeAsync(() => {
     TestBed

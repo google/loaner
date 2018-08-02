@@ -273,10 +273,6 @@ function enableHeartbeat() {
   Heartbeat.setHeartbeatAlarmListener();
 }
 
-function disableHeartbeat() {
-  Heartbeat.disableHeartbeat();
-}
-
 /**
  * Checks to see if the heartbeat exists.
  */
@@ -296,12 +292,8 @@ function checkForHeartbeatAlarm(): Observable<boolean> {
   });
 }
 
-/**
- * Onboards users and checks for device enrollment on login and startup.
- * Since devices might wipe local storage, this repopulates local values.
- */
+/** Onboards users and checks for device enrollment on login and startup. */
 function onboardUser() {
-  const storage = new Storage();
   let device: HeartbeatResponse;
   Heartbeat.sendHeartbeat()
       .pipe(switchMap(deviceInfo => {
@@ -331,6 +323,7 @@ function onboardUser() {
 /**
  * Used to check onboarding criteria. If a device is part of the program, it
  * launches the onboarding flow.
+ * Since devices might wipe local storage, this repopulates local values.
  */
 function onboarding(
     isEnrolled: boolean, startAssignment: boolean, heartbeatExists: boolean) {

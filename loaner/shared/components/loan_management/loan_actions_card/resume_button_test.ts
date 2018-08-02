@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, ViewChild} from '@angular/core';
+import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -20,7 +20,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {DEVICE, ResumeLoanMock} from '../../../testing/mocks';
 import {ResumeLoan} from '../../resume_loan';
 
-import {LoanActionsCardComponent, LoanActionsCardModule} from './index';
+import {LoanActionsCardModule} from './index';
 
 const PENDING_DEVICE = {...DEVICE};
 PENDING_DEVICE.pendingReturn = true;

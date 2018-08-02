@@ -14,13 +14,7 @@
 
 import {Location} from '@angular/common';
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Router} from '@angular/router';
-import {NEVER} from 'rxjs';
-import {finalize, switchMap} from 'rxjs/operators';
-
-import {Damaged} from '../../../../../shared/components/damaged';
-import {Extend} from '../../../../../shared/components/extend';
-import {GuestMode} from '../../../../../shared/components/guest';
+import {ActivatedRoute} from '@angular/router';
 
 import {Device} from '../../models/device';
 import {DeviceService} from '../../services/device';
@@ -40,7 +34,8 @@ export class DeviceDetails implements OnInit {
   constructor(
       private readonly deviceService: DeviceService,
       private readonly location: Location,
-      private readonly route: ActivatedRoute) {}
+      private readonly route: ActivatedRoute,
+  ) {}
 
   ngOnInit() {
     this.route.params.subscribe((params) => {

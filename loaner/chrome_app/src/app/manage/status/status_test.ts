@@ -31,7 +31,6 @@ import {ResumeLoan} from '../../../../../shared/components/resume_loan';
 import {ConfigService} from '../../../../../shared/config';
 import {FocusModule} from '../../../../../shared/directives/focus/index';
 import {Device, DeviceApiParams} from '../../../../../shared/models/device';
-import {Background} from '../../shared/background_service';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
 import {Storage} from '../../shared/storage/storage';
