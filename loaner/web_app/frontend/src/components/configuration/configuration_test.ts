@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
@@ -93,39 +93,6 @@ describe('ConfigurationComponent', () => {
     expect(auditEmailRecipientsListElement).toBeDefined();
   });
 
-  it('calls the config service update method when submitted', () => {
-    fixture.detectChanges();
-    const configService: ConfigService = TestBed.get(ConfigService);
-    spyOn(configService, 'update');
-    // make a change to unlock the submit button
-    configuration.config.supportContact += 'test!';
-    fixture.detectChanges();
-    fakeAsync(() => {
-      const submitButton = fixture.debugElement.nativeElement.querySelector(
-          'form button[type="submit"]');
-      submitButton.click();
-      fixture.detectChanges();
-      expect(configService.update).toHaveBeenCalled();
-    });
-  });
-
-  it('calls the config update service for each changed value', () => {
-    fixture.detectChanges();
-    const configService: ConfigService = TestBed.get(ConfigService);
-    spyOn(configService, 'update');
-    // make a change to unlock the submit button
-    configuration.config.supportContact += 'test!';
-    configuration.config.shelfAuditInterval = 48;
-    fixture.detectChanges();
-    fakeAsync(() => {
-      const submitButton = fixture.debugElement.nativeElement.querySelector(
-          'form button[type="submit"]');
-      submitButton.click();
-      fixture.detectChanges();
-      expect(configService.update).toHaveBeenCalledTimes(2);
-    });
-  });
-
   it('converts a csv string to an array', () => {
     fixture.detectChanges();
     const expected = ['a', 'b', 'c'];
@@ -141,5 +108,78 @@ describe('ConfigurationComponent', () => {
     const expected = 'a,\nb,\nc,\n';
     const listValue = ['a', 'b', 'c'];
     expect(configuration.arrayToCsv(listValue)).toEqual(expected);
+  });
+
+  it('calls config service to update with a single change', () => {
+    fixture.whenStable().then(() => {
+      const configService: ConfigService = TestBed.get(ConfigService);
+      spyOn(configService, 'updateAll');
+      fixture.detectChanges();
+      configuration.config.supportContact += 'test!';
+      fixture.detectChanges();
+      tick(250);
+      const compiled = fixture.debugElement.nativeElement;
+      const supportContactElement =
+          compiled.querySelector('input[name="support_contact_string"]') as
+          HTMLInputElement;
+      expect(supportContactElement.value).toContain('test!');
+      supportContactElement.dispatchEvent(new Event('input'));
+
+      const submitButton = compiled.querySelector('button[type="submit"]');
+      submitButton.click();
+      fixture.detectChanges();
+      tick(250);
+      expect(configService.updateAll).toHaveBeenCalledWith([{
+        key: 'support_contact',
+        type: 'string',
+        value: (configuration.config.supportContact as string),
+      }]);
+      expect(configService.updateAll).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('calls config service to update with multiple changes', () => {
+    fixture.whenStable().then(() => {
+      const configService: ConfigService = TestBed.get(ConfigService);
+      spyOn(configService, 'updateAll');
+      fixture.detectChanges();
+      configuration.config.supportContact += 'test!';
+      configuration.config.auditInterval = 999;
+      fixture.detectChanges();
+      tick(250);
+      const compiled = fixture.debugElement.nativeElement;
+      // change #1
+      const supportContactElement =
+          compiled.querySelector('input[name="support_contact_string"]') as
+          HTMLInputElement;
+      expect(supportContactElement.value).toContain('test!');
+      supportContactElement.dispatchEvent(new Event('input'));
+
+      // change #2
+      const auditIntervalElement =
+          compiled.querySelector('input[name="audit_interval_number"]') as
+          HTMLInputElement;
+      expect(auditIntervalElement.value)
+          .toBe(configuration.config.auditInterval.toString());
+      auditIntervalElement.dispatchEvent(new Event('input'));
+
+      const submitButton = compiled.querySelector('button[type="submit"]');
+      submitButton.click();
+      fixture.detectChanges();
+      tick(250);
+      expect(configService.updateAll).toHaveBeenCalledWith([
+        {
+          key: 'support_contact',
+          type: 'string',
+          value: (configuration.config.supportContact as string),
+        },
+        {
+          key: 'audit_interval',
+          type: 'number',
+          value: (configuration.config.auditInterval),
+        }
+      ]);
+      expect(configService.updateAll).toHaveBeenCalledTimes(1);
+    });
   });
 });

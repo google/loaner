@@ -446,9 +446,7 @@ export class ConfigServiceMock {
     return of(CONFIG_RESPONSE_MOCK);
   }
 
-  update(
-      name: string, configType: config.ConfigType,
-      value: string|number|boolean|string[]) {}
+  updateAll(configUpdates: config.ConfigUpdate[]) {}
 }
 
 export class AuthServiceMock {

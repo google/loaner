@@ -26,6 +26,12 @@ export declare interface GetConfigRequest {
   config_type: ConfigType;
 }
 
+export declare interface ConfigUpdate {
+  key: string;
+  type: ConfigType;
+  value: string|number|boolean|string[];
+}
+
 export declare interface ConfigResponse {
   name: string;
   config_type: ConfigType;
@@ -39,13 +45,17 @@ export declare interface ListConfigsResponse {
   configs: ConfigResponse[];
 }
 
-export declare interface UpdateConfigRequest {
+export declare interface UpdateConfigRequestSingle {
   name: string;
   config_type: ConfigType;
   string_value?: string;
   integer_value?: number;
   boolean_value?: boolean;
   list_value?: string[];
+}
+
+export declare interface UpdateConfigRequest {
+  config: UpdateConfigRequestSingle[];
 }
 
 export class Config {

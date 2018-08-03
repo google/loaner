@@ -17,7 +17,7 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 
 import {CONFIG} from '../../app.config';
-import {Config, ConfigType} from '../../models/config';
+import {Config, ConfigType, ConfigUpdate} from '../../models/config';
 import {ConfigService} from '../../services/config';
 
 /**
@@ -74,6 +74,7 @@ export class Configuration implements OnInit {
 
   /** Updates the config service with dirty values in the form. */
   save(form: NgForm) {
+    const updates: ConfigUpdate[] = [];
     for (const realKey of Object.keys(form.controls)) {
       const realValue = form.controls[realKey];
       let key: string = realKey;
@@ -100,8 +101,13 @@ export class Configuration implements OnInit {
           console.error('Failed to determine type of key', key);
           continue;
         }
-        this.configService.update(key, type, value);
+        updates.push({
+          key,
+          type,
+          value,
+        });
       }
     }
+    this.configService.updateAll(updates);
   }
 }

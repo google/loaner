@@ -84,45 +84,56 @@ export class ConfigService extends ApiService {
   }
 
   /**
-   * Updates the given config setting with a new value.
-   * @param name Setting id to be updated on the backend.
-   * @param configType The type of the setting that's being updated.
-   * @param value New value to be set in the up to date config setting.
+   * Updates all provided config values on the backend.
+   * @param configUpdates the list of config names (keys), and their associated
+   *     type and value. Example:
+   * [
+   *   {key: 'allow_guest_mode', type: ConfigType.BOOLEAN, value: true},
+   *   {key: 'loan_duration', type: ConfigType.INTEGER, value: 10},
+   * ]
    */
-  update(
-      name: string, configType: config.ConfigType,
-      value: string|number|boolean|string[]) {
-    const request: config.UpdateConfigRequest = {
-      'name': name,
-      'config_type': configType,
+  updateAll(configUpdates: config.ConfigUpdate[]) {
+    const configUpdateRequestSingles: config.UpdateConfigRequestSingle[] =
+        configUpdates.map(configUpdate => {
+          const updateConfigRequestSingle: config.UpdateConfigRequestSingle = {
+            name: configUpdate.key,
+            config_type: configUpdate.type
+          };
+          switch (configUpdate.type) {
+            case config.ConfigType.STRING: {
+              updateConfigRequestSingle['string_value'] =
+                  configUpdate.value as string;
+              break;
+            }
+            case config.ConfigType.INTEGER: {
+              updateConfigRequestSingle['integer_value'] =
+                  configUpdate.value as number;
+              break;
+            }
+            case config.ConfigType.BOOLEAN: {
+              updateConfigRequestSingle['boolean_value'] =
+                  configUpdate.value as boolean;
+              break;
+            }
+            case config.ConfigType.LIST: {
+              updateConfigRequestSingle['list_value'] =
+                  configUpdate.value as string[];
+              break;
+            }
+            default: {
+              throw new TypeError(`Config type ${
+                  config.ConfigType[configUpdate.type]} is not valid.`);
+            }
+          }
+          return updateConfigRequestSingle;
+        });
+
+    // Send the request
+    const updateConfigRequest: config.UpdateConfigRequest = {
+      config: configUpdateRequestSingles,
     };
-
-    switch (configType) {
-      case config.ConfigType.STRING: {
-        request['string_value'] = value as string;
-        break;
-      }
-      case config.ConfigType.INTEGER: {
-        request['integer_value'] = value as number;
-        break;
-      }
-      case config.ConfigType.BOOLEAN: {
-        request['boolean_value'] = value as boolean;
-        break;
-      }
-      case config.ConfigType.LIST: {
-        request['list_value'] = value as string[];
-        break;
-      }
-      default: {
-        throw new TypeError(`Config type ${
-            config.ConfigType[configType]} is not valid for updating config ${
-            name}.`);
-      }
-    }
-
-    this.post('update', request).subscribe(() => {
-      this.snackBar.open(`Config ${name} updated with the value ${value}.`);
+    this.post('update', updateConfigRequest).subscribe(() => {
+      this.snackBar.open(`Config updated.`);
     });
   }
 }
