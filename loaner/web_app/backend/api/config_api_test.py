@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl.testing import parameterized
+
 import mock
 
 from protorpc import message_types
@@ -29,7 +31,7 @@ from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class ConfigApiTest(loanertest.EndpointsTestCase):
+class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   def setUp(self):
     super(ConfigApiTest, self).setUp()
@@ -122,77 +124,93 @@ class ConfigApiTest(loanertest.EndpointsTestCase):
         len(response.configs),
         len(config_defaults.DEFAULTS))
     for response_config in response.configs:
-      self.assertTrue(
-          response_config.name in
-          config_defaults.DEFAULTS)
-
-  def test_update_config_bad_request(self):
-    request = config_messages.UpdateConfigRequest()
-    with self.assertRaises(config_api.endpoints.BadRequestException):
-      self.service.update_config(request)
+      self.assertIn(response_config.name, config_defaults.DEFAULTS)
 
   def test_update_config_value_does_not_exist(self):
     request = config_messages.UpdateConfigRequest(
-        name='Does not exist!',
-        config_type=config_messages.ConfigType.BOOLEAN,
-        boolean_value=False)
+        config=[config_messages.UpdateConfig(
+            name='Does not exist!',
+            config_type=config_messages.ConfigType.BOOLEAN,
+            boolean_value=False)])
     self.assertRaisesRegexp(
         config_api.endpoints.BadRequestException,
         'No such name',
         self.service.update_config,
         request)
 
-  def test_update_config_boolean(self):
-    mock_config = 'test_config_bool'
-    mock_config_value = False
-    config_defaults.DEFAULTS[mock_config] = mock_config_value
+  def test_update_config_multi(self):
+    new_string_value = 'new_string_value'
+    new_int_value = 9
     request = config_messages.UpdateConfigRequest(
-        name=mock_config,
-        config_type=config_messages.ConfigType.BOOLEAN,
-        boolean_value=mock_config_value)
+        config=[
+            config_messages.UpdateConfig(
+                name='test_config_integer',
+                config_type=config_messages.ConfigType.INTEGER,
+                integer_value=new_int_value),
+            config_messages.UpdateConfig(
+                name='test_config_string',
+                config_type=config_messages.ConfigType.STRING,
+                string_value=new_string_value)
+        ])
+    self.service.update_config(request)
+    updated_string_value = config_model.Config.get(name='test_config_string')
+    self.assertEqual(updated_string_value, new_string_value)
+    updated_int_value = config_model.Config.get(name='test_config_integer')
+    self.assertEqual(updated_int_value, new_int_value)
+
+  @parameterized.parameters(
+      ('test_config_list', ['email1', 'email2'], 'list_value',),
+      ('test_config_integer', 5, 'integer_value',),
+      ('test_config_string', 'File a ticket!', 'string_value',),
+      ('test_config_bool', False, 'boolean_value',))
+  def test_update_config(
+      self, mock_config, mock_config_value, config_value_type):
+    request = _create_config_request(
+        config_value_type, mock_config, mock_config_value)
     response = self.service.update_config(request)
     self.assertIsInstance(response, message_types.VoidMessage)
     setting_value = config_model.Config.get(name=mock_config)
     self.assertEqual(setting_value, mock_config_value)
 
-  def test_update_config_string(self):
-    mock_config = 'test_config_string'
-    mock_config_value = 'File a ticket!'
-    config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_messages.UpdateConfigRequest(
-        name=mock_config,
-        config_type=config_messages.ConfigType.STRING,
-        string_value=mock_config_value)
-    response = self.service.update_config(request)
-    self.assertIsInstance(response, message_types.VoidMessage)
-    setting_value = config_model.Config.get(name=mock_config)
-    self.assertEqual(setting_value, mock_config_value)
 
-  def test_update_config_integer(self):
-    mock_config = 'test_config_integer'
-    mock_config_value = 5
-    config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_messages.UpdateConfigRequest(
-        name=mock_config,
-        config_type=config_messages.ConfigType.INTEGER,
-        integer_value=mock_config_value)
-    response = self.service.update_config(request)
-    self.assertIsInstance(response, message_types.VoidMessage)
-    setting_value = config_model.Config.get(name=mock_config)
-    self.assertEqual(setting_value, mock_config_value)
+def _create_config_request(config_value_type, mock_config, mock_config_value):
+  """Creates a config_messages UpdateConfigRequest for testing.
 
-  def test_update_config_list(self):
-    mock_config = 'test_config_list'
-    mock_config_value = ['email1', 'email2']
-    config_defaults.DEFAULTS[mock_config] = mock_config_value
-    request = config_messages.UpdateConfigRequest(
-        name=mock_config,
-        config_type=config_messages.ConfigType.LIST,
-        list_value=mock_config_value)
-    response = self.service.update_config(request)
-    self.assertIsInstance(response, message_types.VoidMessage)
-    setting_value = config_model.Config.get(name=mock_config)
-    self.assertEqual(setting_value, mock_config_value)
+  Args:
+    config_value_type: str, the type of value.
+    mock_config: str, the name of the config.
+    mock_config_value: str, bool, int, list, the config value.
+
+  Returns:
+    A config_messages.UpdateConfigRequest ProtoRPC message.
+  """
+  config_defaults.DEFAULTS[mock_config] = mock_config_value
+  if config_value_type == 'list_value':
+    config = [
+        config_messages.UpdateConfig(
+            name=mock_config,
+            config_type=config_messages.ConfigType.LIST,
+            list_value=mock_config_value)]
+  elif config_value_type == 'integer_value':
+    config = [
+        config_messages.UpdateConfig(
+            name=mock_config,
+            config_type=config_messages.ConfigType.INTEGER,
+            integer_value=mock_config_value)]
+  elif config_value_type == 'string_value':
+    config = [
+        config_messages.UpdateConfig(
+            name=mock_config,
+            config_type=config_messages.ConfigType.STRING,
+            string_value=mock_config_value)]
+  elif config_value_type == 'boolean_value':
+    config = [
+        config_messages.UpdateConfig(
+            name=mock_config,
+            config_type=config_messages.ConfigType.BOOLEAN,
+            boolean_value=mock_config_value)]
+
+  return config_messages.UpdateConfigRequest(config=config)
 
 
 if __name__ == '__main__':

@@ -66,8 +66,8 @@ class ListConfigsResponse(messages.Message):
   configs = messages.MessageField(ConfigResponse, 1, repeated=True)
 
 
-class UpdateConfigRequest(messages.Message):
-  """UpdateConfigRequest request for ProtoRPC message.
+class UpdateConfig(messages.Message):
+  """UpdateConfig request for ProtoRPC message.
 
   Attributes:
     name: str, The name of the name being requested.
@@ -77,9 +77,18 @@ class UpdateConfigRequest(messages.Message):
     boolean_value: bool, The boolean value of the seting being updated.
     list_value: list, The list value of the name being updated.
   """
-  name = messages.StringField(1)
-  config_type = messages.EnumField(ConfigType, 2)
+  name = messages.StringField(1, required=True)
+  config_type = messages.EnumField(ConfigType, 2, required=True)
   string_value = messages.StringField(3)
   integer_value = messages.IntegerField(4)
   boolean_value = messages.BooleanField(5)
   list_value = messages.StringField(6, repeated=True)
+
+
+class UpdateConfigRequest(messages.Message):
+  """UpdateConfigRequest request for ProtoRPC message.
+
+  Attributes:
+    config: UpdateConfig, The configuration name, type, and value to update.
+  """
+  config = messages.MessageField(UpdateConfig, 1, repeated=True)

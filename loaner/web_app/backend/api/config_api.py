@@ -108,22 +108,21 @@ class ConfigAPI(root_api.Service):
   def update_config(self, request):
     """Updates a given config value."""
     self.check_xsrf_token(self.request_state)
-    if not request.config_type or not request.name:
-      raise endpoints.BadRequestException(_FIELD_MISSING_MSG)
-    try:
-      if request.config_type == config_messages.ConfigType.STRING:
-        config_model.Config.set(
-            name=request.name, value=request.string_value)
-      elif request.config_type == config_messages.ConfigType.INTEGER:
-        config_model.Config.set(
-            name=request.name, value=request.integer_value)
-      elif request.config_type == config_messages.ConfigType.BOOLEAN:
-        config_model.Config.set(
-            name=request.name, value=request.boolean_value)
-      elif request.config_type == config_messages.ConfigType.LIST:
-        config_model.Config.set(
-            name=request.name, value=request.list_value)
-    except KeyError as error:
-      raise endpoints.BadRequestException(str(error))
+    for config in request.config:
+      try:
+        if config.config_type == config_messages.ConfigType.STRING:
+          config_model.Config.set(
+              name=config.name, value=config.string_value)
+        elif config.config_type == config_messages.ConfigType.INTEGER:
+          config_model.Config.set(
+              name=config.name, value=config.integer_value)
+        elif config.config_type == config_messages.ConfigType.BOOLEAN:
+          config_model.Config.set(
+              name=config.name, value=config.boolean_value)
+        elif config.config_type == config_messages.ConfigType.LIST:
+          config_model.Config.set(
+              name=config.name, value=config.list_value)
+      except KeyError as error:
+        raise endpoints.BadRequestException(str(error))
 
     return message_types.VoidMessage()

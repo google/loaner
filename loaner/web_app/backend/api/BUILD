@@ -284,6 +284,7 @@ loaner_appengine_test(
         "//loaner/web_app/backend/api/messages:config_messages",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )
