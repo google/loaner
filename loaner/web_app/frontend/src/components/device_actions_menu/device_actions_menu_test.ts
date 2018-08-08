@@ -18,6 +18,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angu
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
+import {of} from 'rxjs';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
@@ -31,7 +32,6 @@ import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, D
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
 @Component({
-  preserveWhitespaces: true,
   template: `
     <loaner-device-actions-menu [device]="testDevice">
     </loaner-device-actions-menu>`,
@@ -65,8 +65,10 @@ describe('DeviceActionsMenu', () => {
     flushMicrotasks();
 
     fixture = TestBed.createComponent(DummyComponent);
-    deviceActionsMenu = fixture.debugElement.componentInstance;
     dummyComponent = fixture.debugElement.componentInstance;
+    deviceActionsMenu =
+        fixture.debugElement.query(By.directive(DeviceActionsMenu))
+            .componentInstance;
     overlayContainerElement =
         TestBed.get(OverlayContainer).getContainerElement();
   }));
@@ -186,113 +188,123 @@ describe('DeviceActionsMenu', () => {
     expect(button.textContent).toContain('Unenroll');
   });
 
-  it('calls DeviceService extend when Extend is clicked.', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    const extendService: Extend = TestBed.get(Extend);
-    spyOn(deviceService, 'extend');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-extend'));
-    button.triggerEventHandler('click', null);
-    fakeAsync(() => {
-      extendService.openDialog(DEVICE_1.dueDate, DEVICE_1.maxExtendDate);
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(deviceService.extend).toHaveBeenCalled();
-    });
-  });
+  it('calls extend when extend button is clicked and emits refresh event.',
+     () => {
+       dummyComponent.testDevice = DEVICE_ASSIGNED;
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const compiled = fixture.debugElement.nativeElement;
+       spyOn(deviceService, 'extend').and.returnValue(of(true));
+       spyOn(deviceActionsMenu.refreshDevice, 'emit');
+       fixture.detectChanges();
+       const actionsButton = compiled.querySelector('.icon-more');
+       actionsButton.click();
+       fixture.detectChanges();
+       const button =
+           (overlayContainerElement.querySelector('.button-extend') as
+            HTMLElement);
+       button.click();
+       fixture.detectChanges();
+       expect(deviceService.extend).toHaveBeenCalled();
+       expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
+     });
 
-  it('calls returnDevice when Return is clicked.', () => {
-    dummyComponent.testDevice = DEVICE_ASSIGNED;
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'returnDevice');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-return'));
-    button.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    expect(deviceService.returnDevice).toHaveBeenCalled();
-  });
+  it('calls returnDevice when Return is clicked and emits refresh event.',
+     () => {
+       dummyComponent.testDevice = DEVICE_ASSIGNED;
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const compiled = fixture.debugElement.nativeElement;
+       spyOn(deviceService, 'returnDevice').and.returnValue(of(true));
+       spyOn(deviceActionsMenu.refreshDevice, 'emit');
+       fixture.detectChanges();
+       const actionsButton = compiled.querySelector('.icon-more');
+       actionsButton.click();
+       fixture.detectChanges();
+       const button =
+           (overlayContainerElement.querySelector('.button-return') as
+            HTMLElement);
+       button.click();
+       fixture.detectChanges();
+       expect(deviceService.returnDevice).toHaveBeenCalled();
+       expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
+     });
 
-  it('calls onGuestModeEnabled when Enable guest is clicked.', () => {
-    const guestModeService: GuestMode = TestBed.get(GuestMode);
-    spyOn(guestModeService, 'onGuestModeEnabled');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-extend'));
-    button.triggerEventHandler('click', null);
-    fakeAsync(() => {
-      guestModeService.openDialog();
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(guestModeService.onGuestModeEnabled).toHaveBeenCalled();
-    });
-  });
+  it('calls enableGuest when guest button is clicked and emits refresh event.',
+     () => {
+       dummyComponent.testDevice = DEVICE_ASSIGNED;
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const compiled = fixture.debugElement.nativeElement;
+       spyOn(deviceService, 'enableGuestMode').and.returnValue(of(true));
+       spyOn(deviceActionsMenu.refreshDevice, 'emit');
+       fixture.detectChanges();
+       const actionsButton = compiled.querySelector('.icon-more');
+       actionsButton.click();
+       fixture.detectChanges();
+       const button =
+           (overlayContainerElement.querySelector('.button-guest') as
+            HTMLElement);
+       button.click();
+       fixture.detectChanges();
+       expect(deviceService.enableGuestMode).toHaveBeenCalled();
+       expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
+     });
 
-  it('calls onDamaged when Mark as damaged is clicked.', () => {
-    const damagedService: Damaged = TestBed.get(Damaged);
-    spyOn(damagedService, 'onDamaged');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-extend'));
-    button.triggerEventHandler('click', null);
-    fakeAsync(() => {
-      damagedService.openDialog();
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(damagedService.onDamaged).toHaveBeenCalled();
-    });
-  });
+  it('calls onDamaged when Mark as damaged is clicked and emits refresh event.',
+     () => {
+       dummyComponent.testDevice = DEVICE_ASSIGNED;
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const compiled = fixture.debugElement.nativeElement;
+       spyOn(deviceService, 'markAsDamaged').and.returnValue(of(true));
+       spyOn(deviceActionsMenu.refreshDevice, 'emit');
+       fixture.detectChanges();
+       const actionsButton = compiled.querySelector('.icon-more');
+       actionsButton.click();
+       fixture.detectChanges();
+       const button =
+           (overlayContainerElement.querySelector('.button-damaged') as
+            HTMLElement);
+       button.click();
+       fixture.detectChanges();
+       expect(deviceService.markAsDamaged).toHaveBeenCalled();
+       expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
+     });
 
-  it('calls onLost when Mark as lost is clicked.', () => {
-    const lostService: Lost = TestBed.get(Lost);
-    spyOn(lostService, 'onLost');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-extend'));
-    button.triggerEventHandler('click', null);
-    fakeAsync(() => {
-      lostService.openDialog();
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(lostService.onLost).toHaveBeenCalled();
-    });
-  });
+  it('calls onLost when Mark as lost is clicked and emits refresh event.',
+     () => {
+       dummyComponent.testDevice = DEVICE_ASSIGNED;
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const compiled = fixture.debugElement.nativeElement;
+       spyOn(deviceService, 'markAsLost').and.returnValue(of(true));
+       spyOn(deviceActionsMenu.refreshDevice, 'emit');
+       fixture.detectChanges();
+       const actionsButton = compiled.querySelector('.icon-more');
+       actionsButton.click();
+       fixture.detectChanges();
+       const button =
+           (overlayContainerElement.querySelector('.button-lost') as
+            HTMLElement);
+       button.click();
+       fixture.detectChanges();
+       expect(deviceService.markAsLost).toHaveBeenCalled();
+       expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
+     });
 
-  it('calls onUnenroll when Unenroll is clicked.', () => {
-    const unenrollService: Unenroll = TestBed.get(Unenroll);
-    spyOn(unenrollService, 'onUnenroll');
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
-    fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-extend'));
-    button.triggerEventHandler('click', null);
-    fakeAsync(() => {
-      unenrollService.openDialog('123');
-      tick(500);
-      flushMicrotasks();
-      tick(500);
-      fixture.detectChanges();
-      expect(unenrollService.onUnenroll).toHaveBeenCalled();
-    });
-  });
+  it('calls onUnenroll when Unenroll is clicked and emits refresh event.',
+     () => {
+       dummyComponent.testDevice = DEVICE_ASSIGNED;
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const compiled = fixture.debugElement.nativeElement;
+       spyOn(deviceService, 'unenroll').and.returnValue(of(true));
+       spyOn(deviceActionsMenu.refreshDevice, 'emit');
+       fixture.detectChanges();
+       const actionsButton = compiled.querySelector('.icon-more');
+       actionsButton.click();
+       fixture.detectChanges();
+       const button =
+           (overlayContainerElement.querySelector('.button-unenroll') as
+            HTMLElement);
+       button.click();
+       fixture.detectChanges();
+       expect(deviceService.unenroll).toHaveBeenCalled();
+       expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
+     });
 });

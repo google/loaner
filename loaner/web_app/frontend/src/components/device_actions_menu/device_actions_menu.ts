@@ -58,6 +58,7 @@ export class DeviceActionsMenu {
         .subscribe(() => {
           this.unenrollService.finished();
           this.unenrolled.emit();
+          this.refreshDevice.emit();
         });
   }
 

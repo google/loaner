@@ -15,7 +15,7 @@
 import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
 import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
 import {interval, merge, NEVER, Subject} from 'rxjs';
-import {startWith, switchMap, takeUntil} from 'rxjs/operators';
+import {startWith, takeUntil, tap} from 'rxjs/operators';
 
 import {Device, DeviceApiParams} from '../../models/device';
 import {Shelf} from '../../models/shelf';
@@ -85,30 +85,12 @@ export class DeviceListTable implements OnInit {
     const intervalObservable = interval(60000).pipe(startWith(0));
 
     merge(intervalObservable, this.sort.sortChange, this.paginator.page)
-        .pipe(
-            takeUntil(this.onDestroy),
-            switchMap(() => {
-              if (this.pauseLoading) return NEVER;
-
-              let filters: DeviceApiParams = {
-                page_number: this.paginator.pageIndex + 1,
-                page_size: this.paginator.pageSize,
-              };
-              const sort = this.sort.active;
-              const sortDirection = this.sort.direction || 'asc';
-
-              filters = this.setupShelfFilters(filters);
-
-              return this.deviceService.list(filters, sort, sortDirection);
-            }),
-            )
-        .subscribe(response => {
-          this.totalResults = response.totalResults;
-          this.dataSource.data = response.devices;
-          // We need to manually call change detection here because of
-          // https://github.com/angular/angular/issues/14748
-          this.changeDetector.detectChanges();
-        });
+        .pipe(takeUntil(this.onDestroy), tap(() => {
+                if (!this.pauseLoading) {
+                  this.getDeviceList();
+                }
+              }))
+        .subscribe();
   }
 
   ngOnDestroy() {
@@ -126,5 +108,25 @@ export class DeviceListTable implements OnInit {
       };
     }
     return filters;
+  }
+
+  private getDeviceList() {
+    let filters: DeviceApiParams = {
+      page_number: this.paginator.pageIndex + 1,
+      page_size: this.paginator.pageSize,
+    };
+    const sort = this.sort.active;
+    const sortDirection = this.sort.direction || 'asc';
+
+    filters = this.setupShelfFilters(filters);
+
+    this.deviceService.list(filters, sort, sortDirection)
+        .subscribe(response => {
+          this.totalResults = response.totalResults;
+          this.dataSource.data = response.devices;
+          // We need to manually call change detection here because of
+          // https://github.com/angular/angular/issues/14748
+          this.changeDetector.detectChanges();
+        });
   }
 }

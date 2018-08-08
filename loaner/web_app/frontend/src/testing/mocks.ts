@@ -224,6 +224,7 @@ export const DEVICE_ASSIGNED = new Device({
   due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
+  guest_permitted: true,
 });
 
 export const DEVICE_GUEST_NOT_PERMITTED = new Device({
