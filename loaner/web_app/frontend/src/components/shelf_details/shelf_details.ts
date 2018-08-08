@@ -16,9 +16,12 @@ import {Location} from '@angular/common';
 import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 
+import {APPLICATION_PERMISSIONS} from '../../app.config';
+
 import {Shelf} from '../../models/shelf';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
+import {UserService} from '../../services/user';
 
 /**
  * Component that renders the Shelf Details template on the frontend.
@@ -33,17 +36,29 @@ export class ShelfDetails implements OnInit {
   /** Shelf that will have the details displayed in the template. */
   @Input() shelf!: Shelf;
 
+  showAdvancedOptions = false;
+  showQuickAudit = false;
+
   constructor(
       private readonly dialogBox: Dialog,
       private readonly location: Location,
       private readonly router: Router,
       private readonly shelfService: ShelfService,
+      private readonly userService: UserService,
   ) {}
 
   ngOnInit() {
     if (!this.shelf) {
       this.back();
     }
+    this.userService.whenUserLoaded().subscribe(user => {
+      if (user.superadmin) {
+        this.showAdvancedOptions = true;
+      } else {
+        this.showQuickAudit =
+            user.hasAnyPermission(APPLICATION_PERMISSIONS.AUDIT_SHELF);
+      }
+    });
   }
 
   /** Route to action update to enable form. */

@@ -7,9 +7,16 @@
     </button>
     <span>Shelf Details</span>
     <span fxFlex></span>
+    <button mat-mini-fab
+            class="quickAuditButton"
+            *ngIf="showQuickAudit"
+            routerLink="/shelf/{{shelf.location}}/audit">
+      <mat-icon color="accent" svgIcon="checkin"></mat-icon>
+    </button>
     <button mat-icon-button
             [matMenuTriggerFor]="actionsMenu"
-            class="actionsMenuButton">
+            class="actionsMenuButton"
+            *ngIf="showAdvancedOptions">
       <mat-icon class="icon-more">more_vert</mat-icon>
     </button>
     <mat-menu #actionsMenu="matMenu" class="actions-menu">

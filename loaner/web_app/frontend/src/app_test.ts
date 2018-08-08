@@ -41,7 +41,7 @@ describe('AppComponent', () => {
     icon: 'laptop_chromebook',
     name: 'TestItem_Hidden',
     routerLink: 'user',
-    requiredPermission: CONFIG.appPermissions.AUDIT_SHELF,
+    requiredPermission: [CONFIG.appPermissions.AUDIT_SHELF],
     hideOnRoutes: ['']
   };
 
@@ -99,26 +99,24 @@ describe('AppComponent', () => {
         });
   });
 
-  it('renders sidebar items if a list of permissions are passed',
-     () => {
-       app.user = new User({
-         permissions: [
-           CONFIG.appPermissions.READ_SHELVES,
-           CONFIG.appPermissions.READ_DEVICES,
-         ]
-       });
-       fixture.detectChanges();
-       const compiled = fixture.debugElement.nativeElement;
-       const sideNavListContent =
-           compiled
-               .querySelector(
-                   'mat-sidenav-container > mat-sidenav > mat-nav-list')
-               .innerHTML;
-       expect(sideNavListContent).toContain('Devices');
-       expect(sideNavListContent).toContain('ng-reflect-router-link="devices"');
-       expect(sideNavListContent).toContain('Shelves');
-       expect(sideNavListContent).toContain('ng-reflect-router-link="shelves"');
-     });
+  it('renders sidebar items if a list of permissions are passed', () => {
+    app.user = new User({
+      permissions: [
+        CONFIG.appPermissions.READ_SHELVES,
+        CONFIG.appPermissions.READ_DEVICES,
+      ]
+    });
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const sideNavListContent =
+        compiled
+            .querySelector('mat-sidenav-container > mat-sidenav > mat-nav-list')
+            .innerHTML;
+    expect(sideNavListContent).toContain('Devices');
+    expect(sideNavListContent).toContain('ng-reflect-router-link="devices"');
+    expect(sideNavListContent).toContain('Shelves');
+    expect(sideNavListContent).toContain('ng-reflect-router-link="shelves"');
+  });
 
   it('renders user sidebar items for standard user', () => {
     fixture.detectChanges();

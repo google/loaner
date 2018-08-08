@@ -23,12 +23,51 @@ describe('UserModel', () => {
     user = new User();
   });
 
-  it('should verify user does not have permission', () => {
-    expect(user.hasPermission(CONFIG.appPermissions.READ_SHELVES)).toBe(false);
+  it('requires all permissions on hasAllPermissions', () => {
+    user.permissions = [
+      CONFIG.appPermissions.READ_SHELVES,
+      CONFIG.appPermissions.READ_DEVICES,
+    ];
+
+    expect(user.hasAllPermissions(
+               CONFIG.appPermissions.READ_SHELVES,
+               ))
+        .toBe(true);
+    expect(user.hasAllPermissions(
+               CONFIG.appPermissions.READ_SHELVES,
+               CONFIG.appPermissions.READ_DEVICES))
+        .toBe(true);
+    expect(user.hasAllPermissions(
+               CONFIG.appPermissions.READ_SHELVES,
+               CONFIG.appPermissions.READ_DEVICES,
+               CONFIG.appPermissions.READ_SURVEYS))
+        .toBe(false);
+    expect(user.hasAllPermissions(CONFIG.appPermissions.READ_SURVEYS))
+        .toBe(false);
   });
 
-  it('should verify user does have permission', () => {
-    user.permissions = [CONFIG.appPermissions.READ_SHELVES];
-    expect(user.hasPermission(CONFIG.appPermissions.READ_SHELVES)).toBe(true);
+  it('requires any permission on hasAnyPermission', () => {
+    user.permissions = [
+      CONFIG.appPermissions.READ_CONFIGS,
+      CONFIG.appPermissions.READ_DEVICES,
+      CONFIG.appPermissions.READ_SHELVES,
+    ];
+    expect(user.hasAnyPermission(CONFIG.appPermissions.READ_DEVICES))
+        .toBe(true);
+    expect(user.hasAnyPermission(
+               CONFIG.appPermissions.READ_DEVICES,
+               CONFIG.appPermissions.READ_SHELVES))
+        .toBe(true);
+    expect(user.hasAnyPermission(
+               CONFIG.appPermissions.READ_SURVEYS,
+               CONFIG.appPermissions.READ_CONFIGS,
+               ))
+        .toBe(true);
+    expect(user.hasAnyPermission(CONFIG.appPermissions.READ_SURVEYS))
+        .toBe(false);
+  });
+
+  it('aliases hasPermission to hasAllPermissions', () => {
+    expect(user.hasPermission).toBe(user.hasAllPermissions);
   });
 });

@@ -18,7 +18,8 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {ConfigService} from '../../services/config';
 import {DeviceService} from '../../services/device';
 import {ShelfService} from '../../services/shelf';
-import {ConfigServiceMock, DeviceServiceMock, ShelfServiceMock} from '../../testing/mocks';
+import {UserService} from '../../services/user';
+import {ConfigServiceMock, DeviceServiceMock, ShelfServiceMock, UserServiceMock} from '../../testing/mocks';
 
 import {ShelfDetailView, ShelfDetailViewModule} from '.';
 
@@ -35,6 +36,7 @@ describe('ShelfDetailView', () => {
             {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
             {provide: ShelfService, useClass: ShelfServiceMock},
+            {provide: UserService, useClass: UserServiceMock},
           ],
         })
         .compileComponents();

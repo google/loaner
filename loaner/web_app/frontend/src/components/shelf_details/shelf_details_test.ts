@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {HttpClientModule} from '@angular/common/http';
 import {Component} from '@angular/core';
-import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
+import {APPLICATION_PERMISSIONS} from '../../app.config';
+
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
-import {ShelfServiceMock} from '../../testing/mocks';
-import {TEST_SHELF} from '../../testing/mocks';
+import {UserService} from '../../services/user';
+import {ShelfServiceMock, TEST_SHELF, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
 import {ShelfDetails, ShelfDetailsModule} from '.';
 
@@ -45,10 +48,12 @@ describe('ShelfDetailsComponent', () => {
               {path: 'shelves', component: DummyComponent},
             ]),
             ShelfDetailsModule,
+            HttpClientModule,
             BrowserAnimationsModule,
           ],
           providers: [
             {provide: ShelfService, useClass: ShelfServiceMock},
+            {provide: UserService, useClass: UserServiceMock},
           ],
         })
         .compileComponents();
@@ -146,4 +151,70 @@ describe('ShelfDetailsComponent', () => {
 
     expect(shelfService.disable).toHaveBeenCalled();
   });
+
+  it('shows the quick audit button to auditors', fakeAsync(() => {
+       const userService: UserService = TestBed.get(UserService);
+       const testUser = TEST_USER;
+       testUser.permissions.push(APPLICATION_PERMISSIONS.AUDIT_SHELF);
+       spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
+       fixture.detectChanges();
+       tick(250);
+       const compiled = fixture.debugElement.nativeElement;
+       expect(shelfDetails.showQuickAudit).toBe(true);
+       expect(compiled.querySelector('.quickAuditButton')).toBeTruthy();
+     }));
+
+  it('hides the quick audit button for non-auditors', fakeAsync(() => {
+       const userService: UserService = TestBed.get(UserService);
+       const testUser = TEST_USER;
+       testUser.permissions = testUser.permissions.filter(permission => {
+         return permission !== APPLICATION_PERMISSIONS.AUDIT_SHELF;
+       });
+       spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
+       fixture.detectChanges();
+       tick(250);
+       const compiled = fixture.debugElement.nativeElement;
+       expect(shelfDetails.showQuickAudit).toBe(false);
+       expect(compiled.querySelector('.quickAuditButton')).toBeFalsy();
+     }));
+
+  it('shows the advanced options to superadmins', fakeAsync(() => {
+       const userService: UserService = TestBed.get(UserService);
+       const testUser = TEST_USER;
+       testUser.superadmin = true;
+       spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
+       fixture.detectChanges();
+       tick(250);
+       const compiled = fixture.debugElement.nativeElement;
+       expect(shelfDetails.showAdvancedOptions).toBe(true);
+       expect(compiled.querySelector('.actionsMenuButton')).toBeTruthy();
+       expect(compiled.querySelector('.quickAuditButton')).toBeFalsy();
+     }));
+
+  it('hides the advanced options for non-superadmins', fakeAsync(() => {
+       const userService: UserService = TestBed.get(UserService);
+       const testUser = TEST_USER;
+       testUser.superadmin = false;
+       spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
+       fixture.detectChanges();
+       tick(250);
+       const compiled = fixture.debugElement.nativeElement;
+       expect(shelfDetails.showAdvancedOptions).toBe(false);
+       expect(compiled.querySelector('.actionsMenuButton')).toBeFalsy();
+     }));
+
+  it('hides quick audit button when user is superadmin', fakeAsync(() => {
+       const userService: UserService = TestBed.get(UserService);
+       const testUser = TEST_USER;
+       testUser.superadmin = true;
+       testUser.permissions.push(APPLICATION_PERMISSIONS.AUDIT_SHELF);
+       spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
+       fixture.detectChanges();
+       tick(250);
+       const compiled = fixture.debugElement.nativeElement;
+       expect(shelfDetails.showAdvancedOptions).toBe(true);
+       expect(shelfDetails.showQuickAudit).toBe(false);
+       expect(compiled.querySelector('.actionsMenuButton')).toBeTruthy();
+       expect(compiled.querySelector('.quickAuditButton')).toBeFalsy();
+     }));
 });

@@ -45,17 +45,24 @@ export class User {
     };
   }
 
-  hasPermission(requiredPermissions: string|string[]): boolean {
-    if (typeof requiredPermissions === 'string') {
-      return this.permissions.includes(requiredPermissions);
-    }
-
-    let hasPermission = false;
-    for (const permission of requiredPermissions) {
-      if (this.permissions.includes(permission)) {
-        hasPermission = true;
-      }
-    }
-    return hasPermission;
+  /**
+   * Checks if the user has one or more of the given permissions.
+   * @param anyRequiredPermissions one or more permission to match.
+   */
+  hasAnyPermission(...anyRequiredPermissions: string[]): boolean {
+    return anyRequiredPermissions.some(
+        permission => this.permissions.includes(permission));
   }
+
+  /**
+   * Checks if the user has all of the given permissions.
+   * @param allRequiredPermissions one or more permissions to match.
+   */
+  hasAllPermissions(...allRequiredPermissions: string[]): boolean {
+    return allRequiredPermissions.every(
+        permission => this.permissions.includes(permission));
+  }
+
+  /** Alias method for hasAllPermissions. */
+  hasPermission = this.hasAllPermissions;
 }

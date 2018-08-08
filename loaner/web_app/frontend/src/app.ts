@@ -35,7 +35,7 @@ export declare interface NavigationItem {
   name: string;
   routerLink?: string;
   url?: string;
-  requiredPermission?: string|string[];
+  requiredPermission?: string[];
   hideOnRoutes: string[];
 }
 
@@ -164,7 +164,7 @@ export class AppComponent extends LoaderView {
       return true;
     }
     return this.user &&
-        this.user.hasPermission(navigationItem.requiredPermission);
+        this.user.hasPermission(...navigationItem.requiredPermission);
   }
 
   /*
@@ -190,6 +190,6 @@ export class AppComponent extends LoaderView {
    * Checks whether a given user can access the search features.
    */
   canShowSearchBox(): boolean {
-    return this.user && this.user.hasPermission(SEARCH_PERMISSIONS);
+    return this.user && this.user.hasPermission(...SEARCH_PERMISSIONS);
   }
 }
