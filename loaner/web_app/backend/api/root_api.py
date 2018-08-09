@@ -49,7 +49,6 @@ class Service(remote.Service):
 
 ROOT_API = endpoints.api(
     allowed_client_ids=constants.ALLOWED_CLIENT_IDS,
-    auth_level=endpoints.AUTH_LEVEL.REQUIRED,
     description='Loaner Root API',
     name='loaner',
     scopes=constants.ROOT_SCOPES,
