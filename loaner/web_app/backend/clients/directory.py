@@ -31,6 +31,7 @@ from google.oauth2 import service_account
 
 from loaner.web_app import constants
 
+
 DEVICE_ID = u'deviceId'
 MODEL = u'model'
 ORG_UNIT_PATH = u'orgUnitPath'
@@ -246,6 +247,7 @@ class DirectoryApiClient(object):
           'Directory API move Chrome device Org Unit failed with a %s '
           'exception because %s.', str(type(err)), err.resp.reason)
       raise DirectoryRPCError(err.resp.reason)
+
 
   def disable_chrome_device(self, device_id):
     """Disable a Chrome device within an organization.
