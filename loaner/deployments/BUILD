@@ -1,5 +1,5 @@
 # Description:
-#   BUILD file for //loaner/oss/deployments.
+#   BUILD file for //loaner/deployments.
 
 package(
     default_visibility = [

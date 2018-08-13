@@ -1,5 +1,5 @@
 # Description:
-#   BUILD file for //loaner/oss/deployments/lib.
+#   BUILD file for //loaner/deployments/lib.
 
 package(
     default_visibility = [
@@ -10,6 +10,18 @@ package(
 #############
 # Libraries #
 #############
+
+py_library(
+    name = "app_engine_lib",
+    srcs = [
+        "app_engine.py",
+    ],
+    deps = [
+        ":auth_lib",
+        "@absl_archive//absl/logging",
+        "@googleapiclient_archive//:googleapiclient",
+    ],
+)
 
 py_library(
     name = "auth_lib",
@@ -32,7 +44,7 @@ py_library(
         "common.py",
     ],
     data = [
-        "//loaner/oss/deployments:configs",
+        "//loaner/deployments:configs",
     ],
     deps = [
         "@absl_archive//absl:app",
@@ -45,6 +57,22 @@ py_library(
 #########
 # Tests #
 #########
+
+py_test(
+    name = "app_engine_test",
+    size = "small",
+    srcs = [
+        "app_engine_test.py",
+    ],
+    deps = [
+        ":app_engine_lib",
+        ":auth_lib",
+        ":common_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@googleapiclient_archive//:googleapiclient",
+        "@mock_archive//:mock",
+    ],
+)
 
 py_test(
     name = "auth_test",
@@ -86,6 +114,7 @@ py_test(
 test_suite(
     name = "all_tests",
     tests = [
+        ":app_engine_test",
         ":auth_test",
         ":common_test",
     ],
