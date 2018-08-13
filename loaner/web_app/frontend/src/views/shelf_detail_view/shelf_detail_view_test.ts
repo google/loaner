@@ -12,9 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {DomSanitizer} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {MatIconRegistry} from '../../core/material_module';
 import {ConfigService} from '../../services/config';
 import {DeviceService} from '../../services/device';
 import {ShelfService} from '../../services/shelf';
@@ -31,7 +34,11 @@ describe('ShelfDetailView', () => {
   beforeEach(fakeAsync(() => {
     TestBed
         .configureTestingModule({
-          imports: [RouterTestingModule, ShelfDetailViewModule],
+          imports: [
+            HttpClientTestingModule,
+            RouterTestingModule,
+            ShelfDetailViewModule,
+          ],
           providers: [
             {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: DeviceService, useClass: DeviceServiceMock},
@@ -43,6 +50,13 @@ describe('ShelfDetailView', () => {
 
     flushMicrotasks();
 
+    const iconRegistry = TestBed.get(MatIconRegistry);
+    const sanitizer = TestBed.get(DomSanitizer);
+    iconRegistry.addSvgIcon(
+        'checkin',
+        // Note: The bypassSecurity here can't be refactored: the code
+        // is destined to be open-sourced.
+        sanitizer.bypassSecurityTrustResourceUrl('/fakepath/checkin'));
     fixture = TestBed.createComponent(ShelfDetailView);
     shelfDetailView = fixture.debugElement.componentInstance;
   }));

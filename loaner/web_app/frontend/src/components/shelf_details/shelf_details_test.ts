@@ -13,14 +13,16 @@
 // limitations under the License.
 
 import {HttpClientModule} from '@angular/common/http';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {Component} from '@angular/core';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angular/core/testing';
+import {DomSanitizer} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
 import {APPLICATION_PERMISSIONS} from '../../app.config';
-
+import {MatIconRegistry} from '../../core/material_module';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {UserService} from '../../services/user';
@@ -49,6 +51,7 @@ describe('ShelfDetailsComponent', () => {
             ]),
             ShelfDetailsModule,
             HttpClientModule,
+            HttpClientTestingModule,
             BrowserAnimationsModule,
           ],
           providers: [
@@ -60,6 +63,13 @@ describe('ShelfDetailsComponent', () => {
 
     flushMicrotasks();
 
+    const iconRegistry = TestBed.get(MatIconRegistry);
+    const sanitizer = TestBed.get(DomSanitizer);
+    iconRegistry.addSvgIcon(
+        'checkin',
+        // Note: The bypassSecurity here can't be refactored: the code
+        // is destined to be open-sourced.
+        sanitizer.bypassSecurityTrustResourceUrl('/fakepath/checkin'));
     fixture = TestBed.createComponent(ShelfDetails);
     shelfDetails = fixture.debugElement.componentInstance;
     shelfDetails.shelf = TEST_SHELF;

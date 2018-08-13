@@ -12,11 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, ComponentFixtureAutoDetect, discardPeriodicTasks, fakeAsync, TestBed, tick,} from '@angular/core/testing';
+import {DomSanitizer} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {ShelfService} from '../../services/shelf';
 
+import {MatIconRegistry} from '../../core/material_module';
+import {ShelfService} from '../../services/shelf';
 import {ShelfServiceMock} from '../../testing/mocks';
 
 import {ShelfListTable, ShelfListTableModule} from '.';
@@ -30,6 +33,7 @@ describe('ShelfListTableComponent', () => {
     TestBed
         .configureTestingModule({
           imports: [
+            HttpClientTestingModule,
             RouterTestingModule,
             ShelfListTableModule,
             BrowserAnimationsModule,
@@ -43,6 +47,13 @@ describe('ShelfListTableComponent', () => {
 
     tick();
 
+    const iconRegistry = TestBed.get(MatIconRegistry);
+    const sanitizer = TestBed.get(DomSanitizer);
+    iconRegistry.addSvgIcon(
+        'checkin',
+        // Note: The bypassSecurity here can't be refactored: the code
+        // is destined to be open-sourced.
+        sanitizer.bypassSecurityTrustResourceUrl('/fakepath/checkin'));
     fixture = TestBed.createComponent(ShelfListTable);
     shelfListTable = fixture.debugElement.componentInstance;
 
