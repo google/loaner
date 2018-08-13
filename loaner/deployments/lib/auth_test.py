@@ -37,8 +37,8 @@ from oauth2client import tools
 from google.oauth2 import credentials
 
 from absl.testing import absltest
-from loaner.deployments import auth
-from loaner.deployments import common
+from loaner.deployments.lib import auth
+from loaner.deployments.lib import common
 
 FLAGS = flags.FLAGS
 

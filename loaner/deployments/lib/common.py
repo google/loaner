@@ -59,7 +59,7 @@ def _get_config_file_path(config_file_path):
       'The full path for the config file was not specified, '
       'looking in the default directory.')
   return os.path.join(
-      os.path.dirname(os.path.abspath(__file__)), config_file_path)
+      os.path.dirname(os.path.abspath(__file__)), '..', config_file_path)
 
 
 @flags.validator('config_file_path')

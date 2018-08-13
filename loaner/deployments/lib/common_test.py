@@ -30,7 +30,7 @@ from pyfakefs import mox3_stubout
 import mock
 
 from absl.testing import absltest
-from loaner.deployments import common
+from loaner.deployments.lib import common
 
 _CONFIG = """
 dev:
@@ -72,7 +72,8 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
 
   @parameterized.parameters(
       ('/this/config/file.yaml', '/this/config/file.yaml', 0),
-      (os.path.join(os.path.dirname(os.path.abspath(__file__)), 'config.yaml'),
+      (os.path.join(
+          os.path.dirname(os.path.abspath(__file__)), '..', 'config.yaml'),
        'config.yaml', 1),
   )
   @mock.patch.object(logging, 'debug')
