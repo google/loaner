@@ -26,7 +26,6 @@ import mock
 from google.appengine.api import datastore_errors
 from google.appengine.api import search
 from google.appengine.ext import deferred
-from loaner.web_app import config_defaults
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import events
@@ -44,7 +43,7 @@ class DeviceModelTest(loanertest.TestCase):
     super(DeviceModelTest, self).setUp()
     config_model.Config.set(
         'device_identifier_mode',
-        config_defaults.DeviceIdentifierMode.SERIAL_NUMBER)
+        config_model.DeviceIdentifierMode.SERIAL_NUMBER)
     self.shelf = shelf_model.Shelf.enroll(
         user_email=loanertest.USER_EMAIL, location='MTV', capacity=10,
         friendly_name='MTV office')
@@ -83,7 +82,7 @@ class DeviceModelTest(loanertest.TestCase):
     # Provide serial number when asset tag required.
     config_model.Config.set(
         'device_identifier_mode',
-        config_defaults.DeviceIdentifierMode.ASSET_TAG)
+        config_model.DeviceIdentifierMode.ASSET_TAG)
     with self.assertRaisesWithLiteralMatch(
         datastore_errors.BadValueError, device_model._ASSET_TAGS_REQUIRED_MSG):
       device_model.Device.enroll(
@@ -92,7 +91,7 @@ class DeviceModelTest(loanertest.TestCase):
     # Provide insufficient data when both asset tag and serial number required.
     config_model.Config.set(
         'device_identifier_mode',
-        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED)
+        config_model.DeviceIdentifierMode.BOTH_REQUIRED)
     with self.assertRaisesWithLiteralMatch(
         datastore_errors.BadValueError,
         device_model._SERIAL_NUMBERS_REQUIRED_MSG):
@@ -210,7 +209,7 @@ class DeviceModelTest(loanertest.TestCase):
 
     config_model.Config.set(
         'device_identifier_mode',
-        config_defaults.DeviceIdentifierMode.ASSET_TAG)
+        config_model.DeviceIdentifierMode.ASSET_TAG)
     self.testbed.raise_event_patcher.stop()
     special_mock_raiseevent = mock.Mock(side_effect=special_side_effect)
     special_raise_event_patcher = mock.patch.object(
@@ -257,7 +256,7 @@ class DeviceModelTest(loanertest.TestCase):
 
     config_model.Config.set(
         'device_identifier_mode',
-        config_defaults.DeviceIdentifierMode.ASSET_TAG)
+        config_model.DeviceIdentifierMode.ASSET_TAG)
     self.testbed.raise_event_patcher.stop()
     special_mock_raiseevent = mock.Mock(side_effect=special_side_effect)
     special_raise_event_patcher = mock.patch.object(

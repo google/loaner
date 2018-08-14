@@ -24,9 +24,9 @@ import mock
 
 from protorpc import message_types
 
-from loaner.web_app import config_defaults
 from loaner.web_app.backend.api import config_api
 from loaner.web_app.backend.api.messages import config_messages
+from loaner.web_app.backend.lib import utils
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -114,17 +114,19 @@ class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         self.existing_list_config_in_datastore.list_value,
         response.list_value)
 
-  def test_list_configs(self):
+  @mock.patch.object(utils, 'load_config_from_yaml')
+  def test_list_configs(self, mock_load_config_from_yaml):
+    mock_configs = {
+        'string_config': 'config value 1',
+        'integer_config': 1,
+        'bool_config': True,
+        'list_config': ['email1', 'email2'],
+    }
+    mock_load_config_from_yaml.return_value = mock_configs
     request = message_types.VoidMessage()
     response = self.service.list_configs(request)
 
-    # Make sure that the response contains all of the config in
-    # config.py.
-    self.assertTrue(
-        len(response.configs),
-        len(config_defaults.DEFAULTS))
-    for response_config in response.configs:
-      self.assertIn(response_config.name, config_defaults.DEFAULTS)
+    self.assertEqual(len(response.configs), 4)
 
   def test_update_config_value_does_not_exist(self):
     request = config_messages.UpdateConfigRequest(
@@ -138,9 +140,14 @@ class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         self.service.update_config,
         request)
 
-  def test_update_config_multi(self):
+  @mock.patch.object(utils, 'load_config_from_yaml')
+  def test_update_config_multi(self, mock_load_config_from_yaml):
     new_string_value = 'new_string_value'
     new_int_value = 9
+    mock_load_config_from_yaml.return_value = {
+        'test_config_integer': 2,
+        'test_config_string': 'old_string_value',
+    }
     request = config_messages.UpdateConfigRequest(
         config=[
             config_messages.UpdateConfig(
@@ -163,8 +170,11 @@ class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       ('test_config_integer', 5, 'integer_value',),
       ('test_config_string', 'File a ticket!', 'string_value',),
       ('test_config_bool', False, 'boolean_value',))
+  @mock.patch.object(utils, 'load_config_from_yaml')
   def test_update_config(
-      self, mock_config, mock_config_value, config_value_type):
+      self, mock_config, mock_config_value, config_value_type,
+      mock_load_config_from_yaml):
+    mock_load_config_from_yaml.return_value = {mock_config: mock_config_value}
     request = _create_config_request(
         config_value_type, mock_config, mock_config_value)
     response = self.service.update_config(request)
@@ -184,7 +194,6 @@ def _create_config_request(config_value_type, mock_config, mock_config_value):
   Returns:
     A config_messages.UpdateConfigRequest ProtoRPC message.
   """
-  config_defaults.DEFAULTS[mock_config] = mock_config_value
   if config_value_type == 'list_value':
     config = [
         config_messages.UpdateConfig(
