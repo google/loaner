@@ -248,7 +248,6 @@ class DirectoryApiClient(object):
           'exception because %s.', str(type(err)), err.resp.reason)
       raise DirectoryRPCError(err.resp.reason)
 
-
   def disable_chrome_device(self, device_id):
     """Disable a Chrome device within an organization.
 
