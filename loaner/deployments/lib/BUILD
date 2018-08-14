@@ -54,6 +54,18 @@ py_library(
     ],
 )
 
+py_library(
+    name = "storage_lib",
+    srcs = [
+        "storage.py",
+    ],
+    deps = [
+        ":auth_lib",
+        "@absl_archive//absl/logging",
+        "@googleapiclient_archive//:googleapiclient",
+    ],
+)
+
 #########
 # Tests #
 #########
@@ -111,11 +123,28 @@ py_test(
     ],
 )
 
+py_test(
+    name = "storage_test",
+    size = "small",
+    srcs = [
+        "storage_test.py",
+    ],
+    deps = [
+        ":auth_lib",
+        ":common_lib",
+        ":storage_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@googleapiclient_archive//:googleapiclient",
+        "@mock_archive//:mock",
+    ],
+)
+
 test_suite(
     name = "all_tests",
     tests = [
         ":app_engine_test",
         ":auth_test",
         ":common_test",
+        ":storage_test",
     ],
 )
