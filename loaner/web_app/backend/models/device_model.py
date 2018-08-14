@@ -27,6 +27,7 @@ from google.appengine.api import datastore_errors
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
+from loaner.web_app import config_defaults
 from loaner.web_app import constants
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.clients import directory
@@ -287,12 +288,12 @@ class Device(base_model.BaseModel):
       asset_tag = asset_tag.upper()
     device_identifier_mode = config_model.Config.get('device_identifier_mode')
     if not asset_tag and device_identifier_mode in (
-        config_model.DeviceIdentifierMode.BOTH_REQUIRED,
-        config_model.DeviceIdentifierMode.ASSET_TAG):
+        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED,
+        config_defaults.DeviceIdentifierMode.ASSET_TAG):
       raise datastore_errors.BadValueError(_ASSET_TAGS_REQUIRED_MSG)
     elif not serial_number and device_identifier_mode in (
-        config_model.DeviceIdentifierMode.BOTH_REQUIRED,
-        config_model.DeviceIdentifierMode.SERIAL_NUMBER):
+        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED,
+        config_defaults.DeviceIdentifierMode.SERIAL_NUMBER):
       raise datastore_errors.BadValueError(_SERIAL_NUMBERS_REQUIRED_MSG)
     directory_client = directory.DirectoryApiClient(user_email)
     device = cls.get(serial_number=serial_number, asset_tag=asset_tag)
@@ -316,7 +317,7 @@ class Device(base_model.BaseModel):
       # If this implementation of the app can translate asset tags to serial
       # numbers, recheck for an existing device now that we may have the serial.
       if device_identifier_mode == (
-          config_model.DeviceIdentifierMode.ASSET_TAG):
+          config_defaults.DeviceIdentifierMode.ASSET_TAG):
         device_by_serial = cls.get(serial_number=serial_number)
         if device_by_serial:
           device = _update_existing_device(

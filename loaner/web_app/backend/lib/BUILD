@@ -166,12 +166,6 @@ loaner_appengine_library(
     srcs = [
         "utils.py",
     ],
-    data = [
-        "//loaner/web_app:config_defaults_yaml",
-    ],
-    deps = [
-        "//loaner/web_app:constants",
-    ],
 )
 
 loaner_appengine_library(

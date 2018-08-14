@@ -69,7 +69,7 @@ loaner_appengine_library(
         "config_model.py",
     ],
     deps = [
-        "//loaner/web_app/backend/lib:utils",
+        "//loaner/web_app:config_defaults",
     ],
 )
 
@@ -82,6 +82,7 @@ loaner_appengine_library(
         ":base_model",
         ":config_model",
         ":user_model",
+        "//loaner/web_app:config_defaults",
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/api:permissions",
         "//loaner/web_app/backend/clients:directory",
@@ -191,10 +192,9 @@ loaner_appengine_test(
     ],
     deps = [
         ":config_model",
+        "//loaner/web_app:config_defaults",
         "//loaner/web_app/backend/testing:loanertest",
-        "@absl_archive//absl/testing:absltest",
         "@absl_archive//absl/testing:parameterized",
-        "@pyfakefs_archive//:pyfakefs",
     ],
 )
 

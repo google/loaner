@@ -22,11 +22,11 @@ from protorpc import message_types
 
 import endpoints
 
+from loaner.web_app import config_defaults
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import config_messages
-from loaner.web_app.backend.lib import utils
 from loaner.web_app.backend.models import config_model
 
 _FIELD_MISSING_MSG = 'Please double-check you provided all necessary fields.'
@@ -80,8 +80,8 @@ class ConfigAPI(root_api.Service):
     """Gets a list of all config values."""
     self.check_xsrf_token(self.request_state)
     response_message = []
-    config_defaults = utils.load_config_from_yaml()
-    for setting in config_defaults:
+
+    for setting in config_defaults.DEFAULTS:
       setting_value = config_model.Config.get(setting)
       if isinstance(setting_value, basestring):
         response_message.append(config_messages.ConfigResponse(
