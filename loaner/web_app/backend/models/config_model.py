@@ -13,7 +13,6 @@
 # limitations under the License.
 
 """A model representing configuration config."""
-
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
@@ -21,7 +20,8 @@ from __future__ import print_function
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
-from loaner.web_app import config_defaults
+from loaner.web_app.backend.lib import utils
+
 
 _CONFIG_NOT_FOUND_MSG = 'No such name "%s" exists in default configurations.'
 
@@ -58,6 +58,7 @@ class Config(ndb.Model):
     Raises:
       KeyError: An error occurred when name does not exist.
     """
+    config_defaults = utils.load_config_from_yaml()
     memcache_config = memcache.get(name)
     cached_config = None
     if memcache_config:
@@ -76,14 +77,14 @@ class Config(ndb.Model):
       # Conversion from use_asset_tags to device_identifier_mode.
       if name == 'device_identifier_mode' and not cached_config:
         if cls.get('use_asset_tags'):
-          cached_config = config_defaults.DeviceIdentifierMode.BOTH_REQUIRED
+          cached_config = DeviceIdentifierMode.BOTH_REQUIRED
           cls.set(name, cached_config)
           memcache.set(name, cached_config)
       if cached_config is not None:
         memcache.set(name, cached_config)
         return cached_config
-      elif name in config_defaults.DEFAULTS:
-        return config_defaults.DEFAULTS[name]
+      elif name in config_defaults:
+        return config_defaults[name]
 
     raise KeyError(_CONFIG_NOT_FOUND_MSG, name)
 
@@ -98,7 +99,8 @@ class Config(ndb.Model):
     Raises:
       KeyError: Error raised when name does not exist in config.py file.
     """
-    if name not in config_defaults.DEFAULTS:
+    config_defaults = utils.load_config_from_yaml()
+    if name not in config_defaults:
       raise KeyError(
           _CONFIG_NOT_FOUND_MSG, name)
 
@@ -120,3 +122,10 @@ class Config(ndb.Model):
       stored_config.put()
 
     memcache.set(name, value)
+
+
+class DeviceIdentifierMode(object):
+  """Constants defining supported means of identifying devices."""
+  ASSET_TAG = 'asset_tag'
+  SERIAL_NUMBER = 'serial_number'
+  BOTH_REQUIRED = 'both_required'

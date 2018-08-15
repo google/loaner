@@ -57,6 +57,10 @@ APP_DOMAIN = ['example.com']
 # NOTE: using my_customer is an approved method for the used APIs.
 MY_CUSTOMER = ('' or 'my_customer')
 
+# The absolute path to config_defaults.yaml.
+CONFIG_DEFAULTS_PATH = (
+    os.path.join(os.path.dirname(__file__), 'config_defaults.yaml'))
+
 # Variables defining different deployment environments, place the Google Cloud
 # Project ID for each environment on the appropriate line.
 # NOTE: These must match the Google Cloud Project ID's in the

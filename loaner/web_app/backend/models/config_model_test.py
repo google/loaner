@@ -18,15 +18,31 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import __builtin__
 import itertools
+import os
 
 from absl.testing import parameterized
+from pyfakefs import fake_filesystem
+from pyfakefs import mox3_stubout
 
 from google.appengine.api import memcache
 
-from loaner.web_app import config_defaults
+from absl.testing import absltest
+from loaner.web_app import constants
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import loanertest
+
+
+_config_defaults_yaml = """
+test_config: 'test_value'
+use_asset_tags: True
+string_config: 'config value 1'
+integer_config: 1
+bool_config: True,
+list_config: ['email1', 'email2']
+device_identifier_mode: 'serial_number'
+"""
 
 
 def _create_config_parameters():
@@ -53,6 +69,18 @@ class ConfigurationTest(
 
   def setUp(self):
     super(ConfigurationTest, self).setUp()
+    # Save the real modules for clean up.
+    self.real_open = __builtin__.open
+    self.real_file = __builtin__.file
+    self.fs = fake_filesystem.FakeFilesystem()
+    self.os = fake_filesystem.FakeOsModule(self.fs)
+    self.open = fake_filesystem.FakeFileOpen(self.fs)
+    self.stubs = mox3_stubout.StubOutForTesting()
+    self.stubs.SmartSet(__builtin__, 'open', self.open)
+    self.stubs.SmartSet(os, 'path', self.os.path)
+
+    config_file = constants.CONFIG_DEFAULTS_PATH
+    self.fs.CreateFile(config_file, contents=_config_defaults_yaml)
 
     config_model.Config(
         id='string_config', string_value='config value 1').put()
@@ -60,6 +88,12 @@ class ConfigurationTest(
     config_model.Config(id='bool_config', bool_value=True).put()
     config_model.Config(
         id='list_config', list_value=['email1', 'email2']).put()
+
+  def tearDown(self):
+    super(ConfigurationTest, self).tearDown()
+    self.stubs.UnsetAll()
+    __builtin__.open = self.real_open
+    __builtin__.file = self.real_file
 
   @parameterized.parameters(_create_config_parameters())
   def test_get_from_datastore(self, test_config):
@@ -77,12 +111,10 @@ class ConfigurationTest(
     self.assertEqual(
         reference_datastore_config.string_value, 'config value 1')
 
-  @parameterized.parameters(_create_config_parameters())
-  def test_get_from_default(self, test_config):
+  def test_get_from_default(self):
     config = 'test_config'
-    config_defaults.DEFAULTS[config] = test_config[1]
     config_datastore = config_model.Config.get(config)
-    self.assertEqual(config_datastore, test_config[1])
+    self.assertEqual(config_datastore, 'test_value')
     self.assertIsNone(memcache.get(config))
     self.assertIsNone(config_model.Config.get_by_id(config))
 
@@ -90,13 +122,11 @@ class ConfigurationTest(
     config_model.Config.set('use_asset_tags', True)
     config_datastore = config_model.Config.get('device_identifier_mode')
     self.assertEqual(
-        config_datastore,
-        config_defaults.DeviceIdentifierMode.BOTH_REQUIRED)
+        config_datastore, config_model.DeviceIdentifierMode.BOTH_REQUIRED)
 
   def test_get_identifier_without_use_asset(self):
     config_datastore = config_model.Config.get('device_identifier_mode')
-    self.assertEqual(
-        config_datastore, config_defaults.DEFAULTS['device_identifier_mode'])
+    self.assertEqual(config_datastore, 'both_required')
 
   def test_get_nonexistent(self):
     with self.assertRaisesRegexp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
@@ -104,7 +134,6 @@ class ConfigurationTest(
 
   @parameterized.parameters(_create_config_parameters())
   def test_set(self, test_config):
-    config_defaults.DEFAULTS[test_config[0]] = test_config[1]
     config_model.Config.set(test_config[0], test_config[1])
     memcache_config = memcache.get(test_config[0])
     config = config_model.Config.get(test_config[0])

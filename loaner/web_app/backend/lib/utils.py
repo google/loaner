@@ -19,6 +19,9 @@ from __future__ import division
 from __future__ import print_function
 
 import calendar
+import yaml
+
+from loaner.web_app import constants
 
 
 def datetime_to_unix(timestamp, milliseconds=False):
@@ -47,3 +50,14 @@ def is_weekend_or_monday(date):
     Bool indicating if it is a weekend or Monday.
   """
   return date.weekday() in (0, 5, 6)
+
+
+def load_config_from_yaml():
+  """Opens the config_defaults yaml file.
+
+  Returns:
+    A dictionary of the default data from the yaml file.
+  """
+  yaml_path = constants.CONFIG_DEFAULTS_PATH
+  with open(yaml_path) as data:
+    return yaml.safe_load(data)

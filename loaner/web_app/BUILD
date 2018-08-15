@@ -18,6 +18,13 @@ load(
 # ==============================================================================
 
 filegroup(
+    name = "config_defaults_yaml",
+    srcs = [
+        "config_defaults.yaml",
+    ],
+)
+
+filegroup(
     name = "permissions",
     srcs = [
         "permissions.json",
@@ -91,13 +98,6 @@ loaner_appengine_library(
         "//loaner/web_app/backend/handlers/cron:sync_user_roles",
         "//loaner/web_app/backend/handlers/task:process_action",
         "//loaner/web_app/backend/handlers/task:stream_to_bigquery",
-    ],
-)
-
-loaner_appengine_library(
-    name = "config_defaults",
-    srcs = [
-        "config_defaults.py",
     ],
 )
 
