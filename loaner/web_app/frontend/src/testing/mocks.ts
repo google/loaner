@@ -254,6 +254,7 @@ export const DEVICE_GUEST_PERMITTED = new Device({
 });
 
 export const DEVICE_LOST = new Device({
+  assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777007',
   assignment_date: new Date(2018, 1, 1),
@@ -291,13 +292,13 @@ export const DEVICE_LOCKED = new Device({
 export const DEVICE_OVERDUE = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
-  serial_number: '777009',
+  serial_number: '77700112',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
-  due_date: new Date(2018, 1, 3),
+  due_date: new Date(2017, 4, 4),
   current_ou: 'ROOT',
-  max_extend_date: new Date(2018, 1, 4),
+  overdue: true,
 });
 
 export const DEVICE_LOST_AND_MORE = new Device({
@@ -314,9 +315,17 @@ export const DEVICE_LOST_AND_MORE = new Device({
 
 export class DeviceServiceMock {
   dataChange = new BehaviorSubject<Device[]>([
-    DEVICE_1, DEVICE_2, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG,
-    DEVICE_MARKED_FOR_RETURN, DEVICE_UNASSIGNED, DEVICE_ASSIGNED, DEVICE_LOST,
-    DEVICE_DAMAGED, DEVICE_LOCKED, DEVICE_OVERDUE
+    DEVICE_1,
+    DEVICE_2,
+    DEVICE_WITH_ASSET_TAG,
+    DEVICE_WITHOUT_ASSET_TAG,
+    DEVICE_MARKED_FOR_RETURN,
+    DEVICE_UNASSIGNED,
+    DEVICE_ASSIGNED,
+    DEVICE_LOST,
+    DEVICE_DAMAGED,
+    DEVICE_LOCKED,
+    DEVICE_OVERDUE,
   ]);
 
   create() {

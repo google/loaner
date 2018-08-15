@@ -121,10 +121,10 @@ export class Device {
   maxExtendDate!: Date;
   /** Given name on this loan. */
   givenName = 'there';
-  /** List of flags relevant to this device. */
-  chips: DeviceChip[] = [];
   /** Indicates an overdue device. */
   overdue = false;
+  /** List of flags relevant to this device. */
+  chips: DeviceChip[] = [];
 
   constructor(device: DeviceApiParams = {}) {
     this.serialNumber = device.serial_number || this.serialNumber;
@@ -147,8 +147,8 @@ export class Device {
     this.guestEnabled = device.guest_enabled || this.guestEnabled;
     this.guestAllowed = device.guest_permitted || this.guestAllowed;
     this.givenName = device.given_name || this.givenName;
-    this.chips = this.makeChips();
     this.overdue = !!device.overdue || this.overdue;
+    this.chips = this.makeChips();
   }
 
 

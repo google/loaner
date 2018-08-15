@@ -104,78 +104,96 @@ describe('DeviceListTableComponent', () => {
     expect(deviceListTable.pauseLoading).toBe(false);
   });
 
-  it('shows the assigned chip when device is assigned', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([DEVICE_ASSIGNED]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Assigned');
-    });
-  });
+  it('shows the assigned chip when device is assigned', fakeAsync(() => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_ASSIGNED],
+         totalResults: 1,
+         totalPages: 1,
+       }));
+       deviceListTable.ngAfterViewInit();
+       const matChipListContent =
+           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+               .textContent;
+       expect(matChipListContent).toContain('Assigned');
+       discardPeriodicTasks();
+     }));
 
-  it('shows the damaged chip when device is damaged', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([DEVICE_DAMAGED]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Damaged');
-    });
-  });
+  it('shows the damaged chip when device is damaged', fakeAsync(() => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_DAMAGED],
+         totalResults: 1,
+         totalPages: 1,
+       }));
+       deviceListTable.ngAfterViewInit();
+       const matChipListContent =
+           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+               .textContent;
+       expect(matChipListContent).toContain('Damaged');
+       discardPeriodicTasks();
+     }));
 
-  it('shows the locked chip when device is locked', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([DEVICE_LOCKED]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Locked');
-    });
-  });
+  it('shows the locked chip when device is locked', fakeAsync(() => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_LOCKED],
+         totalResults: 1,
+         totalPages: 1,
+       }));
+       deviceListTable.ngAfterViewInit();
+       const matChipListContent =
+           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+               .textContent;
+       expect(matChipListContent).toContain('Locked');
+       discardPeriodicTasks();
+     }));
 
-  it('shows the lost chip when device is lost', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([DEVICE_LOST]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Lost');
-    });
-  });
+  it('shows the lost chip when device is lost', fakeAsync(() => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_LOST_AND_MORE],
+         totalResults: 1,
+         totalPages: 1,
+       }));
+       deviceListTable.ngAfterViewInit();
+       const matChipListContent =
+           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+               .textContent;
+       expect(matChipListContent).toContain('Lost');
+       discardPeriodicTasks();
+     }));
 
-  it('shows the pending return chip when device is pending return', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list')
-        .and.returnValue(of([DEVICE_MARKED_FOR_RETURN]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Pending return');
-    });
-  });
+  it('shows the pending return chip when device is pending return',
+     fakeAsync(() => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_MARKED_FOR_RETURN],
+         totalResults: 1,
+         totalPages: 1,
+       }));
+       deviceListTable.ngAfterViewInit();
+       const matChipListContent =
+           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+               .textContent;
+       expect(matChipListContent).toContain('Pending return');
+       discardPeriodicTasks();
+     }));
 
-  it('shows the overdue chip when device is overdue', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([DEVICE_OVERDUE]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Overdue');
-    });
-  });
+  it('shows the overdue chip when device is overdue', fakeAsync(() => {
+       const deviceService: DeviceService = TestBed.get(DeviceService);
+       spyOn(deviceService, 'list').and.returnValue(of({
+         devices: [DEVICE_OVERDUE],
+         totalResults: 1,
+         totalPages: 1,
+       }));
+       deviceListTable.ngAfterViewInit();
+       const matChipListContent =
+           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+               .textContent;
+       expect(matChipListContent).toContain('Overdue');
+       discardPeriodicTasks();
+     }));
 
   it('does not show the return and damaged chips if device is lost',
      fakeAsync(() => {
@@ -185,10 +203,8 @@ describe('DeviceListTableComponent', () => {
          totalResults: 1,
          totalPages: 1,
        }));
-       deviceListTable.ngOnInit();
+
        deviceListTable.ngAfterViewInit();
-       tick();
-       fixture.detectChanges();
        const matChipListContent =
            fixture.debugElement.nativeElement.querySelector('mat-chip-list')
                .textContent;
@@ -202,12 +218,10 @@ describe('DeviceListTableComponent', () => {
   it('shows the unassigned chip when device is unassigned', () => {
     const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'list').and.returnValue(of([DEVICE_UNASSIGNED]));
-    fakeAsync(() => {
-      fixture.detectChanges();
-      const matChipListContent =
-          fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-              .textContent;
-      expect(matChipListContent).toContain('Unassigned');
-    });
+    fixture.detectChanges();
+    const matChipListContent =
+        fixture.debugElement.nativeElement.querySelector('mat-chip-list')
+            .textContent;
+    expect(matChipListContent).toContain('Unassigned');
   });
 });
