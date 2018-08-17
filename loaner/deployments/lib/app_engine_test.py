@@ -27,7 +27,6 @@ import mock
 
 from absl.testing import absltest
 from loaner.deployments.lib import app_engine
-from loaner.deployments.lib import auth
 from loaner.deployments.lib import common
 
 
@@ -49,22 +48,6 @@ class AppEngineTest(absltest.TestCase):
     super(AppEngineTest, self).setUp()
     self.config = common.ProjectConfig(
         'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_BUCKET')
-
-  def test_create_admin_api(self):
-    """Test the initialization of the App Engine Admin API helper class."""
-    test_app_engine_admin_api = app_engine.AdminAPI(self.config, mock.Mock())
-    self.assertEqual(self.config, test_app_engine_admin_api._config)
-    self.assertEqual(
-        'AdminAPI for project: TEST_PROJECT.', str(test_app_engine_admin_api))
-
-  @mock.patch.object(auth, 'CloudCredentials', autospec=True)
-  def test_create_admin_api_from_config(self, mock_creds):
-    """Test initialization using the classmethod from_config."""
-    del mock_creds  # Unused.
-    test_from_config = app_engine.AdminAPI.from_config(self.config)
-    self.assertEqual(self.config, test_from_config._config)
-    self.assertEqual(
-        'AdminAPI for project: TEST_PROJECT.', str(test_from_config))
 
   def test_admin_api_create(self):
     """Test the create API method for the App Engine Admin API."""

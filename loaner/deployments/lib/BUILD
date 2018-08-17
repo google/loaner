@@ -17,7 +17,7 @@ py_library(
         "app_engine.py",
     ],
     deps = [
-        ":auth_lib",
+        ":google_api_lib",
         "@absl_archive//absl/logging",
         "@googleapiclient_archive//:googleapiclient",
     ],
@@ -72,9 +72,20 @@ py_library(
         "directory.py",
     ],
     deps = [
-        ":auth_lib",
+        ":google_api_lib",
         "@absl_archive//absl/logging",
         "@googleapiclient_archive//:googleapiclient",
+    ],
+)
+
+py_library(
+    name = "google_api_lib",
+    srcs = [
+        "google_api.py",
+    ],
+    deps = [
+        ":auth_lib",
+        "@absl_archive//absl/logging",
     ],
 )
 
@@ -84,7 +95,7 @@ py_library(
         "storage.py",
     ],
     deps = [
-        ":auth_lib",
+        ":google_api_lib",
         "@absl_archive//absl/logging",
         "@googleapiclient_archive//:googleapiclient",
     ],
@@ -102,7 +113,6 @@ py_test(
     ],
     deps = [
         ":app_engine_lib",
-        ":auth_lib",
         ":common_lib",
         "@absl_archive//absl/testing:absltest",
         "@googleapiclient_archive//:googleapiclient",
@@ -170,12 +180,27 @@ py_test(
         "directory_test.py",
     ],
     deps = [
-        ":auth_lib",
         ":common_lib",
         ":directory_lib",
         "@absl_archive//absl/testing:absltest",
         "@absl_archive//absl/testing:parameterized",
         "@googleapiclient_archive//:googleapiclient",
+        "@mock_archive//:mock",
+    ],
+)
+
+py_test(
+    name = "google_api_test",
+    size = "small",
+    srcs = [
+        "google_api_test.py",
+    ],
+    deps = [
+        ":auth_lib",
+        ":common_lib",
+        ":google_api_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )
@@ -187,7 +212,6 @@ py_test(
         "storage_test.py",
     ],
     deps = [
-        ":auth_lib",
         ":common_lib",
         ":storage_lib",
         "@absl_archive//absl/testing:absltest",
@@ -204,6 +228,7 @@ test_suite(
         ":common_test",
         ":datastore_test",
         ":directory_test",
+        ":google_api_test",
         ":storage_test",
     ],
 )

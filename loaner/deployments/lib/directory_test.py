@@ -27,7 +27,6 @@ from googleapiclient import errors
 import httplib2
 import mock
 
-from loaner.deployments.lib import auth
 from loaner.deployments.lib import common
 from loaner.deployments.lib import directory
 from absl.testing import absltest
@@ -67,22 +66,6 @@ class DirectoryAPITest(parameterized.TestCase, absltest.TestCase):
     super(DirectoryAPITest, self).setUp()
     self.config = common.ProjectConfig(
         'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_BUCKET')
-
-  def test_create_directory_api(self):
-    """Test the initialization of the Google Admin Directory API class."""
-    test_directory_api = directory.DirectoryAPI(self.config, mock.Mock)
-    self.assertEqual(self.config, test_directory_api._config)
-    self.assertEqual(
-        'DirectoryAPI for project: TEST_PROJECT.', str(test_directory_api))
-
-  @mock.patch.object(auth, 'CloudCredentials', autospec=True)
-  def test_create_directory_api_from_config(self, mock_creds):
-    """Test the initialization using the classmethod from_config."""
-    del mock_creds  # Unused.
-    test_directory_api = directory.DirectoryAPI.from_config(self.config)
-    self.assertEqual(self.config, test_directory_api._config)
-    self.assertEqual(
-        'DirectoryAPI for project: TEST_PROJECT.', str(test_directory_api))
 
   def test_directory_api_insert_role(self):
     """Test the insert_role API method for the Google Admin Directory API."""

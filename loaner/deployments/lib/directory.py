@@ -24,15 +24,7 @@ from absl import logging
 
 from googleapiclient import errors
 
-from loaner.deployments.lib import auth
-
-# Google App Engine Admin SDK constants.
-_SERVICE_NAME = 'admin'
-_VERSION = 'directory_v1'
-_SCOPES = (
-    'https://www.googleapis.com/auth/admin.directory.rolemanagement',
-    'https://www.googleapis.com/auth/admin.directory.user',
-)
+from loaner.deployments.lib import google_api
 
 # Error messages.
 _FORBIDDEN_ERROR_MSG = (
@@ -82,39 +74,14 @@ class NotFoundError(Exception):
   """Raised when a resource is not found."""
 
 
-class DirectoryAPI(object):
+class DirectoryAPI(google_api.GoogleAPI):
   """Google Admin Directory API access."""
 
-  def __init__(self, config, client):
-    """Initializes the Google Admin Directory API.
-
-    This object should be initialized using the classmethod 'from_config'.
-
-    Args:
-      config: common.ProjectConfig, the project configuration.
-      client: the client to use when accessing the Google Admin Directory API.
-    """
-    logging.debug('Creating a new DirectoryAPI object with config: %s', config)
-    self._config = config
-    self._client = client
-
-  def __str__(self):
-    return '{} for project: {}.'.format(
-        self.__class__.__name__, self._config.project)
-
-  @classmethod
-  def from_config(cls, config):
-    """Returns an initialized DirectoryAPI object.
-
-    Args:
-      config: common.ProjectConfig, the project configuration.
-
-    Returns:
-      An authenticated Google Admin Directory API object.
-    """
-    creds = auth.CloudCredentials(config, _SCOPES)
-    client = creds.get_api_client(_SERVICE_NAME, _VERSION, _SCOPES)
-    return cls(config, client)
+  SCOPES = (
+      'https://www.googleapis.com/auth/admin.directory.rolemanagement',
+      'https://www.googleapis.com/auth/admin.directory.user')
+  SERVICE = 'admin'
+  VERSION = 'directory_v1'
 
   def insert_role(self, name=_ROLE_NAME):
     """Creates and inserts a new GSuite Admin Role.

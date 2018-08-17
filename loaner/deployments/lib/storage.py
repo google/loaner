@@ -24,12 +24,7 @@ from absl import logging
 
 from googleapiclient import errors
 
-from loaner.deployments.lib import auth
-
-# Google App Engine Admin SDK constants.
-_SERVICE_NAME = 'storage'
-_VERSION = 'v1'
-_SCOPES = ('https://www.googleapis.com/auth/devstorage.read_write',)
+from loaner.deployments.lib import google_api
 
 # Error messages.
 _GET_BUCKET_ERROR_MSG = 'Failed to retrieve Google Cloud Storage Bucket %r: %s.'
@@ -49,37 +44,12 @@ class InsertionError(Exception):
   """Raised when inserting a new resource fails."""
 
 
-class CloudStorageAPI(object):
+class CloudStorageAPI(google_api.GoogleAPI):
   """Google Cloud Storage API access."""
 
-  def __init__(self, config, client):
-    """Initializes the Google Cloud Storage API.
-
-    Args:
-      config: common.ProjectConfig, the project configuration.
-      client: the api client to use when accessing the Google Cloud Storage API.
-    """
-    logging.debug('Creating a new Cloud Storage object with config: %r', config)
-    self._config = config
-    self._client = client
-
-  def __str__(self):
-    return '{} for project: {}.'.format(
-        self.__class__.__name__, self._config.project)
-
-  @classmethod
-  def from_config(cls, config):
-    """Returns an initialized CloudStorageAPI object.
-
-    Args:
-      config: common.ProjectConfig, the project configuration.
-
-    Returns:
-      An authenticated CloudStorageAPI instance.
-    """
-    creds = auth.CloudCredentials(config, _SCOPES)
-    client = creds.get_api_client(_SERVICE_NAME, _VERSION, _SCOPES)
-    return cls(config, client)
+  SCOPES = ('https://www.googleapis.com/auth/devstorage.read_write',)
+  SERVICE = 'storage'
+  VERSION = 'v1'
 
   def get_bucket(self, bucket_name=None):
     """Retrieves a Google Cloud Storage Bucket object.

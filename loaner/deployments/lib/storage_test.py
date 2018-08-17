@@ -25,7 +25,6 @@ from googleapiclient import errors
 import httplib2
 import mock
 
-from loaner.deployments.lib import auth
 from loaner.deployments.lib import common
 from loaner.deployments.lib import storage
 from absl.testing import absltest
@@ -51,24 +50,6 @@ class CloudStorageAPITest(absltest.TestCase):
     super(CloudStorageAPITest, self).setUp()
     self.config = common.ProjectConfig(
         'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_BUCKET')
-
-  def test_create_cloud_storage_api(self):
-    """Test the initialization of the Google Cloud Storage API helper class."""
-    test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock.Mock)
-    self.assertEqual(self.config, test_cloud_storage_api._config)
-    self.assertEqual(
-        'CloudStorageAPI for project: TEST_PROJECT.',
-        str(test_cloud_storage_api))
-
-  @mock.patch.object(auth, 'CloudCredentials', autospec=True)
-  def test_create_cloud_storage_api_from_config(self, mock_creds):
-    """Test the initialization using the classmethod from_config."""
-    del mock_creds  # Unused.
-    test_cloud_storage_api = storage.CloudStorageAPI.from_config(self.config)
-    self.assertEqual(self.config, test_cloud_storage_api._config)
-    self.assertEqual(
-        'CloudStorageAPI for project: TEST_PROJECT.',
-        str(test_cloud_storage_api))
 
   def test_cloud_storage_get_bucket(self):
     """Test the get_bucket API method for the Google Cloud Storage API."""

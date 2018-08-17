@@ -22,12 +22,7 @@ from absl import logging
 
 from googleapiclient import errors
 
-from loaner.deployments.lib import auth
-
-# Google App Engine Admin SDK constants.
-_SERVICE_NAME = 'appengine'
-_VERSION = 'v1'
-_SCOPES = ['https://www.googleapis.com/auth/appengine.admin']
+from loaner.deployments.lib import google_api
 
 # Error messages.
 _CREATE_ERROR_MSG = (
@@ -64,39 +59,12 @@ class NotFoundError(Error):
   """Raised when a resource is not found."""
 
 
-class AdminAPI(object):
+class AdminAPI(google_api.GoogleAPI):
   """App Engine Admin API access."""
 
-  def __init__(self, config, client):
-    """Initializes the App Engine Admin API.
-
-    This object should be initialized using the classmethod 'from_config'.
-
-    Args:
-      config: common.ProjectConfig, the project configuration.
-      client: the api client to use when accessing the App Engine Admin API.
-    """
-    logging.debug('Creating a new AdminAPI object with config: %s', config)
-    self._config = config
-    self._client = client
-
-  def __str__(self):
-    return '{} for project: {}.'.format(
-        self.__class__.__name__, self._config.project)
-
-  @classmethod
-  def from_config(cls, config):
-    """Returns an initialized AdminAPI object.
-
-    Args:
-      config: common.ProjectConfig, the project configuration.
-
-    Returns:
-      An authenticated App Engine Admin API object.
-    """
-    creds = auth.CloudCredentials(config, _SCOPES)
-    client = creds.get_api_client(_SERVICE_NAME, _VERSION, _SCOPES)
-    return cls(config, client)
+  SCOPES = ('https://www.googleapis.com/auth/appengine.admin',)
+  SERVICE = 'appengine'
+  VERSION = 'v1'
 
   def create(self, location):
     """Creates a new Google App Engine application in a given location.
