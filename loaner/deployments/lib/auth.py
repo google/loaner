@@ -66,7 +66,7 @@ class CloudCredentials(object):
       scopes: list|str|, a list of the required scopes for this credential.
     """
     self._config = config
-    self._credentials = self._get_credentials(scopes)
+    self._credentials = self.get_credentials(scopes)
 
   def get_api_client(self, service, version, scopes):
     """Gets an authenticated api connection to the provided service and version.
@@ -81,12 +81,12 @@ class CloudCredentials(object):
     """
     if not self._credentials.has_scopes(scopes):
       scopes.extend(self._credentials.scopes)
-      self._credentials = self._get_credentials(scopes)
+      self._credentials = self.get_credentials(scopes)
     return build(
         serviceName=service, version=version,
         http=google_auth_httplib2.AuthorizedHttp(credentials=self._credentials))
 
-  def _get_credentials(self, scopes):
+  def get_credentials(self, scopes):
     """Get the user credentials for deployment.
 
     Args:

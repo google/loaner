@@ -133,6 +133,16 @@ new_http_archive(
 )
 
 new_http_archive(
+    name = "gcloud_api_core_archive",
+    build_file = "//third_party:gcloud_api_core.BUILD",
+    sha256 = "ac85fc7f6687bb0271f2f70ca298da90f35789f9de1fe3a11e8caeb571332b77",
+    strip_prefix = "google-api-core-1.3.0",
+    urls = [
+        "https://files.pythonhosted.org/packages/85/e5/edfb19739e4aa98306b14a08ec5ab22f656631ad2d0c148367c69a3a8f82/google-api-core-1.3.0.tar.gz",
+    ],
+)
+
+new_http_archive(
     name = "gcloud_auth_archive",
     build_file = "//third_party:gcloud_auth.BUILD",
     sha256 = "c12971320cf266ab1c7ed5a65ad311ad393695940f46315d05280207482e1eba",
@@ -161,6 +171,16 @@ new_http_archive(
     urls = [
         "https://mirror.bazel.build/pypi.python.org/packages/58/d0/c3a30eca2a0073d5ac00254a1a9d259929a899deee6e3dfe4e45264f5187/google-cloud-core-0.25.0.tar.gz",
         "https://pypi.python.org/packages/58/d0/c3a30eca2a0073d5ac00254a1a9d259929a899deee6e3dfe4e45264f5187/google-cloud-core-0.25.0.tar.gz",
+    ],
+)
+
+new_http_archive(
+    name = "gcloud_datastore_archive",
+    build_file = "//third_party:gcloud_datastore.BUILD",
+    sha256 = "d1f7e8d0a5f188e0d29b223e56bb3ea1ce129e60e00c448c1850dfb54fc5eaba",
+    strip_prefix = "google-cloud-datastore-1.7.0",
+    urls = [
+        "https://files.pythonhosted.org/packages/fd/c2/98290b77dd5625720effeb6b3cf3930a7a8b757fddd6ef09cb2a1df4742c/google-cloud-datastore-1.7.0.tar.gz",
     ],
 )
 
@@ -278,6 +298,15 @@ load("@pip_deps//:requirements.bzl", "pip_install")
 
 pip_install()
 
+pip_import(
+    name = "pip_grpcio",
+    requirements = "//third_party:requirements.grpcio.txt",
+)
+
+load("@pip_grpcio//:requirements.bzl", pip_grpcio_install = "pip_install")
+
+pip_grpcio_install()
+
 new_http_archive(
     name = "mock_archive",
     build_file = "//third_party:mock.BUILD",
@@ -321,11 +350,10 @@ new_http_archive(
 new_http_archive(
     name = "protobuf_archive",
     build_file = "//third_party:protobuf.BUILD",
-    sha256 = "1cbcee2c45773f57cb6de7ee0eceb97f92b9b69c0178305509b162c0160c1f04",
-    strip_prefix = "protobuf-3.3.0",
+    sha256 = "1489b376b0f364bcc6f89519718c057eb191d7ad6f1b395ffd93d1aa45587811",
+    strip_prefix = "protobuf-3.6.1",
     urls = [
-        "http://mirror.bazel.build/pypi.python.org/packages/56/28/6263d846f60dad93939fd3a22d712d6bae3bf3484332d22bd5933dec8c99/protobuf-3.3.0.tar.gz",
-        "https://pypi.python.org/packages/56/28/6263d846f60dad93939fd3a22d712d6bae3bf3484332d22bd5933dec8c99/protobuf-3.3.0.tar.gz",
+        "https://files.pythonhosted.org/packages/1b/90/f531329e628ff34aee79b0b9523196eb7b5b6b398f112bb0c03b24ab1973/protobuf-3.6.1.tar.gz",
     ],
 )
 
@@ -376,6 +404,16 @@ new_http_archive(
     strip_prefix = "pylru-1.0.9",
     urls = [
         "https://pypi.python.org/packages/c0/7d/0de1055632f3871dfeaabe5a3f0510317cd98b93e7b792b44e4c7de2b17b/pylru-1.0.9.tar.gz",
+    ],
+)
+
+new_http_archive(
+    name = "pytz_archive",
+    build_file = "//third_party:pytz.BUILD",
+    sha256 = "ffb9ef1de172603304d9d2819af6f5ece76f2e85ec10692a524dd876e72bf277",
+    strip_prefix = "pytz-2018.5",
+    urls = [
+        "https://files.pythonhosted.org/packages/ca/a9/62f96decb1e309d6300ebe7eee9acfd7bccaeedd693794437005b9067b44/pytz-2018.5.tar.gz",
     ],
 )
 

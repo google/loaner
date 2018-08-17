@@ -54,6 +54,19 @@ py_library(
 )
 
 py_library(
+    name = "datastore_lib",
+    srcs = [
+        "datastore.py",
+    ],
+    deps = [
+        ":auth_lib",
+        "//loaner/web_app/backend/common:google_cloud_lib_fixer",
+        "@absl_archive//absl/logging",
+        "@gcloud_datastore_archive//:gcloud_datastore",
+    ],
+)
+
+py_library(
     name = "directory_lib",
     srcs = [
         "directory.py",
@@ -135,6 +148,22 @@ py_test(
 )
 
 py_test(
+    name = "datastore_test",
+    size = "small",
+    srcs = [
+        "datastore_test.py",
+    ],
+    deps = [
+        ":auth_lib",
+        ":common_lib",
+        ":datastore_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@gcloud_datastore_archive//:gcloud_datastore",
+        "@mock_archive//:mock",
+    ],
+)
+
+py_test(
     name = "directory_test",
     size = "small",
     srcs = [
@@ -173,6 +202,7 @@ test_suite(
         ":app_engine_test",
         ":auth_test",
         ":common_test",
+        ":datastore_test",
         ":directory_test",
         ":storage_test",
     ],
