@@ -47,10 +47,21 @@ py_library(
         "//loaner/deployments:configs",
     ],
     deps = [
-        "@absl_archive//absl:app",
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
         "@yaml_archive//:yaml",
+    ],
+)
+
+py_library(
+    name = "directory_lib",
+    srcs = [
+        "directory.py",
+    ],
+    deps = [
+        ":auth_lib",
+        "@absl_archive//absl/logging",
+        "@googleapiclient_archive//:googleapiclient",
     ],
 )
 
@@ -124,6 +135,23 @@ py_test(
 )
 
 py_test(
+    name = "directory_test",
+    size = "small",
+    srcs = [
+        "directory_test.py",
+    ],
+    deps = [
+        ":auth_lib",
+        ":common_lib",
+        ":directory_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:parameterized",
+        "@googleapiclient_archive//:googleapiclient",
+        "@mock_archive//:mock",
+    ],
+)
+
+py_test(
     name = "storage_test",
     size = "small",
     srcs = [
@@ -145,6 +173,7 @@ test_suite(
         ":app_engine_test",
         ":auth_test",
         ":common_test",
+        ":directory_test",
         ":storage_test",
     ],
 )
