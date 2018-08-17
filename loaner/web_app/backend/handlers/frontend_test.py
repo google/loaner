@@ -18,13 +18,42 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import httplib
 import mock
 
+from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
 from loaner.web_app.backend.handlers import frontend
 from loaner.web_app.backend.lib import bootstrap  # pylint: disable=unused-import
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import handlertest
+
+
+class FrontendHandlerTestAuth(handlertest.HandlerTestCase):
+  """Test FrontendHandler with various auth errors."""
+
+  def test_no_user(self):
+    self.logout_user()
+
+    response = self.testapp.get(r'/', expect_errors=True)
+
+    self.assertEqual(response.status_int, httplib.UNAUTHORIZED)
+
+  def test_wrong_domain(self):
+    current_domains = constants.APP_DOMAIN
+    def _reset_app_domain():
+      constants.APP_DOMAIN = current_domains
+    self.addCleanup(_reset_app_domain)
+    constants.APP_DOMAIN = ['google.com']
+    self.testbed.setup_env(
+        user_email='user@example.com',
+        user_id='1',
+        user_is_admin='0',
+        overwrite=True)
+
+    response = self.testapp.get(r'/', expect_errors=True)
+
+    self.assertEqual(response.status_int, httplib.FORBIDDEN)
 
 
 class FrontendHandlerTestComplete(handlertest.HandlerTestCase):

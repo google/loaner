@@ -18,11 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import httplib
 import os
 import re
 
 from absl import logging
 import webapp2
+
+from google.appengine.api import users
 
 from loaner.web_app import constants
 from loaner.web_app.backend.lib import bootstrap
@@ -49,6 +52,16 @@ class FrontendHandler(webapp2.RequestHandler):
     self.bootstrap_completed = bootstrap.is_bootstrap_completed()
 
   def get(self, path):
+    user = users.get_current_user()
+    if not user:
+      self.response.status = httplib.UNAUTHORIZED
+      self.response.out.write('You must be logged in to access this app.')
+      return
+    elif user.email().split('@')[1] not in constants.APP_DOMAIN:
+      self.response.status = httplib.FORBIDDEN
+      self.response.out.write('Forbidden.')
+      return
+
     if path == '/application.js':
       self._serve_frontend_javascript()
       return
