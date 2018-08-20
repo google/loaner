@@ -1,5 +1,22 @@
+<div *ngIf="animationEnabled" class="return-animation">
+  <video autoplay loop width="600" height="400"
+         matTooltip="Click to play/pause the animation."
+         [playbackRate]="playbackRate"
+         #returnAnimation [attr.aria-label]="returnAnimationAltText"
+         (click)="playPauseAnimation()" tabindex="0" loaner-focus>
+    <source [src]="animationURL" type="video/mp4">
+  </video>
+  <button mat-icon-button class="animation-menu-icon"
+          aria-label="Open the animation menu."
+          i18n-aria-label="Open the animation menu.">
+    <mat-icon matTooltip="Animation settings"
+              (click)="openAnimationMenu()">
+      dvr
+    </mat-icon>
+  </button>
+</div>
 
-<div *ngIf="flow === flows.ONBOARDING" class="return-card">
+<div *ngIf="!animationEnabled && flow === flows.ONBOARDING" class="return-card">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       Before you go!
@@ -22,7 +39,8 @@
     </p>
   </mat-card>
 </div>
-<div *ngIf="flow === flows.OFFBOARDING" class="return-card">
+
+<div *ngIf="!animationEnabled && flow === flows.OFFBOARDING" class="return-card">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       Thanks for using {{ programName }}!

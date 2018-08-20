@@ -12,9 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import {Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
+import {MatDialog} from '@angular/material';
 
-import {Component, Input} from '@angular/core';
-
+import {AnimationMenuService} from '../../services/animation_menu_service';
+import {AnimationMenuComponent} from '../animation_menu';
 
 export enum FlowsEnum {
   NONE,
@@ -28,8 +30,57 @@ export enum FlowsEnum {
   styleUrls: ['./return_instructions.scss'],
   templateUrl: './return_instructions.ng.html',
 })
-export class LoanerReturnInstructions {
-flows = FlowsEnum;
-@Input() programName: string;
-@Input() flow: FlowsEnum;
+export class LoanerReturnInstructions implements OnInit {
+  @ViewChild('returnAnimation') animationElement!: ElementRef;
+
+  flows = FlowsEnum;
+
+  playbackRate = 1;
+  @Input() programName!: string;
+  @Input() animationEnabled!: boolean;
+  @Input() animationAltText!: string;
+  @Input() animationURL!: string;
+  @Input() flow: FlowsEnum = FlowsEnum.NONE;
+  returnPlaying = true;
+
+  constructor(
+      private animationService: AnimationMenuService,
+      readonly dialog: MatDialog) {}
+
+  ngOnInit() {
+    this.animationService.getAnimationSpeed().subscribe((speed: number) => {
+      this.playbackRate = speed / 100;
+    });
+    if (this.flow === this.flows.NONE) {
+      throw new Error('The return instructions flow was never defined!');
+    }
+  }
+
+  /** Plays or pauses the animation */
+  playPauseAnimation() {
+    if (this.animationEnabled && this.animationElement) {
+      if (this.returnPlaying) {
+        this.animationElement.nativeElement.pause();
+        this.returnPlaying = false;
+      } else {
+        this.animationElement.nativeElement.play();
+        this.returnPlaying = true;
+      }
+    }
+  }
+
+  /** Reloads the animation */
+  reloadAnimation() {
+    if (this.animationEnabled && this.animationElement) {
+      this.animationElement.nativeElement.load();
+      this.animationElement.nativeElement.playbackRate = this.playbackRate;
+    }
+  }
+
+  /** Opens the animation menu and adjusts the animation settings on close. */
+  openAnimationMenu() {
+    if (this.animationEnabled && this.animationElement) {
+      this.dialog.open(AnimationMenuComponent);
+    }
+  }
 }

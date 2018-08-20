@@ -13,13 +13,22 @@
 // limitations under the License.
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {MatDialog, MatDialogRef} from '@angular/material';
 
+import {AnimationMenuService} from '../../services/animation_menu_service';
+import {AnimationMenuServiceMock} from '../../testing/mocks';
 
 import {FlowsEnum, LoanerReturnInstructions} from './index';
 import {MaterialModule} from './material_module';
 
+/** Mock material Dialog. */
+class MatDialogMock {}
+
+/** Mock material DialogRef. */
+class MatDialogRefMock {}
 
 describe('LoanerReturnInstructions', () => {
+  let animationService: AnimationMenuService;
   let app: LoanerReturnInstructions;
   let fixture: ComponentFixture<LoanerReturnInstructions>;
 
@@ -28,6 +37,20 @@ describe('LoanerReturnInstructions', () => {
         .configureTestingModule({
           declarations: [LoanerReturnInstructions],
           imports: [MaterialModule],
+          providers: [
+            {
+              provide: AnimationMenuService,
+              useClass: AnimationMenuServiceMock,
+            },
+            {
+              provide: MatDialog,
+              useClass: MatDialogMock,
+            },
+            {
+              provide: MatDialogRef,
+              useClass: MatDialogRefMock,
+            },
+          ],
         })
         .compileComponents();
   }));
@@ -35,13 +58,51 @@ describe('LoanerReturnInstructions', () => {
   beforeEach(async(() => {
     fixture = TestBed.createComponent(LoanerReturnInstructions);
     app = fixture.debugElement.componentInstance;
+    animationService = TestBed.get(AnimationMenuService);
     app.flow = FlowsEnum.ONBOARDING;
     fixture.detectChanges();
   }));
 
+  it('renders the animation or return text', () => {
+    app.flow = FlowsEnum.ONBOARDING;
+    app.animationEnabled = true;
+    fixture.detectChanges();
+    const returnAnimation =
+        fixture.debugElement.nativeElement.querySelector('.return-animation');
+    expect(returnAnimation).toBeTruthy();
+  });
+
+  it('has a playback rate of 100% for animation', () => {
+    app.flow = FlowsEnum.ONBOARDING;
+    app.animationEnabled = true;
+    fixture.detectChanges();
+    expect(app.animationElement.nativeElement.playbackRate).toBe(1);
+  });
+
+  it('has a playback rate of 50% for animation', () => {
+    app.flow = FlowsEnum.ONBOARDING;
+    spyOn(animationService, 'setAnimationSpeed').and.callThrough();
+    app.animationEnabled = true;
+    animationService.setAnimationSpeed(50);
+    fixture.detectChanges();
+    expect(animationService.setAnimationSpeed).toHaveBeenCalledWith(50);
+
+    expect(app.animationElement.nativeElement.playbackRate).toBe(0.5);
+    expect(app.playbackRate).toBe(0.5);
+  });
+
+  it('does NOT render the animation or return text', () => {
+    app.flow = FlowsEnum.ONBOARDING;
+    app.animationEnabled = false;
+    fixture.detectChanges();
+    const returnAnimation =
+        fixture.debugElement.nativeElement.querySelector('.return-animation');
+    expect(returnAnimation).toBeFalsy();
+  });
 
   it('renders the return text for the onboarding flow', () => {
     app.flow = FlowsEnum.ONBOARDING;
+    app.animationEnabled = false;
     fixture.detectChanges();
     const returnBox =
         fixture.debugElement.nativeElement.querySelector('.return-card');
@@ -51,6 +112,7 @@ describe('LoanerReturnInstructions', () => {
   it('renders the return text for the offboarding flow', () => {
     app.flow = FlowsEnum.OFFBOARDING;
     app.programName = 'Test Program';
+    app.animationEnabled = false;
     fixture.detectChanges();
     const returnBox =
         fixture.debugElement.nativeElement.querySelector('.return-card');

@@ -1,5 +1,19 @@
 @import '../../themes/standard';
 
+.return-animation {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  margin: 20px;
+}
+
+.animation-menu-icon {
+  align-self: flex-end;
+  opacity: .4;
+  padding-right: 16px;
+  position: absolute;
+  z-index: 1;
+}
 
 .return-card {
   display: flex;

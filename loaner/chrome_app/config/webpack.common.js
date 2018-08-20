@@ -73,7 +73,12 @@ module.exports = {
       // Chrome App icons
       {from: './chrome_app/src/app/assets/icons/', to: './assets/icons/'},
       // FAQ markdown file
-      {from: './chrome_app/src/app/assets/faq.md', to: './assets/faq.md'}
+      {from: './chrome_app/src/app/assets/faq.md', to: './assets/faq.md'},
+      // Animations
+      {
+        from: './chrome_app/src/app/assets/animations/',
+        to: './assets/animations/'
+      }
     ]),
   ]
 };

@@ -16,6 +16,7 @@ import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 
 import {FocusModule} from '../../directives/focus';
+import {AnimationMenuService} from '../../services/animation_menu_service';
 
 import {MaterialModule} from './material_module';
 import {FlowsEnum, LoanerReturnInstructions} from './return_instructions';
@@ -28,6 +29,7 @@ import {FlowsEnum, LoanerReturnInstructions} from './return_instructions';
     FocusModule,
     MaterialModule,
   ],
+  providers: [AnimationMenuService],
 })
 export class LoanerReturnInstructionsModule {
 }

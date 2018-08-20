@@ -1,0 +1,24 @@
+<div>
+  <h1 class="mat-dialog-title">Animation Menu</h1>
+  <div mat-dialog-content>
+    <p class="card-description">
+      Manage the animation for your experience here using the option(s) below.
+    </p>
+    <p>Change animation speed:</p>
+    <span>
+      <mat-slider min="50" max="100" step="10" thumbLabel
+                  (change)="playbackRate = $event.value"
+                  [value]="playbackRate"
+                  class="full-width"
+                  color="primary">
+      </mat-slider>
+    </span>
+  </div>
+  <div mat-dialog-actions>
+    <button mat-button (click)="closeDialog()"
+            id="close"
+            class="action-button">
+      Close
+    </button>
+  </div>
+</div>

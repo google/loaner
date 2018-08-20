@@ -90,7 +90,7 @@ export class ConfigService {
 
   // Chrome App specific variables
   chromeMode = CHROME_MODE.PROD;
-  DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
+  DEV_DEVICE_ID = 'd8810b84-6ebb-4d4c-b6ac-52ddb595ae52';
   LOGGING = false;
 
   // Shared variables
@@ -205,6 +205,17 @@ export const BACKGROUND_LOGO = {
   altText: 'Grab n Go background logo',
 };
 
+/** Welcome animation configuration */
+export const WELCOME_ANIMATION_ENABLED = true;
+export const WELCOME_ANIMATATION_ALT_TEXT = `An animation showing
+ an overview of Grab n Go loaner device.`;
+export const WELCOME_ANIMATION_URL = '../assets/animations/welcome.mp4';
+
+/** Return animation configuration */
+export const RETURN_ANIMATION_ENABLED = true;
+export const RETURN_ANIMATION_ALT_TEXT = `An animation showing
+ an overview of returning your Grab n Go loaner device.`;
+export const RETURN_ANIMATION_URL = '../assets/animations/return.mp4';
 
 /** Toolbar icon to be displayed on the top right of onboarding/offboarding. */
 export const TOOLBAR_ICON_ENABLED = false;

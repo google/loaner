@@ -1,5 +1,23 @@
 @import '../../assets/global';
 
+.animation-menu-icon {
+  bottom: 3px;
+  opacity: .4;
+  position: absolute;
+  right: 33px;
+  z-index: 1;
+}
+
+.welcome-animation {
+  margin: 20px;
+  position: relative;
+  text-align: center;
+}
+
+.welcome-animation video {
+  text-align: center;
+  vertical-align: middle;
+}
 
 .continue-text {
   font-size: 14px;

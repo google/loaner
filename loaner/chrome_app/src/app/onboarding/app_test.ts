@@ -14,8 +14,10 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 
+import {AnimationMenuService} from '../../../../shared/components/animation_menu';
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
 import {PROGRAM_NAME} from '../../../../shared/config';
+import {AnimationMenuServiceMock} from '../../../../shared/testing/mocks';
 import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
 import {Background, BackgroundMock} from '../shared/background_service';
 
@@ -30,6 +32,10 @@ describe('Onboarding AppRoot', () => {
         .configureTestingModule({
           imports: [AppModule],
           providers: [
+            {
+              provide: AnimationMenuService,
+              useClass: AnimationMenuServiceMock,
+            },
             {
               provide: AnalyticsService,
               useClass: AnalyticsServiceMock,

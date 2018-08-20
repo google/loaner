@@ -12,26 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {MatButtonModule, MatDialogModule, MatSliderModule} from '@angular/material';
 
-import {FocusModule} from '../../../../../shared/directives/focus';
-import {AnimationMenuService} from '../../../../../shared/services/animation_menu_service';
-
-import {MaterialModule} from './material_module';
-import {WelcomeComponent} from './welcome';
+const MATERIAL_MODULES = [
+  MatButtonModule,
+  MatDialogModule,
+  MatSliderModule,
+];
 
 @NgModule({
-  declarations: [WelcomeComponent],
-  exports: [WelcomeComponent],
-  imports: [
-    CommonModule,
-    FocusModule,
-    MaterialModule,
-  ],
-  providers: [AnimationMenuService],
+  imports: MATERIAL_MODULES,
+  exports: MATERIAL_MODULES,
 })
-export class WelcomeModule {
+export class MaterialModule {
 }
-
-export {WelcomeComponent};

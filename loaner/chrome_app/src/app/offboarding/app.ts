@@ -18,17 +18,15 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserModule, Title} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
+import {AnimationMenuModule} from '../../../../shared/components/animation_menu';
 import {FlowState, LoanerFlowSequence, LoanerFlowSequenceButtons, LoanerFlowSequenceModule, NavigationLabels, Step} from '../../../../shared/components/flow_sequence';
 import {LoanerTextCardModule} from '../../../../shared/components/info_card';
 import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
+import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, ConfigService, PROGRAM_NAME, RETURN_ANIMATION_ALT_TEXT, RETURN_ANIMATION_ENABLED, RETURN_ANIMATION_URL, TOOLBAR_ICON, TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
 import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
-import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED,
-ConfigService, PROGRAM_NAME,
-TOOLBAR_ICON,
-TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {Background} from '../shared/background_service';
 import {ChromeAppPlatformLocation} from '../shared/chrome_app_platform_location';
 import {FailAction, FailType, Failure, FailureModule} from '../shared/failure';
@@ -166,6 +164,9 @@ device to your nearest shelf as soon as possible.`,
 
     // Setup return instructions
     this.returnInstructions.programName = PROGRAM_NAME;
+    this.returnInstructions.animationEnabled = RETURN_ANIMATION_ENABLED;
+    this.returnInstructions.animationAltText = RETURN_ANIMATION_ALT_TEXT;
+    this.returnInstructions.animationURL = RETURN_ANIMATION_URL;
 
     // Listen for flow finished
     this.flowSequenceButtons.finished.subscribe(finished => {
@@ -196,6 +197,7 @@ device to your nearest shelf as soon as possible.`,
           this.updateAnalytics('/return');
           // Ensure that can proceed isn't disabled because of a previous check.
           this.flowSequenceButtons.canProceed = true;
+          this.returnInstructions.reloadAnimation();
           break;
         case 'return_instructions':
           this.updateAnalytics('/return_instructions');
@@ -312,6 +314,7 @@ rest.`;
   declarations: [AppRoot],
   imports: [
     AnalyticsModule,
+    AnimationMenuModule,
     BrowserAnimationsModule,
     BrowserModule,
     FlexLayoutModule,

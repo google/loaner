@@ -1,5 +1,22 @@
+<div *ngIf="welcomeAnimationEnabled" class="welcome-animation">
+  <button mat-icon-button class="animation-menu-icon"
+          aria-label="Open the animation menu."
+          i18n-aria-label="Open the animation menu.">
+    <mat-icon matTooltip="Animation settings"
+              (click)="openAnimationMenu()">
+      dvr
+    </mat-icon>
+  </button>
+  <video autoplay loop width="600" height="400"
+         matTooltip="Click to play/pause the animation."
+         [playbackRate]="playbackRate"
+         #welcomeAnimation [attr.aria-label]="welcomeAnimationAltText"
+         (click)="playPauseAnimation()" tabindex="0" loaner-focus>
+    <source [src]="welcomeAnimationURL" type="video/mp4">
+  </video>
+</div>
 
-<div class="welcome-card">
+<div *ngIf="!welcomeAnimationEnabled" class="welcome-card">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       Let's get started

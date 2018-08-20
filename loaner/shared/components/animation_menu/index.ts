@@ -12,26 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
-import {FocusModule} from '../../../../../shared/directives/focus';
-import {AnimationMenuService} from '../../../../../shared/services/animation_menu_service';
+import {AnimationMenuService} from '../../services/animation_menu_service';
 
+import {AnimationMenuComponent} from './animation_menu';
 import {MaterialModule} from './material_module';
-import {WelcomeComponent} from './welcome';
 
 @NgModule({
-  declarations: [WelcomeComponent],
-  exports: [WelcomeComponent],
+  declarations: [AnimationMenuComponent],
+  entryComponents: [AnimationMenuComponent],
   imports: [
-    CommonModule,
-    FocusModule,
+    BrowserAnimationsModule,
     MaterialModule,
   ],
   providers: [AnimationMenuService],
 })
-export class WelcomeModule {
+export class AnimationMenuModule {
 }
 
-export {WelcomeComponent};
+export * from './animation_menu';
+export * from '../../services/animation_menu_service';

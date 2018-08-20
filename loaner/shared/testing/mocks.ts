@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {NgModule} from '@angular/core';
+import {Injectable, NgModule} from '@angular/core';
 import {ComponentFixtureAutoDetect} from '@angular/core/testing';
-import {Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, of} from 'rxjs';
 
 import {Damaged} from '../components/damaged';
 import {Extend} from '../components/extend';
@@ -93,4 +93,23 @@ export class UnenrollMock extends DeviceActionsDialogService {
   ],
 })
 export class SharedMocksModule {
+}
+
+/** Mock of service to interact with the animation menu between components. */
+@Injectable()
+export class AnimationMenuServiceMock {
+  playbackRate = new BehaviorSubject<number>(100);
+
+  /**
+   * Set the animation speed in Chrome Storage.
+   * @param value The value to store for animationSpeed in Chrome Storage.
+   */
+  setAnimationSpeed(value: number) {
+    this.playbackRate.next(value);
+  }
+
+  /** Gets the animation speed. */
+  getAnimationSpeed(): Observable<number> {
+    return this.playbackRate.asObservable();
+  }
 }

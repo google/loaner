@@ -16,6 +16,8 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {AnimationMenuService} from '../../../../shared/services/animation_menu_service';
+import {AnimationMenuServiceMock} from '../../../../shared/testing/mocks';
 import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
 
 import {AppModule, AppRoot} from './app';
@@ -29,6 +31,10 @@ describe('AppRoot offboarding', () => {
         .configureTestingModule({
           imports: [RouterTestingModule, AppModule],
           providers: [
+            {
+              provide: AnimationMenuService,
+              useClass: AnimationMenuServiceMock,
+            },
             {
               provide: AnalyticsService,
               useClass: AnalyticsServiceMock,
