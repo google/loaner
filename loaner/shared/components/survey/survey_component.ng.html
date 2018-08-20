@@ -2,7 +2,8 @@
   <loaner-loader></loaner-loader>
 </div>
 
-<div *ngIf="surveyAnswered">
+<div *ngIf="surveyAnswered"
+     [class.survey-card-chrome]="chromeApp">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       You have already answered this question
@@ -15,7 +16,8 @@
   </mat-card>
 </div>
 
-<div *ngIf="surveyNew">
+<div *ngIf="surveyNew"
+     [class.survey-card-chrome]="chromeApp">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       {{ surveyData.question_text }}
@@ -49,7 +51,9 @@
     </mat-radio-group>
   </mat-card>
 </div>
-<div *ngIf="surveyNotGiven">
+
+<div *ngIf="surveyNotGiven"
+     [class.survey-card-chrome]="chromeApp">
   <mat-card tabindex="0" loaner-focus>
     <p>
       Sorry, looks like we don't have a survey for you. Continue through to the next step.

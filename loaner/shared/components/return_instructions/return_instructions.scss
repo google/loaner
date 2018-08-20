@@ -29,3 +29,31 @@
   font-style: bold;
   line-height: 200%;
 }
+
+// Below are Chrome App specific classes.
+.return-card-chrome {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  position: absolute;
+  width: 550px;
+}
+
+.animation-menu-icon-chrome {
+  bottom: 3px;
+  opacity: .4;
+  position: absolute;
+  right: 33px;
+  z-index: 1;
+}
+
+.return-animation-chrome {
+  margin: 20px;
+  position: relative;
+  text-align: center;
+}
+
+.return-animation-chrome video {
+  text-align: center;
+  vertical-align: middle;
+}

@@ -7,9 +7,13 @@
 </mat-toolbar>
 <loaner-flow-sequence>
   <welcome loanerFlowChild></welcome>
-  <survey loanerFlowChild></survey>
+  <survey loanerFlowChild
+          [chromeApp]="true">
+  </survey>
   <return loanerFlowChild></return>
-  <loaner-return-instructions [flow]="flows.ONBOARDING" loanerFlowChild>
+  <loaner-return-instructions [flow]="flows.ONBOARDING"
+                              loanerFlowChild
+                              [chromeApp]="true">
   </loaner-return-instructions>
 </loaner-flow-sequence>
 <div class="navigation-progress">

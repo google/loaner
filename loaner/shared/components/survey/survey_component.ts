@@ -29,6 +29,7 @@ import {Survey, SurveyAnswer, SurveyResponse, SurveyResponseAnswer, SurveyType} 
 export class SurveyComponent extends LoaderView implements OnInit {
   @Input() surveyType?: SurveyType;
   @Input() surveyDescription?: string;
+  @Input() chromeApp = false;
   answerRequired?: boolean;
   surveyAnswer?: SurveyResponseAnswer;
   surveyData?: SurveyResponse;

@@ -100,6 +100,34 @@ describe('LoanerReturnInstructions', () => {
     expect(returnAnimation).toBeFalsy();
   });
 
+  it('applies the proper classes for the Chrome App', () => {
+    app.flow = FlowsEnum.ONBOARDING;
+    app.chromeApp = true;
+    app.animationEnabled = true;
+    fixture.detectChanges();
+    const returnAnimation =
+        fixture.debugElement.nativeElement.querySelector('.return-animation');
+    const returnAnimationChrome =
+        fixture.debugElement.nativeElement.querySelector(
+            '.return-animation-chrome');
+    expect(returnAnimationChrome).toBeTruthy();
+    expect(returnAnimation).toBeFalsy();
+  });
+
+  it('applies the proper classes for the Web App', () => {
+    app.flow = FlowsEnum.ONBOARDING;
+    app.chromeApp = false;
+    app.animationEnabled = true;
+    fixture.detectChanges();
+    const returnAnimation =
+        fixture.debugElement.nativeElement.querySelector('.return-animation');
+    const returnAnimationChrome =
+        fixture.debugElement.nativeElement.querySelector(
+            '.return-animation-chrome');
+    expect(returnAnimation).toBeTruthy();
+    expect(returnAnimationChrome).toBeFalsy();
+  });
+
   it('renders the return text for the onboarding flow', () => {
     app.flow = FlowsEnum.ONBOARDING;
     app.animationEnabled = false;

@@ -41,6 +41,7 @@ export class LoanerReturnInstructions implements OnInit {
   @Input() animationAltText!: string;
   @Input() animationURL!: string;
   @Input() flow: FlowsEnum = FlowsEnum.NONE;
+  @Input() chromeApp = false;
   returnPlaying = true;
 
   constructor(

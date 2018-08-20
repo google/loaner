@@ -1,12 +1,7 @@
-<div *ngIf="animationEnabled" class="return-animation">
-  <video autoplay loop width="600" height="400"
-         matTooltip="Click to play/pause the animation."
-         [playbackRate]="playbackRate"
-         #returnAnimation [attr.aria-label]="returnAnimationAltText"
-         (click)="playPauseAnimation()" tabindex="0" loaner-focus>
-    <source [src]="animationURL" type="video/mp4">
-  </video>
-  <button mat-icon-button class="animation-menu-icon"
+<div *ngIf="animationEnabled"
+     [ngClass]="{'return-animation': !chromeApp, 'return-animation-chrome': chromeApp}">
+  <button mat-icon-button
+          [ngClass]="{'animation-menu-icon': !chromeApp, 'animation-menu-icon-chrome': chromeApp}"
           aria-label="Open the animation menu."
           i18n-aria-label="Open the animation menu.">
     <mat-icon matTooltip="Animation settings"
@@ -14,9 +9,17 @@
       dvr
     </mat-icon>
   </button>
+  <video autoplay loop width="600" height="400"
+         matTooltip="Click to play/pause the animation."
+         [playbackRate]="playbackRate"
+         #returnAnimation [attr.aria-label]="returnAnimationAltText"
+         (click)="playPauseAnimation()" tabindex="0" loaner-focus>
+    <source [src]="animationURL" type="video/mp4">
+  </video>
 </div>
 
-<div *ngIf="!animationEnabled && flow === flows.ONBOARDING" class="return-card">
+<div *ngIf="!animationEnabled && flow === flows.ONBOARDING"
+     [ngClass]="{'return-card': !chromeApp, 'return-card-chrome': chromeApp}">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       Before you go!
@@ -40,7 +43,8 @@
   </mat-card>
 </div>
 
-<div *ngIf="!animationEnabled && flow === flows.OFFBOARDING" class="return-card">
+<div *ngIf="!animationEnabled && flow === flows.OFFBOARDING"
+     [ngClass]="{'return-card': !chromeApp, 'return-card-chrome': chromeApp}">
   <mat-card tabindex="0" loaner-focus>
     <h1 class="card-title">
       Thanks for using {{ programName }}!

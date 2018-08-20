@@ -112,6 +112,26 @@ describe('SurveyComponent', () => {
     }
   });
 
+  it('applies the proper classes for the Chrome App', () => {
+    app.surveyData = surveyData;
+    app.ready();
+    app.chromeApp = true;
+    fixture.detectChanges();
+    const surveyCardChrome =
+        fixture.debugElement.nativeElement.querySelector('.survey-card-chrome');
+    expect(surveyCardChrome).toBeTruthy();
+  });
+
+  it('applies the proper classes for the Web App', () => {
+    app.surveyData = surveyData;
+    app.ready();
+    app.chromeApp = false;
+    fixture.detectChanges();
+    const surveyCardChrome =
+        fixture.debugElement.nativeElement.querySelector('.survey-card-chrome');
+    expect(surveyCardChrome).toBeFalsy();
+  });
+
   it('should show surveyDescription if given', () => {
     app.surveyData = surveyData;
     app.surveyDescription = 'This is a description';
