@@ -90,6 +90,17 @@ py_library(
 )
 
 py_library(
+    name = "password_lib",
+    srcs = [
+        "password.py",
+    ],
+    deps = [
+        "@absl_archive//absl/flags",
+        "@absl_archive//absl/logging",
+    ],
+)
+
+py_library(
     name = "storage_lib",
     srcs = [
         "storage.py",
@@ -206,6 +217,19 @@ py_test(
 )
 
 py_test(
+    name = "password_test",
+    size = "small",
+    srcs = [
+        "password_test.py",
+    ],
+    deps = [
+        ":password_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:parameterized",
+    ],
+)
+
+py_test(
     name = "storage_test",
     size = "small",
     srcs = [
@@ -229,6 +253,7 @@ test_suite(
         ":datastore_test",
         ":directory_test",
         ":google_api_test",
+        ":password_test",
         ":storage_test",
     ],
 )
