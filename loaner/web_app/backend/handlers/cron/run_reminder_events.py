@@ -96,7 +96,7 @@ class RunReminderEventsHandler(webapp2.RequestHandler):
                 reminder_event.interval * 86400):
               logging.info(
                   _DEVICE_REPEAT_WAITING_MSG, device.identifier,
-                  reminder_event.level)
+                  reminder_event.level, reminder_event.repeat_interval)
               continue
 
         # We should set a reminder with the delay from configuration settings.

@@ -206,9 +206,9 @@ class RunReminderEventsHandlerTest(handlertest.HandlerTestCase):
 
     self.testapp.get(
         r'/_cron/run_reminder_events?find_remindable_devices=true')
-    mock_loginfo.assert_any_call(
+    mock_loginfo.assert_called_with(
         run_reminder_events._DEVICE_REPEAT_WAITING_MSG,
-        self.device1.identifier, 0)
+        self.device1.identifier, 0, self.reminder_due_event.repeat_interval)
     self.assertFalse(self.testbed.mock_raiseevent.called)
 
   @mock.patch('__main__.run_reminder_events.logging.info')
