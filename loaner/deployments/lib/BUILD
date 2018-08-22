@@ -106,9 +106,9 @@ py_library(
         "storage.py",
     ],
     deps = [
-        ":google_api_lib",
+        ":auth_lib",
         "@absl_archive//absl/logging",
-        "@googleapiclient_archive//:googleapiclient",
+        "@gcloud_storage_archive//:gcloud_storage",
     ],
 )
 
@@ -236,10 +236,11 @@ py_test(
         "storage_test.py",
     ],
     deps = [
+        ":auth_lib",
         ":common_lib",
         ":storage_lib",
         "@absl_archive//absl/testing:absltest",
-        "@googleapiclient_archive//:googleapiclient",
+        "@gcloud_storage_archive//:gcloud_storage",
         "@mock_archive//:mock",
     ],
 )

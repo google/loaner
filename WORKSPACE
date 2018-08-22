@@ -195,6 +195,16 @@ new_http_archive(
 )
 
 new_http_archive(
+    name = "gcloud_storage_archive",
+    build_file = "//third_party:gcloud_storage.BUILD",
+    sha256 = "c1969558df8d7994cf4f89f60c01c619d77fc19facb38f66640d1f749a663e2e",
+    strip_prefix = "google-cloud-storage-1.10.0",
+    urls = [
+        "https://files.pythonhosted.org/packages/62/73/1ea71c8b319064bc6ae0530cb0f78fe15987c7881f132938e3fa83ddff46/google-cloud-storage-1.10.0.tar.gz",
+    ],
+)
+
+new_http_archive(
     name = "googleapiclient_archive",
     build_file = "//third_party:googleapiclient.BUILD",
     sha256 = "4a807d2c6ea83186f0cb6ede00f42e0f4cf6daf01c4ec1e7e24863113527204d",

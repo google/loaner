@@ -24,9 +24,6 @@ from google.cloud import datastore
 
 from loaner.deployments.lib import auth
 
-# Google Cloud Datastore scopes.
-_SCOPES = ('https://www.googleapis.com/auth/datastore',)
-
 # Error messages.
 _GET_ERROR_MSG = 'Failed to retrieve the datastore version for project %r: %r'
 
@@ -37,6 +34,8 @@ class NotFoundError(Exception):
 
 class DatastoreAPI(object):
   """Google Cloud Datastore API access."""
+
+  SCOPES = ('https://www.googleapis.com/auth/datastore',)
 
   def __init__(self, config, client):
     """Initializes the Google Cloud Datastore API.
@@ -66,9 +65,9 @@ class DatastoreAPI(object):
     Returns:
       An authenticated DatastoreAPI instance.
     """
-    creds = auth.CloudCredentials(config, _SCOPES)
+    creds = auth.CloudCredentials(config, cls.SCOPES)
     client = datastore.Client(
-        project=config.project, credentials=creds.get_credentials(_SCOPES))
+        project=config.project, credentials=creds.get_credentials(cls.SCOPES))
     return cls(config, client)
 
   def get_version(self):

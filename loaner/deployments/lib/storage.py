@@ -18,18 +18,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import httplib
-
 from absl import logging
 
-from googleapiclient import errors
+from google.cloud import exceptions
+from google.cloud import storage
 
-from loaner.deployments.lib import google_api
+from loaner.deployments.lib import auth
 
 # Error messages.
 _GET_BUCKET_ERROR_MSG = 'Failed to retrieve Google Cloud Storage Bucket %r: %s.'
-_INSERT_BUCKET_ERROR_MSG = (
-    'Failed to insert Google Cloud Storage Bucket %r for project %r: %s.')
 
 
 class AlreadyExistsError(Exception):
@@ -40,16 +37,44 @@ class NotFoundError(Exception):
   """Raised when a resource is not found."""
 
 
-class InsertionError(Exception):
-  """Raised when inserting a new resource fails."""
-
-
-class CloudStorageAPI(google_api.GoogleAPI):
+class CloudStorageAPI(object):
   """Google Cloud Storage API access."""
 
   SCOPES = ('https://www.googleapis.com/auth/devstorage.read_write',)
-  SERVICE = 'storage'
-  VERSION = 'v1'
+
+  def __init__(self, config, client):
+    """Initializes the Google Cloud Storage API.
+
+    This object should be initialized using the classmethod 'from_config'.
+
+    Args:
+      config: common.ProjectConfig, the project configuration.
+      client: the api client to use when accessing the Google Cloud Storage
+          API.
+    """
+    logging.debug(
+        'Creating a new CloudStorageAPI object with config: %s', config)
+    self._config = config
+    self._client = client
+
+  def __str__(self):
+    return '{} for project: {}.'.format(
+        self.__class__.__name__, self._config.project)
+
+  @classmethod
+  def from_config(cls, config):
+    """Returns an initialized CloudStorageAPI object.
+
+    Args:
+      config: common.ProjectConfig, the project configuration.
+
+    Returns:
+      An authenticated CloudStorageAPI instance.
+    """
+    creds = auth.CloudCredentials(config, cls.SCOPES)
+    client = storage.Client(
+        project=config.project, credentials=creds.get_credentials(cls.SCOPES))
+    return cls(config, client)
 
   def get_bucket(self, bucket_name=None):
     """Retrieves a Google Cloud Storage Bucket object.
@@ -59,16 +84,17 @@ class CloudStorageAPI(google_api.GoogleAPI):
 
     Returns:
       A dictionary object representing a Google Cloud Storage Bucket.
+          type: google.cloud.storage.bucket.Bucket
 
     Raises:
       NotFoundError: when a resource is not found.
     """
     bucket_name = bucket_name or self._config.bucket
     try:
-      return self._client.buckets().get(bucket=bucket_name).execute()
-    except errors.HttpError as err:
-      logging.error(_GET_BUCKET_ERROR_MSG, self._config.bucket, err)
-      raise NotFoundError(_GET_BUCKET_ERROR_MSG % (self._config.bucket, err))
+      return self._client.get_bucket(bucket_name)
+    except exceptions.NotFound as err:
+      logging.error(_GET_BUCKET_ERROR_MSG, bucket_name, err)
+      raise NotFoundError(_GET_BUCKET_ERROR_MSG % (bucket_name, err))
 
   def insert_bucket(self, bucket_name=None):
     """Inserts a Google Cloud Storage Bucket object.
@@ -78,29 +104,20 @@ class CloudStorageAPI(google_api.GoogleAPI):
 
     Returns:
       A dictionary object representing a Google Cloud Storage Bucket.
+          type: google.cloud.storage.bucket.Bucket
 
     Raises:
       AlreadyExistsError: when trying to insert a bucket that already exists.
-      InsertionError: when inserting a bucket fails for an unknown reason.
     """
     bucket_name = bucket_name or self._config.bucket
     try:
-      new_bucket = self._client.buckets().insert(
-          project=self._config.project,
-          body={'name': bucket_name},
-      ).execute()
-    except errors.HttpError as err:
-      if err.resp.status == httplib.CONFLICT:
-        raise AlreadyExistsError(
-            'The Google Cloud Storage Bucket with name %r already exists.' %
-            bucket_name)
+      new_bucket = self._client.create_bucket(bucket_name)
+    except exceptions.Conflict as err:
+      raise AlreadyExistsError(
+          'The Google Cloud Storage Bucket with name %r already exists: %s.' %
+          (bucket_name, err))
 
-      logging.error(
-          _INSERT_BUCKET_ERROR_MSG, bucket_name, self._config.project, err)
-      raise InsertionError(
-          _INSERT_BUCKET_ERROR_MSG % (bucket_name, self._config.project, err))
-
-    logging.info(
+    logging.debug(
         'The Googld Cloud Storage Bucket %r has been created for project '
         '%r.', bucket_name, self._config.project)
     return new_bucket
