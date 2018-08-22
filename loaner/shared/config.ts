@@ -90,7 +90,7 @@ export class ConfigService {
 
   // Chrome App specific variables
   chromeMode = CHROME_MODE.PROD;
-  DEV_DEVICE_ID = 'd8810b84-6ebb-4d4c-b6ac-52ddb595ae52';
+  DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
   LOGGING = false;
 
   // Shared variables
