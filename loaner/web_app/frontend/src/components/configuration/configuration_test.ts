@@ -16,6 +16,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed, tick} from '@angu
 import {FormsModule} from '@angular/forms';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
+import {of} from 'rxjs';
 
 import {ConfigService} from '../../services/config';
 import {ConfigServiceMock} from '../../testing/mocks';
@@ -50,6 +51,13 @@ describe('ConfigurationComponent', () => {
   it('creates the Configuration', () => {
     expect(configuration).toBeDefined();
   });
+
+  it('calls config service to get config', fakeAsync(() => {
+       const configService: ConfigService = TestBed.get(ConfigService);
+       spyOn(configService, 'list').and.callThrough();
+       fixture.detectChanges();
+       expect(configService.list).toHaveBeenCalledTimes(1);
+     }));
 
   it('renders a known boolean config', () => {
     fixture.detectChanges();
@@ -110,76 +118,44 @@ describe('ConfigurationComponent', () => {
     expect(configuration.arrayToCsv(listValue)).toEqual(expected);
   });
 
-  it('calls config service to update with a single change', () => {
-    fixture.whenStable().then(() => {
-      const configService: ConfigService = TestBed.get(ConfigService);
-      spyOn(configService, 'updateAll');
-      fixture.detectChanges();
-      configuration.config.supportContact += 'test!';
-      fixture.detectChanges();
-      tick(250);
-      const compiled = fixture.debugElement.nativeElement;
-      const supportContactElement =
-          compiled.querySelector('input[name="support_contact_string"]') as
-          HTMLInputElement;
-      expect(supportContactElement.value).toContain('test!');
-      supportContactElement.dispatchEvent(new Event('input'));
+  it('unlocks the submit button when any input value is changed',
+     fakeAsync(() => {
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const submitButtonBeforeChange =
+           compiled.querySelector('button[type="submit"]');
+       expect(submitButtonBeforeChange).toBeDefined();
+       expect(
+           (submitButtonBeforeChange as HTMLElement).getAttribute('disabled'))
+           .toBeDefined();
+       const supportContactInput =
+           compiled.querySelector('input[name="support_contact_string"]');
+       (supportContactInput as HTMLInputElement).value =
+           'support_contact_test@localhost';
+       (supportContactInput as HTMLInputElement)
+           .dispatchEvent(new Event('input'));
+       fixture.detectChanges();
+       const submitButtonAfterChange =
+           compiled.querySelector('button[type="submit"]');
+       expect(submitButtonAfterChange).toBeDefined();
+       expect(submitButtonAfterChange.getAttribute('disabled')).toBeFalsy();
+     }));
 
-      const submitButton = compiled.querySelector('button[type="submit"]');
-      submitButton.click();
-      fixture.detectChanges();
-      tick(250);
-      expect(configService.updateAll).toHaveBeenCalledWith([{
-        key: 'support_contact',
-        type: 'string',
-        value: (configuration.config.supportContact as string),
-      }]);
-      expect(configService.updateAll).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  it('calls config service to update with multiple changes', () => {
-    fixture.whenStable().then(() => {
-      const configService: ConfigService = TestBed.get(ConfigService);
-      spyOn(configService, 'updateAll');
-      fixture.detectChanges();
-      configuration.config.supportContact += 'test!';
-      configuration.config.auditInterval = 999;
-      fixture.detectChanges();
-      tick(250);
-      const compiled = fixture.debugElement.nativeElement;
-      // change #1
-      const supportContactElement =
-          compiled.querySelector('input[name="support_contact_string"]') as
-          HTMLInputElement;
-      expect(supportContactElement.value).toContain('test!');
-      supportContactElement.dispatchEvent(new Event('input'));
-
-      // change #2
-      const auditIntervalElement =
-          compiled.querySelector('input[name="audit_interval_number"]') as
-          HTMLInputElement;
-      expect(auditIntervalElement.value)
-          .toBe(configuration.config.auditInterval.toString());
-      auditIntervalElement.dispatchEvent(new Event('input'));
-
-      const submitButton = compiled.querySelector('button[type="submit"]');
-      submitButton.click();
-      fixture.detectChanges();
-      tick(250);
-      expect(configService.updateAll).toHaveBeenCalledWith([
-        {
-          key: 'support_contact',
-          type: 'string',
-          value: (configuration.config.supportContact as string),
-        },
-        {
-          key: 'audit_interval',
-          type: 'number',
-          value: (configuration.config.auditInterval),
-        }
-      ]);
-      expect(configService.updateAll).toHaveBeenCalledTimes(1);
-    });
-  });
+  it('calls config service after updating an input and triggering submit',
+     fakeAsync(() => {
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const configService: ConfigService = TestBed.get(ConfigService);
+       spyOn(configService, 'updateAll').and.returnValue(of());
+       const supportContactInput =
+           compiled.querySelector('input[name="support_contact_string"]');
+       expect(supportContactInput).toBeDefined();
+       supportContactInput.value = 'support_contact_test@localhost';
+       supportContactInput.dispatchEvent(new Event('input'));
+       fixture.detectChanges();
+       const formElement = compiled.querySelector('form');
+       formElement.dispatchEvent(new Event('submit'));
+       fixture.detectChanges();
+       expect(configService.updateAll).toHaveBeenCalledTimes(1);
+     }));
 });
