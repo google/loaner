@@ -47,21 +47,30 @@ class ProcessActionHandlerTest(handlertest.HandlerTestCase):
         info = 'Action with a %s.' % device.__class__.__name__
         logging.info(info)
 
-    mock_importactions.return_value = {'async': {'sample': ActionSample()}}
+    mock_importactions.return_value = {
+        'async': {
+            'sample1': ActionSample(),
+            'sample2': ActionSample()
+        }}
     test_device = device_model.Device()
-    payload = pickle.dumps(
-        {'action_name': 'sample', 'device': test_device, 'shelf': None})
+    payload = pickle.dumps({
+        'device': test_device, 'shelf': None,
+        'async_actions': ['sample1', 'sample2']})
     response = self.testapp.post(r'/_ah/queue/process-action', payload)
 
     self.assertEqual(response.status_int, 200)
-    self.assertEqual(mock_loginfo.call_count, 2)
     expected_calls = [
-        mock.call('ProcessActionHandler loaded %d async actions: %s', 1,
-                  "['sample']"),
+        mock.call('ProcessActionHandler loaded %d async actions: %s', 2,
+                  "['sample1', 'sample2']"),
         mock.call('Action with a Device.')
     ]
     mock_loginfo.assert_has_calls(expected_calls)
 
+    # Task for sample1 Action created a task for sample2 Action.
+    self.assertLen(self.taskqueue_add.mock_calls, 1)
+    task_payload = pickle.loads(
+        self.taskqueue_add.call_args_list[0][1]['payload'])
+    self.assertEqual(task_payload['async_actions'], ['sample2'])
 
 if __name__ == '__main__':
   handlertest.main()

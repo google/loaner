@@ -23,6 +23,7 @@ import pickle
 from absl import logging
 import webapp2
 
+from google.appengine.api import taskqueue
 from loaner.web_app.backend.lib import action_loader
 
 
@@ -37,14 +38,32 @@ class ProcessActionHandler(webapp2.RequestHandler):
     logging.info(
         'ProcessActionHandler loaded %d async actions: %s',
         len(self.actions['async']),
-        str(self.actions['async'].keys()))
+        str(sorted(self.actions['async'].keys())))
 
   def post(self):
-    """Process an Action task with the correct Action class."""
+    """Process an async Action task with the correct Action class."""
     payload = pickle.loads(self.request.body)
-    action_name = payload.pop('action_name')
+    async_actions = payload.pop('async_actions')
+    action_name = async_actions.pop(0)
     action_instance = self.actions['async'].get(action_name)
     if action_instance:
-      action_instance.run(**payload)
+      try:
+        action_instance.run(**payload)
+      # pylint: disable=broad-except, because this logic, in which tasks are
+      # responsible for spawning subsequent tasks, creates a chain that could be
+      # interrupted by any conceivable exception in an action's run method. This
+      # handling ensures any further tasks will run.
+      except Exception as error:
+        logging.exception(
+            'Failed to run async Action %r due to error: %r',
+            action_name, str(error))
+      # pylint: enable=broad-except
     else:
       logging.error('No async Action named %s found.', action_name)
+
+    if async_actions:
+      payload['async_actions'] = async_actions
+      taskqueue.add(
+          queue_name='process-action',
+          payload=pickle.dumps(payload),
+          target='default')

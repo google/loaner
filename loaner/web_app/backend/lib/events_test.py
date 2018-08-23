@@ -65,13 +65,19 @@ class EventsTest(loanertest.TestCase):
     mock_sync_action.run.side_effect = side_effect1
     mock_loadactions.return_value = {
         'sync': {'sync_action': mock_sync_action},
-        'async': {'async_action': 'fake_async_action'}}
-    mock_getactionsforevent.return_value = ['sync_action', 'async_action']
+        'async': {
+            'async_action1': 'fake_async_action1',
+            'async_action2': 'fake_async_action2',
+            'async_action3': 'fake_async_action3',
+        }
+    }
+    mock_getactionsforevent.return_value = [
+        'sync_action', 'async_action3', 'async_action1', 'async_action2']
     test_device = device_model.Device(
         chrome_device_id='4815162342', serial_number='123456')
 
     expected_async_payload = pickle.dumps({
-        'action_name': 'async_action',
+        'async_actions': ['async_action1', 'async_action2', 'async_action3'],
         'device': test_device
     })
 

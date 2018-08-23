@@ -42,9 +42,10 @@ class NoEventsError(Error):
 def raise_event(event_name, device=None, shelf=None):
   """Raises an Event, running its sync and async Actions.
 
-  This function runs async Actions as tasks, but sync ones serially,
-  accumulating changes from each action. Supply either a device or shelf arg,
-  but not both.
+  This function runs sync Actions serially, accumulating changes from each
+  action, and then kicks off async Actions via a single task that will spawn
+  more tasks for additional actions. Supply either a device or shelf arg, but
+  not both.
 
   Args:
     event_name: str, the name of the Event.
@@ -61,6 +62,8 @@ def raise_event(event_name, device=None, shelf=None):
         and shelf.
   """
   event_actions = get_actions_for_event(event_name)
+  event_actions.sort()
+  event_async_actions = []
   actions_dict = action_loader.load_actions()
   model = device or shelf
   if not event_actions:
@@ -90,12 +93,19 @@ def raise_event(event_name, device=None, shelf=None):
           logging.error(
               'Skipping Action "%s" because it raised an exception: %s',
               action, str(error))
-      if action in actions_dict[base_action.ActionType.ASYNC]:
-        action_kwargs['action_name'] = action
-        taskqueue.add(
-            queue_name='process-action',
-            payload=pickle.dumps(action_kwargs),
-            target='default')
+      elif action in actions_dict[base_action.ActionType.ASYNC]:
+        event_async_actions.append(action)
+      else:
+        logging.error(
+            'Skipping Action %r because it is not loaded in the application.',
+            action)
+
+    if event_async_actions:
+      action_kwargs['async_actions'] = event_async_actions
+      taskqueue.add(
+          queue_name='process-action',
+          payload=pickle.dumps(action_kwargs),
+          target='default')
 
   return model
 

@@ -97,7 +97,7 @@ class TestCase(absltest.TestCase):
 
     taskqueue_patcher = mock.patch.object(taskqueue, 'add')
     self.addCleanup(taskqueue_patcher.stop)
-    taskqueue_patcher.start()
+    self.taskqueue_add = taskqueue_patcher.start()
 
     # The events.raise_event method raises an exception if there are no events
     # in datastore. It's called often in the model methods, many of which are
