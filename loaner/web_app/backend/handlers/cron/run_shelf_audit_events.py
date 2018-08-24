@@ -38,6 +38,7 @@ class RunShelfAuditEventsHandler(webapp2.RequestHandler):
     global_setting_query = shelf_model.Shelf.query(
         shelf_model.Shelf.audit_notification_enabled == True,  # pylint: disable=singleton-comparison
         shelf_model.Shelf.audit_requested == False,  # pylint: disable=singleton-comparison
+        shelf_model.Shelf.last_audit_time != None,
         shelf_model.Shelf.last_audit_time < earliest_time,
         shelf_model.Shelf.audit_interval_override == None)  # pylint: disable=singleton-comparison
 

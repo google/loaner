@@ -78,7 +78,7 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
     # Shelf ready for notifications and not audited in a while.
     self.shelf2.audit_notification_enabled = True
     self.shelf2.audit_requested = False
-    self.shelf2.last_known_healthy = _NOW - datetime.timedelta(
+    self.shelf2.last_audit_time = _NOW - datetime.timedelta(
         hours=shelf_audit_interval + 1)
     self.shelf2.put()
 
@@ -91,6 +91,15 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
     self.shelf4.audit_notification_enabled = True
     self.shelf4.audit_requested = True
     self.shelf4.put()
+
+    # Shelf ready for notifications but has not been audited ever.
+    shelf5 = shelf_model.Shelf.enroll(
+        'test@{}'.format(loanertest.USER_DOMAIN), 'US-WAS', 24,
+        'Washington', 40.6892534, -74.0466891, 1.0,
+        loanertest.USER_EMAIL)
+    shelf5.audit_notification_enabled = True
+    shelf5.audit_requested = False
+    shelf5.last_audit_time = None
 
     self.testbed.mock_raiseevent.reset_mock()
 
