@@ -10,6 +10,22 @@ branch. While we try to keep the master branch working we consider it
 "unstable" and don't recommend using it unless you want to develop for the
 project.
 
+## [Alpha 0.7](https://github.com/google/loaner/tree/Alpha-(0.7))
+Warning: This is a breaking change. If you are running earlier versions of the
+app you will need to take the following steps after upgrading for the app to
+continue functioning correctly.
+
+1. Open the `shared/config.ts` file from within the loaner directory and scroll
+   to the CHROME_PUBLIC_KEYS section. In this section, you'll paste the value
+   from the key field in the `chrome_app/manifet.json` (the public key of the
+   Chrome App) to the respective environment (eg. if this is your prod app,
+   paste the public key into the prod's quoted value). This is how the Chrome
+   App will determine which API to target.
+
+   NOTE: Make sure the key fits on a single line.
+1. Save the file and follow the [Deploy to the Chrome Web Store](deploy_chrome_app.md)
+   steps to update the application.
+
 ## [Alpha 0.6a](https://github.com/google/loaner/tree/Alpha-(0.6))
 Released 06/08/18
 

@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/// <reference types="chrome/chrome-app" />
 import {Injectable} from '@angular/core';
 
 export interface EnvironmentsVariable {
@@ -72,6 +73,20 @@ export const CHROME_ENDPOINTS: EnvironmentsVariable = {
   dev: `https://chrome-dot-${DEV}.appspot.com`,
 };
 
+/**
+ * Below are the public keys for the Chrome Applications that you're deploying.
+ * This is how the Chrome App will target a specific track (prod, dev, or qa).
+ *
+ * This value can be retrieved from the Chrome Webstore developer dashboard
+ * under the "More Info" button.
+ * NOTE: Each key must be on a single-line!
+ */
+export const CHROME_PUBLIC_KEYS: EnvironmentsVariable = {
+  prod: '',
+  qa: '',
+  dev: '',
+};
+
 /** ######################################################################## */
 
 /**
@@ -89,9 +104,35 @@ export class ConfigService {
   IS_FRONTEND = this.ON_LOCAL || this.ON_DEV || this.ON_QA || this.ON_PROD;
 
   // Chrome App specific variables
-  chromeMode = CHROME_MODE.PROD;
   DEV_DEVICE_ID = 'sup3r-s3cr3t-d3v1c3-1d';
   LOGGING = false;
+  get chromeMode() {
+    try {
+      const manifest = chrome.runtime.getManifest();
+      switch (manifest.key) {
+        case CHROME_PUBLIC_KEYS.prod: {
+          return CHROME_MODE.PROD;
+        }
+        case CHROME_PUBLIC_KEYS.qa: {
+          return CHROME_MODE.QA;
+        }
+        case CHROME_PUBLIC_KEYS.dev: {
+          return CHROME_MODE.DEV;
+        }
+        default: {
+          console.error(
+              'The key defined in the manifest.json of the Chrome App is not recognized. Defaulting to dev.');
+          return CHROME_MODE.DEV;
+        }
+      }
+    } catch (e) {
+      if (!this.IS_FRONTEND) {
+        console.error('The chrome.runtime API isn\'t available.', e);
+      }
+      // Returns dev to deal with unhandled conditions and tests.
+      return CHROME_MODE.DEV;
+    }
+  }
 
   // Shared variables
   analyticsEnabled = false;

@@ -84,7 +84,8 @@ describe('ConfigService', () => {
        config.ON_QA = false;
        config.ON_PROD = false;
        config.IS_FRONTEND = false;
-       config.chromeMode = CHROME_MODE.PROD;
+       spyOnProperty(config, 'chromeMode', 'get')
+           .and.returnValue(CHROME_MODE.PROD);
        config.calculateApiUrls();
        expect(config.chromeApiUrl)
            .toBe('https://chrome-dot-prod-app-engine-project.appspot.com/_ah/api');
@@ -99,7 +100,8 @@ describe('ConfigService', () => {
        config.ON_QA = false;
        config.ON_PROD = false;
        config.IS_FRONTEND = false;
-       config.chromeMode = CHROME_MODE.DEV;
+       spyOnProperty(config, 'chromeMode', 'get')
+           .and.returnValue(CHROME_MODE.DEV);
        config.calculateApiUrls();
        expect(config.chromeApiUrl)
            .toBe('https://chrome-dot-dev-app-engine-project.appspot.com/_ah/api');
@@ -114,7 +116,8 @@ describe('ConfigService', () => {
        config.ON_QA = false;
        config.ON_PROD = false;
        config.IS_FRONTEND = false;
-       config.chromeMode = CHROME_MODE.QA;
+       spyOnProperty(config, 'chromeMode', 'get')
+           .and.returnValue(CHROME_MODE.QA);
        config.calculateApiUrls();
        expect(config.chromeApiUrl)
            .toBe('https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');

@@ -143,6 +143,14 @@ initialize it. Below are the steps you will need to complete.
 
 1.  Save `manifest.json`.
 
+1.  Open the `shared/config.ts` file from within the loaner directory and scroll
+    to the CHROME_PUBLIC_KEYS section. In this section, you'll paste that same
+    public key to the respective environment (eg. if this is your prod app,
+    paste the public key into the prod's quoted value). This is how the Chrome
+    App will determine which API to target.
+
+    NOTE: Make sure the key fits on a single line.
+
 1.  Be sure that you have stored the `key.pem` file in a secure place and that
     you have removed it from the `dist` folder. If the `key.pem` file is located
     here in future uploads, you may be denied access unless you are re-keying
