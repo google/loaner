@@ -379,16 +379,16 @@ def _get_identifier_from_request(device_request):
     return 'urlkey'
 
   for device_identifier in [
-      'asset_tag', 'chrome_device_id', 'serial_number', 'unknown_identifier']:
+      'asset_tag', 'chrome_device_id', 'serial_number', 'identifier']:
     if getattr(device_request, device_identifier, None):
       return device_identifier
   raise endpoints.BadRequestException(_NO_IDENTIFIERS_MSG)
 
 
 def _get_device(device_request):
-  """Gets a device using any identifier, including unknown_identifier.
+  """Gets a device using any identifier, including identifier.
 
-  If unknown_identifier is supplied, this will try it as both asset_tag and
+  If identifier is supplied, this will try it as both asset_tag and
   serial_number.
 
   Args:

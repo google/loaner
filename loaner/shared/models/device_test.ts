@@ -39,10 +39,6 @@ describe('Device', () => {
     due_date: moment(today).subtract(1, 'w').toDate(),
     overdue: true,
   });
-  const assetTagDevice = new Device({
-    serial_number: '123',
-    asset_tag: 'abc',
-  });
   const pendingReturnDevice =
       new Device({serial_number: '789', pending_return: true});
   const maximumExtendedDevice = new Device({
@@ -51,7 +47,6 @@ describe('Device', () => {
     due_date: moment(today).toDate(),
     max_extend_date: moment(today).toDate()
   });
-  const serialNumberDevice = new Device({serial_number: '456', asset_tag: ''});
 
   it('returns a value < 0 when a device is overdue', () => {
     expect(overdueDevice.timeUntilDue).toBeLessThan(0);
@@ -69,10 +64,5 @@ describe('Device', () => {
     expect(maximumExtendedDevice.canExtend).toBe(false);
     maximumExtendedDevice.maxExtendDate = moment(today).add(1, 'd').toDate();
     expect(maximumExtendedDevice.canExtend).toBe(true);
-  });
-
-  it('returns asset tag before serial number for its id', () => {
-    expect(assetTagDevice.id).toBe(assetTagDevice.assetTag);
-    expect(serialNumberDevice.id).toBe(serialNumberDevice.serialNumber);
   });
 });

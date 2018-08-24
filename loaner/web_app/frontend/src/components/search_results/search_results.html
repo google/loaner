@@ -14,7 +14,7 @@
   <mat-card-content>
     <mat-nav-list *ngIf="model === 'device'">
       <mat-list-item *ngFor="let device of results"
-                     [routerLink]="['/device/', device.id]">
+                     [routerLink]="['/device', device.identifier]">
         <mat-icon mat-list-icon>laptop_chromebook</mat-icon>
         <h4 mat-line>
           {{ device.deviceModel }}

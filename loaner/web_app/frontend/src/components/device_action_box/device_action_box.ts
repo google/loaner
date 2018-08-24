@@ -179,7 +179,7 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   }
 
   private takeUnenrollActions() {
-    if (!this.device.unknownIdentifier) {
+    if (!this.device.identifier) {
       this.mainIdentifier.nativeElement.focus();
       this.snackBar.open(
           `${this.mainIdentifierName} is empty and it is required`);

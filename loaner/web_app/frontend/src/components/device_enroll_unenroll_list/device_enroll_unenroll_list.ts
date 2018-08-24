@@ -49,11 +49,12 @@ export class DeviceEnrollUnenrollList {
 
   /**
    * Adds a device to the pool of devices that are being enrolled or unenrolled.
-   * @param device device object that holds the device identifier to be enrolled
+   * @param device The object that holds the device identifier to be enrolled
    * or unenrolled
    */
   deviceAction(device: Device) {
-    const deviceId = device.id;
+    const deviceId =
+        device.assetTag || device.serialNumber || device.identifier;
     let deviceOnAction: DeviceOnAction;
     if (deviceId) {
       deviceOnAction = {

@@ -28,6 +28,7 @@ export declare interface ShelfRequestParams {
 export declare interface ShelfApiParams {
   friendly_name?: string;
   location?: string;
+  identifier?: string;
   latitude?: number;
   longitude?: number;
   altitude?: number;
@@ -60,6 +61,8 @@ export class Shelf {
   friendlyName = '';
   /** The floor location of a given shelf. */
   location = '';
+  /** The identifier for a shelf. A string of friendly name or location. */
+  identifier = '';
   /** Latitude on which the shelf is located. */
   latitude? = 0;
   /** Longitude on which the shelf is located. */
@@ -90,6 +93,7 @@ export class Shelf {
   constructor(shelf: ShelfApiParams = {}) {
     this.friendlyName = shelf.friendly_name || this.friendlyName;
     this.location = shelf.location || this.location;
+    this.identifier = shelf.identifier || this.identifier;
     this.latitude = shelf.latitude || this.latitude;
     this.longitude = shelf.longitude || this.longitude;
     this.altitude = shelf.altitude || this.altitude;
@@ -114,6 +118,7 @@ export class Shelf {
       latitude: this.latitude,
       longitude: this.longitude,
       friendly_name: this.friendlyName,
+      identifier: this.identifier,
       location: this.location,
       responsible_for_audit: this.responsibleForAudit,
       capacity: this.capacity,

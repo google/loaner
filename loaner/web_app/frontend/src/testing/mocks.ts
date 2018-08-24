@@ -137,6 +137,7 @@ export const DEVICE_1 = new Device({
   asset_tag: 'device1',
   device_model: 'chromebook',
   serial_number: '321653',
+  identifier: 'device1',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -149,6 +150,7 @@ export const DEVICE_2 = new Device({
   asset_tag: 'device2',
   device_model: 'chromebook',
   serial_number: '236135',
+  identifier: 'device2',
   pending_return: true,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -162,6 +164,7 @@ export const DEVICE_WITH_ASSET_TAG = new Device({
   asset_tag: 'abc',
   device_model: 'chromebook',
   serial_number: '777001',
+  identifier: 'abc',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -175,6 +178,7 @@ export const DEVICE_WITHOUT_ASSET_TAG = new Device({
   asset_tag: '',
   device_model: 'chromebook',
   serial_number: '777002',
+  identifier: '777002',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -187,6 +191,7 @@ export const DEVICE_MARKED_FOR_RETURN = new Device({
   asset_tag: '',
   device_model: 'chromebook',
   serial_number: '777003',
+  identifier: '777003',
   pending_return: true,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -198,6 +203,7 @@ export const DEVICE_NOT_MARKED_FOR_RETURN = new Device({
   asset_tag: '',
   device_model: 'chromebook',
   serial_number: '777004',
+  identifier: '777004',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -209,6 +215,7 @@ export const DEVICE_NOT_MARKED_FOR_RETURN = new Device({
 export const DEVICE_UNASSIGNED = new Device({
   device_model: 'chromebook',
   serial_number: '777005',
+  identifier: '777005',
   pending_return: false,
   due_date: new Date(2018, 1, 1),
   current_ou: 'ROOT',
@@ -218,6 +225,7 @@ export const DEVICE_ASSIGNED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777006',
+  identifier: '777006',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -231,6 +239,7 @@ export const DEVICE_GUEST_NOT_PERMITTED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777006',
+  identifier: '777006',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -244,6 +253,7 @@ export const DEVICE_GUEST_PERMITTED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777006',
+  identifier: '777006',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -257,6 +267,7 @@ export const DEVICE_LOST = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777007',
+  identifier: '777007',
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
@@ -269,6 +280,7 @@ export const DEVICE_DAMAGED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777008',
+  identifier: '777008',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -281,6 +293,7 @@ export const DEVICE_LOCKED = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '777009',
+  identifier: '777009',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -293,6 +306,7 @@ export const DEVICE_OVERDUE = new Device({
   assigned_user: 'test_user',
   device_model: 'chromebook',
   serial_number: '77700112',
+  identifier: '77700112',
   pending_return: false,
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
@@ -304,6 +318,7 @@ export const DEVICE_OVERDUE = new Device({
 export const DEVICE_LOST_AND_MORE = new Device({
   device_model: 'chromebook',
   serial_number: '777007',
+  identifier: '777007',
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
@@ -354,7 +369,7 @@ export class DeviceServiceMock {
 
   getDevice(deviceId: string): Observable<Device> {
     const foundDevice = this.dataChange.value.find(mockDevice => {
-      return mockDevice.id === deviceId;
+      return mockDevice.identifier === deviceId;
     });
     if (foundDevice === undefined) {
       throw new Error(`Could not find device in mock with id ${deviceId}`);

@@ -23,8 +23,8 @@ import {Shelf, ShelfApiParams} from './shelf';
 export declare interface DeviceApiParams {
   serial_number?: string;
   asset_tag?: string;
+  identifier?: string;
   urlkey?: string;
-  unknown_identifier?: string;
   damaged?: boolean;
   device_model?: string;
   shelf?: ShelfApiParams;
@@ -53,7 +53,7 @@ export declare interface DeviceRequestApiParams {
   chrome_device_id?: string;
   serial_number?: string;
   urlkey?: string;
-  unknown_identifier?: string;
+  identifier?: string;
 }
 
 export declare interface ExtendDeviceRequestApiParams {
@@ -85,10 +85,10 @@ export class Device {
   serialNumber = '';
   /** Asset tag of the device. */
   assetTag = '';
+  /** Device's identifier not known upfront, asset tag or serial number. */
+  identifier = '';
   /** Urlsafe Key identifier for the device. */
   urlkey = '';
-  /** Device that's not known upfront by the frontend. */
-  unknownIdentifier!: string;
   /** Computer model of the device. */
   deviceModel = 'Unknown Device Model';
   /** Which shelf the device is currently assigned to. */
@@ -129,6 +129,7 @@ export class Device {
   constructor(device: DeviceApiParams = {}) {
     this.serialNumber = device.serial_number || this.serialNumber;
     this.assetTag = device.asset_tag || this.assetTag;
+    this.identifier = device.identifier || this.identifier;
     this.urlkey = device.urlkey || this.urlkey;
     this.damaged = !!device.damaged || this.damaged;
     this.deviceModel = device.device_model || this.deviceModel;
@@ -151,21 +152,6 @@ export class Device {
     this.chips = this.makeChips();
   }
 
-
-  /**
-   * Property to retrieve the asset tag or serial number, in that order.
-   */
-  get id(): string {
-    return this.assetTag || this.serialNumber || this.unknownIdentifier;
-  }
-
-  /**
-   * Property to setting an ID when it's not known by the frontend upfront.
-   */
-  set id(value: string) {
-    this.unknownIdentifier = value;
-  }
-
   /**
    * Property to determine if the device can be extended.
    */
@@ -186,8 +172,8 @@ export class Device {
   toApiMessage(): DeviceApiParams {
     return {
       asset_tag: this.assetTag,
+      identifier: this.identifier,
       urlkey: this.urlkey,
-      unknown_identifier: this.unknownIdentifier,
       assignment_date: this.assignmentDate,
       current_ou: this.currentOu,
       device_model: this.deviceModel,

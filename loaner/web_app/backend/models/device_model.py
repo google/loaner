@@ -426,14 +426,14 @@ class Device(base_model.BaseModel):
   @classmethod
   def get(
       cls, asset_tag=None, chrome_device_id=None, serial_number=None,
-      unknown_identifier=None):
+      identifier=None):
     """Retrieves a device object using one of several device identifiers.
 
     Args:
       asset_tag: str, the asset tag of the device.
       chrome_device_id: str, the Chrome device ID of a device.
       serial_number: str, the serial number of a device.
-      unknown_identifier: str, either an asset tag or serial number of the
+      identifier: str, either an asset tag or serial number of the
           device, and this function will attempt both.
 
     Returns:
@@ -449,10 +449,10 @@ class Device(base_model.BaseModel):
       return cls.query(cls.chrome_device_id == chrome_device_id).get()
     elif serial_number:
       return cls.query(cls.serial_number == serial_number.upper()).get()
-    elif unknown_identifier:
+    elif identifier:
       return (
-          cls.query(cls.serial_number == unknown_identifier.upper()).get() or
-          cls.query(cls.asset_tag == unknown_identifier.upper()).get())
+          cls.query(cls.serial_number == identifier.upper()).get() or
+          cls.query(cls.asset_tag == identifier.upper()).get())
     else:
       raise DeviceIdentifierError('No identifier supplied to get device.')
 

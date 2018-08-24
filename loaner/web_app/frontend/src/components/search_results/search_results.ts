@@ -24,6 +24,7 @@ import {SearchService} from '../../services/search';
 import {ShelfService} from '../../services/shelf';
 import {LoanerSnackBar} from '../../services/snackbar';
 
+
 /**
  * Component that renders the search results on the frontend.
  */
@@ -104,8 +105,8 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
       if (userSearch && devices.length >= 1) {
         this.router.navigate(
             ['user'], {queryParams: {'user': devices[0].assignedUser}});
-      } else if (devices.length === 1 && devices[0].id) {
-        this.router.navigate([`/device/${devices[0].id}`]);
+      } else if (devices.length === 1 && devices[0].identifier) {
+        this.router.navigate(['/device', devices[0].identifier]);
       } else {
         this.results = devices;
         this.location.replaceState(`/search/${this.model}/${queryString}`);

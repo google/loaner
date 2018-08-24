@@ -502,13 +502,13 @@ class DeviceModelTest(loanertest.TestCase):
         device_model.Device.get(chrome_device_id='chrome_id_2').asset_tag,
         'ASSET_TAG_2')
 
-    # Unknown_identifier is can take either an asset tag or serial number.
+    # Identifier is can take either an asset tag or serial number.
     self.assertEqual(
-        device_model.Device.get(unknown_identifier='asset_tag_0').asset_tag,
+        device_model.Device.get(identifier='asset_tag_0').asset_tag,
         'ASSET_TAG_0')
     self.assertEqual(
         device_model.Device.get(
-            unknown_identifier='serial_number_1').serial_number,
+            identifier='serial_number_1').serial_number,
         'SERIAL_NUMBER_1')
 
   def test_is_overdue(self):

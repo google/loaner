@@ -179,7 +179,7 @@ class ShelfApi(root_api.Service):
     shelf_string_query = 'shelf: {}'.format(shelf.key.urlsafe())
     devices_retrieved_on_shelf = device_model.Device.search(shelf_string_query)
     for device_identifier in request.device_identifiers:
-      device = device_model.Device.get(unknown_identifier=device_identifier)
+      device = device_model.Device.get(identifier=device_identifier)
       if not device:
         raise endpoints.NotFoundException(
             _DEVICE_DOES_NOT_EXIST_MSG % device_identifier)

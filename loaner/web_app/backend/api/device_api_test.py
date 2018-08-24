@@ -206,10 +206,11 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   @mock.patch('__main__.device_model.Device.device_audit_check')
   def test_device_audit_check(self, mock_device_audit_check):
-    request = device_messages.DeviceRequest(unknown_identifier='6765')
-    self.assertRaisesRegexp(device_api.endpoints.NotFoundException,
-                            device_api._NO_DEVICE_MSG % '6765',
-                            self.service.device_audit_check, request)
+    request = device_messages.DeviceRequest(identifier='6765')
+    self.assertRaisesRegexp(
+        device_api.endpoints.NotFoundException,
+        device_api._NO_DEVICE_MSG % '6765',
+        self.service.device_audit_check, request)
 
     device_model.Device(
         serial_number='12345',
@@ -218,21 +219,21 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         current_ou='/',
         chrome_device_id='unique_id_1',
         damaged=False).put()
-    request = device_messages.DeviceRequest(unknown_identifier='12345')
+    request = device_messages.DeviceRequest(identifier='12345')
     response = self.service.device_audit_check(request)
     assert mock_device_audit_check.call_count == 1
     self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_device_audit_check_device_not_enrolled(self):
     request = device_messages.DeviceRequest(
-        unknown_identifier=self.device.serial_number)
+        identifier=self.device.serial_number)
     self.device.enrolled = False
     with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.device_audit_check(request)
 
   def test_device_audit_check_device_damaged(self):
     request = device_messages.DeviceRequest(
-        unknown_identifier=self.device.serial_number)
+        identifier=self.device.serial_number)
     self.device.damaged = True
     with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.device_audit_check(request)
@@ -241,13 +242,13 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_get_device_not_found(self, mock_directory_class):
     mock_directory_client = mock_directory_class.return_value
     mock_directory_client.given_name.return_value = 'given name value'
-    request = device_messages.DeviceRequest(unknown_identifier='not-found')
+    request = device_messages.DeviceRequest(identifier='not-found')
     with self.assertRaises(device_api.endpoints.NotFoundException):
       self.service.get_device(request)
 
   def test_get_device_unenrolled(self):
     request = device_messages.DeviceRequest(
-        unknown_identifier=self.device.serial_number)
+        identifier=self.device.serial_number)
     self.device.enrolled = False
     with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.get_device(request)
@@ -264,14 +265,14 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         device_messages.DeviceRequest(serial_number='123ABC'))
     urlkey_response = self.service.get_device(
         device_messages.DeviceRequest(urlkey=self.device.key.urlsafe()))
-    unknown_identifier_response = self.service.get_device(
-        device_messages.DeviceRequest(unknown_identifier='123ABC'))
+    identifier_response = self.service.get_device(
+        device_messages.DeviceRequest(identifier='123ABC'))
 
     self.assertIsInstance(asset_tag_response, device_messages.Device)
     self.assertIsInstance(chrome_device_id_response, device_messages.Device)
     self.assertIsInstance(serial_number_response, device_messages.Device)
     self.assertIsInstance(urlkey_response, device_messages.Device)
-    self.assertIsInstance(unknown_identifier_response, device_messages.Device)
+    self.assertIsInstance(identifier_response, device_messages.Device)
     self.assertEqual(self.device.serial_number,
                      asset_tag_response.serial_number)
     self.assertEqual(self.device.device_model, urlkey_response.device_model)

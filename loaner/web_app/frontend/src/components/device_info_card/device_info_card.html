@@ -30,7 +30,7 @@
             <mat-icon *ngIf="!device.isOverdue">
               laptop_chromebook
             </mat-icon>
-            {{ device.id }}
+            {{ device.identifier }}
           </ng-template>
           <div fxLayout="column" fxLayoutAlign="center center">
             <loaner-loan-actions-card [device]="device">

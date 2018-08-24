@@ -45,7 +45,7 @@ export class StatusComponent extends LoaderView implements OnInit {
 
   /** If the device model data is populated. */
   get hasDevices() {
-    return Boolean(this.device.id);
+    return Boolean(this.device.identifier);
   }
 
   constructor(

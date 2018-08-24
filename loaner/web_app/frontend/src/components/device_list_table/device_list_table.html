@@ -10,7 +10,7 @@
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
           Identifier
         </mat-header-cell>
-        <mat-cell *cdkCellDef="let device">{{device.id}}</mat-cell>
+        <mat-cell *cdkCellDef="let device">{{device.identifier}}</mat-cell>
       </ng-container>
       <ng-container cdkColumnDef="assigned_user">
         <mat-header-cell *cdkHeaderCellDef mat-sort-header>
@@ -71,7 +71,7 @@
 
       <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *cdkRowDef="let device; columns: displayedColumns;"
-              routerLink="/device/{{device.id}}"
+               [routerLink]="['/device', device.identifier]"
                (focus)="pauseLoading=true;"
                (blur)="pauseLoading=false;">
       </mat-row>

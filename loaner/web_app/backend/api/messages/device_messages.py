@@ -46,13 +46,13 @@ class DeviceRequest(messages.Message):
     chrome_device_id: str, The Chrome device id of the Chrome device.
     serial_number: str, The serial number of the Chrome device.
     urlkey: str, The URL-safe key of a device.
-    unknown_identifier: str, Either an asset tag or serial number of the device.
+    identifier: str, Either an asset tag or serial number of the device.
   """
   asset_tag = messages.StringField(1)
   chrome_device_id = messages.StringField(2)
   serial_number = messages.StringField(3)
   urlkey = messages.StringField(4)
-  unknown_identifier = messages.StringField(5)
+  identifier = messages.StringField(5)
 
 
 class Device(messages.Message):

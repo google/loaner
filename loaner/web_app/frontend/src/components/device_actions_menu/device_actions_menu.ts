@@ -52,7 +52,7 @@ export class DeviceActionsMenu {
 
   /** Dialog for removing a device. */
   openRemoveDeviceDialog() {
-    this.unenrollService.openDialog(this.device.id);
+    this.unenrollService.openDialog(this.device.identifier);
     this.unenrollService.onUnenroll
         .pipe(switchMap(() => this.deviceService.unenroll(this.device)))
         .subscribe(() => {
@@ -72,7 +72,7 @@ export class DeviceActionsMenu {
         .pipe(switchMap(() => this.deviceService.enableGuestMode(device)))
         .subscribe(() => {
           this.guestModeService.finished();
-          this.refreshDevice.emit(device.id);
+          this.refreshDevice.emit(device.identifier);
         });
   }
 
@@ -81,12 +81,12 @@ export class DeviceActionsMenu {
    * @param device The device we are enabling guest on.
    */
   unlock(device: Device) {
-    this.unlockService.openDialog(device.id);
+    this.unlockService.openDialog(device.identifier);
     this.unlockService.onUnlock
         .pipe(switchMap(() => this.deviceService.unlock(device)))
         .subscribe(() => {
           this.unlockService.finished();
-          this.refreshDevice.emit(device.id);
+          this.refreshDevice.emit(device.identifier);
         });
   }
 
@@ -106,7 +106,7 @@ export class DeviceActionsMenu {
             () => {
               this.extendService.finished(new Date(temporaryNewDate));
               temporaryNewDate = '';
-              this.refreshDevice.emit(device.id);
+              this.refreshDevice.emit(device.identifier);
             },
             () => {
               this.extendService.close();
@@ -121,7 +121,7 @@ export class DeviceActionsMenu {
     this.deviceService.returnDevice(device).subscribe(() => {
       device.pendingReturn = true;
     });
-    this.refreshDevice.emit(device.id);
+    this.refreshDevice.emit(device.identifier);
   }
 
   /**
@@ -137,7 +137,7 @@ export class DeviceActionsMenu {
         .subscribe(
             () => {
               this.damagedService.finished();
-              this.refreshDevice.emit(device.id);
+              this.refreshDevice.emit(device.identifier);
             },
             () => {
               this.damagedService.close();
@@ -149,14 +149,14 @@ export class DeviceActionsMenu {
    * @param device The device to take action on.
    */
   onUndamaged(device: Device) {
-    this.undamagedService.openDialog(device.id);
+    this.undamagedService.openDialog(device.identifier);
     this.undamagedService.onUndamaged
         .pipe(switchMap(
             damagedReason => this.deviceService.markAsUndamaged(device)))
         .subscribe(
             () => {
               this.undamagedService.finished();
-              this.refreshDevice.emit(device.id);
+              this.refreshDevice.emit(device.identifier);
             },
             () => {
               this.undamagedService.close();
@@ -174,7 +174,7 @@ export class DeviceActionsMenu {
         .subscribe(
             () => {
               this.lostService.finished();
-              this.refreshDevice.emit(device.id);
+              this.refreshDevice.emit(device.identifier);
             },
             () => {
               this.lostService.close();

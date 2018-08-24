@@ -105,15 +105,15 @@ export class DeviceInfoCard implements OnInit {
             return;
           }
           this.loanedDevices = userDevices.sort((a, b) => {
-            if (!a.id || !b.id) return 0;
-            return Number(b.id) - Number(a.id);
+            if (!a.identifier || !b.identifier) return 0;
+            return Number(b.identifier) - Number(a.identifier);
           });
 
           // Represents the device ID to be highlighted if given.
           this.route.params.subscribe((params) => {
             if (params.id) {
               this.selectedTab = this.loanedDevices.findIndex(
-                  device => device.id === params.id);
+                  device => device.identifier === params.id);
             }
           });
         });

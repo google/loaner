@@ -49,7 +49,7 @@ export class DeviceService extends ApiService {
   /** Checks if whether a particular device is ready to be checked in. */
   checkReadyForAudit(id: string): Observable<string> {
     return new Observable(observer => {
-      const request: DeviceRequestApiParams = {'unknown_identifier': id};
+      const request: DeviceRequestApiParams = {'identifier': id};
       this.post('auditable', request, false /* showSnackbarOnFailure */)
           .subscribe(
               () => {
@@ -66,7 +66,7 @@ export class DeviceService extends ApiService {
    * @param id Device identifier to be gotten from the backend.
    */
   getDevice(id: string) {
-    const request: DeviceRequestApiParams = {'unknown_identifier': id};
+    const request: DeviceRequestApiParams = {'identifier': id};
     return this.post('user/get', request)
         .pipe(map(
             (retrievedDevice: DeviceApiParams) => new Device(retrievedDevice)));
@@ -133,7 +133,7 @@ export class DeviceService extends ApiService {
   returnDevice(device: Device) {
     return this.post('user/mark_pending_return', device.toApiMessage())
         .pipe(tap(() => {
-          this.snackBar.open(`Device ${device.id} returned.`);
+          this.snackBar.open(`Device ${device.identifier} returned.`);
         }));
   }
 
@@ -143,7 +143,7 @@ export class DeviceService extends ApiService {
    */
   markAsLost(device: Device) {
     return this.post('user/mark_lost', device.toApiMessage()).pipe(tap(() => {
-      this.snackBar.open(`Device ${device.id} marked as lost.`);
+      this.snackBar.open(`Device ${device.identifier} marked as lost.`);
     }));
   }
 
@@ -153,7 +153,7 @@ export class DeviceService extends ApiService {
    */
   unlock(device: Device) {
     return this.post<void>('unlock', device.toApiMessage()).pipe(tap(() => {
-      this.snackBar.open(`Device ${device.id} has been unlocked.`);
+      this.snackBar.open(`Device ${device.identifier} has been unlocked.`);
     }));
   }
 
@@ -164,7 +164,8 @@ export class DeviceService extends ApiService {
   enableGuestMode(device: Device) {
     return this.post('user/enable_guest_mode', device.toApiMessage())
         .pipe(tap(() => {
-          this.snackBar.open(`Enabled guest mode for device ${device.id}.`);
+          this.snackBar.open(
+              `Enabled guest mode for device ${device.identifier}.`);
         }));
   }
 
@@ -174,7 +175,7 @@ export class DeviceService extends ApiService {
    */
   resumeLoan(device: Device) {
     return this.post('user/resume_loan', device.toApiMessage()).pipe(tap(() => {
-      this.snackBar.open(`Loan resumed for device ${device.id}.`);
+      this.snackBar.open(`Loan resumed for device ${device.identifier}.`);
     }));
   }
 
@@ -190,7 +191,7 @@ export class DeviceService extends ApiService {
     };
     const httpObservable = this.post<void>('user/mark_damaged', request);
     httpObservable.subscribe(() => {
-      this.snackBar.open(`Device ${device.id} marked as damaged.`);
+      this.snackBar.open(`Device ${device.identifier} marked as damaged.`);
     });
     return httpObservable;
   }
@@ -202,7 +203,7 @@ export class DeviceService extends ApiService {
   markAsUndamaged(device: Device) {
     return this.post('undamaged', device.toApiMessage()).pipe(tap(() => {
       this.snackBar.open(
-          `Device ${device.id} is not longer marked as damaged.`);
+          `Device ${device.identifier} is not longer marked as damaged.`);
     }));
   }
 
@@ -212,7 +213,7 @@ export class DeviceService extends ApiService {
    */
   enroll(newDevice: Device) {
     return this.post<void>('enroll', newDevice.toApiMessage()).pipe(tap(() => {
-      this.snackBar.open(`Device ${newDevice.id} enrolled.`);
+      this.snackBar.open(`Device ${newDevice.identifier} enrolled.`);
     }));
   }
 
@@ -224,7 +225,8 @@ export class DeviceService extends ApiService {
   unenroll(deviceToBeUnenrolled: Device): Observable<void> {
     return this.post<void>('unenroll', deviceToBeUnenrolled.toApiMessage())
         .pipe(tap(() => {
-          this.snackBar.open(`Device ${deviceToBeUnenrolled.id} removed.`);
+          this.snackBar.open(
+              `Device ${deviceToBeUnenrolled.identifier} removed.`);
         }));
   }
 }
