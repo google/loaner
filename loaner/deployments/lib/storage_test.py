@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl.testing import parameterized
+
 import mock
 
 from google.cloud import exceptions
@@ -43,7 +45,7 @@ _FAKE_BUCKET_OBJECT = {
 }
 
 
-class CloudStorageAPITest(absltest.TestCase):
+class CloudStorageAPITest(parameterized.TestCase, absltest.TestCase):
 
   def setUp(self):
     super(CloudStorageAPITest, self).setUp()
@@ -68,26 +70,19 @@ class CloudStorageAPITest(absltest.TestCase):
     self.assertTrue(mock_creds.called)
     self.assertTrue(mock_client.called)
 
-  def test_cloud_storage_get_bucket(self):
-    """Test the get_bucket API method for the Google Cloud Storage API."""
-    mock_client = mock.Mock()
-    mock_client.get_bucket.return_value = _FAKE_BUCKET_OBJECT
-
-    test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
-    self.assertEqual(_FAKE_BUCKET_OBJECT, test_cloud_storage_api.get_bucket())
-    mock_client.get_bucket.assert_called_once_with(self.config.bucket)
-
-  def test_cloud_storage_get_bucket__custom_name(self):
+  @parameterized.named_parameters(
+      ('Default Bucket', None, 'TEST_BUCKET'),
+      ('Custom Bucket', 'OTHER_BUCKET', 'OTHER_BUCKET'),
+  )
+  def test_cloud_storage_get_bucket(self, test_bucket, expected_bucket):
     """Test the get_bucket API method for the Google Cloud Storage API."""
     mock_client = mock.Mock()
     mock_client.get_bucket.return_value = _FAKE_BUCKET_OBJECT
 
     test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
     self.assertEqual(
-        _FAKE_BUCKET_OBJECT,
-        test_cloud_storage_api.get_bucket('BUCKET_NAME'),
-    )
-    mock_client.get_bucket.assert_called_once_with('BUCKET_NAME')
+        _FAKE_BUCKET_OBJECT, test_cloud_storage_api.get_bucket(test_bucket))
+    mock_client.get_bucket.assert_called_once_with(expected_bucket)
 
   def test_cloud_storage_get_bucket__not_found_error(self):
     """Test the get_bucket API method for an invalid project."""
@@ -98,27 +93,19 @@ class CloudStorageAPITest(absltest.TestCase):
     with self.assertRaises(storage.NotFoundError):
       test_cloud_storage_api.get_bucket()
 
-  def test_cloud_storage_insert_bucket(self):
+  @parameterized.named_parameters(
+      ('Default Bucket', None, 'TEST_BUCKET'),
+      ('Custom Bucket', 'OTHER_BUCKET', 'OTHER_BUCKET'),
+  )
+  def test_cloud_storage_insert_bucket(self, test_bucket, expected_bucket):
     """Test the insert_bucket method for the Cloud Storage API."""
     mock_client = mock.Mock()
     mock_client.create_bucket.return_value = _FAKE_BUCKET_OBJECT
 
     test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
     self.assertEqual(
-        _FAKE_BUCKET_OBJECT, test_cloud_storage_api.insert_bucket())
-    mock_client.create_bucket.assert_called_once_with(self.config.bucket)
-
-  def test_cloud_storage_insert_bucket__custom_name(self):
-    """Test the insert_bucket method for the Cloud Storage API."""
-    mock_client = mock.Mock()
-    mock_client.create_bucket.return_value = _FAKE_BUCKET_OBJECT
-
-    test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
-    self.assertEqual(
-        _FAKE_BUCKET_OBJECT,
-        test_cloud_storage_api.insert_bucket('BUCKET_NAME'),
-    )
-    mock_client.create_bucket.assert_called_once_with('BUCKET_NAME')
+        _FAKE_BUCKET_OBJECT, test_cloud_storage_api.insert_bucket(test_bucket))
+    mock_client.create_bucket.assert_called_once_with(expected_bucket)
 
   def test_cloud_storage_api_insert_bucket__already_exists_error(self):
     """Test the Cloud Storage Bucket creation for an existing bucket."""
@@ -127,6 +114,71 @@ class CloudStorageAPITest(absltest.TestCase):
         exceptions.Conflict('This bucket already exists.'))
     with self.assertRaises(storage.AlreadyExistsError):
       test_cloud_storage_api.insert_bucket()
+
+  @parameterized.parameters(
+      (None, 'TEST_BUCKET'), ('OTHER_BUCKET', 'OTHER_BUCKET'))
+  @mock.patch.object(storage_client, 'Blob', autospec=True)
+  def test_cloud_storage_insert_blob(
+      self, test_bucket, expected_bucket, mock_blob_class):
+    """Test the creation of a Blob on Google Cloud Storage."""
+    mock_blob = mock_blob_class.return_value
+    mock_client = mock.Mock()
+    test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
+
+    with mock.patch.object(
+        test_cloud_storage_api, 'get_bucket',
+        return_value=_FAKE_BUCKET_OBJECT) as mock_get_bucket:
+
+      test_cloud_storage_api.insert_blob(
+          'TEST_PATH', {'key': 'value'}, test_bucket)
+
+      mock_get_bucket.assert_called_once_with(expected_bucket)
+      mock_blob.upload_from_string.assert_called_once_with(
+          data='{"key": "value"}',
+          content_type='application/json',
+          client=mock_client,
+      )
+
+  @parameterized.named_parameters(
+      ('Default Bucket', None, 'TEST_BUCKET'),
+      ('Custom Bucket', 'OTHER_BUCKET', 'OTHER_BUCKET'),
+  )
+  def test_cloud_storage_get_blob(self, test_bucket, expected_bucket):
+    """Test the retrieval of a Blob from Google Cloud Storage."""
+    with mock.patch.object(
+        storage_client, 'Blob', autospec=True) as mock_blob_class:
+      mock_blob = mock_blob_class.return_value
+      mock_blob.download_as_string.return_value = '{"key": "value"}'
+
+      mock_client = mock.Mock()
+      mock_bucket = mock_client.get_bucket.return_value
+      mock_bucket.get_blob.return_value = mock_blob
+
+      test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
+
+      self.assertEqual(
+          {'key': 'value'},
+          test_cloud_storage_api.get_blob('TEST_BLOB', test_bucket))
+
+      mock_client.get_bucket.assert_called_once_with(expected_bucket)
+      mock_bucket.get_blob.assert_called_once_with('TEST_BLOB', mock_client)
+      mock_blob.download_as_string.assert_called_once_with(mock_client)
+
+  @parameterized.parameters(AttributeError('FAIL'), exceptions.NotFound('FAIL'))
+  @mock.patch.object(storage_client, 'Blob', autospec=True)
+  def test_cloud_storage_get_blob__not_found_error(
+      self, test_error, mock_blob_class):
+    """Test the retrieval of a Blob that cannot be found."""
+    mock_blob = mock_blob_class.return_value
+    mock_blob.download_as_string.side_effect = test_error
+
+    mock_client = mock.Mock()
+    mock_client.get_bucket.return_value.get_blob.return_value = mock_blob
+
+    test_cloud_storage_api = storage.CloudStorageAPI(self.config, mock_client)
+
+    with self.assertRaises(storage.NotFoundError):
+      test_cloud_storage_api.get_blob('TEST_BLOB')
 
 
 if __name__ == '__main__':

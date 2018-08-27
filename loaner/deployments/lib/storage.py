@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import json
+
 from absl import logging
 
 from google.cloud import exceptions
@@ -27,6 +29,9 @@ from loaner.deployments.lib import auth
 
 # Error messages.
 _GET_BUCKET_ERROR_MSG = 'Failed to retrieve Google Cloud Storage Bucket %r: %s.'
+_GET_BLOB_ERROR_MSG = (
+    'Failed to retrieve Blob with name %r from Google Cloud Storage Bucket '
+    '%r: %s.')
 
 
 class AlreadyExistsError(Exception):
@@ -121,3 +126,59 @@ class CloudStorageAPI(object):
         'The Googld Cloud Storage Bucket %r has been created for project '
         '%r.', bucket_name, self._config.project)
     return new_bucket
+
+  def insert_blob(self, path, contents, bucket_name=None):
+    """Inserts a new json encoded Blob in the Cloud Storage bucket provided.
+
+    NOTE: If a Blob already exists at the provided path it will be overwritten
+    by the new contents without warning.
+
+    Args:
+      path: str, the path of the Blob to create relative to the root of the
+          Google Cloud Storage Bucket including the name of the Blob.
+      contents: dict, a dictionary representing the contents of the new Blob.
+      bucket_name: str, the name of the Google Cloud Storage Bucket to insert
+          the new Blob into.
+    """
+    bucket_name = bucket_name or self._config.bucket
+
+    blob = storage.Blob(
+        name=path,
+        bucket=self.get_bucket(bucket_name),
+    )
+
+    blob.upload_from_string(
+        data=json.dumps(contents),
+        content_type='application/json',
+        client=self._client,
+    )
+
+    logging.info(
+        'Successfully uploaded blob %r to bucket %r.', path, bucket_name)
+
+  def get_blob(self, path, bucket_name=None):
+    """Retrieves a json encoded Blob from Google Cloud Storage as a dictionary.
+
+    Args:
+      path: str, the path of the Blob to retrieve relative to the root of the
+          Google Cloud Storage Bucket including the name of the Blob.
+      bucket_name: str, the name of the Google Cloud Storage Bucket to retrieve
+          the Blob from.
+
+    Returns:
+      A dictionary of the Blob from Google Cloud Storage.
+
+    Raises:
+      NotFoundError: when the path provided is not associated with a Blob in the
+          Google Cloud Storage Bucket.
+    """
+    bucket_name = bucket_name or self._config.bucket
+
+    blob = self.get_bucket(bucket_name).get_blob(path, self._client)
+
+    try:
+      contents = blob.download_as_string(self._client)
+    except (AttributeError, exceptions.NotFound) as err:
+      logging.error(_GET_BLOB_ERROR_MSG, path, bucket_name, err)
+      raise NotFoundError(_GET_BLOB_ERROR_MSG % (path, bucket_name, err))
+    return json.loads(contents)

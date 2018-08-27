@@ -240,6 +240,7 @@ py_test(
         ":common_lib",
         ":storage_lib",
         "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:parameterized",
         "@gcloud_storage_archive//:gcloud_storage",
         "@mock_archive//:mock",
     ],
