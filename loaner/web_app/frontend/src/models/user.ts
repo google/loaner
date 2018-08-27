@@ -19,6 +19,7 @@
  */
 export declare interface UserApiParams {
   permissions?: string[];
+  superadmin?: boolean;
 }
 
 /** An user model with all its properties and methods. */
@@ -36,6 +37,7 @@ export class User {
 
   constructor(user: UserApiParams = {}) {
     this.permissions = user.permissions || this.permissions;
+    this.superadmin = user.superadmin || this.superadmin;
   }
 
   /** Translates the User model object to the API message. */
