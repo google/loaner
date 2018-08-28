@@ -125,7 +125,7 @@ export class AuthService {
   reloadAuth() {
     this.currentUser.reloadAuthResponse().then(newAuthResponse => {
       const token: Token = {
-        id: newAuthResponse.id_token,
+        id: newAuthResponse.access_token,
         expirationTime: newAuthResponse.expires_at,
       };
       this.updateToken(token);
@@ -141,7 +141,7 @@ export class AuthService {
       const authResponse = this.currentUser.getAuthResponse();
 
       this.updateToken({
-        id: authResponse.id_token,
+        id: authResponse.access_token,
         expirationTime: authResponse.expires_at,
       });
 
