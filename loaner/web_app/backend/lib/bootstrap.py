@@ -25,6 +25,7 @@ import os
 import sys
 
 from absl import logging
+
 from google.appengine.ext import deferred
 
 from loaner.web_app import constants
@@ -32,14 +33,17 @@ from loaner.web_app.backend.clients import bigquery_client
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import datastore_yaml
 from loaner.web_app.backend.lib import user
+from loaner.web_app.backend.lib import utils
 from loaner.web_app.backend.models import bootstrap_status_model
 from loaner.web_app.backend.models import config_model
+
 
 _ORG_UNIT_EXISTS_MSG = 'Org unit %s already exists, so cannot create.'
 _TASK_DESCRIPTIONS = {
     'bootstrap_datastore_yaml': 'Importing datastore YAML file',
     'bootstrap_chrome_ous': 'Creating Chrome OUs in Directory',
-    'bootstrap_bq_history': 'Configuring datastore history tables in BigQuery'
+    'bootstrap_bq_history': 'Configuring datastore history tables in BigQuery',
+    'bootstrap_load_config_yaml': 'Loading config_defaults.yaml into datastore.'
 }
 
 
@@ -136,6 +140,19 @@ def bootstrap_bq_history(**kwargs):
   del kwargs  # Unused, but comes by default.
   client = bigquery_client.BigQueryClient()
   client.initialize_tables()
+
+
+@managed_task
+def bootstrap_load_config_yaml(**kwargs):
+  """Loads config_defaults.yaml into datastore.
+
+  Args:
+    **kwargs: Unused, but required for bootstrap tasks.
+  """
+  del kwargs  # Unused, but comes by default.
+  config_defaults = utils.load_config_from_yaml()
+  for name, value in config_defaults.iteritems():
+    config_model.Config.set(name, value, False)
 
 
 def get_all_bootstrap_functions():

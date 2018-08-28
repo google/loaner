@@ -33,7 +33,6 @@ from loaner.web_app import constants
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import loanertest
 
-
 _config_defaults_yaml = """
 test_config: 'test_value'
 use_asset_tags: True
@@ -55,17 +54,16 @@ def _create_config_parameters():
   integer_config_value = 1
   bool_config_value = True
   list_config_value = ['email1', 'email2']
-  config_ids = [
-      'string_config', 'integer_config', 'bool_config', 'list_config']
+  config_ids = ['string_config', 'integer_config', 'bool_config', 'list_config']
   config_values = [
-      string_config_value,
-      integer_config_value, bool_config_value, list_config_value]
+      string_config_value, integer_config_value, bool_config_value,
+      list_config_value
+  ]
   for i in itertools.izip(config_ids, config_values):
     yield [i]
 
 
-class ConfigurationTest(
-    parameterized.TestCase, loanertest.TestCase):
+class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
 
   def setUp(self):
     super(ConfigurationTest, self).setUp()
@@ -82,12 +80,10 @@ class ConfigurationTest(
     config_file = constants.CONFIG_DEFAULTS_PATH
     self.fs.CreateFile(config_file, contents=_config_defaults_yaml)
 
-    config_model.Config(
-        id='string_config', string_value='config value 1').put()
+    config_model.Config(id='string_config', string_value='config value 1').put()
     config_model.Config(id='integer_config', integer_value=1).put()
     config_model.Config(id='bool_config', bool_value=True).put()
-    config_model.Config(
-        id='list_config', list_value=['email1', 'email2']).put()
+    config_model.Config(id='list_config', list_value=['email1', 'email2']).put()
 
   def tearDown(self):
     super(ConfigurationTest, self).tearDown()
@@ -108,8 +104,7 @@ class ConfigurationTest(
     config_memcache = config_model.Config.get(config)
 
     self.assertEqual(config_memcache, config_value)
-    self.assertEqual(
-        reference_datastore_config.string_value, 'config value 1')
+    self.assertEqual(reference_datastore_config.string_value, 'config value 1')
 
   def test_get_from_default(self):
     config = 'test_config'
@@ -121,8 +116,8 @@ class ConfigurationTest(
   def test_get_identifier_with_use_asset(self):
     config_model.Config.set('use_asset_tags', True)
     config_datastore = config_model.Config.get('device_identifier_mode')
-    self.assertEqual(
-        config_datastore, config_model.DeviceIdentifierMode.BOTH_REQUIRED)
+    self.assertEqual(config_datastore,
+                     config_model.DeviceIdentifierMode.BOTH_REQUIRED)
 
   def test_get_identifier_without_use_asset(self):
     config_datastore = config_model.Config.get('device_identifier_mode')
@@ -142,8 +137,16 @@ class ConfigurationTest(
     self.assertEqual(config, test_config[1])
 
   def test_set_nonexistent(self):
-    with self.assertRaisesRegexp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
+    with self.assertRaisesRegexp(KeyError,
+                                 config_model._CONFIG_NOT_FOUND_MSG % 'fake'):
       config_model.Config.set('fake', 'does_not_exist')
+
+  def test_set_no_validation(self):
+    fake_key = 'fake_int'
+    fake_value = 23
+    config_model.Config.set(fake_key, fake_value, False)
+    result = config_model.Config.get(fake_key)
+    self.assertEqual(result, fake_value)
 
 
 if __name__ == '__main__':

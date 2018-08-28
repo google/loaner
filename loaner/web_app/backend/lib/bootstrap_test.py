@@ -68,7 +68,7 @@ class BootstrapTest(loanertest.TestCase):
         'bootstrap_started'))
     run_status_dict = bootstrap.run_bootstrap()
     self.assertDictEqual(run_status_dict, bootstrap._TASK_DESCRIPTIONS)
-    self.assertEqual(len(mock_defer.mock_calls), 3)
+    self.assertEqual(len(mock_defer.mock_calls), 4)
     self.assertTrue(config_model.Config.get(
         'bootstrap_started'))
 
@@ -152,6 +152,12 @@ class BootstrapTest(loanertest.TestCase):
     mock_clientclass.return_value = mock_client
     bootstrap.bootstrap_bq_history()
     mock_client.initialize_tables.assert_called()
+
+  def test_bootstrap_load_config_yaml(self):
+    """Tests if config_defaults.yaml is loaded into datastore."""
+    bootstrap.bootstrap_load_config_yaml()
+    config_value = config_model.Config.get_by_id('allow_guest_mode')
+    self.assertTrue(config_value.bool_value)
 
   def test_is_bootstrap_completed(self):
     """Tests is_bootstrap_completed under myriad circumstances."""

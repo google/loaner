@@ -53,7 +53,7 @@ class Config(ndb.Model):
       name: str, name of config name.
 
     Returns:
-      The config name from memcache, datastore, or config file.
+      The config value from memcache, datastore, or config file.
 
     Raises:
       KeyError: An error occurred when name does not exist.
@@ -89,20 +89,20 @@ class Config(ndb.Model):
     raise KeyError(_CONFIG_NOT_FOUND_MSG, name)
 
   @classmethod
-  def set(cls, name, value):
+  def set(cls, name, value, validate=True):
     """Store values for a config name in memcache and datastore.
 
     Args:
       name: str, name of the config setting.
       value: str, int, bool, list value to set or change config setting.
-
+      validate: bool, checks keys against config_defaults if enabled.
     Raises:
       KeyError: Error raised when name does not exist in config.py file.
     """
-    config_defaults = utils.load_config_from_yaml()
-    if name not in config_defaults:
-      raise KeyError(
-          _CONFIG_NOT_FOUND_MSG, name)
+    if validate:
+      config_defaults = utils.load_config_from_yaml()
+      if name not in config_defaults:
+        raise KeyError(_CONFIG_NOT_FOUND_MSG % name)
 
     if isinstance(value, basestring):
       stored_config = cls.get_or_insert(name)
