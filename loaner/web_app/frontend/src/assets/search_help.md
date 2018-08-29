@@ -7,10 +7,18 @@ Looking for a way to narrow your search to be a bit more specific? Below are dif
 * s: or sn: - Serial number
 * u: or au: - Assigned user
 
-**Example:** u: johndoe
-
+**Examples:**
+```
+a:12345
+sn:1SN23456
+u:johndoe
+```
 #### Shelf search options:
 * l: - Location
 * f: or fn: - Friendly name
 
-**Example:** f: Imaginary Shelf
+**Examples:**
+```
+l:US-NYC
+f:Imaginary Shelf
+```
