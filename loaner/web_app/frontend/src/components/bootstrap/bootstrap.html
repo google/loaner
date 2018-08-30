@@ -72,6 +72,7 @@
       <div class="button-row">
         <button mat-raised-button
                 *ngIf="(!bootstrapTasksFinished) && (!canRetry)"
+                class="beginButton"
                 color="primary"
                 [disabled]="!canBootstrap"
                 (click)="bootstrapApplication()">Begin bootstrap</button>

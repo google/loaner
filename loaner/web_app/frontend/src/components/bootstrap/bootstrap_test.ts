@@ -46,11 +46,22 @@ describe('BootstrapComponent', () => {
     bootstrap = fixture.debugElement.componentInstance;
   }));
 
-  it('should create the Bootstrap', () => {
+  it('creates the bootstrap component', () => {
     expect(bootstrap).toBeDefined();
   });
 
-  it('should show each task after the bootstrap button is clicked', () => {
+  it('calls bootstrap service when the begin button is clicked', () => {
+    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    spyOn(bootstrapService, 'run');
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const beginButton = compiled.querySelector('.beginButton');
+    beginButton.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    expect(bootstrapService.run).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders each task in an expansion panel when bootstrap begins', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
     spyOn(bootstrapService, 'run').and.returnValue(of({
       tasks: [
@@ -59,88 +70,142 @@ describe('BootstrapComponent', () => {
         {name: 'task3'},
       ]
     }));
-    bootstrap.bootstrapApplication();
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.textContent).toContain('task1');
-    expect(compiled.textContent).toContain('task2');
-    expect(compiled.textContent).toContain('task3');
+    const beginButton = compiled.querySelector('.beginButton');
+    beginButton.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    const expansionPanels =
+        Array.from(compiled.querySelectorAll('mat-expansion-panel'));
+    expect(expansionPanels.length).toBe(3);
+    const expansionPanelsAsString =
+        expansionPanels
+            .map(expansionPanel => (expansionPanel as HTMLElement).textContent)
+            .toString();
+    expect(expansionPanelsAsString).toContain('task1');
+    expect(expansionPanelsAsString).toContain('task2');
+    expect(expansionPanelsAsString).toContain('task3');
   });
 
-  it('should mark successful tasks with a checkmark icon', () => {
+  it('marks successful tasks with a checkmark icon', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
+    spyOn(bootstrapService, 'run').and.returnValue(of({
       tasks: [
-        {name: 'task1', success: true, timestamp: (new Date().valueOf())}
+        {name: 'task1', success: true},
+        {name: 'task2', success: false},
+        {name: 'task3'},
       ]
     }));
-    fakeAsync(() => {
-      bootstrap.bootstrapApplication();
-      fixture.detectChanges();
-      const compiled = fixture.debugElement.nativeElement;
-      expect(compiled.textContent).toContain('check');
-    });
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const beginButton = compiled.querySelector('.beginButton');
+    beginButton.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    const successfulTaskExpansionPanel =
+        Array.from(compiled.querySelectorAll('mat-expansion-panel'))
+            .find(
+                expansionPanel => (expansionPanel as HTMLElement)
+                                      .textContent!.includes('task1'));
+    expect(successfulTaskExpansionPanel).toBeDefined();
+    const successfulTaskIcon =
+        (successfulTaskExpansionPanel as HTMLElement).querySelector('mat-icon');
+    expect(successfulTaskIcon).toBeDefined();
+    expect((successfulTaskIcon as HTMLElement).textContent)
+        .toContain('check_circle');
   });
 
-  it('should mark failed task with an error icon', () => {
+  it('marks failed tasks with an alert icon', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
+    spyOn(bootstrapService, 'run').and.returnValue(of({
       tasks: [
-        {name: 'task1', success: false, timestamp: (new Date().valueOf())},
+        {name: 'task1', success: true},
+        {name: 'task2', success: false, timestamp: 1},
+        {name: 'task3'},
       ]
     }));
-    fakeAsync(() => {
-      bootstrap.bootstrapApplication();
-      fixture.detectChanges();
-      const compiled = fixture.debugElement.nativeElement;
-      expect(compiled.textContent).toContain('error');
-    });
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const beginButton = compiled.querySelector('.beginButton');
+    beginButton.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    const failedTaskExpansionPanel =
+        Array.from(compiled.querySelectorAll('mat-expansion-panel'))
+            .find(
+                expansionPanel => (expansionPanel as HTMLElement)
+                                      .textContent!.includes('task2'));
+    expect(failedTaskExpansionPanel).toBeDefined();
+    const failedTaskIcon =
+        (failedTaskExpansionPanel as HTMLElement).querySelector('mat-icon');
+    expect(failedTaskIcon).toBeDefined();
+    expect((failedTaskIcon as HTMLElement).textContent).toContain('error');
   });
 
-  it('should call bootstrap run service once bootstrapApplication is called.',
+  it('marks in-progress tasks with a progress spinner', () => {
+    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    spyOn(bootstrapService, 'run').and.returnValue(of({
+      tasks: [
+        {name: 'task1', success: true},
+        {name: 'task2', success: false, timestamp: 1},
+        {name: 'task3'},
+      ]
+    }));
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const beginButton = compiled.querySelector('.beginButton');
+    beginButton.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    const inProgressTaskExpansionPanel =
+        Array.from(compiled.querySelectorAll('mat-expansion-panel'))
+            .find(
+                expansionPanel => (expansionPanel as HTMLElement)
+                                      .textContent!.includes('task3'));
+    expect(inProgressTaskExpansionPanel).toBeDefined();
+    const inProgressTaskSpinner = (inProgressTaskExpansionPanel as HTMLElement)
+                                      .querySelector('mat-spinner');
+    expect(inProgressTaskSpinner).toBeDefined();
+  });
+
+  it('displays the task description instead of the task name whenever possible',
      () => {
        const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-       spyOn(bootstrapService, 'run');
-       fakeAsync(() => {
-         bootstrap.bootstrapApplication();
-         expect(bootstrapService.run).toHaveBeenCalled();
-       });
+       spyOn(bootstrapService, 'run').and.returnValue(of({
+         tasks: [
+           {name: 'task1', description: 'testing task #1'},
+         ]
+       }));
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const beginButton = compiled.querySelector('.beginButton');
+       (beginButton as HTMLElement).dispatchEvent(new Event('click'));
+       fixture.detectChanges();
+       const taskExpansionPanel = compiled.querySelector('mat-expansion-panel');
+       expect(taskExpansionPanel).toBeDefined();
+       expect(taskExpansionPanel.textContent).not.toContain('task1');
+       expect(taskExpansionPanel.textContent).toContain('testing task #1');
      });
 
-  it('should provide details about failed tasks', () => {
+  it('displays failure information in an expansion panel', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    const failureDetails = 'failure details';
-    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
+    spyOn(bootstrapService, 'run').and.returnValue(of({
       tasks: [
         {
           name: 'task1',
+          description: 'testing task #1',
           success: false,
-          timestamp: (new Date().valueOf()),
-          details: failureDetails
+          details: 'testing task #1 failed'
         },
       ]
     }));
-    fakeAsync(() => {
-      bootstrap.bootstrapApplication();
-      fixture.detectChanges();
-      const compiled = fixture.debugElement.nativeElement;
-      expect(compiled.textContent).toContain(failureDetails);
-    });
-  });
-
-  it('should show the task description when possible', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    const taskDescription = 'Literally describes the task!';
-    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
-      tasks: [
-        {name: 'task1', description: taskDescription},
-      ]
-    }));
-    fakeAsync(() => {
-      bootstrap.bootstrapApplication();
-      fixture.detectChanges();
-      const compiled = fixture.debugElement.nativeElement;
-      expect(compiled.textContent).toContain(taskDescription);
-    });
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const beginButton = compiled.querySelector('.beginButton');
+    beginButton.dispatchEvent(new Event('click'));
+    fixture.detectChanges();
+    const taskExpansionPanel = compiled.querySelector('mat-expansion-panel');
+    const taskExpansionPanelDetails = taskExpansionPanel.querySelector('p');
+    expect(taskExpansionPanel).toBeDefined();
+    expect(taskExpansionPanelDetails).toBeDefined();
+    expect(taskExpansionPanelDetails.textContent)
+        .toContain('testing task #1 failed');
   });
 });
