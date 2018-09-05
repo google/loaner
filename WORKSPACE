@@ -549,3 +549,13 @@ new_http_archive(
         "https://files.pythonhosted.org/packages/4a/85/db5a2df477072b2902b0eb892feb37d88ac635d36245a72a6a69b23b383a/PyYAML-3.12.tar.gz",
     ],
 )
+
+new_http_archive(
+    name = "urwid_archive",
+    build_file = "//third_party:urwid.BUILD",
+    sha256 = "644d3e3900867161a2fc9287a9762753d66bd194754679adb26aede559bcccbc",
+    strip_prefix = "urwid-2.0.1",
+    urls = [
+        "https://files.pythonhosted.org/packages/c7/90/415728875c230fafd13d118512bde3184d810d7bf798a631abc05fac09d0/urwid-2.0.1.tar.gz",
+    ],
+)
