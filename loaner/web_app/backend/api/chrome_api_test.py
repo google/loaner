@@ -81,9 +81,9 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.heartbeat(self.chrome_request)
     self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
-    self.assertEqual(response.is_enrolled, True)
-    self.assertEqual(response.start_assignment, True)
-    assert not self.mock_loan_resumes_if_late.called
+    self.assertTrue(response.is_enrolled)
+    self.assertTrue(response.start_assignment)
+    self.assertFalse(self.mock_loan_resumes_if_late.called)
 
   def test_heartbeat_assigned_device(self):
     """Tests heartbeat processing for an assigned, enrolled device."""
@@ -92,11 +92,11 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.heartbeat(self.chrome_request)
     self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
-    self.assertEqual(response.is_enrolled, True)
-    self.assertEqual(response.start_assignment, True)
+    self.assertTrue(response.is_enrolled)
+    self.assertTrue(response.start_assignment)
     device = device_model.Device.get(chrome_device_id=UNIQUE_ID)
     self.assertEqual(device.assigned_user, loanertest.USER_EMAIL)
-    assert not self.mock_loan_resumes_if_late.called
+    self.assertFalse(self.mock_loan_resumes_if_late.called)
 
   def test_heartbeat_assignment_unchanged(self):
     """Tests heartbeat processing for an unchanged assignment."""
@@ -104,8 +104,8 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.heartbeat(self.chrome_request)
     self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
-    self.assertEqual(response.is_enrolled, True)
-    self.assertEqual(response.start_assignment, False)
+    self.assertTrue(response.is_enrolled)
+    self.assertFalse(response.start_assignment)
     self.mock_loan_resumes_if_late.assert_called_once_with(
         loanertest.USER_EMAIL)
 
@@ -115,11 +115,11 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.heartbeat(self.chrome_request)
     self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
-    self.assertEqual(response.is_enrolled, False)
-    self.assertEqual(response.start_assignment, False)
+    self.assertFalse(response.is_enrolled)
+    self.assertFalse(response.start_assignment)
     device = device_model.Device.get(chrome_device_id=UNIQUE_ID)
-    self.assertEqual(device.assigned_user, None)
-    assert not self.mock_loan_resumes_if_late.called
+    self.assertIsNone(device.assigned_user)
+    self.assertFalse(self.mock_loan_resumes_if_late.called)
 
   def test_heartbeat_unenrolled_device_without_entity(self):
     """Tests heartbeat processing for an unenrolled device with no entity."""
@@ -128,12 +128,12 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.heartbeat(self.chrome_request)
     self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
-    self.assertEqual(response.is_enrolled, False)
-    self.assertEqual(response.start_assignment, False)
+    self.assertFalse(response.is_enrolled)
+    self.assertFalse(response.start_assignment)
 
     device = device_model.Device.get(chrome_device_id=UNIQUE_ID)
     self.assertEqual(device.serial_number, SERIAL_NUMBER)
-    self.assertEqual(device.assigned_user, None)
+    self.assertIsNone(device.assigned_user)
     self.assertTrue(device.last_heartbeat)
 
   def test_heartbeat_nonexistent_device(self):

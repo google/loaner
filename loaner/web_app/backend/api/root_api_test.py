@@ -51,7 +51,7 @@ class RootServiceTest(loanertest.EndpointsTestCase):
     with mock.patch.object(xsrf, 'validate_request') as mock_validate_request:
       mock_validate_request.return_value = True
       self.service.do_something(request)
-      assert mock_validate_request.called
+      self.assertTrue(mock_validate_request.called)
 
       mock_validate_request.return_value = False
       self.assertRaisesRegexp(

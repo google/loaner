@@ -51,7 +51,7 @@ class SearchApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       request = search_messages.SearchMessage(model=test_enum)
       response = self.service.clear(request)
       self.assertIsInstance(response, message_types.VoidMessage)
-      assert index_clear.call_count == 1
+      self.assertEqual(index_clear.call_count, 1)
 
   @parameterized.parameters(
       (device_model.Device, search_messages.SearchIndexEnum.DEVICE),
@@ -63,7 +63,7 @@ class SearchApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       request = search_messages.SearchMessage(model=test_enum)
       response = self.service.reindex(request)
       self.assertIsInstance(response, message_types.VoidMessage)
-      assert reindex.call_count == 1
+      self.assertEqual(reindex.call_count, 1)
 
 
 if __name__ == '__main__':

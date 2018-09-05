@@ -46,7 +46,7 @@ class DatastoreEndpointsTest(loanertest.EndpointsTestCase):
     request = datastore_messages.ImportYamlRequest(yaml='fake_yaml')
 
     self.service.datastore_import(request)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     mock_importyaml.assert_called_once_with('fake_yaml', wipe=False)
     user_model.User.get_user(loanertest.USER_EMAIL).key.delete()
 

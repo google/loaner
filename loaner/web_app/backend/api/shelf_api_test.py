@@ -117,7 +117,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         longitude=12.5, altitude=2.0, responsible_for_audit='precise',
         audit_interval_override=33, audit_notification_enabled=True)
     response = self.service.enroll(request)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_enroll_bad_request(self):
@@ -137,7 +137,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_get_by_location(self, mock_xsrf_token):
     request = shelf_messages.ShelfRequest(location='NYC')
     response = self.service.get(request)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertEqual(self.shelf.location, response.location)
     self.assertEqual(self.shelf.friendly_name, response.friendly_name)
 
@@ -154,7 +154,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         shelf_request=shelf_messages.ShelfRequest(location='NYC'),
         location='NYC-9th')
     response = self.service.update(request)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertEqual(self.shelf.location, 'NYC-9th')
     shelf = shelf_model.Shelf.get(friendly_name='GnG')
     self.assertEqual(shelf.location, 'NYC-9th')
@@ -172,7 +172,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   def test_list_shelves(self, request, response_length, mock_xsrf_token):
     response = self.service.list_shelves(request)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertEqual(response_length, len(response.shelves))
 
   def test_list_shelves_invalid_page_size(self):
@@ -225,7 +225,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         shelf_request=shelf_messages.ShelfRequest(location='NYC'),
         device_identifiers=self.device_identifiers)
     response = self.service.audit(request)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     mock_logging.assert_called()
     for identifier in self.device_identifiers:
       datastore_device = device_model.Device.get(serial_number=identifier)
@@ -266,8 +266,8 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         device_identifiers=[self.device3_key.get().serial_number])
     self.service.audit(request)
     self.assertEqual(self.device3_key.get().shelf, self.shelf.key)
-    self.assertEqual(self.device2_key.get().shelf, None)
-    self.assertEqual(self.device4_key.get().shelf, None)
+    self.assertIsNone(self.device2_key.get().shelf)
+    self.assertIsNone(self.device4_key.get().shelf)
 
   def test_get_shelf_urlsafe_key(self):
     """Test getting a shelf using the urlsafe key."""

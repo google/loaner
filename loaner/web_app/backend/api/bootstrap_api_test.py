@@ -65,7 +65,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
     response = self.service.run(request)
     mock_runbootstrap.assert_called()
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertCountEqual(
         ['task1', 'task2'], [task.name for task in response.tasks])
     self.assertCountEqual(
@@ -109,54 +109,54 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     self.assertTrue(response.enabled)
     self.assertTrue(response.started)
     self.assertTrue(response.completed)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
 
     mock_xsrf_token.reset_mock()
 
-    # enabled False and completed True, so no tasks in response.
+    # Enabled False and completed True, so no tasks in response.
     mock_is_enabled.return_value = False
     mock_is_completed.return_value = True
     response = self.service.get_status(request)
 
     self.assertFalse(response.enabled)
     self.assertTrue(response.completed)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
 
     mock_xsrf_token.reset_mock()
 
-    # enabled True and completed False, so yes tasks in response.
+    # Enabled True and completed False, so yes tasks in response.
     mock_is_enabled.return_value = True
     mock_is_completed.return_value = False
     response = self.service.get_status(request)
 
     self.assertTrue(response.enabled)
     self.assertFalse(response.completed)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
 
     task1_success = [
         task.success for task in response.tasks if task.name == 'task1'][0]
     task2_success = [
         task.success for task in response.tasks if task.name == 'task2'][0]
-    self.assertEqual(task1_success, False)
-    self.assertEqual(task2_success, True)
+    self.assertFalse(task1_success)
+    self.assertTrue(task2_success)
 
     mock_xsrf_token.reset_mock()
 
-    # enabled False and completed False, so yes tasks in response.
+    # Enabled False and completed False, so yes tasks in response.
     mock_is_enabled.return_value = False
     mock_is_completed.return_value = False
     response = self.service.get_status(request)
 
     self.assertFalse(response.enabled)
     self.assertFalse(response.completed)
-    assert mock_xsrf_token.call_count == 1
+    self.assertEqual(mock_xsrf_token.call_count, 1)
 
     task1_success = [
         task.success for task in response.tasks if task.name == 'task1'][0]
     task2_success = [
         task.success for task in response.tasks if task.name == 'task2'][0]
-    self.assertEqual(task1_success, False)
-    self.assertEqual(task2_success, True)
+    self.assertFalse(task1_success)
+    self.assertTrue(task2_success)
 
 
 if __name__ == '__main__':
