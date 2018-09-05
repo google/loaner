@@ -296,32 +296,6 @@ class DirectoryApiClient(object):
           'exception because %s.', str(type(err)), err.resp.reason)
       raise DirectoryRPCError(err.resp.reason)
 
-  def users_in_group(self, group_email, page_token=None):
-    """List the users in a group.
-
-    Args:
-      group_email: String, The email address of the group for whose users to
-        return.
-      page_token: String, The optional page token to query for.
-
-    Returns:
-      A dictionary based on a JSON object of kind admin#directory#members.
-        For reference: https://goo.gl/YXiFq1
-
-    Raises:
-      DirectoryRPCError: An error when the RPC call to the directory API fails.
-    """
-    try:
-      return self._client.members().list(
-          groupKey=group_email,
-          pageToken=page_token,
-          fields=constants.GROUP_MEMBER_FIELDS_MASK).execute()
-    except errors.HttpError as err:
-      logging.error(
-          'Directory API group members failed with a %s exception because %s.',
-          str(type(err)), err.resp.reason)
-      raise DirectoryRPCError(err.resp.reason)
-
   def given_name(self, user_email):
     """Get the given name of a user.
 
@@ -358,7 +332,7 @@ class DirectoryApiClient(object):
       A list of all user's email addresses in the group provided.
     """
     users = []
-    response = self.users_in_group(group_email)
+    response = self._users_in_group(group_email)
     if not response.get(_NEXT_PAGE):
       members = response.get('members')
       if members:
@@ -369,9 +343,35 @@ class DirectoryApiClient(object):
     while response.get(_NEXT_PAGE):
       for member in response['members']:
         users.append(member['email'])
-      response = self.users_in_group(group_email, response.get(_NEXT_PAGE))
+      response = self._users_in_group(group_email, response.get(_NEXT_PAGE))
 
     for member in response['members']:
       users.append(member['email'])
 
     return users
+
+  def _users_in_group(self, group_email, page_token=None):
+    """List the users in a group.
+
+    Args:
+      group_email: String, The email address of the group for whose users to
+        return.
+      page_token: String, The optional page token to query for.
+
+    Returns:
+      A dictionary based on a JSON object of kind admin#directory#members.
+        For reference: https://goo.gl/YXiFq1
+
+    Raises:
+      DirectoryRPCError: An error when the RPC call to the directory API fails.
+    """
+    try:
+      return self._client.members().list(
+          groupKey=group_email,
+          pageToken=page_token,
+          fields=constants.GROUP_MEMBER_FIELDS_MASK).execute()
+    except errors.HttpError as err:
+      logging.error(
+          'Directory API group members failed with a %s exception because %s.',
+          str(type(err)), err.resp.reason)
+      raise DirectoryRPCError(err.resp.reason)

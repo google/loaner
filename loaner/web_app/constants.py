@@ -175,9 +175,7 @@ CHROME_LIST_FIELDS_MASK = (
     ',model,orgUnitPath)')
 GROUP_MEMBER_FIELDS_MASK = 'members/email,nextPageToken'
 USER_NAME_FIELDS_MASK = 'name/givenName'
-ORG_UNIT_FIELDS_MASK = (
-    'blockInheritance,name,orgUnitId,orgUnitPath,parentOrgUnitId,'
-    'parentOrgUnitPath')
+ORG_UNIT_FIELDS_MASK = 'name'
 
 XSRF_TOKEN_TIMEOUT = 8 * 60 * 60 * 10**6  # 8 hours in microsec
 XSRF_ACTION_ID = ''

@@ -350,36 +350,6 @@ class DirectoryClientTest(parameterized.TestCase, loanertest.TestCase):
       directory_client.reenable_chrome_device(self.device_id)
     self.assertEqual(mock_logging.error.call_count, 1)
 
-  def test_users_in_group(self):
-    mock_members = mock.Mock()
-    self.mock_client.members = mock_members
-
-    mock_list = mock.Mock()
-    mock_members.return_value.list = mock_list
-
-    mock_execute = mock.Mock()
-    fake_members = {'members': [], 'nextPageToken': 'pageToken'}
-    mock_execute.return_value = fake_members
-    mock_list.return_value.execute = mock_execute
-
-    directory_client = directory.DirectoryApiClient(user_email=self.user_email)
-    self.assertEqual(
-        fake_members, directory_client.users_in_group(self.group_key))
-
-  @mock.patch.object(directory, 'logging', autospec=True)
-  def test_users_in_group_url_error(self, mock_logging):
-
-    def raise_error():
-      raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
-
-    self.mock_client.members.side_effect = raise_error
-
-    with self.assertRaises(directory.DirectoryRPCError):
-      directory_client = directory.DirectoryApiClient(
-          user_email=self.user_email)
-      directory_client.users_in_group(self.group_key)
-    self.assertEqual(mock_logging.error.call_count, 1)
-
   def test_user_name(self):
     mock_users = mock.Mock()
     self.mock_client.users = mock_users
@@ -444,11 +414,41 @@ class DirectoryClientTest(parameterized.TestCase, loanertest.TestCase):
   def test_get_all_users_in_group(self, returns, expected_result):
     test_client = directory.DirectoryApiClient(loanertest.USER_EMAIL)
     with mock.patch.object(
-        test_client, 'users_in_group') as mock_users_in_group:
+        test_client, '_users_in_group') as mock_users_in_group:
       mock_users_in_group.side_effect = returns
       actual_result = test_client.get_all_users_in_group(
           'users@{}'.format(loanertest.USER_DOMAIN))
       self.assertEqual(expected_result, actual_result)
+
+  def test_users_in_group(self):
+    mock_members = mock.Mock()
+    self.mock_client.members = mock_members
+
+    mock_list = mock.Mock()
+    mock_members.return_value.list = mock_list
+
+    mock_execute = mock.Mock()
+    fake_members = {'members': [], 'nextPageToken': 'pageToken'}
+    mock_execute.return_value = fake_members
+    mock_list.return_value.execute = mock_execute
+
+    directory_client = directory.DirectoryApiClient(user_email=self.user_email)
+    self.assertEqual(
+        fake_members, directory_client._users_in_group(self.group_key))
+
+  @mock.patch.object(directory, 'logging', autospec=True)
+  def test_users_in_group_url_error(self, mock_logging):
+
+    def raise_error():
+      raise errors.HttpError(FakeResponse('Does not exist', 400), 'NOT USED.')
+
+    self.mock_client.members.side_effect = raise_error
+
+    with self.assertRaises(directory.DirectoryRPCError):
+      directory_client = directory.DirectoryApiClient(
+          user_email=self.user_email)
+      directory_client._users_in_group(self.group_key)
+    self.assertEqual(mock_logging.error.call_count, 1)
 
 
 if __name__ == '__main__':
