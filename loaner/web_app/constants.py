@@ -168,16 +168,14 @@ ORG_UNIT_DICT = {
     'GUEST': PARENT_ORG_UNIT + '/Guest Enabled',
 }
 
-CHROME_FIELDS_MASK = (
-    'deviceId,serialNumber,status,lastSync,annotatedAssetId,model,orgUnitPath')
+CHROME_FIELDS_MASK = 'deviceId,serialNumber,model,orgUnitPath'
 CHROME_LIST_FIELDS_MASK = (
-    'chromeosdevices(deviceId,serialNumber,status,lastSync,annotatedAssetId'
-    ',model,orgUnitPath)')
+    'chromeosdevices(deviceId,serialNumber,model,orgUnitPath)')
 GROUP_MEMBER_FIELDS_MASK = 'members/email,nextPageToken'
 USER_NAME_FIELDS_MASK = 'name/givenName'
 ORG_UNIT_FIELDS_MASK = 'name'
 
-XSRF_TOKEN_TIMEOUT = 8 * 60 * 60 * 10**6  # 8 hours in microsec
+XSRF_TOKEN_TIMEOUT = 8 * 60 * 60 * 10**6  # 8 hours in microseconds.
 XSRF_ACTION_ID = ''
 XSRF_HEADER = 'X-XSRF-TOKEN'
 XSRF_COOKIE_NAME = 'XSRF-TOKEN'
