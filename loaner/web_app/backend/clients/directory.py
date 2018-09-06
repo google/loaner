@@ -18,8 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+
 import httplib
-from absl import logging
+import logging
 
 # pylint: disable=unused-import,g-bad-import-order,g-import-not-at-top
 from loaner.web_app.backend.common import google_cloud_lib_fixer
@@ -231,10 +232,11 @@ class DirectoryApiClient(object):
     Raises:
       DirectoryRPCError: An error when the RPC call to the directory API fails.
     """
-    logging.info('Moving device %s to OU %s.', device_id, org_unit_path)
     # This is here to catch false device ids. The moveDevicesToOu does not fail
     # for devices that do not exist in this organization.
     self.get_chrome_device(device_id)
+    logging.info(
+        'Moving device with device ID %r to OU %r.', device_id, org_unit_path)
     try:
       self._client.chromeosdevices().moveDevicesToOu(
           customerId=constants.MY_CUSTOMER,

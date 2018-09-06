@@ -25,7 +25,6 @@ loaner_appengine_library(
         ":bootstrap",
         ":datastore_yaml",
         ":events",
-        ":group_service",
         ":send_email",
         ":user",
         ":utils",
@@ -105,17 +104,6 @@ loaner_appengine_library(
 )
 
 loaner_appengine_library(
-    name = "group_service",
-    srcs = [
-        "group_service.py",
-    ],
-    deps = [
-        "//loaner/web_app:constants",
-        "//loaner/web_app/backend/clients:directory",
-    ],
-)
-
-loaner_appengine_library(
     name = "search_utils",
     srcs = [
         "search_utils.py",
@@ -145,8 +133,8 @@ loaner_appengine_library(
         "sync_users.py",
     ],
     deps = [
-        ":group_service",
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/models:user_model",
         "@absl_archive//absl/logging",
     ],
@@ -310,9 +298,9 @@ loaner_appengine_test(
         "sync_users_test.py",
     ],
     deps = [
-        ":group_service",
         ":sync_users",
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/models:user_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@mock_archive//:mock",

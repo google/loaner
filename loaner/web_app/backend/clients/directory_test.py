@@ -23,7 +23,6 @@ from absl.testing import parameterized
 from googleapiclient import errors
 import mock
 
-
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.testing import loanertest
 
@@ -276,7 +275,6 @@ class DirectoryClientTest(parameterized.TestCase, loanertest.TestCase):
       directory_client.move_chrome_device_org_unit(
           self.device_id, self.org_unit_path)
     self.assertEqual(mock_logging.error.call_count, 1)
-
 
   @mock.patch.object(directory, 'logging', autospec=True)
   def test_disable_chrome_device(self, mock_logging):

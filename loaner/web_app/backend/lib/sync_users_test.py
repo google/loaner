@@ -21,7 +21,7 @@ from __future__ import print_function
 import mock
 
 from loaner.web_app import constants
-from loaner.web_app.backend.lib import group_service
+from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import sync_users
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
@@ -35,10 +35,10 @@ class SyncUsersTest(loanertest.EndpointsTestCase):
         name='technician',
         associated_group='technicians@{}'.format(loanertest.USER_DOMAIN))
 
-    mock_group_service = mock.patch.object(
-        group_service, 'get_users_for_group', autospec=True)
-    self.addCleanup(mock_group_service.stop)
-    mock_users_for_group = mock_group_service.start()
+    patcher = mock.patch.object(directory, 'DirectoryApiClient')
+    mock_directory = patcher.start()
+    self.addCleanup(patcher.stop)
+    mock_users_for_group = mock_directory.return_value.get_all_users_in_group
 
     def group_client_side_effect(*args, **kwargs):  # pylint: disable=unused-argument
       if args[0] == constants.SUPERADMINS_GROUP:

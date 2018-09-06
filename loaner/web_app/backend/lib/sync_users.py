@@ -23,7 +23,7 @@ from absl import logging
 from google.appengine.ext import ndb
 
 from loaner.web_app import constants
-from loaner.web_app.backend.lib import group_service
+from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.models import user_model
 
 
@@ -31,15 +31,15 @@ def sync_user_roles():
   """Syncs all of the elevated user roles for each user in Google groups."""
   logging.info('Syncing user roles.')
 
-  superadmins_from_group = group_service.get_users_for_group(
+  client = directory.DirectoryApiClient(constants.ADMIN_USERNAME)
+  superadmins_from_group = client.get_all_users_in_group(
       constants.SUPERADMINS_GROUP)
   _add_or_remove_user_roles(superadmins_from_group, 'superadmin')
 
   all_roles = user_model.Role.query().fetch()
   for role in all_roles:
     if role.associated_group:
-      users_from_group = group_service.get_users_for_group(
-          role.associated_group)
+      users_from_group = client.get_all_users_in_group(role.associated_group)
       _add_or_remove_user_roles(users_from_group, role.name)
 
 
