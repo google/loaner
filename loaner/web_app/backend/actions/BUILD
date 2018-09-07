@@ -117,7 +117,6 @@ loaner_appengine_test(
         "lock_device_test.py",
     ],
     deps = [
-        "//loaner/web_app:constants",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@mock_archive//:mock",

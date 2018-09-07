@@ -36,6 +36,7 @@ from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import user_model
 
+
 DEVICE_NOT_ENROLLED_MSG = 'Device %s is not enrolled in the application.'
 _GUEST_MODE_DISABLED_MSG = (
     'Cannot enable Guest mode because the administrator has disabled it.')

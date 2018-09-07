@@ -20,7 +20,6 @@ from __future__ import print_function
 
 import mock
 
-from loaner.web_app import constants
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -43,7 +42,7 @@ class LockDeviceTest(loanertest.ActionTestCase):
         next_reminder=device_model.Reminder(level=0))
 
     self.action.run(device=device)
-    mock_lock.assert_called_with(constants.ADMIN_USERNAME)
+    self.assertEqual(mock_lock.call_count, 1)
 
 
 if __name__ == '__main__':

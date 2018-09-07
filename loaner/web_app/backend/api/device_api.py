@@ -37,6 +37,7 @@ from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import user_model
 
+
 _NO_DEVICE_MSG = (
     'Device could not be found using device_identifier "%s".')
 _NO_IDENTIFIERS_MSG = 'No identifier supplied to find device.'

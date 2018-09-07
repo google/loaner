@@ -235,6 +235,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":event_models",
+        "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/logging",
     ],

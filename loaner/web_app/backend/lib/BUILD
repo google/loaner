@@ -158,9 +158,7 @@ loaner_appengine_library(
     data = [
         "//loaner/web_app:config_defaults_yaml",
     ],
-    deps = [
-        "//loaner/web_app:constants",
-    ],
+    deps = ["//loaner/web_app:constants"],
 )
 
 loaner_appengine_library(
@@ -200,6 +198,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":api_utils",
+        "//loaner/web_app:constants",
         "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
         "//loaner/web_app/backend/models:device_model",
