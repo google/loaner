@@ -11,6 +11,8 @@ branch. While we try to keep the master branch working we consider it
 project.
 
 ## [Alpha 0.7](https://github.com/google/loaner/tree/Alpha-(0.7))
+Released:
+
 Warning: This is a breaking change. If you are running earlier versions of the
 app you will need to take the following steps after upgrading for the app to
 continue functioning correctly.
@@ -25,6 +27,25 @@ continue functioning correctly.
    NOTE: Make sure the key fits on a single line.
 1. Save the file and follow the [Deploy to the Chrome Web Store](deploy_chrome_app.md)
    steps to update the application.
+
+#### Features added
+* Added configuration view so that configurations can be dynamically updated
+  without redeploying the app.
+* Settings are now loaded into datastore by default during bootstrap.
+* Animations and additional assets have been added.
+* Adds limited support for multiple domains as long as they're controlled by the
+  same G Suite account. This feature is still considered unstable. See the
+  "Multi-domain Support" section of the [Setup Guide](setup_guide.md)
+  for more information.
+
+#### Known issues
+* You must manually [create the GSuite Chrome organizational units](gsuite_config.md)
+  as the app cannot yet create them.
+* There may be additional incompatibilities with older versions of this app. If
+  you experience any problems please use GitHub's issue tracker.
+* If you are constantly redirected to the bootstrap screen you may need to go
+  into Datastore and select "Config" in the dropdown menu and set
+  bootstrap_completed to true.
 
 ## [Alpha 0.6a](https://github.com/google/loaner/tree/Alpha-(0.6))
 Released 06/08/18

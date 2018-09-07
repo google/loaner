@@ -24,7 +24,7 @@ The program is comprised of three parts:
 *   A Google App Engine (GAE) application
 *   A Chrome App that runs on each Chrome OS device
 
-## Current release: [Alpha (v0.6a)](https://github.com/google/loaner/tree/Alpha-(0.6))
+## Current release: [Alpha (v0.7a)](https://github.com/google/loaner/tree/Alpha-(0.7))
 
 Please note that the current release of this application is in ALPHA.
 We will be actively contributing to the project. Please keep an eye out for
@@ -33,7 +33,7 @@ future updates and features!
 To clone this release run the following command:
 
 ```
-git clone -b Alpha-\(0.6\) https://github.com/google/loaner.git
+git clone -b Alpha-\(0.7\) https://github.com/google/loaner.git
 cd loaner
 ```
 
@@ -44,9 +44,9 @@ cd loaner
 ## Technical Stack
 
 *   Chrome App
-    -   Angular/Typescript
+    -   Angular/TypeScript
 *   Frontend
-    -   Angular/Typescript
+    -   Angular/TypeScript
 *   Backend
     -   Python
     -   GAE

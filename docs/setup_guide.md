@@ -40,7 +40,7 @@ configure a Google Cloud Platform project:
         requires that you [create an OAuth2 Client ID within your App Engine
         Project](https://cloud.google.com/endpoints/docs/frameworks/python/creating-client-ids#Creating_OAuth_20_client_IDs).
         When prompted, make sure to select **Web App**. For the Authorized
-        Javascript Origins URL, your App Engine project URL will be your GCP
+        JavaScript Origins URL, your App Engine project URL will be your GCP
         project ID followed by appspot.com. For example, if your GCP project ID
         is "example-123456" then the default URL will be
         https://example-123456.appspot.com. You can also [configure App Engine
@@ -48,7 +48,7 @@ configure a Google Cloud Platform project:
         domain](https://cloud.google.com/appengine/docs/standard/python/mapping-custom-domains).
 
         **NOTE**: Make sure to add your App Engine project URL to Authorized
-        Javascript Origins. Otherwise, the app will fail to authenticate.
+        JavaScript Origins. Otherwise, the app will fail to authenticate.
         Changing this setting has a propagation delay, so if you are getting
         origin errors you will need to set this and then wait a few minutes.
 
@@ -224,6 +224,9 @@ Before you deploy GnG, the following constants must be configured:
 +   **`APP_DOMAIN`** is the Google domain in which you run G Suite with Chrome
     Enterprise. For example, if you arrange G Suite for the domain
     `mycompany.com` use that domain name in this string constant.
+
+    Note: If you'd like to run this program on more than one domain, please see
+    the "Multi-domain Support" section at the bottom of this doc.
 
 +   **`ON_PROD`** is the Google Cloud Project ID the production version of GnG
     will run in. You need to replace the string 'prod-app-engine-project' with
@@ -495,15 +498,42 @@ accidentally overwrite your configuration.
 
 **Note**: The bootstrap process may take a few minutes to complete.
 
-### Create an Authorized Email Sender
+#### Create an Authorized Email Sender
 
 You need to configure an authorized email sender that GnG emails will be sent
 from, e.g. loaner@example.com. To do that, add an [Email API Authorized
 Senders](https://console.cloud.google.com/appengine/settings) in the GCP
 Console.
 
-## Deploy the Chrome App
+#### Deploy the Chrome App
 After bootstrapping is complete, you will need to set up the GnG Chrome App.
 This app helps configure the Chromebooks you will be using as loaners and
 provides the bulk of the user-facing experience. Continue on to [deploying the
 chrome app](deploy_chrome_app.md).
+
+#### Multi-domain Support (Optional).
+
+WARNING: This functionality is considered unstable. Use with caution and report
+any bugs using GitHub's issue tracker.
+
+If you want to support more than one managed domain on loaner devices please
+follow the steps below. Please note, the domains you want to support must be
+part of the same G Suite account and added to admin.google.com via
+Account > Domains > Add/Remove Domains. Different domains managed by different
+G Suite accounts and public Gmail addresses are not supported.
+
++  The domains you want to support must be added to the App Engine project from
+   console.cloud.google.com via App Engine > Settings > Custom Domains.
++  In App Engine > Settings > Application settings "Referrers" must be set to
+   Google Accounts API.
+   WARNING: Setting this allows any Google managed account to try and sign into
+   the app. Make sure you have the latest version of the code deployed or you
+   could be exposing the app publicly.
++  In the application's code in web_app/constants.py the variable APP_DOMAIN
+   should be a list of all the domains you plan on supporting.
++  Go to admin.google.com and in Devices > Chrome Management > Device Settings
+   find the Grab n Go parent OU and set Sign-in Restriction to the list of
+   domains you're supporting. Optionally, you may also want to switch off the
+   Autocomplete Domain option as it may cause some confusion (it's not very
+   intuitive that you can override the sign-in screen by typing your full email
+   address).
