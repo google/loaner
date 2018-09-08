@@ -135,17 +135,6 @@ class Reminder(base_model.BaseModel):
   count = ndb.IntegerProperty()
 
 
-class TagData(base_model.BaseModel):
-  """Datastore model representing a tag reference and its informational field.
-
-  Attributes:
-    tag_key: ndb.Key, a reference to a Tag entity.
-    more_info: str, an informational field about this particular tag reference.
-  """
-  tag_key = ndb.KeyProperty(kind='Tag')
-  more_info = ndb.StringProperty()
-
-
 def validate_assignee_or_admin(method):
   """Decorator that validates if the assignee or an admin is calling method.
 
@@ -201,7 +190,6 @@ class Device(base_model.BaseModel):
     last_reminder: Reminder, Level, time, and count of the last reminder
         the device had.
     next_reminder: Reminder, Level, time, and count of the next reminder.
-    tags: TagData, The tags associated with the device.
   """
   serial_number = ndb.StringProperty()
   asset_tag = ndb.StringProperty()
@@ -223,7 +211,6 @@ class Device(base_model.BaseModel):
   damaged_reason = ndb.StringProperty()
   last_reminder = ndb.StructuredProperty(Reminder)
   next_reminder = ndb.StructuredProperty(Reminder)
-  tags = ndb.StructuredProperty(TagData, repeated=True)
 
   _INDEX_NAME = constants.DEVICE_INDEX_NAME
   _SEARCH_PARAMETERS = {
