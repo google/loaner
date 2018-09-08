@@ -87,13 +87,6 @@ loaner_appengine_library(
 )
 
 loaner_appengine_library(
-    name = "tag_messages",
-    srcs = [
-        "tag_messages.py",
-    ],
-)
-
-loaner_appengine_library(
     name = "user_messages",
     srcs = [
         "user_messages.py",

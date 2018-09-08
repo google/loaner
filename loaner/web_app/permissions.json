@@ -14,6 +14,5 @@
   "MODIFY_ROLE": "modify_role",
   "MODIFY_SHELF": "modify_shelf",
   "MODIFY_SURVEY": "modify_survey",
-  "MODIFY_TAG": "modify_tag",
   "REINDEX_SEARCH": "reindex_search"
 }

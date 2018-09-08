@@ -28,7 +28,6 @@ from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import search_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import shelf_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import survey_api  # pylint: disable=unused-import
-from loaner.web_app.backend.api import tag_api  # pylint: disable=unused-import
 from loaner.web_app.backend.api import user_api  # pylint: disable=unused-import
 
 ENDPOINTS_API = endpoints.api_server([root_api.ROOT_API])

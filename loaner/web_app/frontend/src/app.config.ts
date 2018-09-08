@@ -30,7 +30,6 @@ export interface Permissions {
   MODIFY_ROLE: string;
   MODIFY_SHELF: string;
   MODIFY_SURVEY: string;
-  MODIFY_TAG: string;
   REINDEX_SEARCH: string;
 }
 
@@ -56,7 +55,6 @@ export const APPLICATION_PERMISSIONS: Permissions = {
   MODIFY_ROLE: 'modify_role',
   MODIFY_SHELF: 'modify_shelf',
   MODIFY_SURVEY: 'modify_survey',
-  MODIFY_TAG: 'modify_tag',
   REINDEX_SEARCH: 'reindex_search',
 };
 
