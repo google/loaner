@@ -40,7 +40,7 @@ class SearchApi(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.CLEAR_INDICES)
   def clear(self, request):
-    """Clear a search index for the given type."""
+    """Clears a search index for the given type."""
     if request.model == search_messages.SearchIndexEnum.DEVICE:
       device_model.Device.clear_index()
     elif request.model == search_messages.SearchIndexEnum.SHELF:
@@ -55,7 +55,7 @@ class SearchApi(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.REINDEX_SEARCH)
   def reindex(self, request):
-    """Reindex a search index for the given type."""
+    """Reindexes a search index for the given type."""
     if request.model == search_messages.SearchIndexEnum.DEVICE:
       device_model.Device.index_entities_for_search()
     elif request.model == search_messages.SearchIndexEnum.SHELF:

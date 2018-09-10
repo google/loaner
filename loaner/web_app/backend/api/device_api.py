@@ -100,7 +100,7 @@ class DeviceApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.ADMINISTRATE_LOAN)
   def unlock(self, request):
-    """Unlocks a device is locked or has been marked as lost."""
+    """Unlocks a device if it is locked or has been marked as lost."""
     self.check_xsrf_token(self.request_state)
     device = _get_device(request)
     user_email = user_lib.get_user_email()

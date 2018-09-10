@@ -55,8 +55,8 @@ class Shelf(messages.Message):
     responsible_for_audit: str, The party responsible for audits.
     last_audit_time: datetime,  Indicates the last audit time.
     last_audit_by: str, Indicates the last user to audit the shelf.
-    page_size: int, the number of results to query for and display.
-    page_number: int, the page index to offset the results.
+    page_size: int, The number of results to query for and display.
+    page_number: int, The page index to offset the results.
     shelf_request: ShelfRequest, A message containing the unique identifier to
         be used to retrieve the shelf.
     query: shared_message.SearchRequest, a message containing query options to
@@ -142,9 +142,9 @@ class ListShelfResponse(messages.Message):
   """List Shelf Response ProtoRPC message.
 
   Attributes:
-    shelves: Shelf, The list of shelves being returned.
-    total_results: int, the total number of results for a query.
-    total_pages: int, the total number of pages needed to display all of the
+    shelves: List[Shelf], The list of shelves being returned.
+    total_results: int, The total number of results for a query.
+    total_pages: int, The total number of pages needed to display all of the
         results.
   """
   shelves = messages.MessageField(Shelf, 1, repeated=True)
@@ -158,7 +158,7 @@ class ShelfAuditRequest(messages.Message):
   Attributes:
     shelf_request: ShelfRequest, A message containing the unique identifier to
         be used to retrieve the shelf.
-    device_identifiers: list, A list of device serial numbers to perform a
+    device_identifiers: List[str], A list of device serial numbers to perform a
         device audit on.
   """
   shelf_request = messages.MessageField(ShelfRequest, 1)

@@ -124,10 +124,10 @@ def _check_auth(permission):
 
 
 def _forbid_non_domain_users(user_email):
-  """Check to make sure that the user is a domain user.
+  """Checks to make sure that the user is a domain user.
 
   Args:
-    user_email: String, the user email.
+    user_email: str, the user email.
 
   Raises:
     UnauthorizedException: An error will occur when user is not from app domain.

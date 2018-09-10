@@ -134,7 +134,7 @@ class CustomEventTest(loanertest.TestCase):
 
   def test_create_and_get_all(self):
     self.setup_events()
-    self.assertEqual(len(event_models.CustomEvent.get_all_enabled()), 3)
+    self.assertLen(event_models.CustomEvent.get_all_enabled(), 3)
 
   def test_invalid_model(self):
     """Tests that Custom Events can only apply to Device and Shelf models."""
@@ -162,8 +162,8 @@ class CustomEventTest(loanertest.TestCase):
     query_components1 = self.device_event._build_query_components()
     self.assertEqual(query_components1['less_than_properties'], ['due_date'])
     self.assertEqual(query_components1['extra_inequality_conditions'], [])
-    self.assertEqual(
-        len(query_components1['query'].filters._ConjunctionNode__nodes), 3)
+    self.assertLen(
+        query_components1['query'].filters._ConjunctionNode__nodes, 3)
 
     # Add another inequality filter that uses <. Propery name hould be added to
     # less_than_properties, condition should be added to
@@ -179,8 +179,8 @@ class CustomEventTest(loanertest.TestCase):
     self.assertEqual(
         query_components2['extra_inequality_conditions'],
         [self.device_event.conditions[3]])
-    self.assertEqual(
-        len(query_components2['query'].filters._ConjunctionNode__nodes), 3)
+    self.assertLen(
+        query_components2['query'].filters._ConjunctionNode__nodes, 3)
 
   @mock.patch.object(ndb, 'Query', autospec=True)
   @mock.patch.object(logging, 'error', autospec=True)

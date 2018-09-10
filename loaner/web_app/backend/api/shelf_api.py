@@ -56,7 +56,7 @@ class ShelfApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_SHELF)
   def enroll(self, request):
-    """Enroll request for the Shelf API."""
+    """Enrolls a shelf in the program."""
     user_email = user.get_user_email()
     self.check_xsrf_token(self.request_state)
     try:
@@ -85,7 +85,7 @@ class ShelfApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.READ_SHELVES)
   def get(self, request):
-    """Get a shelf based on location."""
+    """Gets a shelf based on location."""
     self.check_xsrf_token(self.request_state)
     return api_utils.build_shelf_message_from_model(get_shelf(request))
 
@@ -97,7 +97,7 @@ class ShelfApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_SHELF)
   def disable(self, request):
-    """Disable a shelf by its location."""
+    """Disables a shelf by its location."""
     self.check_xsrf_token(self.request_state)
     user_email = user.get_user_email()
     shelf = get_shelf(request)
@@ -113,7 +113,7 @@ class ShelfApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_SHELF)
   def update(self, request):
-    """Get a shelf using location to update its properties."""
+    """Gets a shelf using location to update its properties."""
     self.check_xsrf_token(self.request_state)
     user_email = user.get_user_email()
     shelf = get_shelf(request.shelf_request)
@@ -129,7 +129,7 @@ class ShelfApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.READ_SHELVES)
   def list_shelves(self, request):
-    """List enabled or all shelves based on any shelf attribute."""
+    """Lists enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)
     if request.page_size <= 0:
       raise endpoints.BadRequestException(

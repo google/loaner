@@ -48,7 +48,7 @@ class SurveyApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_SURVEY)
   def create(self, request):
-    """Create a new survey question and insert instance into datastore."""
+    """Creates a new survey question and insert instance into datastore."""
     self.check_xsrf_token(self.request_state)
     if len(request.answers) < 1:
       raise endpoints.BadRequestException(_NOT_ENOUGH_ANSWERS_MSG)
@@ -79,7 +79,7 @@ class SurveyApi(root_api.Service):
       path='request',
       http_method='GET')
   def request(self, request):
-    """Request a survey by type and present that survey to a Chrome App user."""
+    """Requests a survey by type and shows that survey to a Chrome App user."""
     question = survey_models.Question.get_random(
         request.question_type)
     if not question:
@@ -94,7 +94,7 @@ class SurveyApi(root_api.Service):
       path='submit',
       http_method='POST')
   def submit(self, request):
-    """Submit a response to a survey question."""
+    """Submits a response to a survey question."""
     user_email = user_lib.get_user_email()
     question = api_utils.get_ndb_key(
         urlsafe_key=request.question_urlsafe_key).get()
@@ -112,7 +112,7 @@ class SurveyApi(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.READ_SURVEYS)
   def list(self, request):
-    """List survey questions."""
+    """Lists survey questions."""
     cursor = None
     if request.page_token:
       cursor = api_utils.get_datastore_cursor(urlsafe_cursor=request.page_token)
@@ -140,7 +140,7 @@ class SurveyApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_SURVEY)
   def patch(self, request):
-    """Patch a given survey question."""
+    """Patches a given survey question."""
     self.check_xsrf_token(self.request_state)
     question = api_utils.get_ndb_key(
         urlsafe_key=request.question_urlsafe_key).get()

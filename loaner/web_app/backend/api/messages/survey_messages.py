@@ -88,9 +88,9 @@ class QuestionList(messages.Message):
   """QuestionList ProtoRPC Message.
 
   Attributes:
-    surveys: List of Survey, The list of surveys to return.
-    page_token: String, The urlsafe representation of the page token.
-    more: Boolean, Whether or not there are more results to be queried.
+    questions: List[Question], The list of questions to return.
+    page_token: str, The urlsafe representation of the page token.
+    more: bool, Whether or not there are more results to be queried.
   """
   questions = messages.MessageField(Question, 1, repeated=True)
   page_token = messages.StringField(2)
@@ -112,10 +112,10 @@ class QuestionSubmission(messages.Message):
   """QuestionSubmission ProtoRPC Message.
 
   Attributes:
-    question_urlsafe_key: String, The urlsafe ndb.Key for a
+    question_urlsafe_key: str, The urlsafe ndb.Key for a
         survey_models.Survey instace.
-    selected_answer: Answer message representing the answer a user selected.
-    more_info_text: String, the extra info optionally provided for the given
+    selected_answer: Answer, The answer a user selected.
+    more_info_text: str, the extra info optionally provided for the given
         Answer.
   """
   question_urlsafe_key = messages.StringField(1, required=True)
@@ -129,10 +129,10 @@ class ListQuestionsRequest(messages.Message):
   Attributes:
     question_type: survey_models.QuestionType, The type of survey
         to list.
-    enabled: Boolean, True for only enabled surveys, False to view disabled
+    enabled: bool, True for only enabled surveys, False to view disabled
         surveys.
-    page_size: Integer, The size of the page to return.
-    page_token: String, The urlsafe representation of the page token.
+    page_size: int, The size of the page to return.
+    page_token: str, The urlsafe representation of the page token.
   """
   question_type = messages.EnumField(
       survey_models.QuestionType, 1, required=True)

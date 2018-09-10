@@ -160,7 +160,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
 
   @classmethod
   def clear_index(cls):
-    """Clear the index of all documents."""
+    """Clears the index of all documents."""
     index = cls.get_index()
     try:
       while True:
@@ -315,7 +315,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
 
 
 def _sanitize_dict(entity_dict):
-  """Sanitize select values of an entity-derived dictionary."""
+  """Sanitizes select values of an entity-derived dictionary."""
   for key, value in entity_dict.iteritems():
     if isinstance(value, dict):
       entity_dict[key] = _sanitize_dict(value)

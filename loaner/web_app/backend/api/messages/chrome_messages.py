@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Chrome messages."""
+"""Chrome messages for Chrome API."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -35,7 +35,7 @@ class HeartbeatResponse(messages.Message):
 
   Attributes:
     is_enrolled: bool, Determine if the device is enrolled.
-    start_assignment: bool, Determine if assignmenet workflow should be started.
+    start_assignment: bool, Determine if assignment workflow should be started.
   """
   is_enrolled = messages.BooleanField(1)
   start_assignment = messages.BooleanField(2)

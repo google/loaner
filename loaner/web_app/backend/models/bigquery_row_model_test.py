@@ -58,14 +58,12 @@ class BigQueryRowModelTest(loanertest.TestCase):
         'test@{}'.format(loanertest.USER_DOMAIN),
         'test', 'This is a test')
 
-    self.assertEqual(
-        len(bigquery_row_model.BigQueryRow.fetch_unstreamed_rows()), 1)
+    self.assertLen(bigquery_row_model.BigQueryRow.fetch_unstreamed_rows(), 1)
 
     test_row.streamed = True
     test_row.put()
 
-    self.assertEqual(
-        len(bigquery_row_model.BigQueryRow.fetch_unstreamed_rows()), 0)
+    self.assertLen(bigquery_row_model.BigQueryRow.fetch_unstreamed_rows(), 0)
 
   def test_stream(self):
     test_row = bigquery_row_model.BigQueryRow.add(

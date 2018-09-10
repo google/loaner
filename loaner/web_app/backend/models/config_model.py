@@ -47,7 +47,7 @@ class Config(ndb.Model):
 
   @classmethod
   def get(cls, name):
-    """Check memcache for name, if not available, check datastore.
+    """Checks memcache for name, if not available, check datastore.
 
     Args:
       name: str, name of config name.
@@ -90,7 +90,7 @@ class Config(ndb.Model):
 
   @classmethod
   def set(cls, name, value, validate=True):
-    """Store values for a config name in memcache and datastore.
+    """Stores values for a config name in memcache and datastore.
 
     Args:
       name: str, name of the config setting.

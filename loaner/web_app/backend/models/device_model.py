@@ -68,23 +68,23 @@ class Error(Exception):
 
 
 class AssignmentError(Error):
-  """Error raised when assignment fails."""
+  """Raised when assignment fails."""
 
 
 class DeviceCreationError(Error):
-  """Error raised when the app fails to create a device."""
+  """Raised when the app fails to create a device."""
 
 
 class ExtendError(Error):
-  """Error raised when you cannot extend a device's due date."""
+  """Raised when you cannot extend a device's due date."""
 
 
 class EnableGuestError(Error):
-  """Error raised when the guest OU move fails."""
+  """Raised when the guest OU move fails."""
 
 
 class GuestNotAllowedError(Error):
-  """Error raised if someone attempts to enable guest but is not allowed."""
+  """Raised if someone attempts to enable guest but is not allowed."""
 
 
 class DeviceIdentifierError(Error):
@@ -96,7 +96,7 @@ class DeviceNotEnrolledError(Error):
 
 
 class UnableToMoveToShelfError(Error):
-  """Raised when a device can not be moved into a shelf."""
+  """Raised when a device cannot be moved into a shelf."""
 
 
 class FailedToUnenrollError(Error):
@@ -311,7 +311,8 @@ class Device(base_model.BaseModel):
     if device.serial_number:
       serial_number = device.serial_number
     else:
-      raise DeviceCreationError('No serial number for device.')
+      raise DeviceCreationError(
+          'No serial number for device %s.' % identifier)
 
     if not existing_device:
       # If this implementation of the app can translate asset tags to serial
@@ -350,7 +351,7 @@ class Device(base_model.BaseModel):
     device.ou_changed_date = now
     device.last_known_healthy = now
     device.put()
-    device.stream_to_bq(user_email, 'Enrolling device.')
+    device.stream_to_bq(user_email, 'Enrolling device %s.' % identifier)
     return device
 
   def unenroll(self, user_email):
@@ -389,7 +390,7 @@ class Device(base_model.BaseModel):
     self.next_reminder = None
     self = events.raise_event('device_unenroll', device=self)
     self.put()
-    self.stream_to_bq(user_email, 'Unenrolling device.')
+    self.stream_to_bq(user_email, 'Unenrolling device %s.' % self.identifier)
     return self
 
   @classmethod
@@ -494,7 +495,7 @@ class Device(base_model.BaseModel):
     except directory.DeviceAlreadyDisabledError as err:
       logging.error(_ALREADY_DISABLED_MSG, err)
     else:
-      self.stream_to_bq(user_email, 'Disabling device.')
+      self.stream_to_bq(user_email, 'Disabling device %s.' % self.identifier)
     self.locked = True
     self.put()
 
@@ -513,7 +514,8 @@ class Device(base_model.BaseModel):
       self.lost = False
     self.locked = False
     self.move_to_default_ou(user_email=user_email)
-    self.stream_to_bq(user_email, 'Re-enabling disabled device.')
+    self.stream_to_bq(
+        user_email, 'Re-enabling disabled device %s.' % self.identifier)
     self.put()
 
   def loan_assign(self, user_email):
@@ -624,7 +626,8 @@ class Device(base_model.BaseModel):
     self.next_reminder = None
     self = events.raise_event('device_loan_return', device=self)
     self.put()
-    self.stream_to_bq(user_email, 'Marking device as returned.')
+    self.stream_to_bq(
+        user_email, 'Marking device %s as returned.' % self.identifier)
     return self.key
 
   def record_heartbeat(self):
@@ -649,7 +652,8 @@ class Device(base_model.BaseModel):
       raise UnassignedDeviceError(_UNASSIGNED_DEVICE)
     self.mark_pending_return_date = datetime.datetime.utcnow()
     self.move_to_default_ou(user_email=user_email)
-    self.stream_to_bq(user_email, 'Marking device as Pending Return.')
+    self.stream_to_bq(
+        user_email, 'Marking device %s as Pending Return.' % self.identifier)
     self.put()
 
   def set_last_reminder(self, reminder_level):
@@ -693,8 +697,8 @@ class Device(base_model.BaseModel):
     self.damaged_reason = damaged_reason
     self.move_to_default_ou(user_email=user_email)
     self.stream_to_bq(
-        user_email, 'Marking device as damaged, reason: {reason}'.format(
-            reason=damaged_reason))
+        user_email, 'Marking device {} as damaged, reason: {reason}'.format(
+            self.identifier, reason=damaged_reason))
     self.put()
 
   @validate_assignee_or_admin
@@ -702,10 +706,11 @@ class Device(base_model.BaseModel):
     """Resets a device's damaged state.
 
     Args:
-      user_email: string, the user that is marking a device as undamaged
+      user_email: string, the user that is marking a device as undamaged.
     """
     self.damaged = False
-    self.stream_to_bq(user_email, "Clearning the device's damaged state.")
+    self.stream_to_bq(
+        user_email, 'Clearing the device %s damaged state.' % self.identifier)
     self.put()
 
   @validate_assignee_or_admin
@@ -723,7 +728,8 @@ class Device(base_model.BaseModel):
     self.next_reminder = None
     self.move_to_default_ou(user_email=user_email)
     self.lock(user_email)
-    self.stream_to_bq(user_email, 'Marking device lost and locking it.')
+    self.stream_to_bq(
+        user_email, 'Marking device %s lost and locking it.' % self.identifier)
 
   @validate_assignee_or_admin
   def enable_guest_mode(self, user_email):

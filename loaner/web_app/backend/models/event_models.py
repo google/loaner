@@ -60,11 +60,11 @@ class CoreEvent(ndb.Model):
 
   @classmethod
   def create(cls, name, description=None):
-    """Creates a new entity.
+    """Creates a new Event entity.
 
     Args:
-      name: str, the name of the new event.
-      description: str, the description of the new event.
+      name: str, The name of the new event.
+      description: str, The description of the new event.
 
     Returns:
       The new event entity.
@@ -84,10 +84,10 @@ class CoreEvent(ndb.Model):
 
   @classmethod
   def get(cls, name):
-    """Get a CoreEvent (or subclass) entity by name.
+    """Gets a CoreEvent (or subclass) entity by name.
 
     Args:
-      name: str, the name of the new event.
+      name: str, The name of the new event.
 
     Returns:
       The CoreEvent (or subclass) model from datastore, or None.
@@ -108,7 +108,7 @@ class ShelfAuditEvent(CoreEvent):
 
   @classmethod
   def create(cls, actions=None):  # pylint: disable=arguments-differ
-    """Create a ShelfAuditEvent model.
+    """Creates a ShelfAuditEvent model.
 
     Since the app only needs one such event, this overwites any existing shelf
     audit event.
@@ -131,9 +131,9 @@ class CustomEventCondition(ndb.Model):
   """Datastore model representing a condition from which to build an ndb.Query.
 
   Attributes:
-    name: str, names a property on the NDB model.
-    opsymbol: str, specifies a comparison operator.
-    value: pickle, contains the actual value, which could be anything.
+    name: str, Names a property on the NDB model.
+    opsymbol: str, Specifies a comparison operator.
+    value: pickle, Contains the actual value, which could be anything.
   """
   name = ndb.StringProperty(required=True)
   opsymbol = ndb.StringProperty(required=True)
@@ -234,7 +234,7 @@ class CustomEvent(CoreEvent):
         'extra_inequality_conditions': extra_inequality_conditions}
 
   def get_matching_entities(self):
-    """Yield entities that match the event's conditions.
+    """Yields entities that match the event's conditions.
 
     Yields:
       Entities from a datastore query based on the custom event's conditions
@@ -291,7 +291,7 @@ class ReminderEvent(CustomEvent):
 
   @classmethod
   def create(cls, level):
-    """Create a ReminderEvent model for a particular reminder level.
+    """Creates a ReminderEvent model for a particular reminder level.
 
     Uses the level as the ID in the NDB key, and puts prior to returning.
 
@@ -317,7 +317,7 @@ class ReminderEvent(CustomEvent):
 
   @classmethod
   def get(cls, level):
-    """Get a ReminderEvent model for a particular reminder level.
+    """Gets a ReminderEvent model for a particular reminder level.
 
     Args:
       level: int, the level of the reminder event.

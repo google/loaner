@@ -69,7 +69,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     test_shelf.stream_to_bq(
         'test@{}'.format(loanertest.USER_DOMAIN), 'Test stream')
 
-    assert mock_taskqueue.add.called
+    self.assertTrue(mock_taskqueue.add.called)
 
   def test_to_json_dict(self):
     entity = TestEntity(test_string='Hello', test_geopt=ndb.GeoPt(50, 100))
@@ -99,7 +99,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
             fields=[search.TextField(name='text_field', value='item_2')]),]
     mock_to_document.side_effect = documents
     Test.index_entities_for_search()
-    assert mock_to_document.call_count == 2
+    self.assertEqual(mock_to_document.call_count, 2)
 
   @mock.patch.object(base_model, 'logging', autospec=True)
   @mock.patch.object(base_model.BaseModel, 'to_document', autospec=True)
@@ -136,7 +136,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     base_model.BaseModel.add_docs_to_index([search.Document(
         doc_id='test_id', fields=[
             search.TextField(name='field_one', value='value_one')])])
-    assert mock_put.call_count == 2
+    self.assertEqual(mock_put.call_count, 2)
 
   @parameterized.parameters(
       (search.Error(),),
@@ -148,8 +148,8 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     base_model.BaseModel.add_docs_to_index([search.Document(
         doc_id='test_id', fields=[
             search.TextField(name='field_one', value='value_one')])])
-    assert mock_put.call_count == 1
-    assert mock_logging.error.call_count == 1
+    self.assertEqual(mock_put.call_count, 1)
+    self.assertEqual(mock_logging.error.call_count, 1)
 
   def test_get_doc_by_id(self):
     base_model.BaseModel._INDEX_NAME = 'test'
@@ -194,7 +194,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
             doc_id='test_id_three', fields=[
                 search.NumberField(name='field_three', value=3)])])
     # Ensure both docs were added to the index.
-    assert len(test_index.get_range(ids_only=True)) == 3
+    self.assertLen(test_index.get_range(ids_only=True), 3)
     Test.clear_index()
     # Ensure the index was cleared.
     self.assertFalse(test_index.get_range(ids_only=True))
@@ -208,7 +208,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     mock_delete.side_effect = search.DeleteError(
         message='Delete Fail!', results=[])
     base_model.BaseModel.clear_index()
-    assert mock_logging.exception.call_count == 1
+    self.assertEqual(mock_logging.exception.call_count, 1)
 
   def test_to_seach_fields(self):
     # Test list field generation.
@@ -260,7 +260,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     mock_to_search_fields.side_effect = [[text_field1], [test_field2]]
     document_fields = test_model._get_document_fields()
     self.assertCountEqual(expected_result, document_fields)
-    assert mock_to_search_fields.call_count == 2
+    self.assertEqual(mock_to_search_fields.call_count, 2)
 
   @mock.patch.object(base_model.BaseModel, '_to_search_fields')
   def test_get_document_fields_no_identifier(self, mock_to_search_fields):
@@ -271,7 +271,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     mock_to_search_fields.side_effect = [[text_field1], [test_field2]]
     document_fields = test_model._get_document_fields()
     self.assertCountEqual(expected_result, document_fields)
-    assert mock_to_search_fields.call_count == 2
+    self.assertEqual(mock_to_search_fields.call_count, 2)
 
   @mock.patch.object(
       base_model.BaseModel, '_get_document_fields', autospec=True)
@@ -308,7 +308,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     index.put(not_used_doc2)
     actual_search_result = Test.search(query_string='item', query_limit=1)
     self.assertEqual(actual_search_result.number_found, 2)
-    self.assertEqual(len(actual_search_result.results), 1)
+    self.assertLen(actual_search_result.results, 1)
 
     no_search_results = Test.search(query_string='does_not_exist')
     self.assertEqual(no_search_results.number_found, 0)

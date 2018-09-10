@@ -39,7 +39,7 @@ class UserApi(root_api.Service):
       path='get',
       http_method='GET')
   def get(self, request):
-    """Get user details for the logged in user."""
+    """Gets user details for the logged in user."""
     user = user_model.User.get_user(email=user_lib.get_user_email())
     return user_messages.User(
         email=user.key.id(),
@@ -60,7 +60,7 @@ class RoleApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_ROLE)
   def create(self, request):
-    """Create a new role."""
+    """Creates a new role."""
     self.check_xsrf_token(self.request_state)
     user_model.Role.create(
         name=request.name,
@@ -76,7 +76,7 @@ class RoleApi(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.READ_ROLES)
   def get(self, request):
-    """Get a role."""
+    """Gets a role."""
     self.check_xsrf_token(self.request_state)
     role = user_model.Role.get_by_name(request.name)
     return user_messages.Role(
@@ -92,7 +92,7 @@ class RoleApi(root_api.Service):
       http_method='POST',
       permission=permissions.Permissions.MODIFY_ROLE)
   def update(self, request):
-    """Update a role's permissions or associated group. Cannot edit name."""
+    """Updates a role's permissions or associated group. Cannot edit name."""
     self.check_xsrf_token(self.request_state)
     role = user_model.Role.get_by_name(request.name)
     role.update(

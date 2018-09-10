@@ -30,7 +30,7 @@ class Reminder(messages.Message):
 
   Attributes:
     level: int, Indicates if a reminder is due, overdue, or massively overdue.
-    time:  DateTime at which the Device's borrower was reminded.
+    time:  datetime, The date at which the Device's borrower was reminded.
     count: int, Indicates the number of reminders seen.
   """
   level = messages.IntegerField(1)
@@ -61,7 +61,7 @@ class Device(messages.Message):
   Attributes:
     serial_number: str, The serial number of the Chrome device.
     asset_tag: str, The asset tag of the Chrome device.
-    identifier: str, the computed identifier for a device. Serial number if
+    identifier: str, The computed identifier for a device. Serial number if
         asset tag is not provided.
     enrolled: bool, Indicates the enrollment status of the device.
     device_model: int, Identifies the model name of the device.
@@ -130,8 +130,10 @@ class ListDevicesResponse(messages.Message):
   """List device response ProtoRPC message.
 
   Attributes:
-    devices: Device, A device to display.
-    total_results: int, the total number of results for a query.
+    devices: List[Device], The list of devices being returned.
+    total_results: int, The total number of results for a query.
+    total_pages: int, The total number of pages needed to display all of the
+        results.
   """
   devices = messages.MessageField(Device, 1, repeated=True)
   total_results = messages.IntegerField(2)
@@ -163,7 +165,7 @@ class ExtendLoanRequest(messages.Message):
 class ListUserDeviceResponse(messages.Message):
   """UserDeviceResponse ProtoRPC message.
 
-  Atrributes:
-    devices: list, The list of devices assigned to the user.
+  Attributes:
+    devices: List[Device], The list of devices assigned to the user.
   """
   devices = messages.MessageField(Device, 1, repeated=True)

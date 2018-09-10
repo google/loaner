@@ -115,7 +115,8 @@ class DeviceModelTest(loanertest.TestCase):
         user_email=loanertest.USER_EMAIL, serial_number='123456',
         asset_tag='123ABC')
     if device_to_enroll.get('orgUnitPath') != default_ou:
-      assert self.mock_directoryclient.move_chrome_device_org_unit.called
+      self.assertTrue(
+          self.mock_directoryclient.move_chrome_device_org_unit.called)
 
   def test_identifier(self):
 
@@ -412,14 +413,14 @@ class DeviceModelTest(loanertest.TestCase):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.unenroll(loanertest.USER_EMAIL)
 
-    self.assertEqual(self.test_device.enrolled, False)
-    self.assertEqual(self.test_device.assigned_user, None)
-    self.assertEqual(self.test_device.assignment_date, None)
-    self.assertEqual(self.test_device.due_date, None)
-    self.assertEqual(self.test_device.last_reminder, None)
-    self.assertEqual(self.test_device.next_reminder, None)
+    self.assertFalse(self.test_device.enrolled)
+    self.assertIsNone(self.test_device.assigned_user)
+    self.assertIsNone(self.test_device.assignment_date)
+    self.assertIsNone(self.test_device.due_date)
+    self.assertIsNone(self.test_device.last_reminder)
+    self.assertIsNone(self.test_device.next_reminder)
+    self.assertIsNone(self.test_device.mark_pending_return_date)
     self.assertEqual(self.test_device.current_ou, '/')
-    self.assertEqual(self.test_device.mark_pending_return_date, None)
     self.mock_directoryclient.move_chrome_device_org_unit.assert_any_call(
         device_id=u'unique_id', org_unit_path='/')
 
@@ -576,7 +577,7 @@ class DeviceModelTest(loanertest.TestCase):
     self.assertEqual(self.testbed.mock_raiseevent.call_count, 1)
     self.testbed.mock_raiseevent.reset_mock()
 
-    # Start new assignment
+    # Start new assignment.
     self.test_device.loan_assign(loanertest.USER_EMAIL)
     retrieved_device = device_model.Device.get(serial_number='123456')
     self.assertEqual(retrieved_device.assigned_user, loanertest.USER_EMAIL)
@@ -612,12 +613,12 @@ class DeviceModelTest(loanertest.TestCase):
     # Heartbeat arrives a minute before end of grace period, s'allright.
     with freezegun.freeze_time(resume_time + within_grace_period):
       self.test_device.loan_resumes_if_late(loanertest.USER_EMAIL)
-      assert mock_resume_loan.call_count == 0
+      self.assertEqual(mock_resume_loan.call_count, 0)
 
     # Heartbeat arrives a minute later, no dice.
     with freezegun.freeze_time(resume_time + beyond_grace_period):
       self.test_device.loan_resumes_if_late(loanertest.USER_EMAIL)
-      assert mock_resume_loan.call_count == 1
+      self.assertEqual(mock_resume_loan.call_count, 1)
 
   def test_loan_assign_unenrolled(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -692,9 +693,9 @@ class DeviceModelTest(loanertest.TestCase):
     self.assertIsNone(retrieved_device.assigned_user)
     self.assertIsNone(retrieved_device.assignment_date)
     self.assertIsNone(retrieved_device.due_date)
-    self.assertFalse(retrieved_device.lost)
     self.assertIsNone(retrieved_device.last_reminder)
     self.assertIsNone(retrieved_device.next_reminder)
+    self.assertFalse(retrieved_device.lost)
     self.assertEqual(mock_unlock.call_count, 1)
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
@@ -775,7 +776,7 @@ class DeviceModelTest(loanertest.TestCase):
       self.test_device.mark_undamaged(user_email=loanertest.USER_EMAIL)
       datastore_device = device_model.Device.get(serial_number='123456')
       self.assertFalse(datastore_device.damaged)
-      assert mock_stream_to_bq.call_count == 1
+      self.assertEqual(mock_stream_to_bq.call_count, 1)
 
   def test_mark_lost(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -948,7 +949,7 @@ class DecoratorTest(loanertest.TestCase):
       device_model.user_lib, 'get_user_email',
       return_value=loanertest.SUPER_ADMIN_EMAIL)
   def test_validate_assignee_or_admin__is_admin(self, unused_mock):
-    del unused_mock
+    del unused_mock  # Unused.
     datastore_user = user_model.User.get_user(loanertest.SUPER_ADMIN_EMAIL)
     datastore_user.update(superadmin=True)
 
@@ -958,14 +959,14 @@ class DecoratorTest(loanertest.TestCase):
       device_model.user_lib, 'get_user_email',
       return_value=loanertest.USER_EMAIL)
   def test_validate_assignee_or_admin__is_assignee(self, unused_mock):
-    del unused_mock
+    del unused_mock  # Unused.
     self.assertTrue(self.test_device.testable_method())
 
   @mock.patch.object(
       device_model.user_lib, 'get_user_email',
       return_value=loanertest.TECHNICIAN_EMAIL)
   def test_validate_assignee_or_admin__not_authorized(self, unused_mock):
-    del unused_mock
+    del unused_mock  # Unused.
     self.assertRaises(
         device_model.UnauthorizedError, self.test_device.testable_method)
 

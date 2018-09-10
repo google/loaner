@@ -30,7 +30,7 @@ class BootStrapStatusModelTest(loanertest.TestCase):
     status = bootstrap_status_model.BootstrapStatus.get_by_id('bootstrap_1')
     self.assertEqual(status, None)
 
-    # Put and retrieve
+    # Put and retrieve.
     status = bootstrap_status_model.BootstrapStatus.get_or_insert('bootstrap_1')
     status.description = 'Bootstrap the foo'
     status.success = True
