@@ -24,6 +24,7 @@ from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import chrome_messages
 from loaner.web_app.backend.lib import user as user_lib
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 
 _NO_DEVICE_ID_MSG = 'Device ID must be provided.'
@@ -66,5 +67,9 @@ class ChromeApi(root_api.Service):
         raise endpoints.NotFoundException(str(e))
 
     device.record_heartbeat()
+    silent_onboarding = config_model.Config.get('silent_onboarding')
     return chrome_messages.HeartbeatResponse(
-        is_enrolled=is_enrolled, start_assignment=start_assignment)
+        is_enrolled=is_enrolled,
+        start_assignment=start_assignment,
+        silent_onboarding=silent_onboarding,
+    )

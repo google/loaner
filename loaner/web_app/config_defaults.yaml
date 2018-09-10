@@ -102,6 +102,10 @@
 # pending return and the next heartbeat in minutes.
 'return_grace_period': 15
 
+# silent_onboarding: bool, Whether or not to enable the silent onboarding
+# feature of the Chrome app.
+'silent_onboarding': False
+
 # ==============DO NOT EDIT PAST THIS LINE==================
 # All below configurations are used by the app to keep track of state.
 # Adjusting these manually might break things.

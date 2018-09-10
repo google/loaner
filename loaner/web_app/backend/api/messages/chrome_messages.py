@@ -36,6 +36,9 @@ class HeartbeatResponse(messages.Message):
   Attributes:
     is_enrolled: bool, Determine if the device is enrolled.
     start_assignment: bool, Determine if assignment workflow should be started.
+    silent_onboarding: bool, Signals to the Chrome app whether or not to onboard
+        new users in silent mode.
   """
   is_enrolled = messages.BooleanField(1)
   start_assignment = messages.BooleanField(2)
+  silent_onboarding = messages.BooleanField(3)
