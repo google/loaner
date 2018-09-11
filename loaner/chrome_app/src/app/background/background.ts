@@ -336,7 +336,9 @@ function onboardUser() {
       }))
       .subscribe(
           response => {
-            onboarding(device.is_enrolled, device.start_assignment, response);
+            onboarding(
+                device.is_enrolled, device.start_assignment, response,
+                device.silent_onboarding);
           },
           error => {
             // Checks for the existence of the keep trying alarm.
@@ -359,14 +361,15 @@ function onboardUser() {
  * Since devices might wipe local storage, this repopulates local values.
  */
 function onboarding(
-    isEnrolled: boolean, startAssignment: boolean, heartbeatExists: boolean) {
+    isEnrolled: boolean, startAssignment: boolean, heartbeatExists: boolean,
+    silentOnboarding: boolean) {
   if (isEnrolled) {
     const storage = new Storage();
     if (!heartbeatExists) {
       enableHeartbeat();
     }
     storage.local.set('loanerEnrollment', 'true');
-    if (startAssignment) {
+    if (startAssignment && !silentOnboarding) {
       launchOnboardingFlow();
       // If online, report online.
       window.addEventListener('online', reportOnline);
@@ -410,7 +413,9 @@ function keepTrying(alarm: chrome.alarms.Alarm) {
             response => {
               // Kicks off the onboarding process once again and then proceeds
               // to kill this alarm.
-              onboarding(device.is_enrolled, device.start_assignment, response);
+              onboarding(
+                  device.is_enrolled, device.start_assignment, response,
+                  device.silent_onboarding);
               chrome.alarms.onAlarm.removeListener(keepTrying);
               chrome.alarms.clear('KEEP_TRYING');
             },

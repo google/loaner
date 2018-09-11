@@ -41,6 +41,7 @@ declare interface HeartbeatConfiguration {
 declare interface HeartbeatResponse {
   is_enrolled: boolean;
   start_assignment: boolean;
+  silent_onboarding: boolean;
 }
 
 /** Represents the runtime requests that are made via Chrome Messages. */
