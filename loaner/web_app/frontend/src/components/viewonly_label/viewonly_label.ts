@@ -22,7 +22,7 @@ import {Component, Input} from '@angular/core';
   preserveWhitespaces: true,
   selector: 'loaner-viewonly-label',
   styleUrls: ['viewonly_label.scss'],
-  templateUrl: 'viewonly_label.html',
+  templateUrl: 'viewonly_label.ng.html',
 })
 export class ViewonlyLabel {
   @Input() topLabel!: string;

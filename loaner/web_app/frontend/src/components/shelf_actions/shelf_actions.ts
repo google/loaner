@@ -30,7 +30,7 @@ import {ShelfService} from '../../services/shelf';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-actions',
   styleUrls: ['shelf_actions.scss'],
-  templateUrl: 'shelf_actions.html',
+  templateUrl: 'shelf_actions.ng.html',
 })
 export class ShelfActionsCard implements OnInit {
   /** Shelf that will be displayed in the template and created. */

@@ -20,7 +20,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-bootstrap-view',
   styleUrls: ['bootstrap_view.scss'],
-  templateUrl: 'bootstrap_view.html',
+  templateUrl: 'bootstrap_view.ng.html',
 
 })
 export class BootstrapView implements OnInit {

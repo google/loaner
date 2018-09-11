@@ -26,7 +26,7 @@ import {ShelfService} from '../../services/shelf';
   preserveWhitespaces: true,
   selector: 'loaner-audit-table',
   styleUrls: ['audit_table.scss'],
-  templateUrl: 'audit_table.html',
+  templateUrl: 'audit_table.ng.html',
 
 })
 export class AuditTable implements OnInit {

@@ -20,7 +20,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-configuration-view',
   styleUrls: ['configuration_view.scss'],
-  templateUrl: 'configuration_view.html',
+  templateUrl: 'configuration_view.ng.html',
 
 })
 export class ConfigurationView implements OnInit {

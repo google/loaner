@@ -20,7 +20,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-audit-view',
   styleUrls: ['audit_view.scss'],
-  templateUrl: 'audit_view.html',
+  templateUrl: 'audit_view.ng.html',
 
 })
 export class AuditView implements OnInit {

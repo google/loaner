@@ -39,7 +39,7 @@ export type ExpansionState = 'expanded'|'collapsed';
   preserveWhitespaces: true,
   selector: 'loaner-device-action-box',
   styleUrls: ['device_action_box.scss'],
-  templateUrl: 'device_action_box.html',
+  templateUrl: 'device_action_box.ng.html',
   animations: [
     trigger(
         'bodyExpansion',

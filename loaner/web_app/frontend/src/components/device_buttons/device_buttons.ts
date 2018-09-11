@@ -18,7 +18,7 @@ import {Component} from '@angular/core';
   preserveWhitespaces: true,
   selector: 'loaner-device-buttons',
   styleUrls: ['device_buttons.scss'],
-  templateUrl: 'device_buttons.html',
+  templateUrl: 'device_buttons.ng.html',
 })
 export class DeviceButtons {
 }

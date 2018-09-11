@@ -32,7 +32,7 @@ import {DeviceService} from '../../services/device';
   preserveWhitespaces: true,
   selector: 'loaner-device-actions-menu',
   styleUrls: ['device_actions_menu.scss'],
-  templateUrl: 'device_actions_menu.html',
+  templateUrl: 'device_actions_menu.ng.html',
 })
 export class DeviceActionsMenu {
   @Input() device!: Device;

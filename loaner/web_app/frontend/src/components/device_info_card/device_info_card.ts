@@ -38,7 +38,7 @@ import {UserService} from '../../services/user';
   preserveWhitespaces: true,
   selector: 'loaner-device-info-card',
   styleUrls: ['device_info_card.scss'],
-  templateUrl: 'device_info_card.html',
+  templateUrl: 'device_info_card.ng.html',
 })
 export class DeviceInfoCard implements OnInit {
   // Component's core variables.

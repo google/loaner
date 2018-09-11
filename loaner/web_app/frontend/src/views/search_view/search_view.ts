@@ -24,7 +24,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-search-view',
   styleUrls: ['search_view.scss'],
-  templateUrl: 'search_view.html',
+  templateUrl: 'search_view.ng.html',
 })
 export class SearchView implements OnInit {
   /** Title for the component. */

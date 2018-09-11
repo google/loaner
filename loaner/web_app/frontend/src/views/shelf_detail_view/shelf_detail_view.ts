@@ -25,7 +25,7 @@ import {ShelfService} from '../../services/shelf';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-detail-view',
   styleUrls: ['shelf_detail_view.scss'],
-  templateUrl: 'shelf_detail_view.html',
+  templateUrl: 'shelf_detail_view.ng.html',
 
 })
 export class ShelfDetailView extends LoaderView implements OnInit {

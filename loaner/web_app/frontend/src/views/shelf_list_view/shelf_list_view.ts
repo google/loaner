@@ -20,7 +20,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-list-view',
   styleUrls: ['shelf_list_view.scss'],
-  templateUrl: 'shelf_list_view.html',
+  templateUrl: 'shelf_list_view.ng.html',
 
 })
 export class ShelfListView implements OnInit {

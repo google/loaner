@@ -18,7 +18,7 @@ import {MatDialogRef} from '@angular/material';
 @Component({
   preserveWhitespaces: true,
   styleUrls: ['confirm_dialog.scss'],
-  templateUrl: 'confirm_dialog.html',
+  templateUrl: 'confirm_dialog.ng.html',
 })
 export class ConfirmDialog {
   title!: string;

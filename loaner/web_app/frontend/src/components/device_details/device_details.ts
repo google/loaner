@@ -26,7 +26,7 @@ import {DeviceService} from '../../services/device';
   preserveWhitespaces: true,
   selector: 'loaner-device-details',
   styleUrls: ['device_details.scss'],
-  templateUrl: 'device_details.html',
+  templateUrl: 'device_details.ng.html',
 })
 export class DeviceDetails implements OnInit {
   device = new Device();

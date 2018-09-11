@@ -20,7 +20,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-device-list-view',
   styleUrls: ['device_list_view.scss'],
-  templateUrl: 'device_list_view.html',
+  templateUrl: 'device_list_view.ng.html',
 
 })
 export class DeviceListView implements OnInit {

@@ -28,7 +28,7 @@ import {ShelfService} from '../../services/shelf';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-list-table',
   styleUrls: ['shelf_list_table.scss'],
-  templateUrl: 'shelf_list_table.html',
+  templateUrl: 'shelf_list_table.ng.html',
 })
 export class ShelfListTable implements OnDestroy {
   /** Title of the table to be displayed. */

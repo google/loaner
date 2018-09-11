@@ -29,7 +29,7 @@ import {DeviceService} from '../../services/device';
   preserveWhitespaces: true,
   selector: 'loaner-device-list-table',
   styleUrls: ['device_list_table.scss'],
-  templateUrl: 'device_list_table.html',
+  templateUrl: 'device_list_table.ng.html',
 
 })
 export class DeviceListTable implements OnInit {

@@ -26,7 +26,7 @@ import {ConfigService} from '../../services/config';
 @Component({
   selector: 'loaner-configuration',
   styleUrls: ['configuration.scss'],
-  templateUrl: 'configuration.html',
+  templateUrl: 'configuration.ng.html',
 })
 export class Configuration implements OnInit {
   config: Config = this.config;

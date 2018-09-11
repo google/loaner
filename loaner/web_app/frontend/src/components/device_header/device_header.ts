@@ -20,7 +20,7 @@ import {Component, Input} from '@angular/core';
 @Component({
   selector: 'loaner-device-header',
   styleUrls: ['device_header.scss'],
-  templateUrl: 'device_header.html',
+  templateUrl: 'device_header.ng.html',
 
 })
 export class DeviceHeader {

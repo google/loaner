@@ -30,7 +30,7 @@ import {UserService} from '../../services/user';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-details',
   styleUrls: ['shelf_details.scss'],
-  templateUrl: 'shelf_details.html',
+  templateUrl: 'shelf_details.ng.html',
 })
 export class ShelfDetails implements OnInit {
   /** Shelf that will have the details displayed in the template. */

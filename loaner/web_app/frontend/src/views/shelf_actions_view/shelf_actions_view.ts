@@ -24,7 +24,7 @@ import {ShelfActionsCard} from '../../components/shelf_actions';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-actions-view',
   styleUrls: ['shelf_actions_view.scss'],
-  templateUrl: 'shelf_actions_view.html',
+  templateUrl: 'shelf_actions_view.ng.html',
 
 })
 export class ShelfActionsView implements OnInit {

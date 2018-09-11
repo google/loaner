@@ -99,7 +99,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   encapsulation: ViewEncapsulation.None,
   selector: 'app-root',
   styleUrls: ['app.scss'],
-  templateUrl: 'app.html',
+  templateUrl: 'app.ng.html',
 })
 export class AppComponent extends LoaderView {
   readonly title = `${CONFIG.appName} Application`;

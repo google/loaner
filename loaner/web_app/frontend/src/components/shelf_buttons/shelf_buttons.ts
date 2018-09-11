@@ -18,7 +18,7 @@ import {Component} from '@angular/core';
   preserveWhitespaces: true,
   selector: 'loaner-shelf-buttons',
   styleUrls: ['shelf_buttons.scss'],
-  templateUrl: 'shelf_buttons.html',
+  templateUrl: 'shelf_buttons.ng.html',
 })
 export class ShelfButtons {
 }

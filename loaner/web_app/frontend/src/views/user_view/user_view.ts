@@ -20,7 +20,7 @@ import {CONFIG} from '../../app.config';
   preserveWhitespaces: true,
   selector: 'loaner-user-view',
   styleUrls: ['user_view.scss'],
-  templateUrl: 'user_view.html',
+  templateUrl: 'user_view.ng.html',
 
 })
 export class UserView implements OnInit {

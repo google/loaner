@@ -31,7 +31,7 @@ import {LoanerSnackBar} from '../../services/snackbar';
 @Component({
   selector: 'loaner-search-results',
   styleUrls: ['search_results.scss'],
-  templateUrl: 'search_results.html',
+  templateUrl: 'search_results.ng.html',
 })
 export class SearchResultsComponent implements OnDestroy, OnInit {
   loading = true;
