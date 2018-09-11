@@ -567,4 +567,12 @@ export class SearchServiceMock {
     Regular text.
     `);
   }
+
+  reindex(searchType: string) {
+    return of();
+  }
+
+  clearIndex(searchType: string) {
+    return of();
+  }
 }

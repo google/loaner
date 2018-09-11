@@ -16,13 +16,23 @@ import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 
+import {SearchIndexType} from '../models/config';
+
+import {ApiService} from './api';
+import {LoanerSnackBar} from './snackbar';
+
 @Injectable()
-export class SearchService {
+export class SearchService extends ApiService {
   private searchTextSource = new BehaviorSubject<string>('');
+  apiEndpoint = 'search';
 
   searchText: Observable<string> = this.searchTextSource.asObservable();
 
-  constructor(private readonly http: HttpClient) {}
+  constructor(
+      readonly snackbar: LoanerSnackBar,
+      private readonly directHttp: HttpClient) {
+    super(snackbar, directHttp);
+  }
 
   /**
    * Function to change the text to be searched.
@@ -34,6 +44,34 @@ export class SearchService {
 
   /** Gets the helper text from assets/search_help.md file. */
   getHelp(): Observable<string> {
-    return this.http.get('./assets/search_help.md', {'responseType': 'text'});
+    return this.directHttp.get(
+        './assets/search_help.md', {'responseType': 'text'});
+  }
+
+  /** Builds the request for reindexing and clearing the search index */
+  private getRequestType(searchType: SearchIndexType) {
+    return {'model': searchType === SearchIndexType.Shelf ? 'SHELF' : 'DEVICE'};
+  }
+
+  /**
+   * Reindexes the specified type for searching.
+   * @param searchType represents what should be reindexed.
+   */
+  reindex(searchType: SearchIndexType) {
+    const request = this.getRequestType(searchType);
+    return this.get('reindex', request).subscribe(() => {
+      this.snackBar.open(`Reindexing ${searchType} search.`);
+    });
+  }
+
+  /**
+   * Clears the index for the specified type for searching.
+   * @param searchType represents what should be cleared.
+   */
+  clearIndex(searchType: SearchIndexType) {
+    const request = this.getRequestType(searchType);
+    return this.get('clear', request).subscribe(() => {
+      this.snackBar.open(`Clearing index for ${searchType} search.`);
+    });
   }
 }

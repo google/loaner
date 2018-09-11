@@ -19,7 +19,8 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
 import {ConfigService} from '../../services/config';
-import {ConfigServiceMock} from '../../testing/mocks';
+import {SearchService} from '../../services/search';
+import {ConfigServiceMock, SearchServiceMock} from '../../testing/mocks';
 
 import {Configuration, ConfigurationModule} from '.';
 
@@ -38,6 +39,7 @@ describe('ConfigurationComponent', () => {
           ],
           providers: [
             {provide: ConfigService, useClass: ConfigServiceMock},
+            {provide: SearchService, useClass: SearchServiceMock},
           ],
         })
         .compileComponents();
@@ -157,5 +159,56 @@ describe('ConfigurationComponent', () => {
        formElement.dispatchEvent(new Event('submit'));
        fixture.detectChanges();
        expect(configService.updateAll).toHaveBeenCalledTimes(1);
+     }));
+
+  it('calls reindex service when a reindex button is clicked', fakeAsync(() => {
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const searchService: SearchService = TestBed.get(SearchService);
+       spyOn(searchService, 'reindex').and.returnValue(of());
+       const reindexDevices =
+           compiled.querySelector('button[name="reindex-devices"]');
+       reindexDevices.click();
+       expect(searchService.reindex)
+           .toHaveBeenCalledWith(configuration.searchIndexType.Device);
+       expect(searchService.reindex).toHaveBeenCalledTimes(1);
+       const reindexShelves =
+           compiled.querySelector('button[name="reindex-shelves"]');
+       reindexShelves.click();
+       expect(searchService.reindex)
+           .toHaveBeenCalledWith(configuration.searchIndexType.Shelf);
+       expect(searchService.reindex).toHaveBeenCalledTimes(2);
+       const reindexUsers =
+           compiled.querySelector('button[name="reindex-users"]');
+       reindexUsers.click();
+       expect(searchService.reindex)
+           .toHaveBeenCalledWith(configuration.searchIndexType.User);
+       expect(searchService.reindex).toHaveBeenCalledTimes(3);
+     }));
+
+  it('calls clearIndex service when a clear index button is clicked',
+     fakeAsync(() => {
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const searchService: SearchService = TestBed.get(SearchService);
+       spyOn(searchService, 'clearIndex').and.returnValue(of());
+       const clearIndexDevices =
+           compiled.querySelector('button[name="clear-index-devices"]');
+       clearIndexDevices.click();
+       expect(searchService.clearIndex)
+           .toHaveBeenCalledWith(configuration.searchIndexType.Device);
+       expect(searchService.clearIndex).toHaveBeenCalledTimes(1);
+       const clearIndexShelves =
+           compiled.querySelector('button[name="clear-index-shelves"]');
+       clearIndexShelves.click();
+       expect(searchService.clearIndex)
+           .toHaveBeenCalledWith(configuration.searchIndexType.Shelf);
+       expect(searchService.clearIndex).toHaveBeenCalledTimes(2);
+       const clearIndexUsers =
+           compiled.querySelector('button[name="clear-index-users"]');
+       clearIndexUsers.click();
+       expect(searchService.clearIndex)
+           .toHaveBeenCalledWith(configuration.searchIndexType.User);
+       expect(searchService.clearIndex).toHaveBeenCalledTimes(3);
      }));
 });

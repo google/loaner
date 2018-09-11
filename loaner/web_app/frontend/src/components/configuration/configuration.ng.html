@@ -311,6 +311,68 @@
         </section>
       </mat-card-content>
     </mat-card>
+
+    <!-- Search indexing -->
+    <mat-card>
+      <mat-card-title>Search indexing</mat-card-title>
+      <mat-card-subtitle>
+        Reindex and clear indexes for searches.
+      </mat-card-subtitle>
+      <mat-card-content>
+        <section class="control-set">
+          <div class="label">
+            Clear device, shelf, or user search index
+            <div class="sublabel">Clears the device, shelf, or user search index.</div>
+          </div>
+          <div class="control">
+            <button mat-button
+                    type="button"
+                    name="clear-index-devices"
+                    (click)="searchService.clearIndex(searchIndexType.Device)">
+              Devices
+            </button>
+            <button mat-button
+                    type="button"
+                    name="clear-index-shelves"
+                    (click)="searchService.clearIndex(searchIndexType.Shelf)">
+              Shelves
+            </button>
+            <button mat-button
+                    type="button"
+                    name="clear-index-users"
+                    (click)="searchService.clearIndex(searchIndexType.User)">
+              Users
+            </button>
+          </div>
+        </section>
+        <section class="control-set">
+          <div class="label">
+            Reindex device, shelf, or user search
+            <div class="sublabel">Reindexes the devices, shelves, or users for searching.</div>
+          </div>
+          <div class="control">
+            <button mat-button
+                    type="button"
+                    name="reindex-devices"
+                    (click)="searchService.reindex(searchIndexType.Device)">
+              Devices
+            </button>
+            <button mat-button
+                    type="button"
+                    name="reindex-shelves"
+                    (click)="searchService.reindex(searchIndexType.Shelf)">
+              Shelves
+            </button>
+            <button mat-button
+                    type="button"
+                    name="reindex-users"
+                    (click)="searchService.reindex(searchIndexType.User)">
+              Users
+            </button>
+          </div>
+        </section>
+      </mat-card-content>
+    </mat-card>
     <div class="submit-section">
       <button mat-raised-button [disabled]="!configurationForm.dirty" type="submit">Save changes</button>
     </div>

@@ -21,6 +21,12 @@ export enum ConfigType {
   LIST = 'LIST',
 }
 
+export enum SearchIndexType {
+  Device = 'device',
+  Shelf = 'shelf',
+  User = 'user',
+}
+
 export declare interface GetConfigRequest {
   name: string;
   config_type: ConfigType;

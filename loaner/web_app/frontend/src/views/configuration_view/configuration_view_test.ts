@@ -16,7 +16,8 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/co
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {ConfigService} from '../../services/config';
-import {ConfigServiceMock} from '../../testing/mocks';
+import {SearchService} from '../../services/search';
+import {ConfigServiceMock, SearchServiceMock} from '../../testing/mocks';
 
 import {ConfigurationView, ConfigurationViewModule} from '.';
 
@@ -32,6 +33,7 @@ describe('ConfigurationView', () => {
           imports: [RouterTestingModule, ConfigurationViewModule],
           providers: [
             {provide: ConfigService, useClass: ConfigServiceMock},
+            {provide: SearchService, useClass: SearchServiceMock},
           ],
         })
         .compileComponents();

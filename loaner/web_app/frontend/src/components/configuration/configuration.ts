@@ -17,8 +17,9 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 
 import {CONFIG} from '../../app.config';
-import {Config, ConfigType, ConfigUpdate} from '../../models/config';
+import {Config, ConfigType, ConfigUpdate, SearchIndexType} from '../../models/config';
 import {ConfigService} from '../../services/config';
+import {SearchService} from '../../services/search';
 
 /**
  * Component that renders the Bootstrap flow of the application.
@@ -30,13 +31,16 @@ import {ConfigService} from '../../services/config';
 })
 export class Configuration implements OnInit {
   config: Config = this.config;
+  searchIndexType = SearchIndexType;
 
   @ViewChild(NgForm) configurationForm: NgForm = this.configurationForm;
 
   shelfAuditEmailToList = '';
 
   constructor(
-      readonly router: Router, private readonly configService: ConfigService) {}
+      readonly router: Router, private readonly configService: ConfigService,
+      // tslint:disable-next-line:no-unused-variable used on template.
+      private readonly searchService: SearchService) {}
 
   ngOnInit() {
     this.configService.list().subscribe(config => {
