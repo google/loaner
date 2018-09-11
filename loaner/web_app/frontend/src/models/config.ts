@@ -87,6 +87,7 @@ export class Config {
   timeoutGuestMode?: boolean;
   unenrollOU?: string;
   useAssetTags?: boolean;
+  silentOnboarding?: boolean;
 
   constructor(response: ConfigResponse[]) {
     // tslint:disable:no-unnecessary-type-assertion Fix after b/110225001
@@ -174,6 +175,9 @@ export class Config {
         response.find(a => a.name === 'unenroll_ou')!.string_value as string;
     this.useAssetTags =
         response.find(a => a.name === 'use_asset_tags')!.boolean_value as
+        boolean;
+    this.silentOnboarding =
+        response.find(a => a.name === 'silent_onboarding')!.boolean_value as
         boolean;
     // tslint:enable:no-unnecessary-type-assertion
   }

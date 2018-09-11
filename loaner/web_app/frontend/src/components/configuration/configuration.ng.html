@@ -112,6 +112,18 @@
             </mat-form-field>
           </div>
         </section>
+        <section class="control-set">
+          <div class="label">
+            Silent onboarding
+            <div class="sublabel">
+              Silently onboard users when they login to Chrome devices. They'll still be able to
+              manage and return their loan, but there will be no onboarding flow.
+            </div>
+          </div>
+          <div class="control">
+            <mat-slide-toggle name="silent_onboarding_boolean" [(ngModel)]="config.silentOnboarding"></mat-slide-toggle>
+          </div>
+        </section>
       </mat-card-content>
     </mat-card>
 

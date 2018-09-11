@@ -447,7 +447,8 @@ export const CONFIG_RESPONSE_MOCK = [
   {name: 'img_button_manage', string_value: 'images/testbutton.png'},
   {integer_value: '24', name: 'shelf_audit_interval'},
   {integer_value: '1', name: 'datastore_version'},
-  {boolean_value: true, name: 'anonymous_surveys'}
+  {boolean_value: true, name: 'anonymous_surveys'},
+  {boolean_value: false, name: 'silent_onboarding'}
 ];
 
 export class ConfigServiceMock {
