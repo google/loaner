@@ -36,7 +36,6 @@ from loaner.web_app import constants
 DEVICE_ID = u'deviceId'
 MODEL = u'model'
 ORG_UNIT_PATH = u'orgUnitPath'
-STATUS = u'status'
 SERIAL_NUMBER = u'serialNumber'
 _NEXT_PAGE = 'nextPageToken'
 
