@@ -42,6 +42,11 @@ handlers:
   login: admin
   secure: always
 
+- url: /_ah/api/.*
+  script: loaner.web_app.endpoints_api.ENDPOINTS_API
+  login: optional
+  secure: always
+
 - url: /_ah/queue/deferred
   script: google.appengine.ext.deferred.deferred.application
   login: admin
