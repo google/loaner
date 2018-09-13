@@ -12,6 +12,16 @@ package(
 #############
 
 py_library(
+    name = "app_constants_lib",
+    srcs = [
+        "app_constants.py",
+    ],
+    deps = [
+        "@absl_archive//absl/flags",
+    ],
+)
+
+py_library(
     name = "app_engine_lib",
     srcs = [
         "app_engine.py",
@@ -115,6 +125,18 @@ py_library(
 #########
 # Tests #
 #########
+
+py_test(
+    name = "app_constants_test",
+    size = "small",
+    srcs = [
+        "app_constants_test.py",
+    ],
+    deps = [
+        ":app_constants_lib",
+        "@absl_archive//absl/testing:absltest",
+    ],
+)
 
 py_test(
     name = "app_engine_test",
@@ -249,6 +271,7 @@ py_test(
 test_suite(
     name = "all_tests",
     tests = [
+        ":app_constants_test",
         ":app_engine_test",
         ":auth_test",
         ":common_test",
