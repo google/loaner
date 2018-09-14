@@ -857,9 +857,18 @@ class DeviceModelTest(loanertest.TestCase):
     with freezegun.freeze_time(now):
       self.test_device._disable_guest_mode(loanertest.USER_EMAIL)
       self.assertEqual(
-          constants.ORG_UNIT_DICT['DEFAULT'],
-          self.test_device.current_ou)
+          constants.ORG_UNIT_DICT['DEFAULT'], self.test_device.current_ou)
       self.assertEqual(now, self.test_device.ou_changed_date)
+
+  def test_disable_guest_mode_unenrolled(self):
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.test_device.current_ou = 'IRRELEVANT VALUE'
+    self.test_device.assigned_user = loanertest.USER_EMAIL
+    self.test_device.enrolled = False
+    self.test_device.put()
+
+    self.test_device._disable_guest_mode(loanertest.USER_EMAIL)
+    self.assertEqual('IRRELEVANT VALUE', self.test_device.current_ou)
 
   def test_disable_guest_mode_fail_to_move(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)

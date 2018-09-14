@@ -772,12 +772,12 @@ class Device(base_model.BaseModel):
       raise GuestNotAllowedError(_GUEST_MODE_DISABLED_MSG)
 
   def _disable_guest_mode(self, user_email):
-    """Moves a device back to the default OU if still assigned.
+    """Moves a device back to the default OU if still enrolled and assigned.
 
     Args:
       user_email: str, The email of the acting user.
     """
-    if self.assigned_user == user_email:
+    if self.enrolled and self.assigned_user == user_email:
       self.move_to_default_ou(user_email=user_email)
       self.put()
 
