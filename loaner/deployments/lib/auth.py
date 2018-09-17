@@ -63,7 +63,7 @@ class CloudCredentials(object):
     Args:
       config: common.ProjectConfig, the configuration for the Google Cloud
           Project.
-      scopes: list|str|, a list of the required scopes for this credential.
+      scopes: List[str], a list of the required scopes for this credential.
     """
     self._config = config
     self._credentials = self.get_credentials(scopes)
@@ -74,7 +74,7 @@ class CloudCredentials(object):
     Args:
       service: str, the name of the service to connect to.
       version: str, the version of the service to connect to.
-      scopes: list|str|, a list of the required scopes for this api call.
+      scopes: List[str], a list of the required scopes for this api call.
 
     Returns:
       An authenticated api client connection.
@@ -90,7 +90,7 @@ class CloudCredentials(object):
     """Get the user credentials for deployment.
 
     Args:
-      scopes: list|str|, a list of the required scopes for this credential.
+      scopes: List[str], a list of the required scopes for this credential.
 
     Returns:
       A credentials.Credentials object for the authenticated user.
@@ -108,7 +108,7 @@ class CloudCredentials(object):
     """Gets the OAuth2 credential from file if it contains the scopes provided.
 
     Args:
-      scopes: list|str|, a list of the required scopes for this credential.
+      scopes: List[str], a list of the required scopes for this credential.
 
     Returns:
       A credentials.Credentials object for the authenticated user or None if the
@@ -130,7 +130,7 @@ class CloudCredentials(object):
     """Create the user credentials without a local webserver.
 
     Args:
-      scopes: list|str|, a list of the required scopes for this credential.
+      scopes: List[str], a list of the required scopes for this credential.
 
     Returns:
       An instance of credentials.Credentials for the authenticated user.

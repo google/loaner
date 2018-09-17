@@ -28,10 +28,10 @@ from google.cloud import storage
 from loaner.deployments.lib import auth
 
 # Error messages.
-_GET_BUCKET_ERROR_MSG = 'Failed to retrieve Google Cloud Storage Bucket %r: %s.'
+_GET_BUCKET_ERROR_MSG = 'failed to retrieve Google Cloud Storage Bucket %r: %s'
 _GET_BLOB_ERROR_MSG = (
-    'Failed to retrieve Blob with name %r from Google Cloud Storage Bucket '
-    '%r: %s.')
+    'failed to retrieve Blob with name %r from Google Cloud Storage Bucket '
+    '%r: %s')
 
 
 class AlreadyExistsError(Exception):
@@ -119,8 +119,8 @@ class CloudStorageAPI(object):
       new_bucket = self._client.create_bucket(bucket_name)
     except exceptions.Conflict as err:
       raise AlreadyExistsError(
-          'The Google Cloud Storage Bucket with name %r already exists: %s.' %
-          (bucket_name, err))
+          'the Google Cloud Storage Bucket with name {!r} already exists: '
+          '{}'.format(bucket_name, err))
 
     logging.debug(
         'The Googld Cloud Storage Bucket %r has been created for project '

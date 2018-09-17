@@ -56,8 +56,8 @@ def generate(length):
   """
   if length < _MIN or length > _MAX:
     raise ValueError(
-        'Password length must be between {!r} and {!r} characters length '
-        'provided was: {!r}.'.format(_MIN, _MAX, length))
+        'password length must be between {!r} and {!r} characters length '
+        'provided was: {!r}'.format(_MIN, _MAX, length))
 
   logging.debug('Generating a password with length: %r.', length)
 

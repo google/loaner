@@ -29,7 +29,7 @@ class GoogleAPI(object):
   All attributes must be set by subclasses.
 
   Attributes:
-    SCOPES: iter|str|, a list of the OAuth2 scopes required for the API.
+    SCOPES: List[str], a list of the OAuth2 scopes required for the API.
     SERVICE: str, the service name of the API to access.
     VERSION: str, the version of the API to access.
   """
@@ -57,7 +57,8 @@ class GoogleAPI(object):
         self.__class__.__name__, self._config.project)
 
   def __repr__(self):
-    return '<{}.from_config({})>'.format(self.__class__.__name__, self._config)
+    return '<{}.from_config({!r})>'.format(
+        self.__class__.__name__, self._config)
 
   @classmethod
   def from_config(cls, config):

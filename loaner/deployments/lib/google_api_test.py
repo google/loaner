@@ -42,7 +42,8 @@ class GoogleApiTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(
         'GoogleAPI for project: "TEST_PROJECT"', str(test_google_api))
     self.assertEqual(
-        '<GoogleAPI.from_config(ProjectConfig for project: TEST_PROJECT.)>',
+        '<GoogleAPI.from_config(<ProjectConfig(TEST_PROJECT, TEST_CLIENT_ID, '
+        'TEST_CLIENT_SECRET, TEST_BUCKET)>)>',
         repr(test_google_api))
 
   @mock.patch.object(auth, 'CloudCredentials', autospec=True)

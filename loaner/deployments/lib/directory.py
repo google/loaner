@@ -28,12 +28,12 @@ from loaner.deployments.lib import google_api
 
 # Error messages.
 _FORBIDDEN_ERROR_MSG = (
-    'Failed to contact the Google Admin Directory API, please ensure API access'
+    'failed to contact the Google Admin Directory API, please ensure API access'
     ' is enabled. Instructions can be found here: '
     'https://support.google.com/a/answer/60757?hl=en')
 _INSERT_ROLE_ERROR_MSG = (
-    'Failed to create new Google Admin Role with name %r: %r.')
-_INSERT_USER_ERROR_MSG = 'Failed to create new GSuite User with email %r: %r.'
+    'failed to create new Google Admin Role with name %r: %s')
+_INSERT_USER_ERROR_MSG = 'failed to create new GSuite User with email %r: %s'
 
 # Default privileges for the GSuite Role Account.
 _ROLE_PRIVILEGES = [
@@ -114,7 +114,8 @@ class DirectoryAPI(google_api.GoogleAPI):
       status = err.resp.status
 
       if status == httplib.CONFLICT or status == httplib.INTERNAL_SERVER_ERROR:
-        raise AlreadyExistsError('Role with name %r already exists.' % name)
+        raise AlreadyExistsError(
+            'role with name {!r} already exists'.format(name))
 
       if status == httplib.FORBIDDEN:
         raise ForbiddenError(_FORBIDDEN_ERROR_MSG)
@@ -165,7 +166,7 @@ class DirectoryAPI(google_api.GoogleAPI):
 
       if status == httplib.CONFLICT or status == httplib.INTERNAL_SERVER_ERROR:
         raise AlreadyExistsError(
-            'User with email address %r already exists.' % primary_email)
+            'user with email address {!r} already exists'.format(primary_email))
 
       if status == httplib.FORBIDDEN:
         raise ForbiddenError(_FORBIDDEN_ERROR_MSG)

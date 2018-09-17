@@ -24,9 +24,6 @@ from google.cloud import datastore
 
 from loaner.deployments.lib import auth
 
-# Error messages.
-_GET_ERROR_MSG = 'Failed to retrieve the datastore version for project %r: %r'
-
 
 class NotFoundError(Exception):
   """Raised when a resource is not found."""
@@ -86,4 +83,6 @@ class DatastoreAPI(object):
     try:
       return entity['integer_value']
     except KeyError as err:
-      raise NotFoundError(_GET_ERROR_MSG % (self._config.project, err))
+      raise NotFoundError(
+          'failed to retrieve the datastore version for project '
+          '{!r}: {}'.format(self._config.project, err))

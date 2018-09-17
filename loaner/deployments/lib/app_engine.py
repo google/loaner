@@ -26,9 +26,9 @@ from loaner.deployments.lib import google_api
 
 # Error messages.
 _CREATE_ERROR_MSG = (
-    'Failed to create Google App Engine project for project %s in '
-    'location %s: %s.')
-_GET_ERROR_MSG = 'Failed to get project %s: %s.'
+    'failed to create Google App Engine project for project %r in '
+    'location %r: %s')
+_GET_ERROR_MSG = 'failed to get project %r: %s'
 
 # Valid App Engine application locations.
 LOCATIONS = frozenset([
@@ -84,8 +84,8 @@ class AdminAPI(google_api.GoogleAPI):
     """
     if location not in LOCATIONS:
       raise NotFoundError(
-          'The location provided ({}) was not found in the list of approved '
-          'locations {}.'.format(location, LOCATIONS))
+          'the location provided {!r} was not found in the list of approved '
+          'locations {}'.format(location, LOCATIONS))
     try:
       return self._client.apps().create(
           body={

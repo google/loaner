@@ -77,10 +77,10 @@ def _config_file_validator(config_file_path):
         found on the path.
   """
   if not config_file_path.endswith('.yaml'):
-    raise flags.ValidationError('The config file must end in .yaml')
+    raise flags.ValidationError('the config file must end in .yaml')
   config_file_path = _get_config_file_path(config_file_path)
   if not os.path.isfile(config_file_path):
-    raise flags.ValidationError('The config file specified is not found.')
+    raise flags.ValidationError('the config file specified is not found')
   return True
 
 
@@ -186,9 +186,9 @@ class ProjectConfig(object):
     for key in _REQUIRED_FIELDS:
       if config[key] is None:
         raise ConfigError(
-            'The field ({key}) is required and is not configured, please ensure'
+            'the field {key!r} is required and is not configured, please ensure'
             ' there is a value set for all of the following fields '
-            '{fields}.'.format(key=key, fields=_REQUIRED_FIELDS))
+            '{fields}'.format(key=key, fields=_REQUIRED_FIELDS))
     return cls(
         project=config['project_id'],
         client_id=config['client_id'],
