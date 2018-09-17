@@ -122,6 +122,23 @@ py_library(
     ],
 )
 
+py_library(
+    name = "test_utils_lib",
+    srcs = [
+        "test_utils.py",
+    ],
+)
+
+py_library(
+    name = "utils_lib",
+    srcs = [
+        "utils.py",
+    ],
+    deps = [
+        "@absl_archive//absl/flags",
+    ],
+)
+
 #########
 # Tests #
 #########
@@ -268,6 +285,34 @@ py_test(
     ],
 )
 
+py_test(
+    name = "test_utils_test",
+    size = "small",
+    srcs = [
+        "test_utils_test.py",
+    ],
+    deps = [
+        ":test_utils_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:parameterized",
+    ],
+)
+
+py_test(
+    name = "utils_test",
+    size = "small",
+    srcs = [
+        "utils_test.py",
+    ],
+    deps = [
+        ":test_utils_lib",
+        ":utils_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:flagsaver",
+        "@absl_archive//absl/testing:parameterized",
+    ],
+)
+
 test_suite(
     name = "all_tests",
     tests = [
@@ -280,5 +325,7 @@ test_suite(
         ":google_api_test",
         ":password_test",
         ":storage_test",
+        ":test_utils_test",
+        ":utils_test",
     ],
 )
