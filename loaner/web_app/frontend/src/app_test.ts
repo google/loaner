@@ -91,8 +91,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     compiled
-        .querySelectorAll(
-            'mat-sidenav-container > mat-sidenav > mat-nav-list > div')
+        .querySelectorAll('mat-sidenav-container mat-sidenav mat-nav-list div')
         .forEach((item: Node) => {
           expect(item.textContent).not.toContain('shelves');
           expect(item.textContent).not.toContain('devices');
@@ -109,8 +108,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const sideNavListContent =
-        compiled
-            .querySelector('mat-sidenav-container > mat-sidenav > mat-nav-list')
+        compiled.querySelector('mat-sidenav-container mat-sidenav mat-nav-list')
             .innerHTML;
     expect(sideNavListContent).toContain('Devices');
     expect(sideNavListContent).toContain('ng-reflect-router-link="devices"');
@@ -122,8 +120,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const sideNavListContent =
-        compiled
-            .querySelector('mat-sidenav-container > mat-sidenav > mat-nav-list')
+        compiled.querySelector('mat-sidenav-container mat-sidenav mat-nav-list')
             .innerHTML;
     expect(sideNavListContent).toContain('Report issues');
     expect(sideNavListContent)
@@ -144,8 +141,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const sideNavListContent =
-        compiled
-            .querySelector('mat-sidenav-container > mat-sidenav > mat-nav-list')
+        compiled.querySelector('mat-sidenav-container mat-sidenav mat-nav-list')
             .innerHTML;
     expect(sideNavListContent).toContain('TestItem_Visible');
     expect(sideNavListContent).not.toContain('TestItem_Hidden');
@@ -163,8 +159,7 @@ describe('AppComponent', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const sideNavListContent =
-        compiled
-            .querySelector('mat-sidenav-container > mat-sidenav > mat-nav-list')
+        compiled.querySelector('mat-sidenav-container mat-sidenav mat-nav-list')
             .innerHTML;
     expect(sideNavListContent.split('TestItem_WithRouterLinkAndUrl').length - 1)
         .toBe(1);
