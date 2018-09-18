@@ -19,8 +19,8 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
+import logging
 
-from absl import logging
 import html2text
 
 from google.appengine.api import mail
@@ -36,14 +36,13 @@ class SendEmailError(Error):
   """Error raised when we cannot send an e-mail."""
 
 
-def send_user_email(device, template_name, force_send=False):
+def send_user_email(device, template_name):
   """Sends an email reminder to a Device borrower.
 
   Args:
     device: device_model.Device object for device, assigned_user, and loan
         details.
     template_name: str, name of the template to get from datastore.
-    force_send: bool, if an email should be sent no matter the environment.
 
   Raises:
     SendEmailError: if the data pertaining to the loan is incomplete.
@@ -75,15 +74,14 @@ def send_user_email(device, template_name, force_send=False):
   }
   # We want each different subject to generate a unique hash.
   logging.info('Sending email to %s\nSubject: %s.', device.assigned_user, title)
-  _send_email(force_send, **email_dict)
+  _send_email(**email_dict)
 
 
-def send_shelf_audit_email(shelf, force_send=False):
+def send_shelf_audit_email(shelf):
   """Sends a shelf audit email.
 
   Args:
     shelf: shelf_model.Shelf object for location details.
-    force_send: bool, if an email should be sent no matter the environment.
 
   Raises:
     SendEmailError: if the data pertaining to the audit is incomplete.
@@ -106,32 +104,26 @@ def send_shelf_audit_email(shelf, force_send=False):
   # We want each different subject to generate a unique hash.
   logging.info(
       'Sending email to %s\nSubject: %s.', shelf.responsible_for_audit, title)
-  _send_email(force_send, **email_dict)
+  _send_email(**email_dict)
 
 
-def _send_email(force_send, **kwargs):
+def _send_email(**kwargs):
   """Sends email using App Engine's email API.
 
   Args:
-    force_send: bool, if an email should be sent no matter the environment.
     **kwargs: kwargs for the email api.
   """
   kwargs['sender'] = constants.EMAIL_FROM
-  if force_send and not constants.ON_PROD:
+  if not constants.ON_PROD:
     if constants.ON_DEV:
       kwargs['subject'] = '[dev] ' + kwargs['subject']
     elif constants.ON_LOCAL:
       kwargs['subject'] = '[local] ' + kwargs['subject']
     elif constants.ON_QA:
       kwargs['subject'] = '[qa] ' + kwargs['subject']
-  if constants.ON_PROD or force_send:
-    try:
-      mail.send_mail(**kwargs)
-    except mail.InvalidEmailError as error:
-      logging.error(
-          'Email helper failed to send mail due to an error: %s. (Kwargs: %s)',
-          error.message, str(kwargs))
-  else:
-    logging.debug('On dev, not sending email.')
-    for key, value in kwargs.iteritems():
-      logging.debug('%r: %r', key, value)
+  try:
+    mail.send_mail(**kwargs)
+  except mail.InvalidEmailError as error:
+    logging.error(
+        'Email helper failed to send mail due to an error: %s. (Kwargs: %s)',
+        error.message, kwargs)

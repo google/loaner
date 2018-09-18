@@ -613,6 +613,7 @@ class Device(base_model.BaseModel):
     Returns:
       The key of the datastore record.
     """
+    self = events.raise_event('device_loan_return', device=self)
     if self.lost:
       self.lost = False
     if self.locked:
@@ -624,7 +625,6 @@ class Device(base_model.BaseModel):
     self.move_to_default_ou(user_email=user_email)
     self.last_reminder = None
     self.next_reminder = None
-    self = events.raise_event('device_loan_return', device=self)
     self.put()
     self.stream_to_bq(
         user_email, 'Marking device %s as returned.' % self.identifier)

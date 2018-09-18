@@ -19,57 +19,60 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
+import logging
 
+from absl.testing import parameterized
 import mock
 
+from google.appengine.api import mail
+
+from loaner.web_app import constants
 from loaner.web_app.backend.lib import send_email
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class EmailTest(loanertest.TestCase):
+class EmailTest(parameterized.TestCase, loanertest.TestCase):
 
   def setUp(self):
     super(EmailTest, self).setUp()
     self.default_kwargs = {
         'subject': 'You are for sure a loaner borrower',
+        'sender': constants.EMAIL_FROM,
         'to': loanertest.USER_EMAIL,
         'body': 'A plain text e-mail.',
         'html': '<blink>A rich HTML e-mail.</blink>'
     }
 
-  @mock.patch('__main__.send_email.mail.send_mail')
-  @mock.patch('__main__.send_email.logging.debug')
-  @mock.patch('__main__.send_email.logging.error')
+  @parameterized.named_parameters(
+      {'testcase_name': 'on_prod', 'instance_subject': '', 'on_prod': True,
+       'on_qa': False, 'on_dev': False, 'on_local': False,},
+      {'testcase_name': 'on_qa', 'instance_subject': '[qa] ', 'on_prod': False,
+       'on_qa': True, 'on_dev': False, 'on_local': False,},
+      {'testcase_name': 'on_dev', 'instance_subject': '[dev] ',
+       'on_prod': False, 'on_qa': False, 'on_dev': True, 'on_local': False,},
+      {'testcase_name': 'on_local', 'instance_subject': '[local] ',
+       'on_prod': False, 'on_qa': False, 'on_dev': False, 'on_local': True,},
+  )
   def test_send_email(
-      self, mock_logerror, mock_logdebug, mock_gae_sendmail):
+      self, instance_subject, on_prod, on_qa, on_dev, on_local):
     """Test basic email function."""
+    constants.ON_PROD = on_prod
+    constants.ON_QA = on_qa
+    constants.ON_DEV = on_dev
+    constants.ON_LOCAL = on_local
+    with mock.patch.object(mail, 'send_mail') as mock_gae_sendmail:
+      send_email._send_email(**self.default_kwargs)
+      self.default_kwargs['subject'] = (
+          instance_subject + self.default_kwargs['subject'])
+      mock_gae_sendmail.assert_called_once_with(**self.default_kwargs)
 
-    # Dev, so we only log.
-    send_email.constants.ON_PROD = False
-    send_email._send_email(False, **self.default_kwargs)
-    assert mock_logdebug.called
-    assert not mock_gae_sendmail.called
-
-    # Dev but force send.
-    mock_logdebug.reset_mock()
-    send_email.constants.ON_PROD = False
-    send_email._send_email(True, **self.default_kwargs)
-    assert not mock_logdebug.called
-    assert mock_gae_sendmail.called
-
-    # Kneel before Prod.
-    mock_logdebug.reset_mock()
-    mock_gae_sendmail.reset_mock()
+  @mock.patch.object(mail, 'send_mail', side_effect=mail.InvalidEmailError)
+  @mock.patch.object(logging, 'error')
+  def test_send_email_error(self, mock_logerror, mock_gae_sendmail):
     send_email.constants.ON_PROD = True
-    send_email._send_email(True, **self.default_kwargs)
-    assert mock_gae_sendmail.called
-
-    # Exception raised by GAE's send_mail function.
-    send_email.constants.ON_PROD = True
-    mock_gae_sendmail.side_effect = send_email.mail.InvalidEmailError
-    send_email._send_email(True, **self.default_kwargs)
+    send_email._send_email(**self.default_kwargs)
     assert mock_logerror.called
 
   @mock.patch('__main__.send_email.logging')
@@ -144,51 +147,10 @@ class EmailTest(loanertest.TestCase):
     send_email.config_model.Config.set(
         'img_banner_primary', 'https://button.site/banners/primary.png')
 
-    send_email.send_shelf_audit_email(shelf, 'shelf_audit_request')
+    send_email.send_shelf_audit_email(shelf)
     assert mock_logging.info.called
     assert mock_sendemail.called
     assert mock_render.called
-
-  @mock.patch('__main__.send_email.mail.send_mail')
-  def test_force_send(self, mock_gae_sendmail):
-    """Tests Dev/Local/QA modification of subject field."""
-    send_email.constants.ON_DEV = True
-    send_email.constants.ON_LOCAL = False
-    send_email.constants.ON_PROD = False
-    send_email.constants.ON_QA = False
-
-    # Dev
-    send_email._send_email(force_send=True, **self.default_kwargs)
-
-    # Local
-    send_email.constants.ON_DEV = False
-    send_email.constants.ON_LOCAL = True
-    send_email._send_email(force_send=True, **self.default_kwargs)
-
-    # QA
-    send_email.constants.ON_LOCAL = False
-    send_email.constants.ON_QA = True
-    send_email._send_email(force_send=True, **self.default_kwargs)
-
-    expected_calls = [
-        mock.call(
-            html=self.default_kwargs['html'], body=self.default_kwargs['body'],
-            to=self.default_kwargs['to'], sender='noreply@{}'.format(
-                loanertest.USER_DOMAIN),
-            subject='[dev] You are for sure a loaner borrower'),
-        mock.call(
-            html=self.default_kwargs['html'], body=self.default_kwargs['body'],
-            to=self.default_kwargs['to'], sender='noreply@{}'.format(
-                loanertest.USER_DOMAIN),
-            subject='[local] You are for sure a loaner borrower'),
-        mock.call(
-            html=self.default_kwargs['html'], body=self.default_kwargs['body'],
-            to=self.default_kwargs['to'], sender='noreply@{}'.format(
-                loanertest.USER_DOMAIN),
-            subject='[qa] You are for sure a loaner borrower')
-    ]
-
-    mock_gae_sendmail.assert_has_calls(expected_calls)
 
 
 if __name__ == '__main__':

@@ -122,7 +122,6 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/models:config_model",
-        "@absl_archive//absl/logging",
         "@html2text_archive//:html2text",
     ],
 )
@@ -284,9 +283,11 @@ loaner_appengine_test(
     ],
     deps = [
         ":send_email",
+        "//loaner/web_app:constants",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )
