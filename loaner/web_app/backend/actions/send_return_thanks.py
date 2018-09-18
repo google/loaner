@@ -34,4 +34,4 @@ class SendThanks(base_action.BaseAction):
     if not device:
       raise base_action.MissingDeviceError(
           'Cannot send mail. Task did not receive a device.')
-    send_email.send_user_email(device, 'reminder_return_thanks')
+    send_email.send_user_email(device, 'reminder_return_thanks', False)

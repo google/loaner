@@ -42,7 +42,7 @@ class SendReturnThanksTest(loanertest.ActionTestCase):
         serial_number='123456', chrome_device_id='123')
 
     self.action.run(device=device)
-    mock_sendemail.assert_called_with(device, 'reminder_return_thanks')
+    mock_sendemail.assert_called_with(device, 'reminder_return_thanks', False)
 
 
 if __name__ == '__main__':

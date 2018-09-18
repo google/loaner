@@ -168,15 +168,13 @@ templates:
             <tr>
               <td style="font-family:Roboto, Arial, sans-serif; padding:.3cm;">
                 {% block body %}{% endblock %}
-                <p>
-                  To manage your loan, click the button below.
-                </p>
                 <p>Thanks,<br>The Loaner Service</p>
               </td>
             </tr>
             {% block footer %}
               <tr height=80px>
                 <td style="display:inline-block;text-align:center;width:100%">
+                 {% if include_manage_loan_button %}
                     <a href="https://{{ origin }}/user/{{ serial_number }}"
                          style="display: inline-block;">
                         <img src="{{ img_button_manage }}"
@@ -184,6 +182,7 @@ templates:
                              alt="Manage your loan"
                              title="Manage your loan"></img>
                     </a>
+                 {% endif %}
                 </td>
               </tr>
             {% endblock %}

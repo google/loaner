@@ -36,13 +36,15 @@ class SendEmailError(Error):
   """Error raised when we cannot send an e-mail."""
 
 
-def send_user_email(device, template_name):
+def send_user_email(device, template_name, include_manage_loan_button=True):
   """Sends an email reminder to a Device borrower.
 
   Args:
     device: device_model.Device object for device, assigned_user, and loan
         details.
     template_name: str, name of the template to get from datastore.
+    include_manage_loan_button: bool, if the email should include the manage
+        loan button.
 
   Raises:
     SendEmailError: if the data pertaining to the loan is incomplete.
@@ -64,6 +66,7 @@ def send_user_email(device, template_name):
       'img_button_manage': config_model.Config.get('img_button_manage'),
       'origin': constants.ORIGIN,
       'serial_number': device.serial_number or '',
+      'include_manage_loan_button': include_manage_loan_button,
   }
   title, body = constants.TEMPLATE_LOADER.render(template_name, template_dict)
   email_dict = {
