@@ -147,16 +147,21 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         self.test_shelf_model)
     self.assertEqual(actual_message, self.expected_shelf_message)
 
-  def test_to_dict(self):
+  @parameterized.named_parameters(
+      {'testcase_name': 'with_lat_long', 'message': shelf_messages.Shelf(
+          location='NY', capacity=50, friendly_name='Big_Apple',
+          audit_requested=False, responsible_for_audit='daredevils',
+          latitude=12.5, longitude=12.5, last_audit_by=loanertest.USER_EMAIL,
+          enabled=True), 'expected_dict': {
+              'location': 'NY', 'capacity': 50, 'friendly_name': 'Big_Apple',
+              'audit_requested': False, 'responsible_for_audit': 'daredevils',
+              'lat_long': ndb.GeoPt(12.5, 12.5),
+              'last_audit_by': loanertest.USER_EMAIL, 'enabled': True},},
+      {'testcase_name': 'without_lat_long', 'message': shelf_messages.Shelf(
+          location='NY'), 'expected_dict': {'location': 'NY', 'enabled': True},}
+  )
+  def test_to_dict(self, message, expected_dict):
     """Test that a dictionary is build from a ProtoRPC message."""
-    message = shelf_messages.Shelf(
-        location='NY', capacity=50, friendly_name='The_Big_Apple',
-        audit_requested=False, responsible_for_audit='daredevils',
-        last_audit_by=loanertest.USER_EMAIL, enabled=True)
-    expected_dict = {
-        'location': 'NY', 'capacity': 50, 'friendly_name': 'The_Big_Apple',
-        'audit_requested': False, 'responsible_for_audit': 'daredevils',
-        'last_audit_by': loanertest.USER_EMAIL, 'enabled': True}
     filters = api_utils.to_dict(message, shelf_model.Shelf)
     self.assertEqual(filters, expected_dict)
 

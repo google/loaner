@@ -133,7 +133,18 @@ def to_dict(entity, model_class):
   """
   dictionary = {}
   for key in model_class._properties:  # pylint: disable=protected-access
-    value = getattr(entity, key, None)
+    if key == 'lat_long':
+      try:
+        value = ndb.GeoPt(
+            getattr(entity, 'latitude', None),
+            getattr(entity, 'longitude', None))
+      except datastore_errors.BadValueError:
+        # BadValueError was raised when getattr returned None for latitude and
+        # longitude. No need to set ndb.GeoPt as the values were None.
+        pass
+    else:
+      value = getattr(entity, key, None)
+
     if value is not None and value != []:  # pylint: disable=g-explicit-bool-comparison
       dictionary[key] = value
   return dictionary
