@@ -3,7 +3,7 @@
 # Execute backend bazel tests.
 #   Usage: ./backend_tests.sh SHARD_INDEX TOTAL_NUMBER_OF_SHARDS
 
-set -ex
+set -e
 
 CURRENT_TEST_GROUP=${1:-0}
 TOTAL_TEST_GROUPS=${2:-1}

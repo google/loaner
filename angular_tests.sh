@@ -3,7 +3,7 @@
 # Execute frontend and Chrome app npm tests.
 #   Usage: ./angular_tests.sh
 
-set -ex
+set -e
 
 cd loaner
 

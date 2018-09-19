@@ -27,6 +27,7 @@ matrix:
         - GROUP=1
         - GROUP=2
         - GROUP=3
+        - GROUP=4
     - language: node_js
       node_js:
         - "8.11.0"
@@ -42,4 +43,4 @@ matrix:
 
 env:
   global:
-    - TOTAL_GROUPS=4
+    - TOTAL_GROUPS=5
