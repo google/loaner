@@ -45,7 +45,8 @@
           <mat-cell *cdkCellDef="let shelf">
             <button mat-icon-button routerLink="/shelf/{{shelf.location}}/audit"
                     (focus)="pauseLoading=true;"
-                    (blur)="pauseLoading=false;">
+                    (blur)="pauseLoading=false;"
+                    aria-label="Audit shelf">
               <mat-icon svgIcon="checkin"
                         matTooltip="Audit Shelf"
                         matTooltipPosition="above"></mat-icon>
