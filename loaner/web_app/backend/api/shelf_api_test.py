@@ -173,7 +173,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_list_shelves(self, request, response_length, mock_xsrf_token):
     response = self.service.list_shelves(request)
     self.assertEqual(mock_xsrf_token.call_count, 1)
-    self.assertEqual(response_length, len(response.shelves))
+    self.assertLen(response.shelves, response_length)
 
   def test_list_shelves_invalid_page_size(self):
     with self.assertRaises(endpoints.BadRequestException):
@@ -201,20 +201,20 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     previouse_shelf_locations = []
     request = shelf_messages.Shelf(enabled=True, page_size=1, page_number=1)
     response = self.service.list_shelves(request)
-    self.assertEqual(len(response.shelves), 1)
+    self.assertLen(response.shelves, 1)
     previouse_shelf_locations.append(response.shelves[0].location)
 
     # Get next page results and make sure it's not the same as last.
     request = shelf_messages.Shelf(enabled=True, page_size=1, page_number=2)
     response = self.service.list_shelves(request)
-    self.assertEqual(len(response.shelves), 1)
+    self.assertLen(response.shelves, 1)
     self.assertNotIn(response.shelves[0], previouse_shelf_locations)
     previouse_shelf_locations.append(response.shelves[0].location)
 
     # Get next page results and make sure it's not the same as last 2.
     request = shelf_messages.Shelf(enabled=True, page_size=1, page_number=3)
     response = self.service.list_shelves(request)
-    self.assertEqual(len(response.shelves), 1)
+    self.assertLen(response.shelves, 1)
     self.assertNotIn(response.shelves[0], previouse_shelf_locations)
     previouse_shelf_locations.append(response.shelves[0].location)
 
@@ -226,7 +226,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
         device_identifiers=self.device_identifiers)
     response = self.service.audit(request)
     self.assertEqual(mock_xsrf_token.call_count, 1)
-    mock_logging.assert_called()
+    self.assertTrue(mock_logging.called)
     for identifier in self.device_identifiers:
       datastore_device = device_model.Device.get(serial_number=identifier)
       self.assertEqual(datastore_device.shelf.get().location, 'NYC')

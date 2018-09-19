@@ -264,7 +264,7 @@ class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
           return results.
       sort_options: search.SortOptions, an object specifying a multi-dimensional
           sort over search results.
-      returned_fields: list|str|, an iterable of names of fields to return in
+      returned_fields: List[str], an iterable of names of fields to return in
           search results.
 
     Returns:
