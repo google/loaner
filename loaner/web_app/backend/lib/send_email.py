@@ -99,7 +99,7 @@ def send_shelf_audit_email(shelf):
   title, body = constants.TEMPLATE_LOADER.render(
       'shelf_audit_request', template_dict)
   email_dict = {
-      'to': shelf.responsible_for_audit,
+      'to': config_model.Config.get('shelf_audit_email_to'),
       'subject': title,
       'body': html2text.html2text(body),
       'html': body,
