@@ -22,6 +22,7 @@ import sys
 import textwrap
 
 from absl import flags
+from six.moves import input
 
 FLAGS = flags.FLAGS
 
@@ -60,3 +61,84 @@ def write(message):
   """
   sys.stdout.write(_wrap_lines(message) + '\n')
   sys.stdout.flush()
+
+
+def prompt(message, user_prompt=None, default=None, parser=None):
+  """Prompts the user for input.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    user_prompt: str, the prompt to display before input.
+    default: str, the default value if no other input is provided.
+    parser: Callable, an object to validate and parse the provided input.
+        A parser must meet the following requirements:
+          1) The object must have a parse() method that accepts a single string
+             as input and returns the parsed output.
+          2) Any error that occurs during parse() should raise a ValueError to
+             indicate bad user input with a helpful error message.
+        A working example can be found below as the 'YesNoParser'.
+
+  Returns:
+    The user provided input (optionally parsed).
+
+  Raises:
+    NameError: when the developer provided parser object does not provide the
+        public `parse` method.
+  """
+  if user_prompt is None:
+    user_prompt = '>>>> '
+
+  if default is not None:
+    message = '{}\nDefault: {}'.format(message, default)
+
+  while True:
+    write(message)
+    user_input = input(user_prompt)
+    if not user_input and default is not None:
+      user_input = default
+    if parser is None:
+      break
+    parse_method = getattr(parser, 'parse', None)
+    if parse_method is None or not hasattr(parse_method, '__call__'):
+      raise NameError(
+          "the object provided as a parser {!r} must have 'parse' as a public "
+          'method'.format(parser))
+    try:
+      user_input = parser.parse(user_input)
+    except ValueError as err:
+      write("Invalid Response: '{}'\nError: {}\nPlease try again.\n".format(
+          user_input, err))
+    else:
+      break
+  return user_input
+
+
+class YesNoParser(object):
+  """A Yes/No parser object."""
+
+  def __init__(self, need_full=False):
+    self._need_full = need_full
+    self._valid_yes = ('yes',) if need_full else ('y', 'yes')
+    self._valid_no = ('no',) if need_full else ('n', 'no')
+
+  def __repr__(self):
+    return '<{0}({1})>'.format(self.__class__.__name__, self._need_full)
+
+  def parse(self, arg):
+    """Parses and validates the provided argument.
+
+    Args:
+      arg: str, the string to be parsed and validated.
+
+    Returns:
+      A boolean for whether or not the provided input is valid.
+
+    Raises:
+      ValueError: when the provided argument is invalid.
+    """
+    clean_arg = arg.strip().lower()
+    if clean_arg in self._valid_yes:
+      return True
+    if clean_arg in self._valid_no:
+      return False
+    raise ValueError("the value {!r} is not a 'yes' or 'no'".format(arg))
