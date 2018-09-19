@@ -142,3 +142,103 @@ class YesNoParser(object):
     if clean_arg in self._valid_no:
       return False
     raise ValueError("the value {!r} is not a 'yes' or 'no'".format(arg))
+
+
+class StringParser(object):
+  """A string parser object."""
+
+  def __init__(self, allow_empty_string=False):
+    self._allow_empty_string = allow_empty_string
+
+  def parse(self, arg):
+    """Parses and validates the provided argument.
+
+    Args:
+      arg: str, the string to be parsed and validated.
+
+    Returns:
+      The parsed string.
+
+    Raises:
+      ValueError: when the provided argument is invalid.
+    """
+    clean_arg = arg.strip()
+    if self._allow_empty_string or clean_arg:
+      return clean_arg
+    raise ValueError('the value {!r} is not a valid string'.format(arg))
+
+
+def prompt_yes_no(message, need_full=False, **kwargs):
+  """Prompt the user for a 'yes' or 'no' as a boolean.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    need_full: bool, whether or not the full word ('yes' or 'no') is required.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    True if the user responded with 'yes' and False if 'no'.
+  """
+  return prompt(message, parser=YesNoParser(need_full=need_full), **kwargs)
+
+
+def prompt_string(message, allow_empty_string=False, **kwargs):
+  """Prompt the user for a string.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    allow_empty_string: bool, whether or not the response is allowed to be an
+        empty string.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    A user provided string.
+  """
+  return prompt(message, parser=StringParser(allow_empty_string, **kwargs))
+
+
+def prompt_int(message, minimum=None, maximum=None, **kwargs):
+  """Prompt the user for an integer.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    minimum: int, the minimum accepted value.
+    maximum: int, the maximum accepted value.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    A user provided int.
+  """
+  parser = flags.IntegerParser(lower_bound=minimum, upper_bound=maximum)
+  return prompt(message, parser=parser, **kwargs)
+
+
+def prompt_csv(message, **kwargs):
+  """Prompt the user for a comma separated list of values.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    A user provided list of values.
+  """
+  return prompt(message, parser=flags.ListParser(), **kwargs)
+
+
+def prompt_enum(message, accepted_values=None, case_sensitive=True, **kwargs):
+  """Prompt the user for a value within an Enum.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    accepted_values: List[Any], a list of accepted values.
+    case_sensitive: bool, whether or not validation should require the response
+        to be the same case.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    A user provided value from within the Enum.
+  """
+  parser = flags.EnumParser(
+      enum_values=accepted_values, case_sensitive=case_sensitive)
+  return prompt(message, parser=parser, **kwargs)

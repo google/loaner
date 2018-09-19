@@ -122,6 +122,68 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
     with self.assertRaises(ValueError):
       parser.parse(user_input)
 
+  @parameterized.named_parameters(
+      ('Empty String Allowed', True, '', ''),
+      ('Non-empty String', False, 'this', 'this'),
+      ('Excess  whitespace', False, '  that  ', 'that'),
+  )
+  def test_string_parser(self, allow_empty_string, user_input, expected):
+    parser = utils.StringParser(allow_empty_string)
+    self.assertEqual(parser.parse(user_input), expected)
+
+  def test_string_parser_errors(self):
+    parser = utils.StringParser(False)
+    with self.assertRaises(ValueError):
+      parser.parse('')
+
+  @parameterized.named_parameters(
+      ('Short, upper, True', False, 'Y', True),
+      ('Long, lower, True', True, 'yes', True),
+      ('Short, lower, False', False, 'n', False),
+      ('Long, upper, False', True, 'NO', False),
+  )
+  def test_prompt_yes_no(self, need_full, user_input, expected):
+    with mock.patch.object(utils, 'input', return_value=user_input):
+      actual = utils.prompt_yes_no('MESSAGE', need_full)
+    self.assertEqual(actual, expected)
+
+  @parameterized.named_parameters(
+      ('Empty String Allowed', True, '', ''),
+      ('Non-empty String', False, 'this', 'this'),
+      ('Excess  whitespace', False, '  that  ', 'that'),
+  )
+  def test_prompt_string(self, allow_empty_string, user_input, expected):
+    with mock.patch.object(utils, 'input', return_value=user_input):
+      actual = utils.prompt_string('MESSAGE', allow_empty_string)
+    self.assertEqual(actual, expected)
+
+  @parameterized.named_parameters(
+      ('Middle of the bounds', 0, 10, 5, None, 5),
+      ('Maximum', 0, 5, None, '5', 5),
+      ('Minimum', 0, 5, None, '0', 0),
+      ('No Bounds', None, None, None, '100000', 100000),
+  )
+  def test_prompt_int(self, minimum, maximum, default, user_input, expected):
+    with mock.patch.object(utils, 'input', return_value=user_input):
+      actual = utils.prompt_int('MESSAGE', minimum, maximum, default=default)
+    self.assertEqual(actual, expected)
+
+  def test_prompt_csv(self):
+    with mock.patch.object(utils, 'input', return_value='1,two,this'):
+      actual = utils.prompt_csv('MESSAGE')
+    self.assertEqual(actual, ['1', 'two', 'this'])
+
+  @parameterized.named_parameters(
+      ('First case insensitive', ['one', 'TWO', 'Three'], False, 'one', 'one'),
+      ('Second case insensitive', ['one', 'TWO', 'Three'], False, 'tWo', 'TWO'),
+      ('Case Sensitive', ['one', 'TWO', 'Three'], True, 'Three', 'Three'),
+  )
+  def test_prompt_enum(self, values, case_sensitive, user_input, expected):
+    with mock.patch.object(utils, 'input', return_value=user_input):
+      actual = utils.prompt_enum(
+          'MESSAGE', accepted_values=values, case_sensitive=case_sensitive)
+    self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
   absltest.main()
