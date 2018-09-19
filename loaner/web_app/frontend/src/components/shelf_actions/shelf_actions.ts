@@ -102,7 +102,8 @@ export class ShelfActionsCard implements OnInit {
 
   /** Navigates to the shelf details page. */
   backToShelfDetails() {
-    this.router.navigate([`/shelf/${this.shelf.location}/details`]);
+    if (!this.shelf.location) return;
+    this.router.navigate(['/shelf', this.shelf.location, 'details']);
   }
 
   /** Can deactivate route checking. */

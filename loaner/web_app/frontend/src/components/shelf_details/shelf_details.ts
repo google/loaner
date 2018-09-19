@@ -63,7 +63,7 @@ export class ShelfDetails implements OnInit {
 
   /** Route to action update to enable form. */
   edit() {
-    this.router.navigate([`/shelf/${this.shelf.location}/update`]);
+    this.router.navigate(['/shelf', this.shelf.location, 'update']);
   }
 
   /** Dialog for removing a shelf. */

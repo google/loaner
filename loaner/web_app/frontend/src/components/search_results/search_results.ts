@@ -125,7 +125,7 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
       this.totalResults = response.totalResults;
       const shelves = response.shelves;
       if (shelves.length === 1 && shelves[0].location) {
-        this.router.navigate([`/shelf/${shelves[0].location}/details`]);
+        this.router.navigate(['/shelf', shelves[0].location, 'details']);
       } else {
         this.results = shelves;
         this.location.replaceState(`/search/shelf/${queryString}`);
