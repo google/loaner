@@ -73,7 +73,7 @@ describe('ConfigurationComponent', () => {
     fixture.detectChanges();
     const groupResponsibleForAuditInput =
         fixture.debugElement.nativeElement.querySelector(
-            'input[name="responsible_for_audit_string"]');
+            'input[name="responsible_for_audit_list"]');
     expect(groupResponsibleForAuditInput).toBeDefined();
     expect(groupResponsibleForAuditInput.type).toBe('email');
   });
