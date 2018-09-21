@@ -229,8 +229,8 @@ Before you deploy GnG, the following constants must be configured:
     the "Multi-domain Support" section at the bottom of this doc.
 
 +   **`ON_PROD`** is the Google Cloud Project ID the production version of GnG
-    will run in. You need to replace the empty string with the Google Cloud
-    Project ID of your project.
+    will run in. You need to replace the string 'prod-app-engine-project' with
+    the ID of your project.
 
 +   **`ADMIN_USERNAME`** the email address of the G Suite role account you set
     up. Usually loaner-role@example.com.
@@ -276,9 +276,9 @@ versions to test deployments before promoting them to the production version.
 #### shared/config.ts
 
 +   **`PROD`** is the Google Cloud Project ID that the production version of GnG
-    will operate in. You will need to place the Google Cloud Project ID in the
-    empty string next to `export const PROD = '';`. This is the same ID used for
-    ON_PROD in loaner/web_app/constants.py.
+    will operate in. You will need to replace the string
+    'prod-app-engine-project' with the ID of your project. This is the same ID
+    used for ON_PROD in loaner/web_app/constants.py.
 
 +   **`WEB_APP_CLIENT_IDS`** is the OAuth2 Client ID you created previously that
     the Web App frontend will use to authenticate to the backend. This is the
