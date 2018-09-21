@@ -50,15 +50,26 @@ chrome.app.runtime.onLaunched.addListener((launchData) => {
  * On installed of the application start the onboarding process.
  */
 chrome.runtime.onInstalled.addListener(() => {
-  onboardUser();
+  prepareToOnboardUser();
 });
 
 /**
  * On installed of the application start the onboarding process.
  */
 chrome.runtime.onStartup.addListener(() => {
-  onboardUser();
+  prepareToOnboardUser();
 });
+
+/**
+ * This function adds a listener which waits for the user profile to be
+ * available to the chrome.identity API.
+ */
+function prepareToOnboardUser() {
+  // First attempt occurs regardless of sign in.
+  onboardUser();
+  // Second attempt only occurs if the sign in changes.
+  chrome.identity.onSignInChanged.addListener(() => onboardUser());
+}
 
 /**
  * Launches the GnG Management application.
