@@ -411,8 +411,11 @@ class DeviceModelTest(loanertest.TestCase):
 
   def test_unenroll(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.test_device.unenroll(loanertest.USER_EMAIL)
+    self.test_device.assigned_user = loanertest.USER_EMAIL
 
+    self.testbed.mock_raiseevent.return_value = self.test_device
+    self.test_device.unenroll(loanertest.USER_EMAIL)
+    self.assertEqual(self.testbed.mock_raiseevent.call_count, 4)
     self.assertFalse(self.test_device.enrolled)
     self.assertIsNone(self.test_device.assigned_user)
     self.assertIsNone(self.test_device.assignment_date)
