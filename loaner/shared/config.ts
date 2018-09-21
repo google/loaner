@@ -49,28 +49,28 @@ export enum ENVIRONMENTS {
  * These must match the Google Cloud Project ID's in the
  * //loaner/deployments/deploy.sh file for DEV, QA, and PROD respectively.
  */
-export const DEV = 'dev-app-engine-project';
-export const QA = 'qa-app-engine-project';
-export const PROD = 'prod-app-engine-project';
+export const DEV = '';
+export const QA = '';
+export const PROD = '';
 
 /** The url for the Google Cloud Endpoints API for your application. */
 export const WEB_APP_CLIENT_IDS: EnvironmentsVariable = {
-  prod: '',
-  qa: '',
-  dev: '',
+  dev: ``,
+  qa: ``,
+  prod: ``,
 };
 
 /** The url for the Google Cloud Endpoints API for your application. */
 export const STANDARD_ENDPOINTS: EnvironmentsVariable = {
-  prod: `https://endpoints-dot-${PROD}.appspot.com`,
-  qa: `https://endpoints-dot-${QA}.appspot.com`,
   dev: `https://endpoints-dot-${DEV}.appspot.com`,
+  qa: `https://endpoints-dot-${QA}.appspot.com`,
+  prod: `https://endpoints-dot-${PROD}.appspot.com`,
 };
 
 export const CHROME_ENDPOINTS: EnvironmentsVariable = {
-  prod: `https://chrome-dot-${PROD}.appspot.com`,
-  qa: `https://chrome-dot-${QA}.appspot.com`,
   dev: `https://chrome-dot-${DEV}.appspot.com`,
+  qa: `https://chrome-dot-${QA}.appspot.com`,
+  prod: `https://chrome-dot-${PROD}.appspot.com`,
 };
 
 /**
@@ -82,9 +82,9 @@ export const CHROME_ENDPOINTS: EnvironmentsVariable = {
  * NOTE: Each key must be on a single-line!
  */
 export const CHROME_PUBLIC_KEYS: EnvironmentsVariable = {
-  prod: '',
-  qa: '',
-  dev: '',
+  dev: ``,
+  qa: ``,
+  prod: ``,
 };
 
 /** ######################################################################## */

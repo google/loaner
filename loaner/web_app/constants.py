@@ -65,13 +65,13 @@ CONFIG_DEFAULTS_PATH = (
 # Project ID for each environment on the appropriate line.
 # NOTE: These must match the Google Cloud Project ID's in the
 # //loaner/deployments/deploy.sh file for DEV, QA, and PROD respectively.
-ON_PROD = ON_GAE and ('prod-app-engine-project' in APPLICATION_ID)
+ON_PROD = ON_GAE and ('' in APPLICATION_ID)
 
 # If you are using a QA server fill out the Google Cloud Project ID below.
-ON_QA = ON_GAE and ('qa-app-engine-project' in APPLICATION_ID)
+ON_QA = ON_GAE and ('' in APPLICATION_ID)
 
 # If you are using a DEV server fill out the Google Cloud Project ID below.
-ON_DEV = ON_GAE and ('dev-app-engine-project' in APPLICATION_ID)
+ON_DEV = ON_GAE and ('' in APPLICATION_ID)
 
 # The email address of the GSuite Admin to use for Domain Wide Delegated
 # Authority for access to the Google Admin SDK Directory API.
