@@ -133,6 +133,7 @@ def to_dict(entity, model_class):
   """
   dictionary = {}
   for key in model_class._properties:  # pylint: disable=protected-access
+    value = None
     if key == 'lat_long':
       try:
         value = ndb.GeoPt(
