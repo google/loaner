@@ -185,6 +185,7 @@ loaner_appengine_test(
     deps = [
         ":action_loader",
         "//loaner/web_app/backend/actions",
+        "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@mock_archive//:mock",
     ],

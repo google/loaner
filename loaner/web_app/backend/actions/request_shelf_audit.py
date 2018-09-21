@@ -20,6 +20,7 @@ from __future__ import print_function
 
 from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import send_email
+from loaner.web_app.backend.models import config_model
 
 
 class RequestShelfAudit(base_action.BaseAction):
@@ -34,6 +35,7 @@ class RequestShelfAudit(base_action.BaseAction):
     if not shelf:
       raise base_action.MissingShelfError(
           'Cannot send audit request. Task did not receive a shelf.')
-    send_email.send_shelf_audit_email(shelf)
+    if config_model.Config.get('shelf_audit_email'):
+      send_email.send_shelf_audit_email(shelf)
     shelf.audit_requested = True
     shelf.put()

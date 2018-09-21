@@ -55,7 +55,7 @@ loaner_appengine_library(
     deps = [
         ":base_action",
         "//loaner/web_app/backend/lib:send_email",
-        "//loaner/web_app/backend/models:shelf_model",
+        "//loaner/web_app/backend/models:config_model",
     ],
 )
 
@@ -67,7 +67,7 @@ loaner_appengine_library(
     deps = [
         ":base_action",
         "//loaner/web_app/backend/lib:send_email",
-        "//loaner/web_app/backend/models:device_model",
+        "//loaner/web_app/backend/models:event_models",
         "@absl_archive//absl/logging",
     ],
 )
@@ -130,8 +130,10 @@ loaner_appengine_test(
     ],
     deps = [
         "//loaner/web_app/backend/lib:send_email",
+        "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )

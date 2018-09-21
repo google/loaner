@@ -222,7 +222,9 @@ loaner_appengine_test(
         "event_models_test.py",
     ],
     deps = [
+        ":device_model",
         ":event_models",
+        ":shelf_model",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/logging",
