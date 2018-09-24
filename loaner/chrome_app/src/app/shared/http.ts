@@ -22,6 +22,7 @@ import {ConfigService} from '../../../../shared/config';
 
 let accessToken: string;
 const CONFIG = new ConfigService();
+const MAX_RETRIES = 5;
 
 export type HeaderInitTs26 = HeaderInit&string[][];
 
@@ -72,11 +73,29 @@ function makeRequest<T>(
           }
           accessToken = newAccessToken;
           let removedCacheToken = false;
+          let attempt = 0;
 
           const attemptFetch = () => {
             const options: RequestInit = {
               method,
               headers: headers || HEADERS(),
+            };
+
+            // Retries the request if the fetch below fails.
+            const retryOrReject = (reason: {}) => {
+              if (attempt === MAX_RETRIES) {
+                console.error(`Maximum retries ${
+                    MAX_RETRIES} reached. Aborting retries.`);
+                reject(reason);
+              } else {
+                console.error(`Heartbeat failed on attempt ${attempt}`);
+                console.error('Heartbeat failure reason: ', reason);
+                const retryTimeout = setTimeout(() => {
+                  attemptFetch();
+                  attempt++;
+                  clearTimeout(retryTimeout);
+                }, Math.pow(2, attempt) * 1000);
+              }
             };
 
             if (method !== 'head' && method !== 'get') {
@@ -102,13 +121,13 @@ function makeRequest<T>(
                         // Since the heartbeat uses this, we check for these
                         // statuses to allow it to keep trying to make a
                         // successful heartbeat.
-                        reject(response.status);
+                        retryOrReject(response);
                       } else {
                         resolve(response.json());
                       }
                     },
                     (reason: {}) => {
-                      reject(reason);
+                      retryOrReject(reason);
                     });
           };
 
