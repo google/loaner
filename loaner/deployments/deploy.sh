@@ -186,9 +186,30 @@ auth login"
   function goto_loaner_dir() {
     info_message "Going to the loaner directory..."
     # Resolve current directory of the script and any symbolic links
-    DEPLOY_PATH="$(dirname "$(readlink -f "${0}")")"
-    # cd to the 'loaner/loaner/' directory.
-    cd "${DEPLOY_PATH}" && cd ..
+    if [[ "${PLATFORM}" == "${_MAC}" ]]; then
+      local pwd=$(pwd -P)
+      case "${pwd}" in
+        */loaner/loaner)
+          ;;
+        */loaner/loaner/*)
+          cd "${pwd%%/loaner/loaner/*}/loaner/loaner"
+          ;;
+        */loaner)
+          cd "${pwd%%/loaner/*}/loaner"
+          ;;
+        */loaner/*)
+          cd "${pwd%%/loaner/*}/loaner"
+          ;;
+        *)
+          error_message "This script must be run within the loaner directory."
+          ;;
+      esac
+    else
+      DEPLOY_PATH="$(dirname "$(readlink -f "${0}")")"
+      # cd to the 'loaner/loaner/' directory.
+      cd "${DEPLOY_PATH}" && cd ..
+    fi
+
 
     # Make sure we are in the loaner directory.
     if [[ ${PWD##*/} != "loaner" ]]; then
