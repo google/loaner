@@ -29,7 +29,7 @@ from absl import logging
 from google.appengine.ext import deferred
 
 from loaner.web_app import constants
-from loaner.web_app.backend.clients import bigquery_client
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import datastore_yaml
 from loaner.web_app.backend.lib import user
@@ -138,7 +138,7 @@ def bootstrap_bq_history(**kwargs):
         Directory API client methods (required for BigQuery streaming).
   """
   del kwargs  # Unused, but comes by default.
-  client = bigquery_client.BigQueryClient()
+  client = bigquery.BigQueryClient()
   client.initialize_tables()
 
 

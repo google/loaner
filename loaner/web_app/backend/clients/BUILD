@@ -16,15 +16,15 @@ load(
 loaner_appengine_library(
     name = "clients",
     deps = [
-        ":bigquery_client",
+        ":bigquery",
         ":directory",
     ],
 )
 
 loaner_appengine_library(
-    name = "bigquery_client",
+    name = "bigquery",
     srcs = [
-        "bigquery_client.py",
+        "bigquery.py",
     ],
     deps = [
         "//loaner/web_app:constants",
@@ -55,12 +55,12 @@ loaner_appengine_library(
 # ==============================================================================
 
 loaner_appengine_test(
-    name = "bigquery_client_test",
+    name = "bigquery_test",
     srcs = [
-        "bigquery_client_test.py",
+        "bigquery_test.py",
     ],
     deps = [
-        ":bigquery_client",
+        ":bigquery",
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/common:google_cloud_lib_fixer",
         "//loaner/web_app/backend/models:bigquery_row_model",
@@ -88,7 +88,7 @@ loaner_appengine_test(
 test_suite(
     name = "all_tests",
     tests = [
-        ":bigquery_client_test",
+        ":bigquery_test",
         ":directory_test",
     ],
 )

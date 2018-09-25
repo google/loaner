@@ -22,7 +22,7 @@ from absl import logging
 
 from google.appengine.ext import ndb
 
-from loaner.web_app.backend.clients import bigquery_client
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.models import base_model
 
 
@@ -81,10 +81,10 @@ class BigQueryRow(base_model.BaseModel):
   def stream(self):
     """Streams the row to BigQuery."""
     logging.info('Streaming row to table %s', self.model_type)
-    bq_client = bigquery_client.BigQueryClient()
+    bq_client = bigquery.BigQueryClient()
     try:
       bq_client.stream_row(self.model_type, self._to_bq_format())
-    except bigquery_client.InsertError:
+    except bigquery.InsertError:
       logging.error('Unable to stream row, see logs.')
       return
     else:

@@ -25,7 +25,7 @@ import mock
 
 from google.appengine.ext import deferred  # pylint: disable=unused-import
 
-from loaner.web_app.backend.clients import bigquery_client  # pylint: disable=unused-import
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.lib import bootstrap
 from loaner.web_app.backend.lib import datastore_yaml  # pylint: disable=unused-import
 from loaner.web_app.backend.models import bootstrap_status_model
@@ -145,7 +145,7 @@ class BootstrapTest(loanertest.TestCase):
         org_unit_name in bootstrap.constants.ORG_UNIT_DICT
     ])
 
-  @mock.patch('__main__.bigquery_client.BigQueryClient')
+  @mock.patch.object(bigquery, 'BigQueryClient')
   def test_bootstrap_bq_history(self, mock_clientclass):
     """Tests bootstrap_bq_history."""
     mock_client = mock.Mock()

@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for backend.clients.bigquery_client."""
+"""Tests for backend.clients.bigquery."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -25,13 +25,13 @@ import mock
 # pylint: disable=g-bad-import-order
 from loaner.web_app.backend.common import google_cloud_lib_fixer  # pylint: disable=unused-import
 from google import cloud
-from google.cloud import bigquery
+from google.cloud import bigquery as gcloud_bq
 
 from google.appengine.ext import ndb
 # pylint: enable=g-bad-import-order
 
 from loaner.web_app import constants
-from loaner.web_app.backend.clients import bigquery_client
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.models import bigquery_row_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.testing import loanertest
@@ -42,7 +42,7 @@ class BigQueryClientTest(loanertest.TestCase):
 
   def setUp(self):
     super(BigQueryClientTest, self).setUp()
-    bq_patcher = mock.patch.object(bigquery, 'Client', autospec=True)
+    bq_patcher = mock.patch.object(gcloud_bq, 'Client', autospec=True)
     self.addCleanup(bq_patcher.stop)
     self.bq_mock = bq_patcher.start()
     self.dataset = mock.Mock()
@@ -51,29 +51,28 @@ class BigQueryClientTest(loanertest.TestCase):
     self.table.exists.return_value = True
     self.table.insert_data.return_value = None
     self.dataset.table.return_value = self.table
-    self.client = bigquery_client.BigQueryClient()
+    self.client = bigquery.BigQueryClient()
     self.client._dataset = self.dataset
 
-  @mock.patch.object(bigquery_client, 'bigquery')
+  @mock.patch.object(bigquery, '_generate_schema')
+  def test_initialize_tables(self, mock_schema):
+    with mock.patch.object(bigquery, 'bigquery'):
+      mock_client = bigquery.BigQueryClient()
+      mock_client._dataset = mock.Mock()
+
+      mock_client.initialize_tables()
+
+      mock_schema.assert_called()
+      mock_client._dataset.create.assert_called()
+      mock_client._dataset.table.called_with(constants.BIGQUERY_DEVICE_TABLE)
+      mock_client._dataset.table.called_with(constants.BIGQUERY_SHELF_TABLE)
+
+  @mock.patch.object(bigquery, 'bigquery')
   @mock.patch.object(
-      bigquery_client, '_generate_schema', return_value=mock.Mock())
-  def test_initialize_tables(self, mock_schema, _):
-    mock_client = bigquery_client.BigQueryClient()
-    mock_client._dataset = mock.Mock()
-
-    mock_client.initialize_tables()
-
-    mock_schema.assert_called()
-    mock_client._dataset.create.assert_called()
-    mock_client._dataset.table.called_with(constants.BIGQUERY_DEVICE_TABLE)
-    mock_client._dataset.table.called_with(constants.BIGQUERY_SHELF_TABLE)
-
-  @mock.patch.object(bigquery_client, 'bigquery')
-  @mock.patch.object(
-      bigquery_client, '_generate_schema', return_value=mock.Mock())
+      bigquery, '_generate_schema', return_value=mock.Mock())
   def test_initialize_tables__dataset_exists(self, mock_schema, unused):
     del unused
-    mock_client = bigquery_client.BigQueryClient()
+    mock_client = bigquery.BigQueryClient()
     mock_client._dataset = mock.Mock()
     mock_client._dataset.create.side_effect = cloud.exceptions.Conflict(
         'Already Exists: Dataset Loaner')
@@ -99,7 +98,7 @@ class BigQueryClientTest(loanertest.TestCase):
     self.table.exists.return_value = False
 
     self.assertRaises(
-        bigquery_client.GetTableError, self.client.stream_row, 'test', None)
+        bigquery.GetTableError, self.client.stream_row, 'test', None)
 
   def test_stream_row_bq_errors(self):
     self.table.insert_data.return_value = 'Oh no it exploded'
@@ -111,19 +110,19 @@ class BigQueryClientTest(loanertest.TestCase):
         test_device, now, loanertest.USER_EMAIL, 'Enroll', 'This is a test')
 
     self.assertRaises(
-        bigquery_client.InsertError, self.client.stream_row, 'test',
+        bigquery.InsertError, self.client.stream_row, 'test',
         row._to_bq_format())
 
   def test_generate_schema_no_entity(self):
-    generated_schema = bigquery_client._generate_schema()
+    generated_schema = bigquery._generate_schema()
 
     self.assertEqual(len(generated_schema), 5)
-    self.assertIsInstance(generated_schema[0], bigquery.SchemaField)
+    self.assertIsInstance(generated_schema[0], gcloud_bq.SchemaField)
 
   def test_generate_schema_entity(self):
-    entity_fields = [bigquery.SchemaField('test', 'STRING', 'REQUIRED')]
+    entity_fields = [gcloud_bq.SchemaField('test', 'STRING', 'REQUIRED')]
 
-    generated_schema = bigquery_client._generate_schema(entity_fields)
+    generated_schema = bigquery._generate_schema(entity_fields)
     self.assertEqual(len(generated_schema), 6)
     self.assertEqual(generated_schema[5].fields[0].name, 'test')
 
@@ -139,16 +138,16 @@ class BigQueryClientTest(loanertest.TestCase):
       nested_attribute = ndb.StructuredProperty(NestedTestModel)
 
     nested_schema = [
-        bigquery.SchemaField('nested_string_attribute', 'STRING', 'NULLABLE')]
+        gcloud_bq.SchemaField('nested_string_attribute', 'STRING', 'NULLABLE')]
     expected_schema = [
-        bigquery.SchemaField('string_attribute', 'STRING', 'NULLABLE'),
-        bigquery.SchemaField('integer_attribute', 'INTEGER', 'NULLABLE'),
-        bigquery.SchemaField('boolean_attribute', 'BOOLEAN', 'NULLABLE'),
-        bigquery.SchemaField(
+        gcloud_bq.SchemaField('string_attribute', 'STRING', 'NULLABLE'),
+        gcloud_bq.SchemaField('integer_attribute', 'INTEGER', 'NULLABLE'),
+        gcloud_bq.SchemaField('boolean_attribute', 'BOOLEAN', 'NULLABLE'),
+        gcloud_bq.SchemaField(
             'nested_attribute', 'RECORD', 'NULLABLE', fields=nested_schema)
     ]
 
-    schema = bigquery_client._generate_entity_schema(TestModel())
+    schema = bigquery._generate_entity_schema(TestModel())
 
     expected_schema_names = _populate_schema_names(expected_schema)
     schema_names = _populate_schema_names(schema)

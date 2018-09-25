@@ -51,7 +51,7 @@ loaner_appengine_library(
     ],
     deps = [
         ":base_model",
-        "//loaner/web_app/backend/clients:bigquery_client",
+        "//loaner/web_app/backend/clients:bigquery",
         "@absl_archive//absl/logging",
     ],
 )

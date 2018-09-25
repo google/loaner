@@ -65,7 +65,7 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app:constants",
-        "//loaner/web_app/backend/clients:bigquery_client",
+        "//loaner/web_app/backend/clients:bigquery",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:datastore_yaml",
         "//loaner/web_app/backend/lib:utils",
@@ -218,7 +218,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":bootstrap",
-        "//loaner/web_app/backend/clients:bigquery_client",
+        "//loaner/web_app/backend/clients:bigquery",
         "//loaner/web_app/backend/lib:datastore_yaml",
         "//loaner/web_app/backend/models:bootstrap_status_model",
         "//loaner/web_app/backend/models:config_model",
