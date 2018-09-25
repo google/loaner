@@ -55,9 +55,9 @@ export const PROD = 'prod-app-engine-project';
 
 /** The url for the Google Cloud Endpoints API for your application. */
 export const WEB_APP_CLIENT_IDS: EnvironmentsVariable = {
-  prod: '',
-  qa: '',
-  dev: '',
+  prod: `{PROD_WEB_ID}`,
+  qa: `{QA_WEB_ID}`,
+  dev: `{DEV_WEB_ID}`,
 };
 
 /** The url for the Google Cloud Endpoints API for your application. */
@@ -82,9 +82,9 @@ export const CHROME_ENDPOINTS: EnvironmentsVariable = {
  * NOTE: Each key must be on a single-line!
  */
 export const CHROME_PUBLIC_KEYS: EnvironmentsVariable = {
-  prod: '',
-  qa: '',
-  dev: '',
+  prod: '{PROD_CHROME_KEY}',
+  qa: '{QA_CHROME_KEY}',
+  dev: '{DEV_CHROME_KEY}',
 };
 
 /** ######################################################################## */

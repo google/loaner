@@ -49,7 +49,8 @@ describe('ConfigService', () => {
     expect(config.chromeApiUrl)
         .toBe('https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');
     expect(config.endpointsApiUrl)
-        .toBe('https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
+        .toBe(
+            'https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
   });
 
   it('provides the correct link for chrome/endpoints apis if on dev', () => {
@@ -120,8 +121,10 @@ describe('ConfigService', () => {
            .and.returnValue(CHROME_MODE.QA);
        config.calculateApiUrls();
        expect(config.chromeApiUrl)
-           .toBe('https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');
+           .toBe(
+               'https://chrome-dot-qa-app-engine-project.appspot.com/_ah/api');
        expect(config.endpointsApiUrl)
-           .toBe('https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
+           .toBe(
+               'https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
      });
 });
