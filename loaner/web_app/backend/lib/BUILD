@@ -157,7 +157,9 @@ loaner_appengine_library(
     data = [
         "//loaner/web_app:config_defaults_yaml",
     ],
-    deps = ["//loaner/web_app:constants"],
+    deps = [
+        "//loaner/web_app:constants",
+    ],
 )
 
 loaner_appengine_library(

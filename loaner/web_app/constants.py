@@ -142,23 +142,23 @@ COMPILED_JS_PATH = os.path.join(FRONTEND_ROOT, 'application.js')
 
 # The OAuth2 Client ID's that are allowed to access the Endpoints API's
 # configured in the endpoints.py and chrome.py files.
-ALLOWED_CLIENT_IDS = [
-    CHROME_APP_CLIENT_ID, WEB_APP_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID
-]
+ALLOWED_CLIENT_IDS = (
+    CHROME_APP_CLIENT_ID, WEB_APP_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID,
+)
 
 # OAuth2 Scopes to request when an application user authenticates to the web
 # frontend.
-ROOT_SCOPES = [
+ROOT_SCOPES = (
     'https://www.googleapis.com/auth/userinfo.email',
-]
+)
 
 # OAuth2 Scopes for the Directory API client and the configured admin account.
-DIRECTORY_SCOPES = [
+DIRECTORY_SCOPES = (
     'https://www.googleapis.com/auth/admin.directory.device.chromeos',
     'https://www.googleapis.com/auth/admin.directory.group.member.readonly',
     'https://www.googleapis.com/auth/admin.directory.orgunit',
     'https://www.googleapis.com/auth/admin.directory.user.readonly',
-]
+)
 
 # Dictionary defining where Grab n Go Loaner devices will be moved to enable and
 # disable guest mode if guest mode is permitted for this version.

@@ -25,7 +25,6 @@ import endpoints
 from loaner.web_app import constants
 from loaner.web_app.backend.lib import xsrf
 
-
 __all__ = ['ROOT_API']
 
 

@@ -31,7 +31,6 @@ from loaner.web_app import constants
 from loaner.web_app.backend.lib import bootstrap
 from loaner.web_app.backend.lib import sync_users
 
-
 if os.environ.get('TEST_WORKSPACE') == 'gng':
   # The following mocks are here to stub out the npm compiled frontend since
   # Bazel cannot easily build an npm package during tests.

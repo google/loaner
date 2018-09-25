@@ -30,7 +30,6 @@ from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
 
-
 _AUDIT_MSG = 'Marking shelf with name %s as audited.'
 _AUDIT_REQUEST_MSG = 'Requesting audit for shelf with name %s.'
 _CREATE_NEW_SHELF_MSG = 'Creating a new shelf with name %s.'

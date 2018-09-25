@@ -31,7 +31,6 @@ from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.models import survey_models
 
-
 NDB_TO_BIGQUERY_TYPE = {
     'StringProperty': 'STRING',
     'IntegerProperty': 'INTEGER',

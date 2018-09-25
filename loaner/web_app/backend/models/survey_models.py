@@ -30,7 +30,6 @@ from loaner.web_app import constants
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
 
-
 _MORE_INFO_MSG = (
     'If more_info_enabled or placeholder_text are provided then both are '
     'required.')

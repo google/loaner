@@ -64,7 +64,6 @@ from loaner.web_app import constants
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import user_model
 
-
 _FORBIDDEN_MSG = (
     'Permission check failed. Please make sure you are logged in and have the '
     'correct permission to perform this action.')

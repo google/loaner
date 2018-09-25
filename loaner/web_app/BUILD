@@ -37,9 +37,7 @@ filegroup(
 
 loaner_appengine_library(
     name = "constants",
-    srcs = [
-        "constants.py",
-    ],
+    srcs = ["constants.py"],
     deps = [
         "//loaner/web_app/backend/models:template_model",
         "@endpoints_archive//:endpoints",
