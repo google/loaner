@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import os
+import jinja2
 
 from google.appengine.api import app_identity
 
@@ -61,6 +62,11 @@ MY_CUSTOMER = ('' or 'my_customer')
 CONFIG_DEFAULTS_PATH = (
     os.path.join(os.path.dirname(__file__), 'config_defaults.yaml'))
 
+# Setup of Jinja2 Enviorment for serving backend/static_content templates.
+JINJA = jinja2.Environment(
+    autoescape=True, loader=jinja2.FileSystemLoader(
+        os.path.join(os.path.dirname(__file__), 'backend/static_content')))
+
 # Variables defining different deployment environments, place the Google Cloud
 # Project ID for each environment on the appropriate line.
 # NOTE: These must match the Google Cloud Project ID's in the
@@ -72,6 +78,9 @@ ON_QA = ON_GAE and ('qa-app-engine-project' in APPLICATION_ID)
 
 # If you are using a DEV server fill out the Google Cloud Project ID below.
 ON_DEV = ON_GAE and ('dev-app-engine-project' in APPLICATION_ID)
+
+# Maintenance mode, serves a splash page when the app is under maintenance.
+MAINTENANCE = False
 
 # The email address of the GSuite Admin to use for Domain Wide Delegated
 # Authority for access to the Google Admin SDK Directory API.

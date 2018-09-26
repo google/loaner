@@ -20,7 +20,9 @@ from __future__ import print_function
 
 import webapp2
 
+from loaner.web_app import constants
 from loaner.web_app.backend.handlers import frontend
+from loaner.web_app.backend.handlers import maintenance
 from loaner.web_app.backend.handlers.cron import run_custom_events
 from loaner.web_app.backend.handlers.cron import run_reminder_events
 from loaner.web_app.backend.handlers.cron import run_shelf_audit_events
@@ -40,6 +42,9 @@ web_app_routes = [
     (r'/_cron/sync_user_roles', sync_user_roles.SyncUserRolesHandler),
     (r'(/.*)', frontend.FrontendHandler),
 ]
+
+if constants.MAINTENANCE:
+  web_app_routes = [(r'/.*', maintenance.MaintenanceHandler)]
 
 
 web_app = webapp2.WSGIApplication(web_app_routes, debug=True)
