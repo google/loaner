@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
+import logging
 
 import mock
 
@@ -55,12 +56,15 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
         'Statue of Liberty', 40.6892534, -74.0466891, 1.0,
         loanertest.USER_EMAIL)
 
-  def test_no_shelves(self):
+  @mock.patch.object(config_model.Config, 'get', return_value=True)
+  @mock.patch.object(logging, 'warning')
+  def test_no_shelves(self, mock_warning, mock_config_get):
     """Tests with no entities in datastore."""
     response = self.testapp.get(r'/_cron/run_shelf_audit_events')
 
     self.assertEqual(response.status_int, 200)
     self.assertFalse(self.testbed.mock_raiseevent.called)
+    self.assertEqual(mock_warning.call_count, 0)
 
   def test_shelves(self):
     """Tests with two shelves, and only one raises the event."""
@@ -156,6 +160,12 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
     ]
     self.assertListEqual(
         self.testbed.mock_raiseevent.mock_calls, expected_calls)
+
+  @mock.patch.object(config_model.Config, 'get', return_value=False)
+  @mock.patch.object(logging, 'warning')
+  def test_get_audits_disabled(self, mock_warning, mock_config_get):
+    self.testapp.get(r'/_cron/run_shelf_audit_events')
+    self.assertEqual(mock_warning.call_count, 1)
 
 
 if __name__ == '__main__':
