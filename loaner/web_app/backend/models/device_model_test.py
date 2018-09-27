@@ -779,6 +779,7 @@ class DeviceModelTest(loanertest.TestCase):
       self.test_device.mark_undamaged(user_email=loanertest.USER_EMAIL)
       datastore_device = device_model.Device.get(serial_number='123456')
       self.assertFalse(datastore_device.damaged)
+      self.assertIsNone(datastore_device.damaged_reason)
       self.assertEqual(mock_stream_to_bq.call_count, 1)
 
   def test_mark_lost(self):

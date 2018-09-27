@@ -711,6 +711,7 @@ class Device(base_model.BaseModel):
       user_email: string, the user that is marking a device as undamaged.
     """
     self.damaged = False
+    self.damaged_reason = None
     self.stream_to_bq(
         user_email, 'Clearing the device %s damaged state.' % self.identifier)
     self.put()
