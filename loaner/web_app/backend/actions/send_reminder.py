@@ -22,6 +22,7 @@ from absl import logging
 
 from loaner.web_app.backend.actions import base_action
 from loaner.web_app.backend.lib import send_email
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import event_models
 
 
@@ -54,10 +55,11 @@ class SendReminder(base_action.BaseAction):
       raise base_action.BadDeviceError(
           'Cannot send mail. There is no ReminderEvent entity for level '
           '{}.'.format(device.next_reminder.level))
-    logging.info(
-        'Sending reminder at level %d to device %s.',
-        device.next_reminder.level, device.identifier)
-    send_email.send_user_email(device, reminder_event.template)
+    if config_model.Config.get('loan_duration_email'):
+      logging.info(
+          'Sending email reminder at level %d to device %s.',
+          device.next_reminder.level, device.identifier)
+      send_email.send_user_email(device, reminder_event.template)
     device.set_last_reminder(device.next_reminder.level)
     device.next_reminder = None
     device.put()

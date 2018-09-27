@@ -18,15 +18,17 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from absl.testing import parameterized
 import mock
 
-from loaner.web_app.backend.lib import send_email  # pylint: disable=unused-import
+from loaner.web_app.backend.lib import send_email
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import event_models
 from loaner.web_app.backend.testing import loanertest
 
 
-class SendReminderTest(loanertest.ActionTestCase):
+class SendReminderTest(loanertest.ActionTestCase, parameterized.TestCase):
   """Test the SendReminder Action class."""
 
   def setUp(self):
@@ -48,19 +50,27 @@ class SendReminderTest(loanertest.ActionTestCase):
     self.assertRaisesRegexp(
         Exception, '.*no ReminderEvent.*', self.action.run, device=device)
 
-  @mock.patch('__main__.send_email.send_user_email')
-  def test_run_success(self, mock_sendemail):
+  @parameterized.named_parameters(
+      {'testcase_name': 'send_reminder_email', 'config_return': True,
+       'send_email_call_count': 1},
+      {'testcase_name': 'no_reminder_email', 'config_return': False,
+       'send_email_call_count': 0},
+  )
+  def test_run_success(self, config_return, send_email_call_count):
     device = device_model.Device(
         serial_number='123456', chrome_device_id='123',
         next_reminder=device_model.Reminder(level=0))
-    reminder_event = event_models.ReminderEvent.create(0)
-    reminder_event.template = 'fake_template_name'
-    self.assertFalse(device.last_reminder)
+    with mock.patch.object(
+        config_model.Config, 'get', return_value=config_return):
+      with mock.patch.object(send_email, 'send_user_email') as mock_sendemail:
+        event_models.ReminderEvent.create(0)
+        self.assertFalse(device.last_reminder)
 
-    self.action.run(device=device)
-    mock_sendemail.assert_called_with(device, 'fake_template_name')
-    device = device.key.get()
-    self.assertTrue(device.last_reminder)
+        self.action.run(device=device)
+        device = device.key.get()
+        self.assertTrue(device.last_reminder)
+        self.assertEqual(mock_sendemail.call_count, send_email_call_count)
+
 
 if __name__ == '__main__':
   loanertest.main()
