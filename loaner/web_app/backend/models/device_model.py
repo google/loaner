@@ -382,7 +382,7 @@ class Device(base_model.BaseModel):
     self.due_date = None
     self.shelf = None
     if self.assigned_user:
-      self = events.raise_event('device_loan_return', device=self)
+      self._loan_return(user_email)
     self.assigned_user = None
     self.assignment_date = None
     self.current_ou = unenroll_ou

@@ -409,13 +409,14 @@ class DeviceModelTest(loanertest.TestCase):
             self.test_device.identifier, unenroll_ou, err_message)):
       self.test_device.unenroll(loanertest.USER_EMAIL)
 
-  def test_unenroll(self):
+  @mock.patch.object(device_model.Device, '_loan_return')
+  def test_unenroll(self, mock_return):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.assigned_user = loanertest.USER_EMAIL
 
     self.testbed.mock_raiseevent.return_value = self.test_device
     self.test_device.unenroll(loanertest.USER_EMAIL)
-    self.assertEqual(self.testbed.mock_raiseevent.call_count, 4)
+    mock_return.assert_called_once_with(loanertest.USER_EMAIL)
     self.assertFalse(self.test_device.enrolled)
     self.assertIsNone(self.test_device.assigned_user)
     self.assertIsNone(self.test_device.assignment_date)
