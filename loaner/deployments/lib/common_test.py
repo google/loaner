@@ -28,9 +28,18 @@ from pyfakefs import fake_filesystem
 from pyfakefs import mox3_stubout
 
 import mock
+import yaml
 
 from absl.testing import absltest
 from loaner.deployments.lib import common
+
+_EMPTY_CONFIG = """
+dev:
+  project_id:
+  client_id:
+  client_secret:
+  custom_bucket:
+"""
 
 _CONFIG = """
 dev:
@@ -127,7 +136,7 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
         project_name, 'test_client_id', 'test_client_secret', 'INCORRECT'))
     # Test the string and representations for ProjectConfig.
     self.assertEqual(
-        'ProjectConfig for project: test_project.', str(test_config))
+        "ProjectConfig for project 'test_project'.", str(test_config))
     self.assertEqual(
         '<ProjectConfig({}, test_client_id, test_client_secret, {})>'.format(
             project_name, expected_bucket_name), repr(test_config))
@@ -149,6 +158,21 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
     self.fs.CreateFile(config_file, contents=_INCORRECT_CONFIG)
     with self.assertRaises(common.ConfigError):
       common.ProjectConfig.from_yaml('dev', config_file)
+
+  def test_write(self):
+    expected_dict = {
+        'project_id': 'test_project',
+        'client_id': 'test_client_id',
+        'client_secret': 'test_client_secret',
+        'custom_bucket': None,
+    }
+    self.fs.CreateFile('/this/config.yaml', contents=_EMPTY_CONFIG)
+    test_config = common.ProjectConfig(
+        'test_project', 'test_client_id', 'test_client_secret', None)
+    test_config.write('dev', '/this/config.yaml')
+    with open('/this/config.yaml') as config_file:
+      config = yaml.safe_load(config_file)
+    self.assertEqual(config['dev'], expected_dict)
 
 
 if __name__ == '__main__':

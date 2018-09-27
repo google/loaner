@@ -57,11 +57,19 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
       (3, 'three line breaks', 'three\nline\nbreaks\n'),
       (4, 'four line breaks\n', 'four\nline\nbreaks\n\n'),
       (5, 'in text requires five breaks', 'in\ntext\nrequires\nfive\nbreaks\n'),
+      (1, 'this-is-a-long-line-with-hypens-to-ensure-the-wrapper-does-not-break'
+       '-lines-with-hypens', 'this-is-a-long-line-with-hypens-to-ensure-the-'
+       'wrapper-does-not-break-lines-with-hypens\n'),
   )
   def test_write(self, wrap, text, expected_output):
     with flagsaver.flagsaver(wrap_width=wrap):
       utils.write(text)
       self.assertEqual(sys.stdout.getvalue(), expected_output)
+
+  def test_write_break(self):
+    with mock.patch.object(utils, 'write') as mock_write:
+      utils.write_break()
+      self.assertEqual(3, mock_write.call_count)
 
   @parameterized.named_parameters(
       ('Default args', 'MESSAGE', None, None, None, 'INPUT',

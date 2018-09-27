@@ -23,6 +23,7 @@ import textwrap
 
 from absl import flags
 from six.moves import input
+from six.moves import range
 
 FLAGS = flags.FLAGS
 
@@ -46,7 +47,10 @@ def _wrap_lines(lines, wrapper=None):
     The formatted string.
   """
   if wrapper is None:
-    wrapper = textwrap.TextWrapper(break_long_words=False, width=_wrap_width())
+    wrapper = textwrap.TextWrapper(
+        break_on_hyphens=False,
+        break_long_words=False,
+        width=_wrap_width())
   result = '\n'.join([wrapper.fill(line) for line in lines.splitlines()])
   if lines.endswith('\n'):
     result += '\n'
@@ -61,6 +65,13 @@ def write(message):
   """
   sys.stdout.write(_wrap_lines(message) + '\n')
   sys.stdout.flush()
+
+
+def write_break():
+  """Writes a line break followed by a line of '-' and two more line breaks."""
+  write('')
+  write(''.join(['-' for _ in range(0, _wrap_width(), 1)]))
+  write('')
 
 
 def prompt(message, user_prompt=None, default=None, parser=None):
@@ -239,6 +250,7 @@ def prompt_enum(message, accepted_values=None, case_sensitive=True, **kwargs):
   Returns:
     A user provided value from within the Enum.
   """
+  message += '\nAvailable options are: {}'.format(', '.join(accepted_values))
   parser = flags.EnumParser(
       enum_values=accepted_values, case_sensitive=case_sensitive)
   return prompt(message, parser=parser, **kwargs)

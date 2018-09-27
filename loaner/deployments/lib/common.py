@@ -26,6 +26,9 @@ from absl import logging
 
 import yaml
 
+REQUIRED_FIELDS = ('project_id', 'client_id', 'client_secret')
+AVAILABLE_PROJECTS = ('prod', 'qa', 'dev')
+
 FLAGS = flags.FLAGS
 
 flags.DEFINE_string(
@@ -34,10 +37,8 @@ flags.DEFINE_string(
     'If just the file name is specified we assume the file is located in the '
     'default (loaner/deployments) directory and will look for the file there.')
 flags.DEFINE_enum(
-    'project', None, ('prod', 'qa', 'dev', 'local'),
+    'project', None, AVAILABLE_PROJECTS,
     'The friendly name for the Google Cloud Project to deploy to.')
-
-_REQUIRED_FIELDS = ('project_id', 'client_id', 'client_secret')
 
 
 class ConfigError(Exception):
@@ -119,7 +120,7 @@ class ProjectConfig(object):
     self._bucket = bucket
 
   def __str__(self):
-    return '{} for project: {}.'.format(self.__class__.__name__, self.project)
+    return '{} for project {!r}.'.format(self.__class__.__name__, self.project)
 
   def __repr__(self):
     return '<{0}({1}, {2}, {3}, {4})>'.format(
@@ -172,7 +173,7 @@ class ProjectConfig(object):
     Args:
       project: str, the project friendly name, used as the top-level key in the
           config file.
-      config_file_path: str, the path to the config file.
+      config_file_path: str, the name or path to the config file.
 
     Returns:
       An instance of ProjectConfig with the project specific configurations.
@@ -183,15 +184,35 @@ class ProjectConfig(object):
     logging.debug('Loading the configuration from the provided config file.')
     with open(_get_config_file_path(config_file_path), 'r') as config_file:
       config = yaml.safe_load(config_file)[project]
-    for key in _REQUIRED_FIELDS:
+    for key in REQUIRED_FIELDS:
       if config[key] is None:
         raise ConfigError(
             'the field {key!r} is required and is not configured, please ensure'
             ' there is a value set for all of the following fields '
-            '{fields}'.format(key=key, fields=_REQUIRED_FIELDS))
+            '{fields}'.format(key=key, fields=REQUIRED_FIELDS))
     return cls(
         project=config['project_id'],
         client_id=config['client_id'],
         client_secret=config['client_secret'],
         bucket=config['custom_bucket'],
     )
+
+  def write(self, key, config_file_path):
+    """Writes the project config for the provided key to disk.
+
+    Args:
+      key: str, the project friendly name, used as the top-level key in the
+          config file.
+      config_file_path: str, the name or path to the config file.
+    """
+    path = _get_config_file_path(config_file_path)
+    with open(path) as config_file:
+      configs = yaml.safe_load(config_file)
+
+    configs[key]['project_id'] = self._project
+    configs[key]['client_id'] = self._client_id
+    configs[key]['client_secret'] = self._client_secret
+    configs[key]['custom_bucket'] = self._bucket
+
+    with open(path, 'w') as config_file:
+      yaml.dump(configs, config_file, default_flow_style=False)
