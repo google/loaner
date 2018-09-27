@@ -80,7 +80,6 @@ export class Config {
   maximumLoanDuration?: number;
   orgUnitPrefix?: string;
   reminderDelay?: number;
-  reminderEmailThrottling?: boolean;
   requireSurveys?: boolean;
   responsibleForAudit?: string[];
   returnGracePeriod?: number;
@@ -142,10 +141,6 @@ export class Config {
     this.reminderDelay =
         response.find(a => a.name === 'reminder_delay')!.integer_value as
         number;
-    this.reminderEmailThrottling =
-        response.find(
-                    a => a.name ===
-                        'reminder_email_throttling')!.boolean_value as boolean;
     this.requireSurveys =
         response.find(a => a.name === 'require_surveys')!.boolean_value as
         boolean;

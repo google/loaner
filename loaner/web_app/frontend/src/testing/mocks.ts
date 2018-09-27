@@ -435,7 +435,6 @@ export const CONFIG_RESPONSE_MOCK = [
   {integer_value: '24', name: 'audit_interval'},
   {boolean_value: true, name: 'timeout_guest_mode'},
   {boolean_value: true, name: 'bootstrap_started'},
-  {boolean_value: true, name: 'reminder_email_throttling'},
   {list_value: [''], name: 'shelf_audit_email_to'},
   {integer_value: '14', name: 'maximum_loan_duration'},
   {name: 'org_unit_prefix', string_value: ''},
