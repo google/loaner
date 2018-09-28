@@ -186,7 +186,7 @@ class ShelfApi(root_api.Service):
       if device.shelf:
         if device.shelf == shelf.key:
           devices_on_shelf.append(device.key.urlsafe())
-          logging.info('Device %s is already on shelf.', device.serial_number)
+          logging.info('Device %s is already on shelf.', device.identifier)
           continue
       try:
         device.move_to_shelf(shelf=shelf, user_email=user_email)

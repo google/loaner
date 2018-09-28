@@ -52,8 +52,8 @@ def send_user_email(device, template_name, include_manage_loan_button=True):
   if ((not device.assigned_user) or (not device.due_date) or
       (not device.assignment_date)):
     raise SendEmailError(
-        'Cannot send reminder e-mail for device with serial {}; '
-        'loan data incomplete.'.format(device.serial_number))
+        'Cannot send reminder e-mail for the following device: {}; '
+        'loan data incomplete.'.format(device.identifier))
 
   assignment_date = device.assignment_date.strftime('%b %e, %Y')
   due_date = device.due_date.strftime('%b %e, %Y')

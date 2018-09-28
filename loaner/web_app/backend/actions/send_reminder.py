@@ -48,8 +48,8 @@ class SendReminder(base_action.BaseAction):
           'Cannot send mail. Task did not receive a device.')
     if not hasattr(device, 'next_reminder') or not device.next_reminder:
       raise base_action.BadDeviceError(
-          'Cannot send mail without next_reminder on device with serial '
-          '{}.'.format(device.serial_number))
+          'Cannot send mail without next_reminder on the following device: '
+          '{}.'.format(device.identifier))
     reminder_event = event_models.ReminderEvent.get(device.next_reminder.level)
     if not reminder_event:
       raise base_action.BadDeviceError(
