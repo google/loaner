@@ -18,7 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import __builtin__
+# Prefer Python 3 and fall back on Python 2.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  import builtins
+except ImportError:
+  import __builtin__ as builtins
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
+
 import datetime
 import json
 import subprocess
@@ -88,15 +95,14 @@ class DeployImplTest(absltest.TestCase):
   def setUp(self):
     super(DeployImplTest, self).setUp()
     # Save the real modules for clean up.
-    self.real_open = __builtin__.open
-    self.real_file = __builtin__.file
+    self.real_open = builtins.open
     # Create a fake file system and stub out builtin modules.
     self.fs = fake_filesystem.FakeFilesystem()
     self.os = fake_filesystem.FakeOsModule(self.fs)
     self.open = fake_filesystem.FakeFileOpen(self.fs)
     self.shutil = fake_filesystem_shutil.FakeShutilModule(self.fs)
     self.stubs = mox3_stubout.StubOutForTesting()
-    self.stubs.SmartSet(__builtin__, 'open', self.open)
+    self.stubs.SmartSet(builtins, 'open', self.open)
     self.stubs.SmartSet(deploy_impl, 'os', self.os)
     self.stubs.SmartSet(deploy_impl, 'shutil', self.shutil)
     # Populate the fake file system with the expected directories and files.
@@ -108,8 +114,7 @@ class DeployImplTest(absltest.TestCase):
   def tearDown(self):
     super(DeployImplTest, self).tearDown()
     self.stubs.UnsetAll()
-    __builtin__.open = self.real_open
-    __builtin__.file = self.real_file
+    builtins.open = self.real_open
 
   def CreateTestAppEngineConfig(
       self, app_servers=None, build_target=_BUILD_TARGET,
@@ -379,8 +384,7 @@ class DeployImplTest(absltest.TestCase):
     self.assertEndsWith(
         test_chrome_app_config.chrome_app_temp_dir, 'loaner/chrome_app/dist')
 
-  @mock.patch.object(
-      __builtin__, 'raw_input', autospec=True, return_value='1.0')
+  @mock.patch.object(deploy_impl, 'input', autospec=True, return_value='1.0')
   def testManifestCheck(self, mock_rawinput):
     """Test the manifest file check opens and loads json data."""
     file_name = '/this/is/a/workspace/loaner/chrome_app/manifest.json'
@@ -392,8 +396,7 @@ class DeployImplTest(absltest.TestCase):
       data = json.load(f)
       assert data['version'] == '1.0'
 
-  @mock.patch.object(
-      __builtin__, 'raw_input', autospec=True, return_value='1.0')
+  @mock.patch.object(deploy_impl, 'input', autospec=True, return_value='1.0')
   def testManifestJsonFailure(self, mock_rawinput):
     """Test the manifest check fails given syntactically invalid json data."""
     self.fs.CreateFile(
@@ -404,8 +407,7 @@ class DeployImplTest(absltest.TestCase):
       test_chrome_app_config._ManifestCheck()
     assert mock_rawinput.call_count == 0
 
-  @mock.patch.object(
-      __builtin__, 'raw_input', autospec=True, return_value='1.0')
+  @mock.patch.object(deploy_impl, 'input', autospec=True, return_value='1.0')
   def testManifestCheckKeyFailure(self, mock_rawinput):
     """Test the manifest check fails without a 'key' value."""
     self.fs.CreateFile(
@@ -416,8 +418,7 @@ class DeployImplTest(absltest.TestCase):
       test_chrome_app_config._ManifestCheck()
     assert mock_rawinput.call_count == 1
 
-  @mock.patch.object(
-      __builtin__, 'raw_input', autospec=True, return_value='1.0')
+  @mock.patch.object(deploy_impl, 'input', autospec=True, return_value='1.0')
   def testManifestCheckOauthIdFailure(self, mock_rawinput):
     """Test the manifest check fails without an oauth client id value."""
     self.fs.CreateFile(

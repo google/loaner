@@ -18,7 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import httplib
+# Prefer Python 3 and fall back on Python 2.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  from http import HTTPStatus as http_status
+except ImportError:
+  import httplib as http_status
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
 
 from absl.testing import parameterized
 
@@ -77,10 +83,10 @@ class DirectoryAPITest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(_FAKE_ROLE_OBJECT, test_directory_api.insert_role())
 
   @parameterized.parameters(
-      (httplib.CONFLICT, directory.AlreadyExistsError),
-      (httplib.INTERNAL_SERVER_ERROR, directory.AlreadyExistsError),
-      (httplib.FORBIDDEN, directory.ForbiddenError),
-      (httplib.NOT_FOUND, directory.InsertionError),
+      (http_status.CONFLICT, directory.AlreadyExistsError),
+      (http_status.INTERNAL_SERVER_ERROR, directory.AlreadyExistsError),
+      (http_status.FORBIDDEN, directory.ForbiddenError),
+      (http_status.NOT_FOUND, directory.InsertionError),
   )
   def test_directory_api_insert_role__errors(
       self, error_code, expected_error):
@@ -88,7 +94,8 @@ class DirectoryAPITest(parameterized.TestCase, absltest.TestCase):
     test_directory_api = directory.DirectoryAPI(self.config, mock.Mock())
     test_directory_api._client.roles.side_effect = errors.HttpError(
         httplib2.Response({
-            'reason': 'NOT USED', 'status': error_code}), 'NOT USED.')
+            'reason': 'NOT USED', 'status': error_code}),
+        'NOT USED.'.encode(encoding='UTF-8'))
     with self.assertRaises(expected_error):
       test_directory_api.insert_role()
 
@@ -103,10 +110,10 @@ class DirectoryAPITest(parameterized.TestCase, absltest.TestCase):
         _FAKE_USER_OBJECT, test_directory_api.insert_user('UNUSED_PASSWORD'))
 
   @parameterized.parameters(
-      (httplib.CONFLICT, directory.AlreadyExistsError),
-      (httplib.INTERNAL_SERVER_ERROR, directory.AlreadyExistsError),
-      (httplib.FORBIDDEN, directory.ForbiddenError),
-      (httplib.NOT_FOUND, directory.InsertionError),
+      (http_status.CONFLICT, directory.AlreadyExistsError),
+      (http_status.INTERNAL_SERVER_ERROR, directory.AlreadyExistsError),
+      (http_status.FORBIDDEN, directory.ForbiddenError),
+      (http_status.NOT_FOUND, directory.InsertionError),
   )
   def test_directory_api_insert_user__errors(
       self, error_code, expected_error):
@@ -114,7 +121,8 @@ class DirectoryAPITest(parameterized.TestCase, absltest.TestCase):
     test_directory_api = directory.DirectoryAPI(self.config, mock.Mock())
     test_directory_api._client.users.side_effect = errors.HttpError(
         httplib2.Response({
-            'reason': 'NOT USED', 'status': error_code}), 'NOT USED.')
+            'reason': 'NOT USED', 'status': error_code}),
+        'NOT USED.'.encode(encoding='UTF-8'))
     with self.assertRaises(expected_error):
       test_directory_api.insert_user('UNUSED_PASSWORD')
 

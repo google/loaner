@@ -18,7 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import httplib
+# Prefer Python 3 and fall back on Python 2.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  from http import HTTPStatus as http_status
+except ImportError:
+  import httplib as http_status
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
 
 from absl import logging
 
@@ -113,11 +119,12 @@ class DirectoryAPI(google_api.GoogleAPI):
     except errors.HttpError as err:
       status = err.resp.status
 
-      if status == httplib.CONFLICT or status == httplib.INTERNAL_SERVER_ERROR:
+      if (status == http_status.CONFLICT or
+          status == http_status.INTERNAL_SERVER_ERROR):
         raise AlreadyExistsError(
             'role with name {!r} already exists'.format(name))
 
-      if status == httplib.FORBIDDEN:
+      if status == http_status.FORBIDDEN:
         raise ForbiddenError(_FORBIDDEN_ERROR_MSG)
 
       logging.error(_INSERT_ROLE_ERROR_MSG, name, err)
@@ -164,11 +171,12 @@ class DirectoryAPI(google_api.GoogleAPI):
     except errors.HttpError as err:
       status = err.resp.status
 
-      if status == httplib.CONFLICT or status == httplib.INTERNAL_SERVER_ERROR:
+      if (status == http_status.CONFLICT or
+          status == http_status.INTERNAL_SERVER_ERROR):
         raise AlreadyExistsError(
             'user with email address {!r} already exists'.format(primary_email))
 
-      if status == httplib.FORBIDDEN:
+      if status == http_status.FORBIDDEN:
         raise ForbiddenError(_FORBIDDEN_ERROR_MSG)
 
       logging.error(_INSERT_USER_ERROR_MSG, primary_email, err)

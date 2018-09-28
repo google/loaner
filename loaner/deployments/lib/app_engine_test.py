@@ -18,7 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import httplib
+# Prefer Python 3 and fall back on Python 2.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  from http import HTTPStatus as http_status
+except ImportError:
+  import httplib as http_status
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
 
 from googleapiclient import errors
 
@@ -70,8 +76,8 @@ class AppEngineTest(absltest.TestCase):
     test_app_engine_admin_api = app_engine.AdminAPI(self.config, mock.Mock())
     test_app_engine_admin_api._client.apps.side_effect = errors.HttpError(
         httplib2.Response({
-            'reason': 'Not found.', 'status': httplib.NOT_FOUND}),
-        'Project not found.')
+            'reason': 'Not found.', 'status': http_status.NOT_FOUND}),
+        'Project not found.'.encode(encoding='UTF-8'))
     with self.assertRaises(app_engine.CreationError):
       test_app_engine_admin_api.create('us-east1')
 
@@ -89,8 +95,8 @@ class AppEngineTest(absltest.TestCase):
     test_app_engine_admin_api = app_engine.AdminAPI(self.config, mock.Mock())
     test_app_engine_admin_api._client.apps.side_effect = errors.HttpError(
         httplib2.Response({
-            'reason': 'Not found.', 'status': httplib.NOT_FOUND}),
-        'App not found.')
+            'reason': 'Not found.', 'status': http_status.NOT_FOUND}),
+        'App not found.'.encode(encoding='UTF-8'))
     with self.assertRaises(app_engine.NotFoundError):
       test_app_engine_admin_api.get()
 

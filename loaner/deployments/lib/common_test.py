@@ -18,7 +18,14 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import __builtin__
+# Prefer Python 3 and fall back on Python 2.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  import builtins
+except ImportError:
+  import __builtin__ as builtins
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
+
 import os
 
 from absl import flags
@@ -63,21 +70,19 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
   def setUp(self):
     super(CommonTest, self).setUp()
     # Save the real modules for clean up.
-    self.real_open = __builtin__.open
-    self.real_file = __builtin__.file
+    self.real_open = builtins.open
     # Create a fake file system and stub out builtin modules.
     self.fs = fake_filesystem.FakeFilesystem()
     self.os = fake_filesystem.FakeOsModule(self.fs)
     self.open = fake_filesystem.FakeFileOpen(self.fs)
     self.stubs = mox3_stubout.StubOutForTesting()
-    self.stubs.SmartSet(__builtin__, 'open', self.open)
+    self.stubs.SmartSet(builtins, 'open', self.open)
     self.stubs.SmartSet(common, 'os', self.os)
 
   def tearDown(self):
     super(CommonTest, self).tearDown()
     self.stubs.UnsetAll()
-    __builtin__.open = self.real_open
-    __builtin__.file = self.real_file
+    builtins.open = self.real_open
 
   @parameterized.parameters(
       ('/this/config/file.yaml', '/this/config/file.yaml', 0),

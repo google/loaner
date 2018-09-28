@@ -16,6 +16,7 @@ py_library(
     srcs = [
         "app_constants.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "@absl_archive//absl/flags",
     ],
@@ -26,6 +27,7 @@ py_library(
     srcs = [
         "app_engine.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         ":google_api_lib",
         "@absl_archive//absl/logging",
@@ -38,6 +40,7 @@ py_library(
     srcs = [
         "auth.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
@@ -56,6 +59,7 @@ py_library(
     data = [
         "//loaner/deployments:configs",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
@@ -68,6 +72,7 @@ py_library(
     srcs = [
         "datastore.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         ":auth_lib",
         "//loaner/web_app/backend/common:google_cloud_lib_fixer",
@@ -81,6 +86,7 @@ py_library(
     srcs = [
         "directory.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         ":google_api_lib",
         "@absl_archive//absl/logging",
@@ -93,6 +99,7 @@ py_library(
     srcs = [
         "google_api.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         ":auth_lib",
         "@absl_archive//absl/logging",
@@ -104,6 +111,7 @@ py_library(
     srcs = [
         "password.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
@@ -115,6 +123,7 @@ py_library(
     srcs = [
         "storage.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         ":auth_lib",
         "@absl_archive//absl/logging",
@@ -127,6 +136,7 @@ py_library(
     srcs = [
         "utils.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "@absl_archive//absl/flags",
         "@six_archive//:six",
@@ -309,5 +319,6 @@ test_suite(
         ":password_test",
         ":storage_test",
         ":utils_test",
+        "//loaner/deployments/lib/ui:all_tests",
     ],
 )

@@ -27,6 +27,8 @@ py_binary(
     srcs = [
         "deploy_impl.py",
     ],
+    default_python_version = "PY3",
+    srcs_version = "PY2AND3",
     deps = [
         ":deploy_impl_lib",
     ],
@@ -41,10 +43,12 @@ py_library(
     srcs = [
         "deploy_impl.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "@absl_archive//absl:app",
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
+        "@six_archive//:six",
     ],
 )
 

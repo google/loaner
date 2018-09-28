@@ -49,6 +49,8 @@ from absl import app
 from absl import flags
 from absl import logging
 
+from six.moves import input
+
 
 FLAGS = flags.FLAGS
 
@@ -443,7 +445,7 @@ class ChromeAppConfig(LoanerConfig):
         raise ManifestError(os.EX_SOFTWARE)
       # Set the new version.
       current_version = data['version']
-      data['version'] = raw_input(
+      data['version'] = input(
           'The current Chrome App version is {}, '
           'please enter the new version: '.format(current_version))
       # Check for the Chrome App Key.
