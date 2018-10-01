@@ -39,21 +39,14 @@ import yaml
 
 from absl.testing import absltest
 from loaner.deployments.lib import common
+from loaner.deployments.lib import utils
 
 _EMPTY_CONFIG = """
-dev:
+default:
   project_id:
   client_id:
   client_secret:
-  custom_bucket:
-"""
-
-_CONFIG = """
-dev:
-  project_id: test_project
-  client_id: test_client_id
-  client_secret: test_client_secret
-  custom_bucket:
+  bucket:
 """
 
 _INCORRECT_CONFIG = """
@@ -61,7 +54,28 @@ dev:
   project_id:
   client_id: test_client_id
   client_secret: test_client_secret
-  custom_bucket:
+  bucket:
+"""
+
+_SINGLE_CONFIG = """
+dev:
+  project_id: test_project
+  client_id: test_client_id
+  client_secret: test_client_secret
+  bucket:
+"""
+
+_MULTI_CONFIG = """
+dev:
+  project_id: test_project
+  client_id: test_client_id
+  client_secret: test_client_secret
+  bucket:
+default:
+  project_id: default_project
+  client_id: default_client_id
+  client_secret: default_client_secret
+  bucket: default_project-gng-loaner
 """
 
 
@@ -116,6 +130,11 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
     with self.assertRaises(flags.ValidationError):
       common._config_file_validator(file_path)
 
+  def test_get_available_configs(self):
+    path = '/this/config/file.yaml'
+    self.fs.CreateFile(path, contents=_MULTI_CONFIG)
+    self.assertEqual(['default', 'dev'], common.get_available_configs(path))
+
   @parameterized.named_parameters(
       {'testcase_name': 'CustomBucketDefined', 'project_name': 'test_project',
        'bucket_name': 'bucket', 'expected_bucket_name': 'bucket'},
@@ -126,7 +145,8 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
       self, project_name, bucket_name, expected_bucket_name):
     """Test the direct construction of ProjectConfig."""
     test_config = common.ProjectConfig(
-        project_name, 'test_client_id', 'test_client_secret', bucket_name)
+        'dev', project_name, 'test_client_id', 'test_client_secret',
+        bucket_name)
     self.assertEqual(project_name, test_config.project)
     self.assertEqual('test_client_id', test_config.client_id)
     self.assertEqual('test_client_secret', test_config.client_secret)
@@ -135,24 +155,26 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
         '{}/configs'.format(expected_bucket_name), test_config.configs)
     # Test that two objects with the same constructor args are equal.
     self.assertEqual(test_config, common.ProjectConfig(
-        project_name, 'test_client_id', 'test_client_secret', bucket_name))
+        'dev', project_name, 'test_client_id', 'test_client_secret',
+        bucket_name))
     # Test that two object with different constructor args are not equal.
     self.assertNotEqual(test_config, common.ProjectConfig(
-        project_name, 'test_client_id', 'test_client_secret', 'INCORRECT'))
+        'dev', project_name, 'test_client_id', 'test_client_secret',
+        'INCORRECT'))
     # Test the string and representations for ProjectConfig.
     self.assertEqual(
         "ProjectConfig for project 'test_project'.", str(test_config))
     self.assertEqual(
-        '<ProjectConfig({}, test_client_id, test_client_secret, {})>'.format(
-            project_name, expected_bucket_name), repr(test_config))
+        '<ProjectConfig(dev, {}, test_client_id, test_client_secret, {})>'
+        ''.format(project_name, expected_bucket_name), repr(test_config))
 
   def test_project_config_from_yaml(self):
     """Test the construction of ProjectConfig when loaded from a config file."""
     expected_config = common.ProjectConfig(
-        'test_project', 'test_client_id', 'test_client_secret', None)
+        'dev', 'test_project', 'test_client_id', 'test_client_secret', None)
     config_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'config.yaml')
-    self.fs.CreateFile(config_file, contents=_CONFIG)
+    self.fs.CreateFile(config_file, contents=_SINGLE_CONFIG)
     test_config = common.ProjectConfig.from_yaml('dev', config_file)
     self.assertEqual(expected_config, test_config)
 
@@ -164,20 +186,31 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
     with self.assertRaises(common.ConfigError):
       common.ProjectConfig.from_yaml('dev', config_file)
 
+  def test_from_prompts(self):
+    expected_response = common.ProjectConfig(
+        'test', 'fake_project', 'fake_client_id', 'fake_client_secret', None)
+    prompt_return = ['fake_project', 'fake_client_id', 'fake_client_secret']
+    with mock.patch.object(
+        utils, 'prompt_string', side_effect=prompt_return) as mock_prompt:
+      self.assertEqual(
+          common.ProjectConfig.from_prompts('test'),
+          expected_response)
+      self.assertEqual(mock_prompt.call_count, 3)
+
   def test_write(self):
     expected_dict = {
         'project_id': 'test_project',
         'client_id': 'test_client_id',
         'client_secret': 'test_client_secret',
-        'custom_bucket': None,
+        'bucket': 'test_project-gng-loaner',
     }
     self.fs.CreateFile('/this/config.yaml', contents=_EMPTY_CONFIG)
     test_config = common.ProjectConfig(
-        'test_project', 'test_client_id', 'test_client_secret', None)
-    test_config.write('dev', '/this/config.yaml')
+        'asdf', 'test_project', 'test_client_id', 'test_client_secret', None)
+    test_config.write('/this/config.yaml')
     with open('/this/config.yaml') as config_file:
       config = yaml.safe_load(config_file)
-    self.assertEqual(config['dev'], expected_dict)
+    self.assertEqual(config['asdf'], expected_dict)
 
 
 if __name__ == '__main__':

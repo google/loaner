@@ -61,6 +61,7 @@ py_library(
     ],
     srcs_version = "PY2AND3",
     deps = [
+        ":utils_lib",
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
         "@yaml_archive//:yaml",
@@ -202,6 +203,7 @@ py_test(
     ],
     deps = [
         ":common_lib",
+        ":utils_lib",
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
         "@absl_archive//absl/testing:absltest",
@@ -297,8 +299,8 @@ py_test(
     ],
     deps = [
         ":utils_lib",
+        "@absl_archive//absl/flags",
         "@absl_archive//absl/testing:absltest",
-        "@absl_archive//absl/testing:flagsaver",
         "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
         "@pyfakefs_archive//:pyfakefs",

@@ -18,9 +18,10 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import platform
 import sys
 
-from absl.testing import flagsaver
+from absl import flags
 from absl.testing import parameterized
 
 import mock
@@ -62,7 +63,7 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
        'wrapper-does-not-break-lines-with-hypens\n'),
   )
   def test_write(self, wrap, text, expected_output):
-    with flagsaver.flagsaver(wrap_width=wrap):
+    with mock.patch.object(flags, 'get_help_width', return_value=wrap):
       utils.write(text)
       self.assertEqual(sys.stdout.getvalue(), expected_output)
 
@@ -70,6 +71,13 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
     with mock.patch.object(utils, 'write') as mock_write:
       utils.write_break()
       self.assertEqual(3, mock_write.call_count)
+
+  @parameterized.parameters('Linux', 'LINUX', ' lInuX  ')
+  def test_clear_screen(self, test_system):
+    with mock.patch.object(platform, 'system', return_value=test_system):
+      with mock.patch.object(utils, 'write') as mock_write:
+        utils.clear_screen()
+        mock_write.assert_called_once_with('\033[H\033[J')
 
   @parameterized.named_parameters(
       ('Default args', 'MESSAGE', None, None, None, 'INPUT',
@@ -86,7 +94,8 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
         utils, 'input', return_value=user_input) as mock_input:
       with mock.patch.object(utils, 'write') as mock_write:
         actual_output = utils.prompt(message, prompt, default, parser)
-        mock_write.assert_called_once_with(expected_message)
+        mock_write.assert_any_call(expected_message)
+        self.assertEqual(mock_write.call_count, 4)
       mock_input.assert_called_once_with(expected_prompt)
     self.assertEqual(actual_output, expected_output)
 
@@ -162,7 +171,8 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
   )
   def test_prompt_string(self, allow_empty_string, user_input, expected):
     with mock.patch.object(utils, 'input', return_value=user_input):
-      actual = utils.prompt_string('MESSAGE', allow_empty_string)
+      actual = utils.prompt_string(
+          'MESSAGE', allow_empty_string, default=user_input)
     self.assertEqual(actual, expected)
 
   @parameterized.named_parameters(

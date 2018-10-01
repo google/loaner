@@ -67,16 +67,19 @@ class CloudStorageAPI(object):
         self.__class__.__name__, self._config.project)
 
   @classmethod
-  def from_config(cls, config):
+  def from_config(cls, config, creds=None):
     """Returns an initialized CloudStorageAPI object.
 
     Args:
       config: common.ProjectConfig, the project configuration.
+      creds: auth.CloudCredentials, the credentials to use for client
+          authentication.
 
     Returns:
       An authenticated CloudStorageAPI instance.
     """
-    creds = auth.CloudCredentials(config, cls.SCOPES)
+    if creds is None:
+      creds = auth.CloudCredentials(config, cls.SCOPES)
     client = storage.Client(
         project=config.project, credentials=creds.get_credentials(cls.SCOPES))
     return cls(config, client)

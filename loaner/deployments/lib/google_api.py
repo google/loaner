@@ -61,11 +61,13 @@ class GoogleAPI(object):
         self.__class__.__name__, self._config)
 
   @classmethod
-  def from_config(cls, config):
+  def from_config(cls, config, creds=None):
     """Returns an initialized Google API object.
 
     Args:
       config: common.ProjectConfig, the project configuration.
+      creds: auth.CloudCredentials, the credentials to use for client
+          authentication.
 
     Returns:
       An authenticated Google API instance.
@@ -85,6 +87,7 @@ class GoogleAPI(object):
       raise AttributeError(
           'VESRION must be set in order to create a new {!r} client'.format(
               cls.__name__))
-    creds = auth.CloudCredentials(config, cls.SCOPES)
+    if creds is None:
+      creds = auth.CloudCredentials(config, cls.SCOPES)
     client = creds.get_api_client(cls.SERVICE, cls.VERSION, cls.SCOPES)
     return cls(config, client)

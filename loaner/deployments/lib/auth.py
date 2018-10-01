@@ -51,7 +51,7 @@ flags.DEFINE_bool(
 
 
 class InvalidCredentials(Exception):
-  """Raised when we are unabled to get valid OAuth2 Credentials."""
+  """Raised when we are unable to get valid OAuth2 Credentials."""
 
 
 class CloudCredentials(object):

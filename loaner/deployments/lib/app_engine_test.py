@@ -53,7 +53,8 @@ class AppEngineTest(absltest.TestCase):
   def setUp(self):
     super(AppEngineTest, self).setUp()
     self.config = common.ProjectConfig(
-        'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_BUCKET')
+        'TEST_KEY', 'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET',
+        'TEST_BUCKET')
 
   def test_admin_api_create(self):
     """Test the create API method for the App Engine Admin API."""

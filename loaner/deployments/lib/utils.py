@@ -18,21 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import platform
 import sys
 import textwrap
 
 from absl import flags
 from six.moves import input
 from six.moves import range
-
-FLAGS = flags.FLAGS
-
-flags.DEFINE_integer('wrap_width', 79, 'The maximum width of wrapped lines')
-
-
-def _wrap_width():
-  """The maximum width of wrapped lines."""
-  return FLAGS.wrap_width if FLAGS.is_parsed() else FLAGS['wrap_width'].default
 
 
 def _wrap_lines(lines, wrapper=None):
@@ -50,7 +42,7 @@ def _wrap_lines(lines, wrapper=None):
     wrapper = textwrap.TextWrapper(
         break_on_hyphens=False,
         break_long_words=False,
-        width=_wrap_width())
+        width=flags.get_help_width())
   result = '\n'.join([wrapper.fill(line) for line in lines.splitlines()])
   if lines.endswith('\n'):
     result += '\n'
@@ -70,8 +62,15 @@ def write(message):
 def write_break():
   """Writes a line break followed by a line of '-' and two more line breaks."""
   write('')
-  write(''.join(['-' for _ in range(0, _wrap_width(), 1)]))
+  write(''.join(['-' for _ in range(0, flags.get_help_width(), 1)]))
   write('')
+
+
+def clear_screen():
+  """Clears the screen of the running system."""
+  system = platform.system().strip().lower()
+  if system == 'linux':
+    write('\033[H\033[J')
 
 
 def prompt(message, user_prompt=None, default=None, parser=None):
@@ -121,6 +120,7 @@ def prompt(message, user_prompt=None, default=None, parser=None):
           user_input, err))
     else:
       break
+  write_break()
   return user_input
 
 
@@ -205,7 +205,7 @@ def prompt_string(message, allow_empty_string=False, **kwargs):
   Returns:
     A user provided string.
   """
-  return prompt(message, parser=StringParser(allow_empty_string, **kwargs))
+  return prompt(message, parser=StringParser(allow_empty_string), **kwargs)
 
 
 def prompt_int(message, minimum=None, maximum=None, **kwargs):

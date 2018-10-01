@@ -26,8 +26,9 @@ from absl import logging
 
 import yaml
 
+from loaner.deployments.lib import utils
+
 REQUIRED_FIELDS = ('project_id', 'client_id', 'client_secret')
-AVAILABLE_PROJECTS = ('prod', 'qa', 'dev')
 
 FLAGS = flags.FLAGS
 
@@ -36,8 +37,8 @@ flags.DEFINE_string(
     'The path to the config file (Optionally the full path to the file).\n'
     'If just the file name is specified we assume the file is located in the '
     'default (loaner/deployments) directory and will look for the file there.')
-flags.DEFINE_enum(
-    'project', None, AVAILABLE_PROJECTS,
+flags.DEFINE_string(
+    'project', None,
     'The friendly name for the Google Cloud Project to deploy to.')
 
 
@@ -85,10 +86,25 @@ def _config_file_validator(config_file_path):
   return True
 
 
+def get_available_configs(config_file_path):
+  """Retrieves all of the exiting configurations.
+
+  Args:
+    config_file_path: str, the name or the full path of the config file.
+
+  Returns:
+    A list of available config keys.
+  """
+  with open(_get_config_file_path(config_file_path)) as config_file:
+    configs = yaml.safe_load(config_file)
+  return sorted(configs.keys())
+
+
 class ProjectConfig(object):
   """Google Cloud Project Configuration.
 
   Attributes:
+    key: str, the top-level key in the config file for this project.
     project: str, the Google Cloud Project Id.
     client_id: str, the OAuth2 Client Id for deployment.
     client_secret: str, the OAuth2 Client Secret for deployment.
@@ -100,13 +116,14 @@ class ProjectConfig(object):
         credentials file.
   """
 
-  def __init__(self, project, client_id, client_secret, bucket):
+  def __init__(self, key, project, client_id, client_secret, bucket):
     """Constructor.
 
     Typically this will not be called directly, instead use the classmethod
     factories.
 
     Args:
+      key: str, the top-level key in the config file for this project.
       project: str, the Google Cloud Project Id.
       client_id: str, the OAuth2 Client Id for deployment.
       client_secret: str, the OAuth2 Client Secret for deployment.
@@ -114,6 +131,7 @@ class ProjectConfig(object):
           if no custom name is provided we will attempt to create a default
           bucket.
     """
+    self._key = key
     self._project = project
     self._client_id = client_id
     self._client_secret = client_secret
@@ -123,8 +141,8 @@ class ProjectConfig(object):
     return '{} for project {!r}.'.format(self.__class__.__name__, self.project)
 
   def __repr__(self):
-    return '<{0}({1}, {2}, {3}, {4})>'.format(
-        self.__class__.__name__, self.project, self.client_id,
+    return '<{0}({1}, {2}, {3}, {4}, {5})>'.format(
+        self.__class__.__name__, self.key, self.project, self.client_id,
         self.client_secret, self.bucket)
 
   def __eq__(self, other):
@@ -132,6 +150,11 @@ class ProjectConfig(object):
 
   def __ne__(self, other):
     return not self.__eq__(other)
+
+  @property
+  def key(self):
+    """Getter for the top-level config key."""
+    return self._key
 
   @property
   def project(self):
@@ -167,12 +190,11 @@ class ProjectConfig(object):
         tempfile.gettempdir(), 'gng_auth_{}.dat'.format(self.project))
 
   @classmethod
-  def from_yaml(cls, project, config_file_path):
+  def from_yaml(cls, key, config_file_path):
     """Load project config data from the config yaml file.
 
     Args:
-      project: str, the project friendly name, used as the top-level key in the
-          config file.
+      key: str, the top-level key in the config file for this project.
       config_file_path: str, the name or path to the config file.
 
     Returns:
@@ -183,36 +205,74 @@ class ProjectConfig(object):
     """
     logging.debug('Loading the configuration from the provided config file.')
     with open(_get_config_file_path(config_file_path), 'r') as config_file:
-      config = yaml.safe_load(config_file)[project]
-    for key in REQUIRED_FIELDS:
-      if config[key] is None:
+      config = yaml.safe_load(config_file)[key]
+    for field in REQUIRED_FIELDS:
+      if config[field] is None:
         raise ConfigError(
-            'the field {key!r} is required and is not configured, please ensure'
-            ' there is a value set for all of the following fields '
-            '{fields}'.format(key=key, fields=REQUIRED_FIELDS))
+            'the field {field!r} is required and is not configured, please '
+            'ensure there is a value set for all of the following fields '
+            '{fields}'.format(field=field, fields=REQUIRED_FIELDS))
     return cls(
+        key=key,
         project=config['project_id'],
         client_id=config['client_id'],
         client_secret=config['client_secret'],
-        bucket=config['custom_bucket'],
+        bucket=config['bucket'],
     )
 
-  def write(self, key, config_file_path):
+  @classmethod
+  def from_prompts(cls, key):
+    """Creates new project config data from prompts.
+
+    Args:
+      key: str, the top-level key in the config file for this project.
+
+    Returns:
+      An instance of ProjectConfig with the project specific configurations.
+    """
+    project = utils.prompt_string(
+        'Which Google Cloud Project ID would you like to use to host this '
+        "deployment of Grab n Go? You can find the Google Cloud Project ID's "
+        'at https://console.cloud.google.com/cloud-resource-manager. If you '
+        'do not have a project you can create a new one at '
+        'https://console.cloud.google.com/projectcreate. For further '
+        'instructions on how to create a new Google Cloud project please visit '
+        'https://cloud.google.com/resource-manager/docs/creating-managing-'
+        'projects.\nPlease ensure Billing has been enabled as it is required '
+        'for this application (instructions can be found here: '
+        'https://cloud.google.com/billing/docs/how-to/modify-project).')
+    client_id = utils.prompt_string(
+        'An OAuth2 Token is required to authenticate to the Google services '
+        'required to manage this application. To do this we first need to '
+        'configure the OAuth Consent Screen at: '
+        'https://console.cloud.google.com/apis/credentials/consent?'
+        'project={0}\nOnce the OAuth Consent Screen is configured please '
+        'create a new OAuth2 Client ID and secret at '
+        'https://console.cloud.google.com/apis/credentials/oauthclient?'
+        "project={0}\nThe 'Application Type' should be 'Other'.\n"
+        'Once you have successfully created a new Client ID and secret, '
+        'both will be provided to you. For further instructions please visit: '
+        'https://support.google.com/cloud/answer/6158849?hl=en.\n'
+        'Please provide the Client ID:'.format(project))
+    client_secret = utils.prompt_string('Please provide the Client Secret:')
+    return cls(key, project, client_id, client_secret, None)
+
+  def write(self, config_file_path):
     """Writes the project config for the provided key to disk.
 
     Args:
-      key: str, the project friendly name, used as the top-level key in the
-          config file.
       config_file_path: str, the name or path to the config file.
     """
     path = _get_config_file_path(config_file_path)
     with open(path) as config_file:
       configs = yaml.safe_load(config_file)
 
-    configs[key]['project_id'] = self._project
-    configs[key]['client_id'] = self._client_id
-    configs[key]['client_secret'] = self._client_secret
-    configs[key]['custom_bucket'] = self._bucket
+    config = configs.get(self.key) or {}
+    config['project_id'] = self.project
+    config['client_id'] = self.client_id
+    config['client_secret'] = self.client_secret
+    config['bucket'] = self.bucket
+    configs[self.key] = config
 
     with open(path, 'w') as config_file:
       yaml.dump(configs, config_file, default_flow_style=False)

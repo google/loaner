@@ -50,7 +50,8 @@ class CloudStorageAPITest(parameterized.TestCase, absltest.TestCase):
   def setUp(self):
     super(CloudStorageAPITest, self).setUp()
     self.config = common.ProjectConfig(
-        'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET', 'TEST_BUCKET')
+        'TEST_KEY', 'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET',
+        'TEST_BUCKET')
 
   def test_create_storage_api(self):
     """Test the initialization of the Cloud Storage API helper class."""
