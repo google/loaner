@@ -699,8 +699,8 @@ class Device(base_model.BaseModel):
     self.damaged_reason = damaged_reason
     self.move_to_default_ou(user_email=user_email)
     self.stream_to_bq(
-        user_email, 'Marking device {} as damaged, reason: {reason}'.format(
-            self.identifier, reason=damaged_reason))
+        user_email, 'Marking device %s as damaged, reason: %s' %
+        (self.identifier, damaged_reason))
     self.put()
 
   @validate_assignee_or_admin
@@ -840,7 +840,7 @@ class Device(base_model.BaseModel):
     self.last_known_healthy = datetime.datetime.utcnow()
     self._loan_return(user_email=user_email)
     self.stream_to_bq(
-        user_email, 'Placing device: {} on shelf: {}'.format(
+        user_email, 'Placing device: %s on shelf: %s' % (
             self.identifier, shelf.location))
 
   def remove_from_shelf(self, shelf, user_email):
@@ -855,7 +855,7 @@ class Device(base_model.BaseModel):
         self.shelf = None
         self.put()
         self.stream_to_bq(
-            user_email, 'Removing device: {} from shelf: {}'.format(
+            user_email, 'Removing device: %s from shelf: %s' % (
                 self.identifier, shelf.location))
 
 
