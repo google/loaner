@@ -227,13 +227,13 @@ templates:
         <p>Hello!</p>
         <p>
           You just signed into a Grab n Go Loaner Chromebook! It&lsquo;s temporarily assigned to you and
-          is due on {{due_date}}. If you need it for longer, click the management button below.
+          is due on {{due_date}}. If you need it for longer, click the Manage Loan button below.
         </p>
         <p>
           When you&lsquo;re done please return the Chromebook to the nearest Grab n Go Loaner shelf and
           plug it in. If you&lsquo;ve already returned it, you&lsquo;ll receive a confirmation of the
           return within about one business day. If you think you received this email in error, please
-          click the management button below to let us know you don&lsquo;t have this device.
+          click the Manage Loan button below to let us know you don&lsquo;t have this device.
         </p>
       {% endblock %}'
 
