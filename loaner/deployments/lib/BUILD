@@ -319,6 +319,5 @@ test_suite(
         ":password_test",
         ":storage_test",
         ":utils_test",
-        "//loaner/deployments/lib/ui:all_tests",
     ],
 )
