@@ -61,9 +61,13 @@ export class ShelfDetails implements OnInit {
     });
   }
 
-  /** Route to action update to enable form. */
+  /**
+   * Route to action update to enable form and skip location history to avoid
+   * back looping between shelf details and shelf update.
+   */
   edit() {
-    this.router.navigate(['/shelf', this.shelf.location, 'update']);
+    this.router.navigate(
+        ['shelf', this.shelf.location, 'update'], {skipLocationChange: true});
   }
 
   /** Dialog for removing a shelf. */
