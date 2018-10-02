@@ -83,7 +83,7 @@ class AuthTest(parameterized.TestCase, absltest.TestCase):
     self._test_client_secret = 'test_client_secret'
     self._test_config = common.ProjectConfig(
         'test_key', self._test_project, self._test_client_id,
-        self._test_client_secret, None)
+        self._test_client_secret, None, '/test/path.yaml')
     # Save the real modules for clean up.
     self.real_open = builtins.open
     # Create a fake file system and stub out builtin modules.

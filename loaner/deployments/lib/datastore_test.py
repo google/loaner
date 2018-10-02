@@ -36,7 +36,7 @@ class DatastoreAPITest(absltest.TestCase):
     super(DatastoreAPITest, self).setUp()
     self.config = common.ProjectConfig(
         'TEST_KEY', 'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET',
-        'TEST_BUCKET')
+        'TEST_BUCKET', '/test/path.yaml')
 
   def test_create_datastore_api(self):
     """Test the initialization of the Cloud Datastore API helper class."""

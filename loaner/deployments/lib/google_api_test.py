@@ -34,7 +34,7 @@ class GoogleApiTest(parameterized.TestCase, absltest.TestCase):
     super(GoogleApiTest, self).setUp()
     self.config = common.ProjectConfig(
         'TEST_KEY', 'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET',
-        'TEST_BUCKET')
+        'TEST_BUCKET', '/this/path.yaml')
 
   def test_init(self):
     """Test the initialization of the GoogleAPI class."""
@@ -44,7 +44,7 @@ class GoogleApiTest(parameterized.TestCase, absltest.TestCase):
         'GoogleAPI for project: "TEST_PROJECT"', str(test_google_api))
     self.assertEqual(
         '<GoogleAPI.from_config(<ProjectConfig(TEST_KEY, TEST_PROJECT, '
-        'TEST_CLIENT_ID, TEST_CLIENT_SECRET, TEST_BUCKET)>)>',
+        'TEST_CLIENT_ID, TEST_CLIENT_SECRET, TEST_BUCKET, /this/path.yaml)>)>',
         repr(test_google_api))
 
   @mock.patch.object(auth, 'CloudCredentials', autospec=True)

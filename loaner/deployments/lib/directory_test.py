@@ -72,7 +72,7 @@ class DirectoryAPITest(parameterized.TestCase, absltest.TestCase):
     super(DirectoryAPITest, self).setUp()
     self.config = common.ProjectConfig(
         'TEST_KEY', 'TEST_PROJECT', 'TEST_CLIENT_ID', 'TEST_CLIENT_SECRET',
-        'TEST_BUCKET')
+        'TEST_BUCKET', '/test/path.yaml')
 
   def test_directory_api_insert_role(self):
     """Test the insert_role API method for the Google Admin Directory API."""

@@ -28,6 +28,7 @@ import yaml
 
 from loaner.deployments.lib import utils
 
+DEFAULT = 'default'
 REQUIRED_FIELDS = ('project_id', 'client_id', 'client_secret')
 
 FLAGS = flags.FLAGS
@@ -114,9 +115,11 @@ class ProjectConfig(object):
         Google Cloud Storage.
     local_credentials_file_path: str, the path to the locally stored
         credentials file.
+    path: str, the absolute path including the name of the config file used to
+        load and store this configuration.
   """
 
-  def __init__(self, key, project, client_id, client_secret, bucket):
+  def __init__(self, key, project, client_id, client_secret, bucket, path):
     """Constructor.
 
     Typically this will not be called directly, instead use the classmethod
@@ -130,20 +133,23 @@ class ProjectConfig(object):
       bucket: str, a custom bucket name used for storing configuration data,
           if no custom name is provided we will attempt to create a default
           bucket.
+      path: str, the absolute path including the name of the config file used to
+          load and store this configuration.
     """
     self._key = key
     self._project = project
     self._client_id = client_id
     self._client_secret = client_secret
     self._bucket = bucket
+    self._path = path
 
   def __str__(self):
     return '{} for project {!r}.'.format(self.__class__.__name__, self.project)
 
   def __repr__(self):
-    return '<{0}({1}, {2}, {3}, {4}, {5})>'.format(
+    return '<{0}({1}, {2}, {3}, {4}, {5}, {6})>'.format(
         self.__class__.__name__, self.key, self.project, self.client_id,
-        self.client_secret, self.bucket)
+        self.client_secret, self.bucket, self.path)
 
   def __eq__(self, other):
     return self.__dict__ == other.__dict__
@@ -189,6 +195,11 @@ class ProjectConfig(object):
     return os.path.join(
         tempfile.gettempdir(), 'gng_auth_{}.dat'.format(self.project))
 
+  @property
+  def path(self):
+    """Getter for the local configuration file."""
+    return self._path
+
   @classmethod
   def from_yaml(cls, key, config_file_path):
     """Load project config data from the config yaml file.
@@ -204,7 +215,8 @@ class ProjectConfig(object):
       ConfigError: when the configuration is missing required values.
     """
     logging.debug('Loading the configuration from the provided config file.')
-    with open(_get_config_file_path(config_file_path), 'r') as config_file:
+    path = _get_config_file_path(config_file_path)
+    with open(path) as config_file:
       config = yaml.safe_load(config_file)[key]
     for field in REQUIRED_FIELDS:
       if config[field] is None:
@@ -218,14 +230,16 @@ class ProjectConfig(object):
         client_id=config['client_id'],
         client_secret=config['client_secret'],
         bucket=config['bucket'],
+        path=path,
     )
 
   @classmethod
-  def from_prompts(cls, key):
+  def from_prompts(cls, key, config_file_path):
     """Creates new project config data from prompts.
 
     Args:
       key: str, the top-level key in the config file for this project.
+      config_file_path: str, the name or path to the config file.
 
     Returns:
       An instance of ProjectConfig with the project specific configurations.
@@ -234,10 +248,10 @@ class ProjectConfig(object):
         'Which Google Cloud Project ID would you like to use to host this '
         "deployment of Grab n Go? You can find the Google Cloud Project ID's "
         'at https://console.cloud.google.com/cloud-resource-manager. If you '
-        'do not have a project you can create a new one at '
+        'do not have an existing project to use, you can create a new one at '
         'https://console.cloud.google.com/projectcreate. For further '
-        'instructions on how to create a new Google Cloud project please visit '
-        'https://cloud.google.com/resource-manager/docs/creating-managing-'
+        'instructions on how to create a new Google Cloud project please visit:'
+        ' https://cloud.google.com/resource-manager/docs/creating-managing-'
         'projects.\nPlease ensure Billing has been enabled as it is required '
         'for this application (instructions can be found here: '
         'https://cloud.google.com/billing/docs/how-to/modify-project).')
@@ -255,16 +269,13 @@ class ProjectConfig(object):
         'https://support.google.com/cloud/answer/6158849?hl=en.\n'
         'Please provide the Client ID:'.format(project))
     client_secret = utils.prompt_string('Please provide the Client Secret:')
-    return cls(key, project, client_id, client_secret, None)
+    return cls(
+        key, project, client_id, client_secret, None,
+        _get_config_file_path(config_file_path))
 
-  def write(self, config_file_path):
-    """Writes the project config for the provided key to disk.
-
-    Args:
-      config_file_path: str, the name or path to the config file.
-    """
-    path = _get_config_file_path(config_file_path)
-    with open(path) as config_file:
+  def write(self):
+    """Writes the project config for the provided key to disk."""
+    with open(self.path) as config_file:
       configs = yaml.safe_load(config_file)
 
     config = configs.get(self.key) or {}
@@ -274,5 +285,5 @@ class ProjectConfig(object):
     config['bucket'] = self.bucket
     configs[self.key] = config
 
-    with open(path, 'w') as config_file:
+    with open(self.path, 'w') as config_file:
       yaml.dump(configs, config_file, default_flow_style=False)

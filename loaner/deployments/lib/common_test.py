@@ -146,34 +146,38 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
     """Test the direct construction of ProjectConfig."""
     test_config = common.ProjectConfig(
         'dev', project_name, 'test_client_id', 'test_client_secret',
-        bucket_name)
+        bucket_name, '/this/config/file.yaml')
     self.assertEqual(project_name, test_config.project)
     self.assertEqual('test_client_id', test_config.client_id)
     self.assertEqual('test_client_secret', test_config.client_secret)
     self.assertEqual(expected_bucket_name, test_config.bucket)
     self.assertEqual(
         '{}/configs'.format(expected_bucket_name), test_config.configs)
+    self.assertEqual('/this/config/file.yaml', test_config.path)
     # Test that two objects with the same constructor args are equal.
     self.assertEqual(test_config, common.ProjectConfig(
         'dev', project_name, 'test_client_id', 'test_client_secret',
-        bucket_name))
+        bucket_name, '/this/config/file.yaml'))
     # Test that two object with different constructor args are not equal.
     self.assertNotEqual(test_config, common.ProjectConfig(
         'dev', project_name, 'test_client_id', 'test_client_secret',
-        'INCORRECT'))
+        'INCORRECT', '/this/config/file.yaml'))
     # Test the string and representations for ProjectConfig.
     self.assertEqual(
         "ProjectConfig for project 'test_project'.", str(test_config))
     self.assertEqual(
-        '<ProjectConfig(dev, {}, test_client_id, test_client_secret, {})>'
-        ''.format(project_name, expected_bucket_name), repr(test_config))
+        '<ProjectConfig(dev, {}, test_client_id, test_client_secret, {}, '
+        '/this/config/file.yaml)>'.format(project_name, expected_bucket_name),
+        repr(test_config))
 
   def test_project_config_from_yaml(self):
     """Test the construction of ProjectConfig when loaded from a config file."""
-    expected_config = common.ProjectConfig(
-        'dev', 'test_project', 'test_client_id', 'test_client_secret', None)
     config_file = os.path.join(
         os.path.dirname(os.path.abspath(__file__)), 'config.yaml')
+    expected_config = common.ProjectConfig(
+        'dev', 'test_project', 'test_client_id', 'test_client_secret', None,
+        config_file,
+    )
     self.fs.CreateFile(config_file, contents=_SINGLE_CONFIG)
     test_config = common.ProjectConfig.from_yaml('dev', config_file)
     self.assertEqual(expected_config, test_config)
@@ -188,12 +192,14 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
 
   def test_from_prompts(self):
     expected_response = common.ProjectConfig(
-        'test', 'fake_project', 'fake_client_id', 'fake_client_secret', None)
+        'test', 'fake_project', 'fake_client_id', 'fake_client_secret', None,
+        '/this/config/file.yaml',
+    )
     prompt_return = ['fake_project', 'fake_client_id', 'fake_client_secret']
     with mock.patch.object(
         utils, 'prompt_string', side_effect=prompt_return) as mock_prompt:
       self.assertEqual(
-          common.ProjectConfig.from_prompts('test'),
+          common.ProjectConfig.from_prompts('test', '/this/config/file.yaml'),
           expected_response)
       self.assertEqual(mock_prompt.call_count, 3)
 
@@ -204,11 +210,13 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
         'client_secret': 'test_client_secret',
         'bucket': 'test_project-gng-loaner',
     }
-    self.fs.CreateFile('/this/config.yaml', contents=_EMPTY_CONFIG)
+    self.fs.CreateFile('/this/config/file.yaml', contents=_EMPTY_CONFIG)
     test_config = common.ProjectConfig(
-        'asdf', 'test_project', 'test_client_id', 'test_client_secret', None)
-    test_config.write('/this/config.yaml')
-    with open('/this/config.yaml') as config_file:
+        'asdf', 'test_project', 'test_client_id', 'test_client_secret', None,
+        '/this/config/file.yaml',
+    )
+    test_config.write()
+    with open('/this/config/file.yaml') as config_file:
       config = yaml.safe_load(config_file)
     self.assertEqual(config['asdf'], expected_dict)
 
