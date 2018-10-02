@@ -110,8 +110,9 @@ export class AppRoot implements AfterViewInit, OnInit {
       readonly title: Title,
   ) {
     this.title.setTitle(`Welcome to ${PROGRAM_NAME}`);
-    this.survey.answer.subscribe(val => this.surveyAnswer = val);
-    this.survey.surveySent.subscribe(val => this.surveySent = val);
+    this.survey.answer.subscribe(val => {
+      this.surveyAnswer = val;
+    });
   }
 
   /**
@@ -166,11 +167,6 @@ export class AppRoot implements AfterViewInit, OnInit {
       this.updateStepNumber(state);
       // Actions to be taken when certain previous step is shown.
       switch (state.previousStep.id) {
-        case 'survey':
-          if (!this.surveySent) {
-            this.sendSurvey(this.surveyAnswer);
-          }
-          break;
         case 'return':
           // Ensure that can proceed isn't disabled because of a previous check.
           this.flowSequenceButtons.canProceed = true;
@@ -220,7 +216,6 @@ export class AppRoot implements AfterViewInit, OnInit {
         case 'return_instructions':
           this.updateAnalytics('/return_instructions');
           this.returnInstructions.reloadAnimation();
-          this.bg.onboardingComplete();
           break;
         default:
           break;
@@ -243,6 +238,13 @@ export class AppRoot implements AfterViewInit, OnInit {
   }
 
   launchManageView() {
+    this.bg.onboardingComplete();
+    if (this.surveyAnswer) {
+      this.surveyComponent.waiting();
+      this.survey.submitSurvey(this.surveyAnswer).subscribe(() => {
+        this.surveyComponent.ready();
+      });
+    }
     this.bg.openView('manage');
   }
 
@@ -257,7 +259,6 @@ plan to use this device. This information will help us monitor usage trends and
 ensure we have an appropriate amount of loaners.`;
 
     this.surveyComponent.surveyType = SurveyType.Assignment;
-    this.surveyComponent.surveySent = this.surveySent;
   }
 
   /**
@@ -270,21 +271,6 @@ ensure we have an appropriate amount of loaners.`;
 continue using the app as normal.`;
       this.failure.register(message, FailType.Network, FailAction.Ignore, val);
     });
-  }
-
-  /**
-   * Sends the survey answer via a service.
-   * @param answer The answer object for the survey
-   */
-  sendSurvey(answer: SurveyAnswer) {
-    if (answer) {
-      this.surveyComponent.waiting();
-      this.survey.submitSurvey(answer).subscribe(() => {
-        this.surveySent = true;
-        this.surveyComponent.surveySent = true;
-        this.surveyComponent.ready();
-      });
-    }
   }
 }
 

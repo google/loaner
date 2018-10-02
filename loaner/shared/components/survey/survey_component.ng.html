@@ -2,20 +2,6 @@
   <loaner-loader></loaner-loader>
 </div>
 
-<div *ngIf="surveyAnswered"
-     [class.survey-card-chrome]="chromeApp">
-  <mat-card tabindex="0" loaner-focus>
-    <h1 class="card-title">
-      You have already answered this question
-    </h1>
-    <p class="card-description">
-      You have already completed this survey. You are no longer able to modify the survey.
-      When returning the device, you'll be able to provide additional information about your loan
-      experience.
-    </p>
-  </mat-card>
-</div>
-
 <div *ngIf="surveyNew"
      [class.survey-card-chrome]="chromeApp">
   <mat-card tabindex="0" loaner-focus>

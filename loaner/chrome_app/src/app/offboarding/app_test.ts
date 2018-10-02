@@ -13,23 +13,24 @@
 // limitations under the License.
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 import {RouterTestingModule} from '@angular/router/testing';
 
+import {Survey, SurveyMock} from '../../../../shared/components/survey';
 import {AnimationMenuService} from '../../../../shared/services/animation_menu_service';
 import {AnimationMenuServiceMock} from '../../../../shared/testing/mocks';
 import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
+import {Background, BackgroundMock} from '../shared/background_service';
 
 import {AppModule, AppRoot} from './app';
 
-describe('AppRoot offboarding', () => {
-  let fixture: ComponentFixture<AppRoot>;
+describe('Offboarding AppRoot', () => {
   let app: AppRoot;
+  let fixture: ComponentFixture<AppRoot>;
 
   beforeEach(() => {
     TestBed
         .configureTestingModule({
-          imports: [RouterTestingModule, AppModule],
+          imports: [AppModule],
           providers: [
             {
               provide: AnimationMenuService,
@@ -39,21 +40,67 @@ describe('AppRoot offboarding', () => {
               provide: AnalyticsService,
               useClass: AnalyticsServiceMock,
             },
+            {
+              provide: Background,
+              useClass: BackgroundMock,
+            },
+            {
+              provide: Survey,
+              useClass: SurveyMock,
+            },
           ],
         })
         .compileComponents();
-  });
 
-  beforeEach(() => {
     fixture = TestBed.createComponent(AppRoot);
-    app = fixture.debugElement.componentInstance;
+    app = fixture.componentInstance;
+    fixture.detectChanges();
   });
 
-  it('should show the title of the page in the toolbar', () => {
-    // Settle the initial view before updating the title.
-    fixture.detectChanges();
-    const toolbarDebugEl = fixture.debugElement.query(By.css('mat-toolbar'));
-    expect(toolbarDebugEl.nativeElement.textContent)
+  it('shows the title of the page in the toolbar', () => {
+    const toolbarDebugEl =
+        fixture.debugElement.nativeElement.querySelector('mat-toolbar');
+    expect(toolbarDebugEl.textContent)
         .toContain('Get ready to return this device');
+  });
+
+  it('renders flow sequence and buttons', () => {
+    expect(fixture.debugElement.nativeElement.querySelector(
+               'loaner-flow-sequence'))
+        .toBeDefined();
+    expect(fixture.debugElement.nativeElement.querySelector(
+               'loaner-flow-sequence-buttons'))
+        .toBeDefined();
+  });
+
+  it('updates the step number when flow changes', () => {
+    expect(app.currentStep).toBe(0);
+    app.flowSequenceButtons.goForward();
+    expect(app.currentStep).toBe(1);
+  });
+
+  it('FAILS to go forward when canProceed is false', () => {
+    app.flowSequenceButtons.canProceed = false;
+    expect(app.currentStep).toBe(0);
+    app.flowSequenceButtons.goForward();
+    expect(app.currentStep).toBe(0);
+  });
+
+  it('sends survey upon request to close the application', () => {
+    const surveyService: Survey = TestBed.get(Survey);
+    spyOn(surveyService, 'submitSurvey').and.callThrough();
+    const fakeSurveyData = {
+      more_info_text: 'Yes, this is more info.',
+      question_urlsafe_key: 'randomQuestionString0',
+      selected_answer: {
+        more_info_enabled: true,
+        more_info_text: 'Not sure what you mean',
+        text: 'Yes',
+      },
+    };
+    app.surveyAnswer = fakeSurveyData;
+    app.closeApplication();
+    fixture.detectChanges();
+    expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
   });
 });

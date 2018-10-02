@@ -145,13 +145,6 @@ describe('SurveyComponent', () => {
         .not.toContain('This is a description');
   });
 
-  it('should not display a question if survey is sent', () => {
-    app.surveySent = true;
-    fixture.detectChanges();
-    expect(fixture.nativeElement.textContent)
-        .toContain('You have already answered this question');
-  });
-
   it('should display \'no survey\' text when no survey data is populated',
      () => {
        fixture.detectChanges();

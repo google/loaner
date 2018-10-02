@@ -57,13 +57,13 @@ describe('Onboarding AppRoot', () => {
     fixture.detectChanges();
   });
 
-  it('should show the title of the page in the toolbar', () => {
+  it('shows the title of the page in the toolbar', () => {
     const toolbarDebugEl =
         fixture.debugElement.nativeElement.querySelector('mat-toolbar');
     expect(toolbarDebugEl.textContent).toContain(`Welcome to ${PROGRAM_NAME}`);
   });
 
-  it('should render flow sequence and buttons', () => {
+  it('renders flow sequence and buttons', () => {
     expect(fixture.debugElement.nativeElement.querySelector(
                'loaner-flow-sequence'))
         .toBeDefined();
@@ -72,21 +72,20 @@ describe('Onboarding AppRoot', () => {
         .toBeDefined();
   });
 
-  it('should update the step number when flow changes', () => {
+  it('updates the step number when flow changes', () => {
     expect(app.currentStep).toBe(0);
     app.flowSequenceButtons.goForward();
     expect(app.currentStep).toBe(1);
   });
 
-  it('should FAIL to go forward when canProceed is false', () => {
+  it('FAILs to go forward when canProceed is false', () => {
     app.flowSequenceButtons.canProceed = false;
     expect(app.currentStep).toBe(0);
     app.flowSequenceButtons.goForward();
     expect(app.currentStep).toBe(0);
   });
 
-  it('should send survey and update surveySent value', () => {
-    expect(app.surveySent).toBeFalsy();
+  it('sends survey upon request to launch the manage view', () => {
     const surveyService: Survey = TestBed.get(Survey);
     spyOn(surveyService, 'submitSurvey').and.callThrough();
     const fakeSurveyData = {
@@ -98,9 +97,9 @@ describe('Onboarding AppRoot', () => {
         text: 'Yes',
       },
     };
-    app.sendSurvey(fakeSurveyData);
+    app.surveyAnswer = fakeSurveyData;
+    app.launchManageView();
+    fixture.detectChanges();
     expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
-    expect(app.surveySent).toBeTruthy();
-    expect(app.surveyComponent.surveySent).toBeTruthy();
   });
 });

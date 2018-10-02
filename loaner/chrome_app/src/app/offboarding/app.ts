@@ -61,7 +61,6 @@ const STEPS: Step[] = [
 @Component({
   encapsulation: ViewEncapsulation.None,
   preserveWhitespaces: true,
-  providers: [Background],
   selector: 'app-root',
   styleUrls: ['./app.scss'],
   templateUrl: './app.ng.html',
@@ -127,8 +126,9 @@ device to your nearest shelf as soon as possible.`,
       readonly title: Title,
   ) {
     title.setTitle(`Return your ${PROGRAM_NAME} loaner`);
-    this.survey.answer.subscribe(val => this.surveyAnswer = val);
-    this.survey.surveySent.subscribe(val => this.surveySent = val);
+    this.survey.answer.subscribe(val => {
+      this.surveyAnswer = val;
+    });
   }
 
   /**
@@ -176,16 +176,6 @@ device to your nearest shelf as soon as possible.`,
     // Subscribe to flow state
     this.flowSequence.flowState.subscribe(state => {
       this.updateStepNumber(state);
-      // Actions to be taken when certain previous step is shown.
-      switch (state.previousStep.id) {
-        case 'survey':
-          if (!this.surveySent) {
-            this.sendSurvey(this.surveyAnswer);
-          }
-          break;
-        default:
-          break;
-      }
 
       // Actions to be taken when certain active/next step is shown.
       switch (state.activeStep.id) {
@@ -249,6 +239,12 @@ device to your nearest shelf as soon as possible.`,
    * application window.
    */
   closeApplication() {
+    if (this.surveyAnswer) {
+      this.surveyComponent.waiting();
+      this.survey.submitSurvey(this.surveyAnswer).subscribe(() => {
+        this.surveyComponent.ready();
+      });
+    }
     this.bg.closeView('offboarding');
   }
 
@@ -262,7 +258,6 @@ device to your nearest shelf as soon as possible.`,
 experience. This will help us improve and maintain the loaner program.`;
 
     this.surveyComponent.surveyType = SurveyType.Return;
-    this.surveyComponent.surveySent = this.surveySent;
   }
 
   /**
@@ -275,21 +270,6 @@ experience. This will help us improve and maintain the loaner program.`;
 continue using the app as normal.`;
       this.failure.register(message, FailType.Network, FailAction.Ignore, val);
     });
-  }
-
-  /**
-   * Sends the survey answer via a service.
-   * @param answer The answer object for the survey
-   */
-  sendSurvey(answer: SurveyAnswer) {
-    if (answer) {
-      this.surveyComponent.waiting();
-      this.survey.submitSurvey(answer).subscribe(() => {
-        this.surveySent = true;
-        this.surveyComponent.surveySent = true;
-        this.surveyComponent.ready();
-      });
-    }
   }
 
   completeReturn() {
@@ -330,6 +310,7 @@ rest.`;
   providers: [
     {provide: PlatformLocation, useClass: ChromeAppPlatformLocation},
     ConfigService,
+    Background,
     Survey,
     Loan,
     // useValue used in this provide since useFactory with parameters doesn't
