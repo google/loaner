@@ -19,12 +19,19 @@ from __future__ import division
 from __future__ import print_function
 
 import platform
+import re
 import sys
 import textwrap
 
 from absl import flags
 from six.moves import input
 from six.moves import range
+
+# A Google Cloud Project ID must be between 6 and 30 characters, it cannot end
+# with a hyphen, it must begin with a letter, and must be all lower case
+# letters, numbers, and hyphens.
+_PROJECT_ID_REGEX = r'^[a-z][a-z0-9-]{4,28}[a-z0-9]$'
+
 
 
 def _wrap_lines(lines, wrapper=None):
@@ -179,8 +186,53 @@ class StringParser(object):
     raise ValueError('the value {!r} is not a valid string'.format(arg))
 
 
+class ProjectIDParser(StringParser):
+  """A Google Cloud Project ID Parser to enforce Google's requirements.
+
+  The official requirements can be found in the `Project` resource reference at:
+  https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project
+  """
+
+  def parse(self, arg):
+    """Parses and validates the provided argument.
+
+    Args:
+      arg: str, the string to be parsed and validated.
+
+    Returns:
+      The parsed Google Cloud Project ID as a string.
+
+    Raises:
+      ValueError: when the provided argument is invalid.
+    """
+    clean_arg = super(ProjectIDParser, self).parse(arg).rstrip('-').lower()
+    matched_arg = re.match(_PROJECT_ID_REGEX, clean_arg)
+    if matched_arg:
+      return matched_arg.string
+    raise ValueError(
+        'the provided Google Cloud Project ID {!r} does not meet the '
+        'requirements, the length must be between 6 and 30 lowercase letters, '
+        'numbers, and hyphens. Trailing hyphens are removed and the first '
+        'character must be a letter. More information can be found in the '
+        'resource reference here: https://cloud.google.com/resource-manager/'
+        'reference/rest/v1/projects#Project'.format(arg))
+
+
+def prompt_project_id(message, **kwargs):
+  """Prompts the user for a Google Cloud Project ID.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    A user provided Google Cloud Project ID as a string.
+  """
+  return prompt(message, parser=ProjectIDParser(False), **kwargs)
+
+
 def prompt_yes_no(message, need_full=False, **kwargs):
-  """Prompt the user for a 'yes' or 'no' as a boolean.
+  """Prompts the user for a 'yes' or 'no' as a boolean.
 
   Args:
     message: str, the info message to display before prompting for user input.
@@ -194,7 +246,7 @@ def prompt_yes_no(message, need_full=False, **kwargs):
 
 
 def prompt_string(message, allow_empty_string=False, **kwargs):
-  """Prompt the user for a string.
+  """Prompts the user for a string.
 
   Args:
     message: str, the info message to display before prompting for user input.
@@ -209,7 +261,7 @@ def prompt_string(message, allow_empty_string=False, **kwargs):
 
 
 def prompt_int(message, minimum=None, maximum=None, **kwargs):
-  """Prompt the user for an integer.
+  """Prompts the user for an integer.
 
   Args:
     message: str, the info message to display before prompting for user input.
@@ -225,7 +277,7 @@ def prompt_int(message, minimum=None, maximum=None, **kwargs):
 
 
 def prompt_csv(message, **kwargs):
-  """Prompt the user for a comma separated list of values.
+  """Prompts the user for a comma separated list of values.
 
   Args:
     message: str, the info message to display before prompting for user input.
@@ -238,7 +290,7 @@ def prompt_csv(message, **kwargs):
 
 
 def prompt_enum(message, accepted_values=None, case_sensitive=True, **kwargs):
-  """Prompt the user for a value within an Enum.
+  """Prompts the user for a value within an Enum.
 
   Args:
     message: str, the info message to display before prompting for user input.

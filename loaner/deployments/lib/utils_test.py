@@ -165,6 +165,32 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(actual, expected)
 
   @parameterized.named_parameters(
+      ('30 Chars', 'ThisOne-1234-is-A-Weird-lOnG-1',
+       'thisone-1234-is-a-weird-long-1'),
+      ('6 Chars', 'ThAt-1', 'that-1'),
+      ('Trailing hypens', ' this-project- ', 'this-project'),
+  )
+  def test_prompt_project_id(self, user_input, expected):
+    with mock.patch.object(utils, 'input', return_value=user_input):
+      actual = utils.prompt_project_id('MESSAGE', default=user_input)
+    self.assertEqual(actual, expected)
+
+  @parameterized.named_parameters(
+      ('Too short', 'fail'),
+      ('Too long', 'thisStringIsTooLongToBeAValidGCPProjectIDYo'),
+      ('Invalid characters', 'asdfasdf%$'),
+      ('Must start with letter', '1234asdf1234'),
+  )
+  def test_prompt_project_id_errors(self, user_input):
+    with mock.patch.object(
+        utils, 'input', side_effect=[user_input, 'valid-ID']) as mock_input:
+      response = utils.prompt_project_id('MESSAGE')
+    # This call count should be two because when the ValueError is raised the
+    # prompt is re-issued and a new input is expected.
+    self.assertEqual(mock_input.call_count, 2)
+    self.assertEqual(response, 'valid-id')
+
+  @parameterized.named_parameters(
       ('Empty String Allowed', True, '', ''),
       ('Non-empty String', False, 'this', 'this'),
       ('Excess  whitespace', False, '  that  ', 'that'),
