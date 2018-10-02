@@ -31,7 +31,22 @@ from six.moves import range
 # with a hyphen, it must begin with a letter, and must be all lower case
 # letters, numbers, and hyphens.
 _PROJECT_ID_REGEX = r'^[a-z][a-z0-9-]{4,28}[a-z0-9]$'
-
+_PROJECT_REQUIREMENTS = (
+    'the length must be between 6 and 30 lowercase letters, numbers, and '
+    'hyphens. The first character must be a letter. More information can be '
+    'found in the resource reference here: https://cloud.google.com'
+    '/resource-manager/reference/rest/v1/projects#Project'
+)
+# An email address must include an `@` and a `.`.
+_EMAIL_REGEX = r'[^@]+@[^@]+\.[^@]+'
+_EMAIL_REQUIREMENTS = 'an email address must include a `@` and `.`'
+# A Google OAuth2 Client ID must be lower case letters, numbers, and hypens
+# followed by '.apps.googleusercontent.com'.
+_CLIENT_ID_REGEX = r'^[a-z0-9-]+\.apps\.googleusercontent\.com$'
+_CLIENT_ID_REQUIREMENTS = (
+    'the OAuth2 Client ID must be lowercase letters, numbers, and hypens '
+    'followed by `.apps.googleusercontent.com`'
+)
 
 
 def _wrap_lines(lines, wrapper=None):
@@ -131,7 +146,17 @@ def prompt(message, user_prompt=None, default=None, parser=None):
   return user_input
 
 
-class YesNoParser(object):
+class Parser(object):
+  """A base parser object."""
+
+  def __eq__(self, other):
+    return self.__dict__ == other.__dict__
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
+
+
+class YesNoParser(Parser):
   """A Yes/No parser object."""
 
   def __init__(self, need_full=False):
@@ -140,7 +165,7 @@ class YesNoParser(object):
     self._valid_no = ('no',) if need_full else ('n', 'no')
 
   def __repr__(self):
-    return '<{0}({1})>'.format(self.__class__.__name__, self._need_full)
+    return '<{0}({1!r})>'.format(self.__class__.__name__, self._need_full)
 
   def parse(self, arg):
     """Parses and validates the provided argument.
@@ -162,13 +187,34 @@ class YesNoParser(object):
     raise ValueError("the value {!r} is not a 'yes' or 'no'".format(arg))
 
 
-class StringParser(object):
+class StringParser(Parser):
   """A string parser object."""
 
   def __init__(self, allow_empty_string=False):
     self._allow_empty_string = allow_empty_string
 
+  def __str__(self):
+    return self.__class__.__name__
+
+  def __repr__(self):
+    return '<{0}(allow_empty_string={1!r})>'.format(
+        self.__class__.__name__, self._allow_empty_string)
+
   def parse(self, arg):
+    """Parses and validates the provided argument.
+
+    When overriding this public method in subclasses call self._parse() to
+    utilize the string parser.
+
+    Args:
+      arg: str, the string to be parsed and validated.
+
+    Returns:
+      The parsed string.
+    """
+    return self._parse(arg)
+
+  def _parse(self, arg):
     """Parses and validates the provided argument.
 
     Args:
@@ -186,12 +232,23 @@ class StringParser(object):
     raise ValueError('the value {!r} is not a valid string'.format(arg))
 
 
-class ProjectIDParser(StringParser):
-  """A Google Cloud Project ID Parser to enforce Google's requirements.
+class RegExParser(StringParser):
+  """A regular expression parser object."""
 
-  The official requirements can be found in the `Project` resource reference at:
-  https://cloud.google.com/resource-manager/reference/rest/v1/projects#Project
-  """
+  def __init__(self, regex, requirements):
+    """Initializes a regular expression parser.
+
+    Args:
+      regex: str, the regular expression to use when parsing values.
+      requirements: str, the string used to describe the requirements of the
+          regular expression in human terms.
+    """
+    super(RegExParser, self).__init__(False)
+    self._regex = regex
+    self._requirements = requirements
+
+  def __repr__(self):
+    return '<RegExParser({0!r}, {1!r})>'.format(self._regex, self._requirements)
 
   def parse(self, arg):
     """Parses and validates the provided argument.
@@ -200,35 +257,82 @@ class ProjectIDParser(StringParser):
       arg: str, the string to be parsed and validated.
 
     Returns:
-      The parsed Google Cloud Project ID as a string.
+      The parsed string.
 
     Raises:
       ValueError: when the provided argument is invalid.
     """
-    clean_arg = super(ProjectIDParser, self).parse(arg).rstrip('-').lower()
-    matched_arg = re.match(_PROJECT_ID_REGEX, clean_arg)
+    clean_arg = self._parse(arg)
+    matched_arg = re.match(self._regex, clean_arg)
     if matched_arg:
       return matched_arg.string
     raise ValueError(
-        'the provided Google Cloud Project ID {!r} does not meet the '
-        'requirements, the length must be between 6 and 30 lowercase letters, '
-        'numbers, and hyphens. Trailing hyphens are removed and the first '
-        'character must be a letter. More information can be found in the '
-        'resource reference here: https://cloud.google.com/resource-manager/'
-        'reference/rest/v1/projects#Project'.format(arg))
+        'the value provided ({!r}) does not match the requirements: {}'.format(
+            arg, self._requirements))
 
 
-def prompt_project_id(message, **kwargs):
-  """Prompts the user for a Google Cloud Project ID.
+class ProjectIDParser(RegExParser):
+  """A Google Cloud Project ID Parser to enforce Google's requirements."""
 
-  Args:
-    message: str, the info message to display before prompting for user input.
-    **kwargs: keyword arguments to be passed to prompt.
+  def __init__(self):
+    super(ProjectIDParser, self).__init__(
+        _PROJECT_ID_REGEX, _PROJECT_REQUIREMENTS)
 
-  Returns:
-    A user provided Google Cloud Project ID as a string.
-  """
-  return prompt(message, parser=ProjectIDParser(False), **kwargs)
+
+class EmailParser(RegExParser):
+  """An email parser object."""
+
+  def __init__(self):
+    super(EmailParser, self).__init__(_EMAIL_REGEX, _EMAIL_REQUIREMENTS)
+
+
+class ClientIDParser(RegExParser):
+  """A Google OAuth2 Client ID parser object."""
+
+  def __init__(self):
+    super(ClientIDParser, self).__init__(
+        _CLIENT_ID_REGEX, _CLIENT_ID_REQUIREMENTS)
+
+
+class ListParser(flags.ListParser):
+  """A list parser object."""
+
+  def __init__(self, allow_empty_list=False):
+    super(ListParser, self).__init__()
+    self._allow_empty_list = allow_empty_list
+
+  def __str__(self):
+    return self.__class__.__name__
+
+  def __repr__(self):
+    return '<{0}(allow_empty_list={1!r})>'.format(
+        self.__class__.__name__, self._allow_empty_list)
+
+  def __eq__(self, other):
+    return self.allow_empty_list == other.allow_empty_list
+
+  def __ne__(self, other):
+    return not self.__eq__(other)
+
+  @property
+  def allow_empty_list(self):
+    return self._allow_empty_list
+
+  def parse(self, arg):
+    """Parses and validates the provided argument.
+
+    Args:
+      arg: str, the string of comma separated values to be parsed and validated.
+
+    Returns:
+      The parsed list.
+
+    Raises:
+      ValueError: when the provided argument is invalid.
+    """
+    if not self._allow_empty_list and not arg:
+      raise ValueError('an empty list is not allowed')
+    return super(ListParser, self).parse(arg)
 
 
 def prompt_yes_no(message, need_full=False, **kwargs):
@@ -260,6 +364,19 @@ def prompt_string(message, allow_empty_string=False, **kwargs):
   return prompt(message, parser=StringParser(allow_empty_string), **kwargs)
 
 
+def prompt_project_id(message, **kwargs):
+  """Prompts the user for a Google Cloud Project ID.
+
+  Args:
+    message: str, the info message to display before prompting for user input.
+    **kwargs: keyword arguments to be passed to prompt.
+
+  Returns:
+    A user provided Google Cloud Project ID as a string.
+  """
+  return prompt(message, parser=ProjectIDParser(), **kwargs)
+
+
 def prompt_int(message, minimum=None, maximum=None, **kwargs):
   """Prompts the user for an integer.
 
@@ -276,17 +393,19 @@ def prompt_int(message, minimum=None, maximum=None, **kwargs):
   return prompt(message, parser=parser, **kwargs)
 
 
-def prompt_csv(message, **kwargs):
+def prompt_csv(message, allow_empty_list=False, **kwargs):
   """Prompts the user for a comma separated list of values.
 
   Args:
     message: str, the info message to display before prompting for user input.
+    allow_empty_list: bool, whether or not an empty list is considered a valid
+        value.
     **kwargs: keyword arguments to be passed to prompt.
 
   Returns:
     A user provided list of values.
   """
-  return prompt(message, parser=flags.ListParser(), **kwargs)
+  return prompt(message, parser=ListParser(allow_empty_list), **kwargs)
 
 
 def prompt_enum(message, accepted_values=None, case_sensitive=True, **kwargs):
