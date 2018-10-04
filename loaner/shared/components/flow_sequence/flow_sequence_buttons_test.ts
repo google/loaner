@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ComponentFixture, fakeAsync, TestBed} from '@angular/core/testing';
+import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {FlexLayoutModule} from '@angular/flex-layout';
 
 import {LoanerFlowSequenceButtons} from './flow_sequence_buttons';
@@ -49,7 +49,7 @@ describe('LoanerFlowSequenceButtons', () => {
     },
   };
 
-  beforeEach(() => {
+  beforeEach(fakeAsync(() => {
     TestBed
         .configureTestingModule({
           declarations: [
@@ -61,12 +61,13 @@ describe('LoanerFlowSequenceButtons', () => {
           ],
         })
         .compileComponents();
+    flushMicrotasks();
 
     fixture = TestBed.createComponent(LoanerFlowSequenceButtons);
     component = fixture.debugElement.componentInstance;
     component.steps = steps;
     component.navLabels = labels;
-  });
+  }));
 
   it('should compile', () => {
     expect(component).toBeTruthy();
@@ -78,42 +79,35 @@ describe('LoanerFlowSequenceButtons', () => {
     fixture.detectChanges();
     expect(fixture.debugElement.nativeElement.querySelectorAll('button').length)
         .toBe(1);
+    expect(
+        fixture.debugElement.nativeElement.querySelector('button').getAttribute(
+            'aria-label'))
+        .toContain('Next step');
   });
 
   it('should show both forward and back buttons when in middle of sequence',
      () => {
-       expect(component.maxStepNumber).toBe(3);
-
        component.currentStepNumber = 1;
        fixture.detectChanges();
        expect(
            fixture.debugElement.nativeElement.querySelectorAll('button').length)
            .toBe(2);
+       expect(fixture.debugElement.nativeElement.querySelectorAll('button')[0]
+                  .getAttribute('aria-label'))
+           .toContain('Previous step');
+       expect(fixture.debugElement.nativeElement.querySelectorAll('button')[1]
+                  .getAttribute('aria-label'))
+           .toContain('Next step');
      });
 
   it('should show the back and finished button when on last step', () => {
-    expect(component.maxStepNumber).toBe(3);
     component.currentStepNumber = 3;
     fixture.detectChanges();
     expect(fixture.debugElement.nativeElement.querySelectorAll('button').length)
         .toBe(2);
-    expect(fixture.debugElement.nativeElement.querySelectorAll('button')[1]
-               .getAttribute('aria-label'))
-        .toContain('All done');
-  });
-
-  it('should show the correct aria labels', () => {
-    expect(component.maxStepNumber).toBe(3);
-    component.currentStepNumber = 2;
-    fixture.detectChanges();
     expect(fixture.debugElement.nativeElement.querySelectorAll('button')[0]
                .getAttribute('aria-label'))
         .toContain('Previous step');
-    expect(fixture.debugElement.nativeElement.querySelectorAll('button')[1]
-               .getAttribute('aria-label'))
-        .toContain('Next step');
-    component.currentStepNumber = 3;
-    fixture.detectChanges();
     expect(fixture.debugElement.nativeElement.querySelectorAll('button')[1]
                .getAttribute('aria-label'))
         .toContain('All done');
@@ -121,79 +115,113 @@ describe('LoanerFlowSequenceButtons', () => {
 
   it('forward button should send flow forward', fakeAsync(() => {
        component.currentStepNumber = 0;
-       expect(component.currentStepNumber).toBe(0);
-       component.flowState.subscribe(state => {
-         expect(state.optional!.activeStepNumber).toBe(1);
+       fixture.detectChanges();
+       expect(
+           fixture.debugElement.nativeElement.querySelectorAll('button').length)
+           .toBe(1);
+       const compiled = fixture.debugElement.nativeElement;
+       const forwardButton = compiled.querySelector('button') as HTMLElement;
+       let forwardOutput = false;
+       component.forward.subscribe(value => {
+         forwardOutput = value;
        });
-       component.forward.subscribe(val => {
-         expect(val).toBeTruthy();
-         component.flowState.next({
-           activeStep: steps[component.currentStepNumber],
-           previousStep: steps[component.currentStepNumber - 1],
-           optional: {
-             activeStepNumber: 1,
-           }
-         });
-       });
-       component.goForward();
+
+       forwardButton.click();
+       expect(forwardOutput).toBeTruthy();
      }));
 
-  it('forward button should NOT send flow forward', fakeAsync(() => {
+  it('forward button should NOT send flow forward when canProceed is false',
+     fakeAsync(() => {
        component.currentStepNumber = 0;
-       expect(component.currentStepNumber).toBe(0);
-       component.flowState.subscribe(state => {
-         expect(state.optional!.activeStepNumber).toBe(1);
-       });
+       fixture.detectChanges();
        component.canProceed = false;
-       component.forward.subscribe(val => {
-         expect(val).toBeFalsy();
-         component.flowState.next({
-           activeStep: steps[component.currentStepNumber],
-           previousStep: steps[component.currentStepNumber - 1],
-           optional: {
-             activeStepNumber: 1,
-           }
-         });
+       expect(
+           fixture.debugElement.nativeElement.querySelectorAll('button').length)
+           .toBe(1);
+       const compiled = fixture.debugElement.nativeElement;
+       const forwardButton = compiled.querySelector('button') as HTMLElement;
+       let forwardOutput = false;
+       component.forward.subscribe(value => {
+         forwardOutput = value;
        });
-       component.goForward();
+
+       forwardButton.click();
+       expect(forwardOutput).toBeFalsy();
+     }));
+
+
+  it('forward button should NOT send flow forward when allowButtonClick is false',
+     fakeAsync(() => {
+       component.currentStepNumber = 0;
+       fixture.detectChanges();
+       component.allowButtonClick = false;
+       expect(
+           fixture.debugElement.nativeElement.querySelectorAll('button').length)
+           .toBe(1);
+       const compiled = fixture.debugElement.nativeElement;
+       const forwardButton = compiled.querySelector('button') as HTMLElement;
+       let forwardOutput = false;
+       component.forward.subscribe(value => {
+         forwardOutput = value;
+       });
+
+       forwardButton.click();
+       expect(forwardOutput).toBeFalsy();
      }));
 
   it('back button should send flow backward', fakeAsync(() => {
        component.currentStepNumber = 2;
-       expect(component.currentStepNumber).toBe(2);
-       component.flowState.subscribe(state => {
-         expect(state.optional!.activeStepNumber).toBe(1);
+       fixture.detectChanges();
+       component.allowButtonClick = true;
+       expect(
+           fixture.debugElement.nativeElement.querySelectorAll('button').length)
+           .toBe(2);
+       const compiled = fixture.debugElement.nativeElement;
+       const backButton = compiled.querySelector('button') as HTMLElement;
+       let backOutput = false;
+       component.back.subscribe(value => {
+         backOutput = value;
        });
-       component.back.subscribe(val => {
-         expect(val).toBeTruthy();
-         component.flowState.next({
-           activeStep: steps[component.currentStepNumber],
-           previousStep: steps[component.currentStepNumber - 1],
-           optional: {
-             activeStepNumber: 1,
-           }
-         });
-       });
-       component.goBack();
+
+       backButton.click();
+       expect(backOutput).toBeTruthy();
      }));
+
+  it('back button should NOT send flow backward', fakeAsync(() => {
+       component.currentStepNumber = 2;
+       fixture.detectChanges();
+       component.allowButtonClick = false;
+       expect(
+           fixture.debugElement.nativeElement.querySelectorAll('button').length)
+           .toBe(2);
+       const compiled = fixture.debugElement.nativeElement;
+       const backButton = compiled.querySelector('button') as HTMLElement;
+       let backOutput = false;
+       component.back.subscribe(value => {
+         backOutput = value;
+       });
+
+       backButton.click();
+       expect(backOutput).toBeFalsy();
+     }));
+
 
   it('finished button should send flow to finished state', fakeAsync(() => {
        component.currentStepNumber = 3;
-       expect(component.maxStepNumber).toBe(component.currentStepNumber);
-       component.flowState.subscribe(state => {
-         expect(state.optional!.flowFinished).toBe(true);
-         expect(state.activeStep).toBe(steps[component.currentStepNumber]);
+       fixture.detectChanges();
+       expect(
+           fixture.debugElement.nativeElement.querySelectorAll('button').length)
+           .toBe(2);
+       const compiled = fixture.debugElement.nativeElement;
+       const finishedButton =
+           compiled.querySelectorAll('button')[1] as HTMLElement;
+       let finishedOutput = false;
+       component.finished.subscribe(value => {
+         finishedOutput = value;
        });
-       component.finished.subscribe(val => {
-         expect(val).toBeTruthy();
-         component.flowState.next({
-           activeStep: steps[component.currentStepNumber],
-           previousStep: steps[component.currentStepNumber - 1],
-           optional: {
-             flowFinished: true,
-           }
-         });
-       });
-       component.finishFlow();
+
+       finishedButton.click();
+       expect(finishedOutput).toBeTruthy();
      }));
+
 });
