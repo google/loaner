@@ -116,7 +116,7 @@ def _send_email(**kwargs):
   Args:
     **kwargs: kwargs for the email api.
   """
-  kwargs['sender'] = constants.EMAIL_FROM
+  kwargs['sender'] = constants.SEND_EMAIL_AS
   if not constants.ON_PROD:
     if constants.ON_DEV:
       kwargs['subject'] = '[dev] ' + kwargs['subject']

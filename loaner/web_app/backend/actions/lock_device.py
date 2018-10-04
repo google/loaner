@@ -34,4 +34,4 @@ class LockDevice(base_action.BaseAction):
     if not device:
       raise base_action.MissingDeviceError(
           'Cannot lock device. Task did not receive a device.')
-    device.lock(constants.ADMIN_USERNAME)
+    device.lock(constants.ADMIN_EMAIL)

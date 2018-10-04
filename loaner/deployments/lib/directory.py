@@ -89,11 +89,12 @@ class DirectoryAPI(google_api.GoogleAPI):
   SERVICE = 'admin'
   VERSION = 'directory_v1'
 
-  def insert_role(self, name=_ROLE_NAME):
+  def insert_role(self, name=_ROLE_NAME, customer_id='my_customer'):
     """Creates and inserts a new GSuite Admin Role.
 
     Args:
       name: str, the name of the new GSuite Admin Role.
+      customer_id: str, the G Suite customer ID to insert the role into.
 
     Returns:
       A dictionary object representing the new GSuite Admin Role.
@@ -107,7 +108,7 @@ class DirectoryAPI(google_api.GoogleAPI):
     """
     try:
       return self._client.roles().insert(
-          customer='my_customer',
+          customer=customer_id,
           body={
               'roleName': name,
               'rolePrivileges': _ROLE_PRIVILEGES,

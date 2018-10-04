@@ -54,7 +54,7 @@ export const QA = 'qa-app-engine-project';
 export const PROD = 'prod-app-engine-project';
 
 /** The url for the Google Cloud Endpoints API for your application. */
-export const WEB_APP_CLIENT_IDS: EnvironmentsVariable = {
+export const WEB_CLIENT_IDS: EnvironmentsVariable = {
   prod: `{PROD_WEB_ID}`,
   qa: `{QA_WEB_ID}`,
   dev: `{DEV_WEB_ID}`,
@@ -165,21 +165,21 @@ export class ConfigService {
   /** Decides which API URLs should be used. */
   calculateApiUrls() {
     if (this.appMode === ENVIRONMENTS.PROD) {
-      this.webClientId = WEB_APP_CLIENT_IDS.prod;
+      this.webClientId = WEB_CLIENT_IDS.prod;
       this.devTrack = false;
       this.chromeEndpoint = CHROME_ENDPOINTS.prod;
       this.standardEndpoint = STANDARD_ENDPOINTS.prod;
     } else if (this.appMode === ENVIRONMENTS.QA) {
-      this.webClientId = WEB_APP_CLIENT_IDS.qa;
+      this.webClientId = WEB_CLIENT_IDS.qa;
       this.devTrack = false;
       this.chromeEndpoint = CHROME_ENDPOINTS.qa;
       this.standardEndpoint = STANDARD_ENDPOINTS.qa;
     } else if (this.appMode === ENVIRONMENTS.DEV) {
-      this.webClientId = WEB_APP_CLIENT_IDS.dev;
+      this.webClientId = WEB_CLIENT_IDS.dev;
       this.chromeEndpoint = CHROME_ENDPOINTS.dev;
       this.standardEndpoint = STANDARD_ENDPOINTS.dev;
     } else {
-      this.webClientId = WEB_APP_CLIENT_IDS.dev;
+      this.webClientId = WEB_CLIENT_IDS.dev;
       this.standardEndpoint = 'http://localhost:8081';
       this.chromeEndpoint = 'http://localhost:8082';
     }

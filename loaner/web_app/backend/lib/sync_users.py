@@ -31,7 +31,7 @@ def sync_user_roles():
   """Syncs all of the elevated user roles for each user in Google groups."""
   logging.info('Syncing user roles.')
 
-  client = directory.DirectoryApiClient(constants.ADMIN_USERNAME)
+  client = directory.DirectoryApiClient(constants.ADMIN_EMAIL)
   superadmins_from_group = client.get_all_users_in_group(
       constants.SUPERADMINS_GROUP)
   _add_or_remove_user_roles(superadmins_from_group, 'superadmin')

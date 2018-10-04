@@ -221,9 +221,11 @@ Before you deploy GnG, the following constants must be configured:
 
 #### loaner/web_app/constants.py
 
-+   **`APP_DOMAIN`** is the Google domain in which you run G Suite with Chrome
-    Enterprise. For example, if you arrange G Suite for the domain
-    `mycompany.com` use that domain name in this string constant.
++   **`APP_DOMAINS`** is a list of domains you would like to have access to this
+    deployment of Grab n Go. The primary domain should be listed first, this is
+    the Google domain in which you run G Suite with Chrome Enterprise. For
+    example, if you arrange G Suite for the domain `mycompany.com` use that
+    domain name as the first value in this list constant.
 
     Note: If you'd like to run this program on more than one domain, please see
     the "Multi-domain Support" section at the bottom of this doc.
@@ -232,11 +234,11 @@ Before you deploy GnG, the following constants must be configured:
     will run in. You need to replace the string 'prod-app-engine-project' with
     the ID of your project.
 
-+   **`ADMIN_USERNAME`** the email address of the G Suite role account you set
-    up. Usually loaner-role@example.com.
++   **`ADMIN_EMAIL`** the email address of the G Suite role account you set up.
+    Usually loaner-role@example.com.
 
-+   **`EMAIL_FROM`** is the email address within the G Suite Domain that GnG app
-    email notifications will be sent from.
++   **`SEND_EMAIL_AS`** is the email address within the G Suite Domain that GnG
+    app email notifications will be sent from.
 
 +   **`SUPERADMINS_GROUP`**: The Google Groups email address that contains
     at least one Superadmin in charge of configuring the app.
@@ -244,11 +246,11 @@ Before you deploy GnG, the following constants must be configured:
 Within the `if ON_PROD` block are the required constants to be configured on the
 Google Cloud Project you will be using to host the production version of GnG:
 
-+   **`CHROME_APP_CLIENT_ID`** the Chrome App will use this to authenticate to
++   **`CHROME_CLIENT_ID`** the Chrome App will use this to authenticate to
     the production version of GnG. **Leave this blank for now, you'll generate
     this ID later.**
 
-+   **`WEB_APP_CLIENT_ID`** is the OAuth2 Client ID you created previously that
++   **`WEB_CLIENT_ID`** is the OAuth2 Client ID you created previously that
     the Web App frontend will use to authenticate to the production version of
     GnG.
 
@@ -261,7 +263,7 @@ Google Cloud Project you will be using to host the production version of GnG:
 The remaining ON_QA and ON_DEV are only required if you choose to use multiple
 versions to test deployments before promoting them to the production version.
 
-+   **`MY_CUSTOMER`** is the (optional) unique ID for your organization's G
++   **`CUSTOMER_ID`** is the (optional) unique ID for your organization's G
     Suite account, which GnG uses to access Google's Directory API. If this is
     not configured the app will use the helper string `my_customer` which will
     default to the G Suite domain the app is running in.
@@ -280,9 +282,9 @@ versions to test deployments before promoting them to the production version.
     'prod-app-engine-project' with the ID of your project. This is the same ID
     used for ON_PROD in loaner/web_app/constants.py.
 
-+   **`WEB_APP_CLIENT_IDS`** is the OAuth2 Client ID you created previously that
++   **`WEB_CLIENT_IDS`** is the OAuth2 Client ID you created previously that
     the Web App frontend will use to authenticate to the backend. This is the
-    same ID that was used for the WEB_APP_CLIENT_ID in
+    same ID that was used for the WEB_CLIENT_ID in
     loaner/web_app/constants.py. If you are deploying a single instance of the
     application, fill in the PROD value with the Client ID.
 
@@ -529,7 +531,7 @@ G Suite accounts and public Gmail addresses are not supported.
    WARNING: Setting this allows any Google managed account to try and sign into
    the app. Make sure you have the latest version of the code deployed or you
    could be exposing the app publicly.
-+  In the application's code in web_app/constants.py the variable APP_DOMAIN
++  In the application's code in web_app/constants.py the variable APP_DOMAINS
    should be a list of all the domains you plan on supporting.
 +  Go to admin.google.com and in Devices > Chrome Management > Device Settings
    find the Grab n Go parent OU and set Sign-in Restriction to the list of

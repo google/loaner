@@ -51,12 +51,12 @@ ON_GAE = (
 APP_NAME = 'Grab n Go'
 
 # The top level domain for the GSuite accounts used in this application.
-APP_DOMAIN = ['example.com']
+APP_DOMAINS = ['example.com']
 
 # The GSuite Customer ID this application will interact with, if nothing is
 # provided it will default to the helper string 'my_customer'.
 # NOTE: using my_customer is an approved method for the used APIs.
-MY_CUSTOMER = ('' or 'my_customer')
+CUSTOMER_ID = ('' or 'my_customer')
 
 # The absolute path to config_defaults.yaml.
 CONFIG_DEFAULTS_PATH = (
@@ -86,10 +86,10 @@ MAINTENANCE = False
 # Authority for access to the Google Admin SDK Directory API.
 # NOTE: The account used here must at least have access to the OAuth2 Scopes
 # listed below in the DIRECTORY_SCOPES variable.
-ADMIN_USERNAME = ''
+ADMIN_EMAIL = '{ADMIN_EMAIL}'
 
 # The email address application emails will come from.
-EMAIL_FROM = 'noreply@example.com'
+SEND_EMAIL_AS = 'noreply@example.com'
 
 # superadmins_group: str, The name of the Google Group that governs who is
 # a superadmin. Superadmins have all permissions by default.
@@ -98,9 +98,9 @@ SUPERADMINS_GROUP = 'technical-admins@example.com'
 # The PROD server specific configurations.
 if ON_PROD:
   # The OAuth2 Client ID for the Chrome Application.
-  CHROME_APP_CLIENT_ID = ''
+  CHROME_CLIENT_ID = ''
   # The OAuth2 Client ID for the Web Application Frontend.
-  WEB_APP_CLIENT_ID = ''
+  WEB_CLIENT_ID = ''
   # The location of the Client Secrets file relative to the Bazel WORKSPACE for
   # the Directory API Service Account with Domain Wide Delegated privilage.
   # i.e. loaner/web_app/client-secret.json
@@ -110,20 +110,20 @@ if ON_PROD:
   # devices.
   PARENT_ORG_UNIT = 'Grab n Go/Prod'
 elif ON_QA:
-  CHROME_APP_CLIENT_ID = ''
-  WEB_APP_CLIENT_ID = ''
+  CHROME_CLIENT_ID = ''
+  WEB_CLIENT_ID = ''
   SECRETS_FILE = ''
   PARENT_ORG_UNIT = 'Grab n Go/QA'
 # The DEV server specific configurations.
 elif ON_DEV:
-  CHROME_APP_CLIENT_ID = ''
-  WEB_APP_CLIENT_ID = ''
+  CHROME_CLIENT_ID = ''
+  WEB_CLIENT_ID = ''
   SECRETS_FILE = ''
   PARENT_ORG_UNIT = 'Grab n Go/Dev'
 # The LOCAL server specific configurations.
 else:
-  CHROME_APP_CLIENT_ID = ''
-  WEB_APP_CLIENT_ID = ''
+  CHROME_CLIENT_ID = ''
+  WEB_CLIENT_ID = ''
   SECRETS_FILE = ''
   PARENT_ORG_UNIT = 'Grab n Go/Dev'
 
@@ -152,7 +152,7 @@ COMPILED_JS_PATH = os.path.join(FRONTEND_ROOT, 'application.js')
 # The OAuth2 Client ID's that are allowed to access the Endpoints API's
 # configured in the endpoints.py and chrome.py files.
 ALLOWED_CLIENT_IDS = (
-    CHROME_APP_CLIENT_ID, WEB_APP_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID,
+    CHROME_CLIENT_ID, WEB_CLIENT_ID, endpoints.API_EXPLORER_CLIENT_ID,
 )
 
 # OAuth2 Scopes to request when an application user authenticates to the web

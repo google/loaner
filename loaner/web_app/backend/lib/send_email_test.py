@@ -39,7 +39,7 @@ class EmailTest(parameterized.TestCase, loanertest.TestCase):
     super(EmailTest, self).setUp()
     self.default_kwargs = {
         'subject': 'You are for sure a loaner borrower',
-        'sender': constants.EMAIL_FROM,
+        'sender': constants.SEND_EMAIL_AS,
         'to': loanertest.USER_EMAIL,
         'body': 'A plain text e-mail.',
         'html': '<blink>A rich HTML e-mail.</blink>'

@@ -40,11 +40,11 @@ class FrontendHandlerTestAuth(handlertest.HandlerTestCase):
     self.assertEqual(response.status_int, httplib.UNAUTHORIZED)
 
   def test_wrong_domain(self):
-    current_domains = constants.APP_DOMAIN
+    current_domains = constants.APP_DOMAINS
     def _reset_app_domain():
-      constants.APP_DOMAIN = current_domains
+      constants.APP_DOMAINS = current_domains
     self.addCleanup(_reset_app_domain)
-    constants.APP_DOMAIN = ['google.com']
+    constants.APP_DOMAINS = ['not-example.com']
     self.testbed.setup_env(
         user_email='user@example.com',
         user_id='1',

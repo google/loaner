@@ -12,89 +12,251 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Grab n Go environment specific constants."""
+"""Grab n Go environment specific constants.
+
+Each one of the constants defined below is an environment specific constant.
+A unique value will be required for every unique Google Cloud Project. These
+will be stored in Google Cloud Storage in the bucket configured in the
+loaner/deployments/config.yaml file for this project.
+
+When adding a configurable project level constant the following procedure must
+be used:
+  1. Add the name of the constant below, the value must be the name that is used
+     for the flag.
+  2. Create the flag with a default, no flag should be marked as required using
+     the `flags` package.
+  3. Add the name of the constant to the loaner/web_app/constants.py file.
+  4. (Optional) add a `Parser` object for the name in the `_PARSERS` dictionary.
+     The `parse` method on the `Parser` object will be used to validate the
+     current value of the constant, whether the default or a user provided
+     value. If the value is invalid, a ValueError is raised and the flag message
+     is used to prompt the user, only ever accepting a value that passes through
+     the `parse` method. If the manager is run in scripted mode an invalid value
+     for any constant defined below will cause an error and the script will
+     exit.
+"""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import json
+import sys
 
 from absl import flags
 
+from loaner.deployments.lib import utils
+
 FLAGS = flags.FLAGS
 
-flags.DEFINE_string(
-    'app_name', 'Grab n Go', 'The official display name of the application.')
+# Constant Names #
+# These are the configurable constants, the name of the constant matches the
+# name in the constants.py file and the value is used as the name of the flag
+# and used as the key for getting the respective `utils.Parser` object in the
+# `_PARSERS` dictionary below.
+APP_DOMAINS = 'app_domains'
+CHROME_CLIENT_ID = 'chrome_client_id'
+WEB_CLIENT_ID = 'web_client_id'
+ADMIN_EMAIL = 'admin_email'
+SEND_EMAIL_AS = 'send_email_as'
+SUPERADMINS_GROUP = 'superadmins_group'
+CUSTOMER_ID = 'customer_id'
+
+# Required to be provided either by flag or by prompt.
 flags.DEFINE_list(
-    'app_domains', [],
-    'A list of domains that will be authorized to access the application.')
-flags.DEFINE_string('my_customer', 'my_customer', 'The G Suite customer ID.')
-flags.DEFINE_string('chrome_client_id', '', 'The Chrome App OAuth2 Client ID.')
-flags.DEFINE_string('web_client_id', '', 'The Web App OAuth2 Client ID.')
-flags.DEFINE_string(
-    'secrets_filepath', '',
-    'The path including the name of the file relative to the Bazel WORKSPACE.\n'
-    'e.g. For the production project: loaner/web_app/prod-client-secret.json'
+    APP_DOMAINS, [],
+    'A list of second-level domains that will be authorized to access the '
+    'application. Only add domain names that you want to have access to the web'
+    " application. Domains should be in the following format: 'example.com'"
 )
 flags.DEFINE_string(
-    'admin_email', '',
-    'The email address to use to access the Google Admin SDK Directory API.')
+    CHROME_CLIENT_ID, '',
+    'The Chrome App OAuth2 Client ID.\n'
+    'In order for the Chrome companion application to be able to make API calls'
+    ' to the management backend an OAuth2 Client ID must be provided. This can '
+    'be created in the Google Cloud Console at: '
+    "https://console.cloud.google.com/apis/credentials. The 'Application Type' "
+    "for this credential is 'Chrome App'.\n"
+    'Further instructions can be found here: https://support.google.com'
+    '/cloud/answer/6158849?hl=en#installedapplications&chrome'
+)
 flags.DEFINE_string(
-    'send_email_as', '',
-    'The email address from which application related emails will come from.')
+    WEB_CLIENT_ID, '',
+    'The Web App OAuth2 Client ID.\n'
+    'In order for the Web application to be able to make API calls to the '
+    'management backend an OAuth2 Client ID must be provided. This can '
+    'be created in the Google Cloud Console at: '
+    "https://console.cloud.google.com/apis/credentials. The 'Application Type' "
+    "for this credential is 'Web Application'.\n"
+    'Further instructions can be found here: https://support.google.com'
+    '/cloud/answer/6158849?hl=en'
+)
 flags.DEFINE_string(
-    'superadmins_group', '',
-    'The name of the group for whom to grant super admin privileges to.')
+    ADMIN_EMAIL, '',
+    'The email address to use to access the Google Admin SDK Directory API.\n'
+    'If this address does not exist we will attempt to create it with a strong '
+    'password, which we will provide you. In order to create this account '
+    'programmatically you will need to be a Super Admin in the G Suite domain '
+    'this account is being created in.\nTo create this manually see the '
+    'setup_guide in the Grab n Go documentation: '
+    'https://github.com/google/loaner/blob/master/docs/setup_guide.md'
+)
+flags.DEFINE_string(
+    SEND_EMAIL_AS, '',
+    'The email address from which application related emails will come from. '
+    'Often a noreply address is used, e.g. noreply@example.com'
+)
+flags.DEFINE_string(
+    SUPERADMINS_GROUP, '',
+    'The name of the group for whom to grant super admin privileges to. '
+    'This should include anyone you want to be able to administer Grab n Go '
+    'from the web application. This gives access to all in app data.'
+)
+
+# Not required to be provided either by flag or by prompt.
+flags.DEFINE_string(
+    CUSTOMER_ID, 'my_customer',
+    'The G Suite customer ID.\nIf you are an administrator of the organization '
+    'this application is running in leave the default. If you are a reseller '
+    'you can get the customer ID by making a get user request: '
+    'https://developers.google.com/admin-sdk/directory/v1/guides/manage-users'
+    '.html#get_user'
+)
+
+# Dictionary where the flag name is the key and the value is a parser, an object
+# that has `parse` as a public instance method. A parser is not required,
+# without one any value will be accepted.
+_PARSERS = {
+    APP_DOMAINS: utils.ListParser(allow_empty_list=False),
+    CHROME_CLIENT_ID: utils.ClientIDParser(),
+    WEB_CLIENT_ID: utils.ClientIDParser(),
+    ADMIN_EMAIL: utils.EmailParser(),
+    SEND_EMAIL_AS: utils.EmailParser(),
+    SUPERADMINS_GROUP: utils.StringParser(allow_empty_string=False),
+    CUSTOMER_ID: utils.StringParser(allow_empty_string=False),
+}
 
 
-class AppConstants(object):
-  """The Grab n Go Application Configuration object."""
+def get_constants_from_flags(module=__name__):
+  """Returns a dictionary of all constants from flags.
 
-  def __init__(
-      self, project, app_name, app_domains, my_customer, chrome_client_id,
-      web_client_id, secrets_filepath, admin_email, send_email_as,
-      superadmins_group):
-    """Initializes a new AppConstants object.
+  This should only be used when skipping user validation (e.g. scripting) since
+  it does not validate the provided values with the custom parsers until the
+  value is requested. If the flag provided does not meet the `Parser`
+  requirements an error will be raised when attempting to retrieve the value.
+
+  Args:
+    module: str, the name of the module to get the constants from.
+
+  Returns:
+    A dictionary of all constants with the flag value as the constant value.
+        The key for each constant is the name of the constant.
+
+  Raises:
+    ValueError: when any of the flag values does not meet the parsing
+        requirements.
+  """
+  def _from_flag(name):
+    """Gets the value of a flag given the name.
+
+    If flags have not been parsed, the default value will be used.
 
     Args:
-      project: str, the Google Cloud Project ID for this configuration.
-      app_name: str, the display name of the web application.
-      app_domains: List[str], a list of G Suite domains (e.g. ['google.com'])
-          authorized to access the web application and endpoints APIs.
-      my_customer: str, the G Suite customer ID or the generic 'my_customer'.
-      chrome_client_id: str, the OAuth2 Client ID for the companion Chrome app.
-      web_client_id: str, the OAuth2 Client ID for the web application.
-      secrets_filepath: str, the absolute path to the secrets file for the
-          Google Admin SDK Directory API role account.
-      admin_email: str, the email address for the administrator account
-          granting access to the Google Admin SDK Directory API.
-      send_email_as: str, the email address for all application emails to come
-          from.
-      superadmins_group: str, the name of the group for which contains the
-          email addresses of the users to be granted super admin access.
+      name: str, the name of the flag.
+
+    Returns:
+      The value of the flag.
     """
-    self._project = project
-    self._app_name = app_name
-    self._app_domains = app_domains
-    self._my_customer = my_customer
-    self._chrome_client_id = chrome_client_id
-    self._web_client_id = web_client_id
-    self._secrets_filepath = secrets_filepath
-    self._admin_email = admin_email
-    self._send_email_as = send_email_as
-    self._superadmins_group = superadmins_group
+    if FLAGS.is_parsed():
+      return getattr(FLAGS, name)
+    return FLAGS[name].default
+  return _get_all_constants(module=module, func=_from_flag)
+
+
+def get_default_constants(module=__name__):
+  """Returns a dictionary of all constants with the default flag value.
+
+  This is used to initialize project level constants for a new project from
+  user prompts.
+
+  Args:
+    module: str, the name of the module to get the constants from.
+
+  Returns:
+    A dictionary of all constants with the default flag value as the constant
+        value. The key for each constant is the name of the constant.
+  """
+  return _get_all_constants(module=module, func=None)
+
+
+def _get_all_constants(module=__name__, func=None):
+  """Returns a dictionary of all constants.
+
+  This function will return all of the flags configured above as `Constant`
+  objects. By default, the default value of the flag will be used.
+
+  Args:
+    module: str, the name of the module to get the constants from.
+    func: Callable, a function that returns the value of each constant given the
+        name of the flag.
+
+  Returns:
+    A dictionary of all key flags in this module represented as Constants,
+        keyed by the name of the constant.
+  """
+  constants = {}
+
+  for flag in FLAGS.get_key_flags_for_module(sys.modules[module]):
+    value = FLAGS[flag.name].default
+    if func:
+      value = func(flag.name)
+    constants[flag.name] = Constant(
+        flag.name, flag.help, value, _PARSERS.get(flag.name))
+  return constants
+
+
+class Constant(object):
+  """Grab n Go project level constant.
+
+  Attributes:
+    name: str, the unique key to reference this constant by (this is identical
+        to the name of the flag above).
+    message: str, the message shown to the user when they are being prompted
+        to provide the value of this constant (this is identical to the help
+        message for the flag).
+    valid: bool, whether or not the current value is valid.
+    value: Any, the value of this constant.
+  """
+
+  def __init__(self, name, message, default, parser=None):
+    """Initializes the constant.
+
+    Args:
+      name: str, the unique key to reference this constant by (this should be
+          identical to the name of the flag above).
+      message: str, the message shown to the user when they are being prompted
+          to provide the value of this constant (this is identical to the help
+          message for the flag).
+      default: Any, the default value of this constant.
+      parser: Callable, an object to validate and parse the provided input.
+          A parser must meet the following requirements:
+            1) The object must have a parse() method that accepts a single
+               string as input and returns the parsed output.
+            2) Any error that occurs during parse() should raise a ValueError to
+               indicate bad user input with a helpful error message.
+          An example can be found in the utils module in this package.
+    """
+    self._name = name
+    self._message = message
+    self._value = default
+    self._parser = parser
 
   def __str__(self):
-    return '{!r} for project: {!r}'.format(
-        self.__class__.__name__, self.project)
+    return '{}: {}'.format(self.name, self._value)
 
   def __repr__(self):
-    return '<{0}({1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10})>'.format(
-        self.__class__.__name__, self.project, self.app_name, self.app_domains,
-        self.my_customer, self.chrome_client_id, self.web_client_id,
-        self.secrets_filepath, self.admin_email, self.send_email_as,
-        self.superadmins_group)
+    return '<{0}({1!r}, {2!r}, {3!r}, {4!r})>'.format(
+        self.__class__.__name__, self.name, self.message, self._value,
+        self._parser)
 
   def __eq__(self, other):
     return self.__dict__ == other.__dict__
@@ -103,66 +265,38 @@ class AppConstants(object):
     return not self.__eq__(other)
 
   @property
-  def project(self):
-    """Getter for the Google Cloud Project ID."""
-    return self._project
+  def name(self):
+    """Getter for the name."""
+    return self._name
 
   @property
-  def app_name(self):
-    """Getter for the web application display name."""
-    return self._app_name
+  def message(self):
+    """Getter for the user message."""
+    return self._message
 
   @property
-  def app_domains(self):
-    """Getter for the authorized G Suite domains."""
-    return self._app_domains
+  def value(self):
+    """Getter for the current value."""
+    return self._value
+
+  @value.setter
+  def value(self, value):
+    """Setter for the current value."""
+    self._value = value if self._parser is None else self._parser.parse(value)
 
   @property
-  def my_customer(self):
-    """Getter for the G Suite customer ID."""
-    return self._my_customer
+  def valid(self):
+    """Getter for whether or not the current value is valid."""
+    if self._parser is None:
+      return True
 
-  @property
-  def chrome_client_id(self):
-    """Getter for the OAuth2 Client ID for the Chrome app."""
-    return self._chrome_client_id
+    try:
+      self._parser.parse(self.value)
+    except ValueError:
+      return False
+    return True
 
-  @property
-  def web_client_id(self):
-    """Getter for the OAuth2 Client ID for the Web app."""
-    return self._web_client_id
-
-  @property
-  def secrets_filepath(self):
-    """Getter for the absolute path to the secrets for the role account."""
-    return self._secrets_filepath
-
-  @property
-  def admin_email(self):
-    """Getter for the admin email address."""
-    return self._admin_email
-
-  @property
-  def send_email_as(self):
-    """Getter for the email address used to send email from."""
-    return self._send_email_as
-
-  @property
-  def superadmins_group(self):
-    """Getter for the super admins group name."""
-    return self._superadmins_group
-
-  def to_json(self):
-    """Convert the AppConstants object to a json string for storage."""
-    return json.dumps({
-        'project': self.project,
-        'app_name': self.app_name,
-        'app_domains': self.app_domains,
-        'my_customer': self.my_customer,
-        'chrome_client_id': self.chrome_client_id,
-        'web_client_id': self.web_client_id,
-        'secrets_filepath': self.secrets_filepath,
-        'admin_email': self.admin_email,
-        'send_email_as': self.send_email_as,
-        'superadmins_group': self.superadmins_group,
-    })
+  def prompt(self):
+    """Prompts the user for a new value."""
+    self.value = utils.prompt(
+        self.message, default=self.value, parser=self._parser)

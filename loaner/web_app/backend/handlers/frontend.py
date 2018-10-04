@@ -57,7 +57,7 @@ class FrontendHandler(webapp2.RequestHandler):
       self.response.status = httplib.UNAUTHORIZED
       self.response.out.write('You must be logged in to access this app.')
       return
-    elif user.email().split('@')[1] not in constants.APP_DOMAIN:
+    elif user.email().split('@')[1] not in constants.APP_DOMAINS:
       self.response.status = httplib.FORBIDDEN
       self.response.out.write('Forbidden.')
       return

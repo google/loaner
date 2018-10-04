@@ -179,6 +179,8 @@ class YesNoParser(Parser):
     Raises:
       ValueError: when the provided argument is invalid.
     """
+    if isinstance(arg, bool):
+      return arg
     clean_arg = arg.strip().lower()
     if clean_arg in self._valid_yes:
       return True

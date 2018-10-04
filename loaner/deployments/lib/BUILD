@@ -18,6 +18,7 @@ py_library(
     ],
     srcs_version = "PY2AND3",
     deps = [
+        ":utils_lib",
         "@absl_archive//absl/flags",
     ],
 )
@@ -156,7 +157,12 @@ py_test(
     ],
     deps = [
         ":app_constants_lib",
+        ":utils_lib",
+        "@absl_archive//absl/flags",
         "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:flagsaver",
+        "@absl_archive//absl/testing:parameterized",
+        "@mock_archive//:mock",
     ],
 )
 

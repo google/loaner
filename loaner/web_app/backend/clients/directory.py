@@ -85,11 +85,11 @@ class DirectoryApiClient(object):
     Raises:
       UnauthorizedUserError: If a user email is not provided.
     """
-    if user_email and user_email.split('@')[1] in constants.APP_DOMAIN:
+    if user_email and user_email.split('@')[1] in constants.APP_DOMAINS:
       credentials = service_account.Credentials.from_service_account_file(
           filename=constants.SECRETS_FILE,
           scopes=constants.DIRECTORY_SCOPES,
-          subject=constants.ADMIN_USERNAME)
+          subject=constants.ADMIN_EMAIL)
 
       logging.info('Created delegated credentials for %s.', user_email)
     else:
@@ -115,7 +115,7 @@ class DirectoryApiClient(object):
     """
     try:
       return self._client.chromeosdevices().get(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           deviceId=device_id,
           fields=constants.CHROME_FIELDS_MASK).execute()
     except errors.HttpError as err:
@@ -142,7 +142,7 @@ class DirectoryApiClient(object):
     """
     try:
       return self._client.chromeosdevices().list(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           maxResults=1,
           query='id:' + serial_number,
           fields=constants.CHROME_LIST_FIELDS_MASK).execute()[
@@ -171,7 +171,7 @@ class DirectoryApiClient(object):
     """
     try:
       return self._client.orgunits().get(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           orgUnitPath=org_unit_path,
           fields=constants.ORG_UNIT_FIELDS_MASK).execute()
     except errors.HttpError as err:
@@ -207,7 +207,7 @@ class DirectoryApiClient(object):
         parent_org_unit_path)
     try:
       return self._client.orgunits().insert(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           body={
               'name': name,
               'parentOrgUnitPath': parent_org_unit_path,
@@ -238,7 +238,7 @@ class DirectoryApiClient(object):
         'Moving device with device ID %r to OU %r.', device_id, org_unit_path)
     try:
       self._client.chromeosdevices().moveDevicesToOu(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           orgUnitPath=org_unit_path,
           body={
               'deviceIds': [device_id]
@@ -261,7 +261,7 @@ class DirectoryApiClient(object):
     logging.info('Disabling chrome device %s.', device_id)
     try:
       self._client.chromeosdevices().action(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           resourceId=device_id,
           body={
               'action': 'disable'
@@ -286,7 +286,7 @@ class DirectoryApiClient(object):
     logging.info('Re-enabling chrome device %s.', device_id)
     try:
       self._client.chromeosdevices().action(
-          customerId=constants.MY_CUSTOMER,
+          customerId=constants.CUSTOMER_ID,
           resourceId=device_id,
           body={
               'action': 'reenable'
