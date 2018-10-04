@@ -12,11 +12,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
 
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
 import {AnimationMenuService} from '../../../../shared/services/animation_menu_service';
+import {NetworkService} from '../../../../shared/services/network_service';
 import {AnimationMenuServiceMock} from '../../../../shared/testing/mocks';
 import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
 import {Background, BackgroundMock} from '../shared/background_service';
@@ -27,7 +28,7 @@ describe('Offboarding AppRoot', () => {
   let app: AppRoot;
   let fixture: ComponentFixture<AppRoot>;
 
-  beforeEach(() => {
+  beforeEach(async(() => {
     TestBed
         .configureTestingModule({
           imports: [AppModule],
@@ -48,14 +49,15 @@ describe('Offboarding AppRoot', () => {
               provide: Survey,
               useClass: SurveyMock,
             },
+            NetworkService,
           ],
         })
         .compileComponents();
 
     fixture = TestBed.createComponent(AppRoot);
-    app = fixture.componentInstance;
+    app = fixture.debugElement.componentInstance;
     fixture.detectChanges();
-  });
+  }));
 
   it('shows the title of the page in the toolbar', () => {
     const toolbarDebugEl =
@@ -81,6 +83,13 @@ describe('Offboarding AppRoot', () => {
 
   it('FAILS to go forward when canProceed is false', () => {
     app.flowSequenceButtons.canProceed = false;
+    expect(app.currentStep).toBe(0);
+    app.flowSequenceButtons.goForward();
+    expect(app.currentStep).toBe(0);
+  });
+
+  it('should FAIL to go forward when allowButtonClick is false', () => {
+    app.flowSequenceButtons.allowButtonClick = false;
     expect(app.currentStep).toBe(0);
     app.flowSequenceButtons.goForward();
     expect(app.currentStep).toBe(0);

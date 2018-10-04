@@ -28,7 +28,7 @@
   <loaner-flow-sequence-buttons [steps]="steps" [navLabels]="labels">
     <button returnButton mat-mini-fab color="primary" (click)="backToManage()"
             matTooltip="Return to the management window."
-            matTooltipPosition="right">
+            matTooltipPosition="right" [disabled]="!flowSequenceButtons.allowButtonClick">
       <mat-icon>arrow_back</mat-icon>
     </button>
   </loaner-flow-sequence-buttons>

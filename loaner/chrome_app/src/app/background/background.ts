@@ -164,8 +164,7 @@ function launchOffboardingFlow() {
 function relaunchOnboarding() {
   checkOnboardingStatus().subscribe(
       status => {
-        const internetStatus = checkInternetConnectivity();
-        if (status === 'incomplete' && internetStatus) {
+        if (status === 'incomplete') {
           launchOnboardingFlow();
         }
       },
@@ -191,33 +190,7 @@ function launchOnboardingFlow() {
 
   chrome.app.window.create('onboarding.html', (options), (win) => {
     win.onClosed.addListener(relaunchOnboarding);
-    // If offline, report offline.
-    window.addEventListener('offline', reportOffline);
   });
-}
-
-/**
- * If the computer is online, launch the onboarding flow.
- */
-function reportOnline() {
-  checkOnboardingStatus().subscribe(status => {
-    if (status === 'incomplete') {
-      launchOnboardingFlow();
-    }
-  });
-}
-
-/**
- * Closes the onboarding flow and shows a notification stating the user is
- * offline.
- */
-function reportOffline() {
-  chrome.app.window.get('onboarding').close();
-  const offlineNotification = 'Oh no! You have no internet connection. ' +
-      'As soon as you have internet once again, we\'ll launch the onboarding ' +
-      'process.';
-  createNotification(
-      'noInternet-onboarding', offlineNotification, 'You\'re offline!');
 }
 
 /**
@@ -235,8 +208,6 @@ chrome.runtime.onMessage.addListener(
       const storage = new Storage();
       if (request.onboardingComplete === true) {
         storage.local.set('onboardingStatus', 'complete');
-        window.removeEventListener('online', reportOnline);
-        window.removeEventListener('offline', reportOffline);
       }
 
       /** Open the requested view */
@@ -382,8 +353,6 @@ function onboarding(
     storage.local.set('loanerEnrollment', 'true');
     if (startAssignment && !silentOnboarding) {
       launchOnboardingFlow();
-      // If online, report online.
-      window.addEventListener('online', reportOnline);
       storage.local.set('onboardingStatus', 'incomplete');
     } else {
       storage.local.set('onboardingStatus', 'complete');

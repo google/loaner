@@ -26,6 +26,7 @@ import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} fro
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
 import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, ConfigService, PROGRAM_NAME, RETURN_ANIMATION_ALT_TEXT, RETURN_ANIMATION_ENABLED, RETURN_ANIMATION_URL, TOOLBAR_ICON, TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
+import {NetworkService} from '../../../../shared/services/network_service';
 import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
 import {Background} from '../shared/background_service';
 import {ChromeAppPlatformLocation} from '../shared/chrome_app_platform_location';
@@ -122,6 +123,7 @@ device to your nearest shelf as soon as possible.`,
       private readonly config: ConfigService,
       private readonly failure: Failure,
       private readonly loan: Loan,
+      private readonly networkService: NetworkService,
       private readonly survey: Survey,
       readonly title: Title,
   ) {
@@ -172,6 +174,10 @@ device to your nearest shelf as soon as possible.`,
     this.flowSequenceButtons.finished.subscribe(finished => {
       if (finished) this.closeApplication();
     });
+
+    // If there is no network connection, disable the flow buttons.
+    this.networkService.internetStatus.subscribe(
+        status => this.flowSequenceButtons.allowButtonClick = status);
 
     // Subscribe to flow state
     this.flowSequence.flowState.subscribe(state => {
@@ -311,6 +317,7 @@ rest.`;
     {provide: PlatformLocation, useClass: ChromeAppPlatformLocation},
     ConfigService,
     Background,
+    NetworkService,
     Survey,
     Loan,
     // useValue used in this provide since useFactory with parameters doesn't

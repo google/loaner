@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {async, ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AnimationMenuService} from '../../../../shared/components/animation_menu';
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
@@ -27,7 +27,7 @@ describe('Onboarding AppRoot', () => {
   let app: AppRoot;
   let fixture: ComponentFixture<AppRoot>;
 
-  beforeEach(() => {
+  beforeEach(async(() => {
     TestBed
         .configureTestingModule({
           imports: [AppModule],
@@ -55,7 +55,7 @@ describe('Onboarding AppRoot', () => {
     fixture = TestBed.createComponent(AppRoot);
     app = fixture.componentInstance;
     fixture.detectChanges();
-  });
+  }));
 
   it('shows the title of the page in the toolbar', () => {
     const toolbarDebugEl =
@@ -85,7 +85,16 @@ describe('Onboarding AppRoot', () => {
     expect(app.currentStep).toBe(0);
   });
 
-  it('sends survey upon request to launch the manage view', () => {
+  it('should FAIL to go forward when allowButtonClick is false', () => {
+    app.flowSequenceButtons.allowButtonClick = false;
+    expect(app.currentStep).toBe(0);
+    app.flowSequenceButtons.goForward();
+    expect(app.currentStep).toBe(0);
+  });
+
+
+  it('should send survey and update surveySent value', () => {
+    expect(app.surveySent).toBeFalsy();
     const surveyService: Survey = TestBed.get(Survey);
     spyOn(surveyService, 'submitSurvey').and.callThrough();
     const fakeSurveyData = {

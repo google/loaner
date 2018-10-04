@@ -1,1 +1,12 @@
 @import '../../../../shared/themes/standard';
+
+// Override the snackbars default margins and width for the failure message.
+// The Chrome App requires additional adjustments for the centering to work.
+.mat-snack-bar-handset {
+  .mat-snack-bar-container {
+    max-width: 50% !important;
+    width: 50% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}

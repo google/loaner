@@ -53,8 +53,10 @@ export class LoanerFlowSequenceButtons implements OnInit {
   @Output() finished = new Subject<boolean>();
   /** Defines the aria and toolTip labels for the butons. */
   @Input() navLabels!: NavigationLabels;
-  /** Defines whether the flow can proceed forward.  */
+  /** Defines whether the flow can proceed forward. */
   @Input() canProceed = true;
+  /** Defines whether the buttons should be available to click. */
+  @Input() allowButtonClick = true;
 
   ngOnInit() {
     this.flowState.subscribe(state => {
@@ -69,13 +71,15 @@ export class LoanerFlowSequenceButtons implements OnInit {
   }
 
   goForward() {
-    if (this.canProceed) {
+    if (this.canProceed && this.allowButtonClick) {
       this.forward.next(true);
     }
   }
 
   goBack() {
-    this.back.next(true);
+    if (this.allowButtonClick) {
+      this.back.next(true);
+    }
   }
 
   finishFlow() {

@@ -23,6 +23,7 @@ import {MaterialModule} from './material_module';
 describe('LoanerFlowSequence', () => {
   let component: LoanerFlowSequence;
   let fixture: ComponentFixture<LoanerFlowSequence>;
+  let buttonsFixture: ComponentFixture<LoanerFlowSequenceButtons>;
   let buttonsComponent: LoanerFlowSequenceButtons;
 
   const steps: Step[] = [
@@ -58,6 +59,7 @@ describe('LoanerFlowSequence', () => {
         .configureTestingModule({
           declarations: [
             LoanerFlowSequence,
+            LoanerFlowSequenceButtons,
           ],
           imports: [
             FlexLayoutModule,
@@ -67,7 +69,9 @@ describe('LoanerFlowSequence', () => {
         .compileComponents();
 
     fixture = TestBed.createComponent(LoanerFlowSequence);
+    buttonsFixture = TestBed.createComponent(LoanerFlowSequenceButtons);
     component = fixture.debugElement.componentInstance;
+    buttonsComponent = buttonsFixture.debugElement.componentInstance;
     component.steps = steps;
     fixture.detectChanges();
   });
@@ -153,7 +157,6 @@ describe('LoanerFlowSequence', () => {
 
   describe('with LoanerFlowSequenceButtons', () => {
     beforeEach(() => {
-      buttonsComponent = new LoanerFlowSequenceButtons();
       buttonsComponent.navLabels = labels;
       buttonsComponent.steps = steps;
       component.flowSequenceButtons = buttonsComponent;
