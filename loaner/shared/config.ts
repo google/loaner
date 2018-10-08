@@ -216,7 +216,7 @@ export interface HeartbeatConfiguration {
 /** Configurable heartbeat parameters. */
 export const HEARTBEAT: HeartbeatConfiguration = {
   /** Heartbeat duration in minutes */
-  duration: 1,
+  duration: 10,
   /** Name of the heartbeat chrome alarm */
   name: 'heartbeat',
   /** URL for the heartbeat api endpoint */
