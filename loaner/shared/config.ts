@@ -228,10 +228,9 @@ export const HEARTBEAT: HeartbeatConfiguration = {
 export const TROUBLESHOOTING_INFORMATION =
 'Contact your IT department for assistance.';
 /** Phone number of IT; Placed on Manage/Troubleshoot page. */
-export const IT_CONTACT_PHONE = '555 55 555';
+export const IT_CONTACT_PHONE = ['555 55 555'];
 /** Website of IT; Placed on Manage/Troubleshoot page. */
-export const IT_CONTACT_WEBSITE =
-'https://support.google.com';
+export const IT_CONTACT_WEBSITE = 'https://support.google.com';
 /** Email of IT; Placed on Manage/troubleshoot page. */
 export const IT_CONTACT_EMAIL = '';
 /** Failure message after 3 failure prompts occur. */

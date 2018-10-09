@@ -45,7 +45,7 @@ describe('TroubleshootComponent', () => {
 
   it('should show the contact information on the page', () => {
     app.contactEmail = 'support@example.com';
-    app.contactPhone = '12345678';
+    app.contactPhone = ['12345678', '910111213'];
     app.contactWebsite = 'support.example.com';
     app.troubleshootingInformation = 'Contact IT';
     fixture.detectChanges();

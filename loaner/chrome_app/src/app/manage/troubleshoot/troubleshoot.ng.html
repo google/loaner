@@ -7,12 +7,12 @@
         {{ troubleshootingInformation }}
     </p>
     <div>
-      <div *ngIf="contactPhone"
-           fxLayout="row"
-           fxLayoutAlign="center center">
+      <div fxLayout="row"
+           fxLayoutAlign="center center"
+           *ngFor="let phone of contactPhone">
         <mat-icon>phone</mat-icon>
         <span class="icon-padding"></span>
-        {{ contactPhone }}
+        {{ phone }}
       </div>
       <div *ngIf="contactEmail"
            fxLayout="row"
