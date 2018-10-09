@@ -53,3 +53,9 @@ declare interface RuntimeRequest {
   open?: boolean;
   view?: string;
 }
+
+/** Represents the local storage values that can be used for the loaner. */
+declare interface LoanerStorage {
+  enrolled?: boolean;
+  onboardingComplete?: boolean;
+}

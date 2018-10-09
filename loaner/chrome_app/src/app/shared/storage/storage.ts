@@ -21,6 +21,10 @@ export declare interface Data {
   [key: string]: string;
 }
 
+export declare interface DataLoanerStorage {
+  [key: string]: LoanerStorage;
+}
+
 /**
  * Read and write to a number of local storage devices.
  */
@@ -47,7 +51,7 @@ export class ChromeLocalStorage {
    * @param key Key for values to retrieve from storage.
    */
   get(key: string): Observable<string> {
-    return new Observable((observer) => {
+    return new Observable(observer => {
       // Fetch initial value from local storage.
       chrome.storage.local.get([key], (result: Data) => {
         observer.next(result[key]);
@@ -56,6 +60,25 @@ export class ChromeLocalStorage {
       chrome.storage.onChanged.addListener((changes, namespace) => {
         if (namespace === 'local' && changes[key] !== undefined) {
           observer.next(changes[key].newValue as string);
+        }
+      });
+    });
+  }
+
+  /**
+   * Retrieve a given value from chrome.storage.local of type LoanerStorage.
+   * @param key Key for values to retrieve from storage.
+   */
+  getLoanerStorage(key: string): Observable<LoanerStorage> {
+    return new Observable(observer => {
+      // Fetch initial value from local storage.
+      chrome.storage.local.get([key], (result: DataLoanerStorage) => {
+        observer.next(result[key]);
+      });
+      // Listen for new changes and push next in observable.
+      chrome.storage.onChanged.addListener((changes, namespace) => {
+        if (namespace === 'local' && changes[key] !== undefined) {
+          observer.next(changes[key].newValue as LoanerStorage);
         }
       });
     });

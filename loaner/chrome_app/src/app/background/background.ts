@@ -14,8 +14,8 @@
 
 /// <reference types="chrome/chrome-app" />
 
-import {Observable} from 'rxjs';
-import {switchMap, take, tap} from 'rxjs/operators';
+import {Observable, of} from 'rxjs';
+import {switchMap, take} from 'rxjs/operators';
 
 import {HEARTBEAT, PROGRAM_NAME} from '../../../../shared/config';
 import {Storage} from '../shared/storage/storage';
@@ -24,6 +24,21 @@ import * as Heartbeat from './heartbeat';
 
 const APP_WIDTH = 700;
 const APP_HEIGHT = 570;
+
+/** Represents an enrolled and onboarded device. */
+const ENROLLED_AND_ONBOARDED: LoanerStorage = {
+  enrolled: true,
+  onboardingComplete: true,
+};
+
+/** Represents an enrolled and not onboarded device. */
+const ENROLLED_AND_NOT_ONBOARDED: LoanerStorage = {
+  enrolled: true,
+  onboardingComplete: false,
+};
+
+/** Represent the name of the local storage key name. */
+const LOANER_STATUS_NAME = 'loanerStatus';
 
 /**
  * On launch of the application check the source and open the management
@@ -46,19 +61,11 @@ chrome.app.runtime.onLaunched.addListener((launchData) => {
   }
 });
 
-/**
- * On installed of the application start the onboarding process.
- */
-chrome.runtime.onInstalled.addListener(() => {
-  prepareToOnboardUser();
-});
+/** On installation/update of the application start the onboarding process. */
+chrome.runtime.onInstalled.addListener(prepareToOnboardUser);
 
-/**
- * On installed of the application start the onboarding process.
- */
-chrome.runtime.onStartup.addListener(() => {
-  prepareToOnboardUser();
-});
+/** On startup of the Chromebook start the onboarding process. */
+chrome.runtime.onStartup.addListener(prepareToOnboardUser);
 
 /**
  * This function adds a listener which waits for the user profile to be
@@ -75,14 +82,9 @@ function prepareToOnboardUser() {
  * Launches the GnG Management application.
  */
 function launchManage() {
-  let enrollment: string;
-  checkEnrollmentStatus()
-      .pipe(switchMap(enrollmentStatus => {
-        enrollment = enrollmentStatus;
-        return checkOnboardingStatus();
-      }))
-      .subscribe(onboarding => {
-        if (enrollment === 'true' && onboarding === 'complete') {
+  checkLoanerStatus().subscribe(
+      status => {
+        if (status.enrolled && status.onboardingComplete) {
           const options: ChromeWindowOptions = {
             bounds: {
               height: APP_HEIGHT,
@@ -92,31 +94,64 @@ function launchManage() {
             resizable: false,
           };
           chrome.app.window.create('manage.html', (options));
-        } else if (enrollment !== 'true') {
+        } else if (!status.enrolled) {
           const notEnrolledNotification = 'This device is not enrolled in ' +
               'the ' + PROGRAM_NAME + ' program. Please contact your ' +
               'administrator.';
           createNotification(
               'notEnrolled', notEnrolledNotification,
               'This device is not enrolled');
-          console.error('Enrollment status: ', enrollment);
-        } else if (onboarding !== 'complete') {
+          console.error('Enrollment status: ', status.enrolled);
+        } else if (!status.onboardingComplete) {
           const notOnboardedNotification = 'Please try again after ' +
               'completing the onboarding process.';
           createNotification(
               'notOnboarded', notOnboardedNotification,
               'Please complete the onboarding process first');
-          console.error('Onboarding status: ', onboarding);
-        } else {
-          const unhandledNotification = 'Oh no! Something unusual appears to ' +
-              'have happened. Please contact your administrator for ' +
-              'additional support.';
+          console.error(
+              'Onboarding complete status: ', status.onboardingComplete);
+        }
+      },
+      (error: {}) => {
+        console.error(error);
+      });
+}
+
+/**
+ * Makes a fresh heartbeat to populate the storage values if they are undefined.
+ */
+function manageValueUpdater(): Observable<LoanerStorage> {
+  // Adds a warning and notification that the values are being updated.
+  console.warn('Attempting to update the local storage values.');
+  const waitNotification = 'We are checking this devices current status.';
+  createNotification('pleaseWait', waitNotification, 'Please wait');
+  return new Observable(observer => {
+    Heartbeat.sendHeartbeat().subscribe(
+        deviceInfo => {
+          if (deviceInfo.is_enrolled && !deviceInfo.start_assignment) {
+            observer.next(ENROLLED_AND_ONBOARDED);
+          } else if (deviceInfo.is_enrolled && deviceInfo.start_assignment) {
+            onboarding(
+                deviceInfo.is_enrolled, deviceInfo.start_assignment, false,
+                deviceInfo.silent_onboarding);
+            observer.next(ENROLLED_AND_NOT_ONBOARDED);
+          } else if (!deviceInfo.is_enrolled) {
+            disableApp();
+            throw new Error(
+                'Device is not enrolled in the app. Disabling app.');
+          } else {
+            throw new Error(
+                'An unknown error has occurred, contact your administrator');
+          }
+        },
+        error => {
+          const unhandledNotification =
+              'Oh no! We were unable to retrieve the devices current state.';
           createNotification(
               'unhandledError', unhandledNotification, 'Something happened');
-          console.error('Enrollment status: ', enrollment);
-          console.error('Onboarding status: ', onboarding);
-        }
-      });
+          console.error(error);
+        });
+  });
 }
 
 /**
@@ -143,8 +178,8 @@ function createNotification(
  * Launches the GnG Offboarding flow.
  */
 function launchOffboardingFlow() {
-  checkEnrollmentStatus().subscribe(status => {
-    if (status) {
+  checkLoanerStatus().subscribe(status => {
+    if (status.enrolled && status.onboardingComplete) {
       const options: ChromeWindowOptions = {
         bounds: {
           height: APP_HEIGHT,
@@ -162,15 +197,11 @@ function launchOffboardingFlow() {
  * Relaunches the Onboarding flow if onboarding is not completed.
  */
 function relaunchOnboarding() {
-  checkOnboardingStatus().subscribe(
-      status => {
-        if (status === 'incomplete') {
-          launchOnboardingFlow();
-        }
-      },
-      error => {
-        console.error(error);
-      });
+  checkLoanerStatus().subscribe(status => {
+    if (!status.onboardingComplete) {
+      launchOnboardingFlow();
+    }
+  });
 }
 
 /**
@@ -206,8 +237,8 @@ chrome.runtime.onUpdateAvailable.addListener(chrome.runtime.reload);
 chrome.runtime.onMessage.addListener(
     (request: RuntimeRequest, sender, sendResponse) => {
       const storage = new Storage();
-      if (request.onboardingComplete === true) {
-        storage.local.set('onboardingStatus', 'complete');
+      if (request.onboardingComplete) {
+        storage.local.set(LOANER_STATUS_NAME, ENROLLED_AND_ONBOARDED);
       }
 
       /** Open the requested view */
@@ -242,34 +273,14 @@ chrome.runtime.onMessage.addListener(
     });
 
 /**
- * Checks the current onboarding status by querying local storage.
+ * Checks the current loaner status by querying local storage.
  */
-function checkOnboardingStatus(): Observable<string> {
+function checkLoanerStatus(): Observable<LoanerStorage> {
   const storage = new Storage();
-  return storage.local.get('onboardingStatus')
-      .pipe(take(1), tap(status => {
-              if (!status) {
-                console.warn('Unable to obtain local onboarding status value.');
-              }
-            }));
-}
-
-/**
- * Checks the current enrollment status by querying local storage.
- */
-function checkEnrollmentStatus(): Observable<string> {
-  const storage = new Storage();
-  return storage.local.get('loanerEnrollment')
-      .pipe(take(1), tap(status => {
-              if (!status) {
-                console.warn('Unable to obtain local enrollment status value.');
-              }
-            }));
-}
-
-/** Check for internet connectivity. */
-function checkInternetConnectivity(): boolean {
-  return navigator.onLine;
+  return storage.local.getLoanerStorage(LOANER_STATUS_NAME)
+      .pipe(
+          take(1),
+          switchMap(status => status ? of(status) : manageValueUpdater()));
 }
 
 /**
@@ -278,8 +289,11 @@ function checkInternetConnectivity(): boolean {
  */
 function disableApp() {
   const storage = new Storage();
-  storage.local.set('loanerEnrollment', 'false');
-  storage.local.set('onboardingStatus', 'disabled');
+  const disabledStatus: LoanerStorage = {
+    enrolled: false,
+    onboardingComplete: false,
+  };
+  storage.local.set(LOANER_STATUS_NAME, disabledStatus);
   chrome.alarms.clearAll();
 }
 
@@ -350,15 +364,13 @@ function onboarding(
     if (!heartbeatExists) {
       enableHeartbeat();
     }
-    storage.local.set('loanerEnrollment', 'true');
     if (startAssignment && !silentOnboarding) {
+      storage.local.set(LOANER_STATUS_NAME, ENROLLED_AND_NOT_ONBOARDED);
       launchOnboardingFlow();
-      storage.local.set('onboardingStatus', 'incomplete');
     } else {
-      storage.local.set('onboardingStatus', 'complete');
+      storage.local.set(LOANER_STATUS_NAME, ENROLLED_AND_ONBOARDED);
     }
-    // If the device isn't enrolled in the program, disable the app
-    // locally.
+    // If the device isn't enrolled in the program, disable the app locally.
   } else {
     disableApp();
   }
