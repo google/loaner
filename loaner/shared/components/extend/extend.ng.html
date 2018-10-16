@@ -40,11 +40,10 @@
 </div>
 
 <div *ngIf="!toBeSubmitted && !loading" tabindex="0" loaner-focus>
-  <h1 mat-dialog-title>Your loan has successfully been extended!</h1>
+  <h1 mat-dialog-title>Your due date has successfully been changed!</h1>
   <div mat-dialog-content>
     <p>
-      You have successfully extended your loan. Please make sure to return the
-      loaner by <strong>{{ dueDate | date:'fullDate' }}</strong>!
+      Please make sure to return the loaner by <strong>{{ dueDate | date:'fullDate' }}</strong>!
     </p>
   </div>
   <div mat-dialog-actions>
