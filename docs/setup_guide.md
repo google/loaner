@@ -300,8 +300,8 @@ versions to test deployments before promoting them to the production version.
 
 *Default Configurations* are those options you can configure when GnG is
 running. The default values for these options are defined in
-`loaner/web_app/config_defaults.py`. After first launch, GnG stores these values
-in [Cloud Datastore](https://cloud.google.com/datastore/). You can change
+`loaner/web_app/config_defaults.yaml`. After first launch, GnG stores these
+values in [Cloud Datastore](https://cloud.google.com/datastore/). You can change
 settings without deploying a new version of GnG:
 
 +   **allow_guest_mode**: Allow users to use guest mode on loaner devices.
@@ -363,7 +363,7 @@ images you upload to Cloud Storage.
 
 Next, click on the image names in the console to open the images and copy their
 URLs. Take these URLs and populate them as values for the variables
-`img_banner_primary` and `img_button_manage` in the `config_defaults.py` file.
+`img_banner_primary` and `img_button_manage` in the `config_defaults.yaml` file.
 
 ### (Optional) Customize Events and Email Templates in the GnG Datastore
 

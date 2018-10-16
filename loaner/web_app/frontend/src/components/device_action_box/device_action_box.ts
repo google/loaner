@@ -24,7 +24,7 @@ import {LoanerSnackBar} from '../../services/snackbar';
 
 /**
  * Device identifier supported modes, needs to match modes on
- * web_app/config_defaults.py
+ * web_app/config_defaults.yaml
  */
 export enum DeviceIdentifierMode {
   ASSET_TAG = 'asset_tag',

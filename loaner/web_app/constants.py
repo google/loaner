@@ -171,7 +171,7 @@ DIRECTORY_SCOPES = (
 
 # Dictionary defining where Grab n Go Loaner devices will be moved to enable and
 # disable guest mode if guest mode is permitted for this version.
-# NOTE: whether Guest Mode is allowed is configured in config_defaults.py.
+# NOTE: whether Guest Mode is allowed is configured in config_defaults.yaml.
 ORG_UNIT_DICT = {
     'DEFAULT': PARENT_ORG_UNIT + '/Default',
     'GUEST': PARENT_ORG_UNIT + '/Guest Enabled',

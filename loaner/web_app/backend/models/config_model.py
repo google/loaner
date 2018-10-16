@@ -29,8 +29,7 @@ _CONFIG_NOT_FOUND_MSG = 'No such name "%s" exists in default configurations.'
 class Config(ndb.Model):
   """Datastore model representing a config name.
 
-  The default values are stored in the config.py DEFAULTS list, and only appear
-  in as entities via this model if the app overrides defaults. A config name
+  The default values are stored in the config_defaults.yaml file. A config name
   has an option to store a value of type string, integer, boolean, or list as
   its value. The same config name can not have a value of multiple types.
 
