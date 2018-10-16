@@ -378,11 +378,11 @@ class Device(base_model.BaseModel):
     except directory.DirectoryRPCError as err:
       raise FailedToUnenrollError(
           _FAILED_TO_MOVE_DEVICE_MSG % (self.identifier, unenroll_ou, str(err)))
+    if self.assigned_user:
+      self._loan_return(user_email)
     self.enrolled = False
     self.due_date = None
     self.shelf = None
-    if self.assigned_user:
-      self._loan_return(user_email)
     self.assigned_user = None
     self.assignment_date = None
     self.current_ou = unenroll_ou
