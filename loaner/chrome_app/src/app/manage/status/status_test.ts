@@ -18,8 +18,8 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDialogRef} from '@angular/material';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
-import {of} from 'rxjs';
 import * as moment from 'moment';
+import {of} from 'rxjs';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';

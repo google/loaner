@@ -16,9 +16,8 @@
 
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {map, switchMap, tap} from 'rxjs/operators';
-
 import * as moment from 'moment';
+import {map, switchMap, tap} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
 import {Extend} from '../../../../../shared/components/extend';
