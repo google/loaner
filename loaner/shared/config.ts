@@ -134,6 +134,17 @@ export class ConfigService {
     }
   }
 
+  /** Generates the web app URL for usage in the Chrome App. */
+  get webAppUrl() {
+    if (this.chromeMode === CHROME_MODE.PROD) {
+      return `https://${PROD}.appspot.com`;
+    } else if (this.chromeMode === CHROME_MODE.QA) {
+      return `https://${QA}.appspot.com`;
+    } else {
+      return `https://${DEV}.appspot.com`;
+    }
+  }
+
   // Shared variables
   analyticsEnabled = false;
   analyticsId = '';

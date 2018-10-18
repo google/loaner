@@ -80,6 +80,7 @@ describe('ReturnComponent', () => {
   });
 
   it('renders content on the page', () => {
+    spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent)
@@ -92,6 +93,15 @@ describe('ReturnComponent', () => {
     fixture.detectChanges();
     expect(app.device.dueDate).toEqual(testDeviceInfo.due_date);
   });
+
+  it('fails to retrieve the loan information and provides a helpful card',
+     () => {
+       spyOn(loan, 'getDevice').and.returnValue(of(new Device()));
+       fixture.detectChanges();
+       expect(app.device.dueDate).toBeFalsy();
+       expect(fixture.nativeElement.textContent)
+           .toContain('Oh no! There was an issue');
+     });
 
   it('allows the loan to be extended 1 day', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));

@@ -32,3 +32,17 @@
     </div>
   </mat-card>
 </div>
+
+<div *ngIf="!loading && !device.dueDate" class="return-card">
+  <mat-card tabindex="0" loaner-focus>
+    <h1 class="card-title">
+      Oh no! There was an issue
+    </h1>
+    <p>
+      We were unable to retrieve necessary information about this loan. You can extend/set your
+      preferred due date on the status page of your loan later on or through our
+      <a [href]="webAppUrl" target="_blank">web application</a>.
+      We're sorry for any inconvenience!
+    </p>
+  </mat-card>
+</div>

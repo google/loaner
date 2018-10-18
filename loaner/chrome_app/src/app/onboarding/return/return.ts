@@ -16,6 +16,7 @@ import {Component, OnInit} from '@angular/core';
 import * as moment from 'moment';
 
 import {LoaderView} from '../../../../../shared/components/loader';
+import {ConfigService} from '../../../../../shared/config';
 import {Device} from '../../../../../shared/models/device';
 import {FailAction, FailType, Failure} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -29,14 +30,16 @@ import {ReturnDateService} from '../../shared/return_date_service';
 })
 export class ReturnComponent extends LoaderView implements OnInit {
   device = new Device();
-  newReturnDate!: Date;
+  newReturnDate?: Date;
   toBeSubmitted = true;
   validDate = true;
+  webAppUrl: string;
 
   constructor(
-      private failure: Failure, private loan: Loan,
-      private returnService: ReturnDateService) {
+      private readonly config: ConfigService, private failure: Failure,
+      private loan: Loan, private returnService: ReturnDateService) {
     super(true);
+    this.webAppUrl = this.config.webAppUrl;
   }
 
   ngOnInit() {
