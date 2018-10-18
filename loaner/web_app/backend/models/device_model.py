@@ -886,9 +886,7 @@ def _update_existing_device(device, user_email, asset_tag=None):
   device.due_date = None
   device.last_reminder = None
   device.mark_pending_return_date = None
-  device.max_extend_date = None
   device.next_reminder = None
-  device.return_date = None
   device.shelf = None
   device.damaged = False
   return device
