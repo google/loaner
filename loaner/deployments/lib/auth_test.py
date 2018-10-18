@@ -18,12 +18,12 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-# Prefer Python 3 and fall back on Python 2.
+# Prefer Python 2 and fall back on Python 3.
 # pylint:disable=g-statement-before-imports,g-import-not-at-top
 try:
-  import builtins
-except ImportError:
   import __builtin__ as builtins
+except ImportError:
+  import builtins
 # pylint:enable=g-statement-before-imports,g-import-not-at-top
 
 import datetime
