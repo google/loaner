@@ -1,13 +1,21 @@
 <span matDialogTitle>
-  {{ title }}
+  Oops! Something went wrong
 </span>
 <div mat-dialog-content>
   <p>
-    {{ data.message }}
+    {{data.message}}
   </p>
   <p>
     Please try again later.
   </p>
+  <mat-expansion-panel>
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        Debug info
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+    <p>{{data.error | json}}</p>
+  </mat-expansion-panel>
 </div>
 <div mat-dialog-actions>
   <button mat-button (click)="closeDialog()">Close</button>

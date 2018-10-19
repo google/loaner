@@ -21,7 +21,7 @@ import {Background} from '../background_service';
 /** Fail information for the user facing dialog */
 export interface FailInfo {
   message: string;
-  title: string;
+  error?: {};
 }
 
 /** Types of actions for a failure */
@@ -45,10 +45,6 @@ export enum FailType {
   templateUrl: './failure.ng.html',
 })
 export class FailureComponentDialog {
-  get title() {
-    return this.data.title || `Oops! Something went wrong`;
-  }
-
   constructor(
       @Inject(MatDialogRef) public dialogRef:
           MatDialogRef<FailureComponentDialog>,
@@ -84,9 +80,9 @@ export class Failure {
       rawError?: {}) {
     this.errorCount += 1;
     if (this.errorCount > this.TOLERABLE_ERROR_COUNT) {
-      this.openDialog(FAILURE_MESSAGE, failAction);
+      this.openDialog(FAILURE_MESSAGE, failAction, rawError);
     } else {
-      this.openDialog(message, FailAction.Ignore);
+      this.openDialog(message, FailAction.Ignore, rawError);
     }
 
     if (this.config.LOGGING) {
@@ -97,15 +93,18 @@ export class Failure {
   /**
    * Opens a dialog with a given failure message.
    * @param message text to display explaining the failure.
+   * @param failType The type of failure.
+   * @param failAction The action to be taken by the failure.
+   * @param rawError Optional raw error message.
    */
   openDialog(
       message: string, failAction: FailAction = FailAction.Ignore,
-      title?: string): void {
+      rawError?: {}) {
     const dialogRef = this.dialog.open(FailureComponentDialog, {
       data: {
-        title,
         message: message || `Something weird has happened here.
 Close this and we will be back shortly`,
+        error: rawError,
       },
     });
 

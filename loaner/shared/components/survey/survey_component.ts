@@ -33,7 +33,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
   answerRequired?: boolean;
   surveyAnswer?: SurveyResponseAnswer;
   surveyData?: SurveyResponse;
-  userInput!: string;
+  userInput?: string;
   @Output() surveyError = new Subject<Error>();
 
   get surveyNew(): boolean|undefined {
@@ -41,7 +41,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
   }
 
   get surveyNotGiven(): boolean|undefined {
-    return !this.surveyType && !this.surveyNew;
+    return !this.surveyType || !this.surveyNew;
   }
 
   constructor(private readonly survey: Survey) {
@@ -89,7 +89,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
                 this.ready();
               },
               error => {
-                this.surveyLoadFailure(new Error(error));
+                this.surveyLoadFailure(error);
                 this.ready();
               });
     } else {
@@ -101,7 +101,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
 
   /**
    * Handle cases where survey cannot be loaded/retrieved.
-   * @param error Any error object.
+   * @param error Error from the survey.
    */
   private surveyLoadFailure(error: Error) {
     this.surveyError.next(error);
