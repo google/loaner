@@ -46,60 +46,53 @@ describe('DeviceDetails', () => {
     deviceDetails = fixture.debugElement.componentInstance;
   }));
 
-  it('should create the DeviceDetails', () => {
+  it('creates the DeviceDetails', () => {
     expect(deviceDetails).toBeTruthy();
   });
 
-  it('should render the serial as title in a .mat-card-title', () => {
+  it('renders the serial as title in a .mat-card-title', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-card-title').textContent)
         .toContain('Serial No:');
   });
 
-  it('should render the asset tag inside .mat-list', () => {
+  it('renders the asset tag inside .mat-list', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent)
         .toContain('Asset tag');
   });
 
-  it('should render device model inside .mat-list', () => {
+  it('renders device model inside .mat-list', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent)
         .toContain('Device model');
   });
 
-  it('should render current shelf inside .mat-list', () => {
+  it('renders current shelf inside .mat-list', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent)
         .toContain('Current Shelf');
   });
 
-  it('should render Current OU inside .mat-list', () => {
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.mat-list').textContent)
-        .toContain('Current OU');
-  });
-
-  it('should render Assigned to inside .mat-list', () => {
+  it('renders Assigned to inside .mat-list', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent)
         .toContain('Assigned to');
   });
 
-  it('should render Due date inside .mat-list', () => {
+  it('renders Due date inside .mat-list', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent)
         .toContain('Due date');
   });
 
-  it('should render Status inside .mat-list', () => {
+  it('renders Status inside .mat-list', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     expect(compiled.querySelector('.mat-list').textContent).toContain('Status');
@@ -113,7 +106,6 @@ describe('DeviceDetails', () => {
         .toContain('Last known healthy');
     const datePipe = new DatePipe('en');
     expect(compiled.querySelector('.lastKnownHealthy').textContent)
-        .toContain(datePipe.transform(
-            deviceDetails.device.lastKnownHealthy, 'medium'));
+        .toContain(datePipe.transform(deviceDetails.device.lastKnownHealthy));
   });
 });

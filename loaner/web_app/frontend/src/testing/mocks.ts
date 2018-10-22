@@ -142,7 +142,6 @@ export const DEVICE_1 = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
 });
 
@@ -155,7 +154,6 @@ export const DEVICE_2 = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
 
 });
@@ -169,7 +167,6 @@ export const DEVICE_WITH_ASSET_TAG = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
 
 });
@@ -183,7 +180,6 @@ export const DEVICE_WITHOUT_ASSET_TAG = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
 });
 
@@ -196,7 +192,6 @@ export const DEVICE_MARKED_FOR_RETURN = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
 });
 
 export const DEVICE_NOT_MARKED_FOR_RETURN = new Device({
@@ -208,7 +203,6 @@ export const DEVICE_NOT_MARKED_FOR_RETURN = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
 });
 
@@ -218,7 +212,6 @@ export const DEVICE_UNASSIGNED = new Device({
   identifier: '777005',
   pending_return: false,
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
 });
 
 export const DEVICE_ASSIGNED = new Device({
@@ -230,7 +223,6 @@ export const DEVICE_ASSIGNED = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
   guest_permitted: true,
 });
@@ -244,7 +236,6 @@ export const DEVICE_GUEST_NOT_PERMITTED = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
   guest_permitted: false,
 });
@@ -258,7 +249,6 @@ export const DEVICE_GUEST_PERMITTED = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   max_extend_date: new Date(2018, 1, 4),
   guest_permitted: true,
 });
@@ -271,7 +261,6 @@ export const DEVICE_LOST = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   lost: true,
   locked: true,
 });
@@ -285,7 +274,6 @@ export const DEVICE_DAMAGED = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   damaged: true,
 });
 
@@ -298,7 +286,6 @@ export const DEVICE_LOCKED = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   locked: true,
 });
 
@@ -311,7 +298,6 @@ export const DEVICE_OVERDUE = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2017, 4, 4),
-  current_ou: 'ROOT',
   overdue: true,
 });
 
@@ -322,7 +308,6 @@ export const DEVICE_LOST_AND_MORE = new Device({
   assignment_date: new Date(2018, 1, 1),
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
-  current_ou: 'ROOT',
   lost: true,
   damaged: true,
   pending_return: true,

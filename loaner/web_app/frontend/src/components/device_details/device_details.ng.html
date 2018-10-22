@@ -34,16 +34,10 @@
             <p mat-line class="secondary-text">{{device.shelf.name}}</p>
           </mat-list-item>
           <mat-list-item fxFlex>
-            <p mat-line>Current OU</p>
-            <p mat-line class="secondary-text">{{device.currentOu}}</p>
-          </mat-list-item>
-          <mat-list-item fxFlex>
             <p mat-line>Due date</p>
             <p *ngIf="device.assignedUser"
                mat-line class="secondary-text">{{device.dueDate ? (device.dueDate | date) : ""}}</p>
           </mat-list-item>
-        </section>
-        <section fxLayout="row" fxLayout.xs="column">
           <mat-list-item fxFlex>
             <p mat-line>Status</p>
             <p mat-line class="secondary-text">
@@ -59,11 +53,12 @@
             <p *ngIf="device.lost"
                mat-line class="secondary-text">Marked as lost</p>
           </mat-list-item>
-          <mat-list-item fxFlex></mat-list-item>
+        </section>
+        <section fxLayout="row" fxLayout.xs="column">
           <mat-list-item class="lastKnownHealthy" fxFlex>
             <p mat-line>Last known healthy</p>
             <p mat-line class="secondary-text">
-              {{ device.lastKnownHealthy | date:'medium' }}
+              {{ device.lastKnownHealthy | date }}
             </p>
           </mat-list-item>
         </section>

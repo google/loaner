@@ -31,7 +31,6 @@ export declare interface DeviceApiParams {
   assigned_user?: string;
   assignment_date?: Date;
   due_date?: Date;
-  current_ou?: string;
   last_heartbeat?: Date;
   last_known_healthy?: Date;
   lost?: boolean;
@@ -101,8 +100,6 @@ export class Device {
   damaged = false;
   /** Which date the device should be returned to the shelf. */
   dueDate!: Date;
-  /** Which OU the device is currently in. Eg: Root, Guest. */
-  currentOu!: string;
   /** The last heartbeat from the device to the backend. */
   lastHeartbeat!: Date;
   /** The last check in of the device at a shelf. */
@@ -137,7 +134,6 @@ export class Device {
     this.assignedUser = device.assigned_user || this.assignedUser;
     this.assignmentDate = device.assignment_date || this.assignmentDate;
     this.dueDate = device.due_date || this.dueDate;
-    this.currentOu = device.current_ou || this.currentOu;
     this.lastHeartbeat = device.last_heartbeat || this.lastHeartbeat;
     this.lastKnownHealthy = device.last_known_healthy || this.lastKnownHealthy;
     this.lost = device.lost || this.lost;
@@ -175,7 +171,6 @@ export class Device {
       identifier: this.identifier,
       urlkey: this.urlkey,
       assignment_date: this.assignmentDate,
-      current_ou: this.currentOu,
       device_model: this.deviceModel,
       due_date: this.dueDate,
       locked: this.locked,
