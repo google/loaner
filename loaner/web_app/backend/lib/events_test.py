@@ -101,16 +101,16 @@ class EventsTest(loanertest.TestCase):
     def side_effect2(device=None):
       """Side effect for sync action's run method that returns the model."""
       del device  # Unused.
-      raise base_action.BadDeviceError('Found a bad attribute found.')
+      raise base_action.BadDeviceError('Found a bad attribute.')
 
     mock_sync_action.run.side_effect = side_effect2
     mock_loadactions.return_value = {
         'sync': {'sync_action': mock_sync_action}, 'async': {}}
     mock_getactionsforevent.return_value = ['sync_action']
 
-    returned_device = events.raise_event('sample_event', device=test_device)
-    self.assertEqual(returned_device, test_device)
-    self.assertEqual(len(mock_logerror.mock_calls), 1)
+    with self.assertRaises(events.EventActionsError):
+      events.raise_event('sample_event', device=test_device)
+      self.assertLen(mock_logerror.mock_calls, 1)
 
     self.testbed.raise_event_patcher.start()  # Because cleanup will stop().
 

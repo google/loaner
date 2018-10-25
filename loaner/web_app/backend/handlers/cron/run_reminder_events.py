@@ -38,6 +38,8 @@ _DEVICE_REPEAT_WAITING_MSG = (
 _DEVICE_SET_REMINDER_MSG = (
     'Device %s will get a reminder level %d after %s.')
 _DEVICE_REMINDING_NOW_MSG = 'Reminding for Device %s at level %s.'
+_EVENT_ACTION_ERROR_MSG = (
+    'The following error occurred while trying to set a device reminder: %s')
 
 
 class RunReminderEventsHandler(webapp2.RequestHandler):
@@ -114,7 +116,12 @@ class RunReminderEventsHandler(webapp2.RequestHandler):
       logging.info(
           _DEVICE_REMINDING_NOW_MSG, device.identifier,
           device.next_reminder.level)
-      events.raise_event(
-          event_name=event_models.ReminderEvent.make_name(
-              device.next_reminder.level),
-          device=device)
+      try:
+        events.raise_event(
+            event_name=event_models.ReminderEvent.make_name(
+                device.next_reminder.level),
+            device=device)
+      except events.EventActionsError as err:
+        # We log the error so that a single device does not disrupt all other
+        # devices that need reminders set.
+        logging.error(_EVENT_ACTION_ERROR_MSG, err)

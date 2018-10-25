@@ -242,6 +242,7 @@ loaner_appengine_test(
         ":config_model",
         ":shelf_model",
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/lib:events",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:parameterized",
         "@freezegun_archive//:freezegun",

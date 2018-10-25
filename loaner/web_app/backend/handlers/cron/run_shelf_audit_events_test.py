@@ -55,6 +55,15 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
         'test@{}'.format(loanertest.USER_DOMAIN), 'US-NYC', 24,
         'Statue of Liberty', 40.6892534, -74.0466891, 1.0,
         loanertest.USER_EMAIL)
+    self.shelf_audit_interval = 24
+    config_model.Config.set('shelf_audit_interval', self.shelf_audit_interval)
+
+  def setup_shelf_not_audited(self):
+    self.shelf2.audit_notification_enabled = True
+    self.shelf2.audit_requested = False
+    self.shelf2.last_audit_time = _NOW - datetime.timedelta(
+        hours=self.shelf_audit_interval + 1)
+    self.shelf2.put()
 
   @mock.patch.object(config_model.Config, 'get', return_value=True)
   @mock.patch.object(logging, 'warning')
@@ -68,23 +77,17 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
 
   def test_shelves(self):
     """Tests with two shelves, and only one raises the event."""
-    shelf_audit_interval = 24
-    config_model.Config.set('shelf_audit_interval', shelf_audit_interval)
     self.setup_shelves()
 
     # Shelf ready for notifications but recently audited.
     self.shelf1.audit_notification_enabled = True
     self.shelf1.audit_requested = False
     self.shelf1.last_audit_time = _NOW - datetime.timedelta(
-        hours=shelf_audit_interval - 1)
+        hours=self.shelf_audit_interval - 1)
     self.shelf1.put()
 
     # Shelf ready for notifications and not audited in a while.
-    self.shelf2.audit_notification_enabled = True
-    self.shelf2.audit_requested = False
-    self.shelf2.last_audit_time = _NOW - datetime.timedelta(
-        hours=shelf_audit_interval + 1)
-    self.shelf2.put()
+    self.setup_shelf_not_audited()
 
     # Shelf disabled for notifications
     self.shelf3.audit_notification_enabled = False
@@ -119,15 +122,13 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
 
   def test_shelves_with_overrides(self):
     """Tests with two shelves, both have overrides, reversing results."""
-    shelf_audit_interval = 24
-    config_model.Config.set('shelf_audit_interval', shelf_audit_interval)
     self.setup_shelves()
 
     # Shelf ready for notifications but recently audited.
     self.shelf1.audit_notification_enabled = True
     self.shelf1.audit_requested = False
     self.shelf1.last_audit_time = _NOW - datetime.timedelta(
-        hours=shelf_audit_interval - 1)
+        hours=self.shelf_audit_interval - 1)
     self.shelf1.audit_interval_override = 22  # Override makes it more strict.
     self.shelf1.put()
 
@@ -135,7 +136,7 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
     self.shelf2.audit_notification_enabled = True
     self.shelf2.audit_requested = False
     self.shelf2.last_known_healthy = _NOW - datetime.timedelta(
-        hours=shelf_audit_interval + 1)
+        hours=self.shelf_audit_interval + 1)
     self.shelf2.audit_interval_override = 26  # Override makes it more lenient.
     self.shelf2.put()
 
@@ -160,6 +161,14 @@ class RunShelfAuditEventsHandlerTest(handlertest.HandlerTestCase):
     ]
     self.assertListEqual(
         self.testbed.mock_raiseevent.mock_calls, expected_calls)
+
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_event_error(self, mock_logging):
+    self.setup_shelves()
+    self.setup_shelf_not_audited()
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
+    self.testapp.get(r'/_cron/run_shelf_audit_events')
+    self.assertEqual(mock_logging.call_count, 1)
 
   @mock.patch.object(config_model.Config, 'get', return_value=False)
   @mock.patch.object(logging, 'warning')

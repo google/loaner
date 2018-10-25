@@ -61,7 +61,15 @@ class RunShelfAuditEventsHandler(webapp2.RequestHandler):
           override_shelves.append(shelf)
 
       for shelf in override_shelves + global_setting_query.fetch():
-        events.raise_event(event_name='shelf_needs_audit', shelf=shelf)
+        try:
+          events.raise_event(event_name='shelf_needs_audit', shelf=shelf)
+        except events.EventActionsError as err:
+          # We catch the event error and only log that error so that a single
+          # shelf will not disrupt requesting audit on all other shelves that
+          # may need to be audited.
+          logging.error(
+              'Failed to request audit for shelf %r because the following '
+              'error occurred: %s', shelf.identifier, err)
 
     else:
       logging.warning('Shelf audit reminders are currently disabled.')

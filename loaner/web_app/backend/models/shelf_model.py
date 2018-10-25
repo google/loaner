@@ -40,6 +40,8 @@ _ENROLL_MSG = 'Enrolling shelf with name %s.'
 _LAT_LONG_MSG = 'You must provide both latitude and longitude.'
 _REACTIVATE_MSG = 'Reactivating shelf with name %s.'
 _NEGATIVE_CAPACITY_MSG = 'Capacity must be greater than 0.'
+_EVENT_ACTION_ERROR_MSG = (
+    'The following error occurred while trying to perform the action (%s): %s')
 
 
 class Error(Exception):
@@ -193,7 +195,15 @@ class Shelf(base_model.BaseModel):
       if latitude is not None and longitude is not None:
         shelf.lat_long = ndb.GeoPt(latitude, longitude)
       logging.info(_CREATE_NEW_SHELF_MSG, shelf.identifier)
-    shelf = events.raise_event('shelf_enroll', shelf=shelf)
+    event_action = 'shelf_enroll'
+    try:
+      shelf = events.raise_event(event_action, shelf=shelf)
+    except events.EventActionsError as err:
+      # For any action that is implemented for shelf_enroll that is required for
+      # the rest of the logic an error should be raised. If all actions are not
+      # required, eg sending a notification email only, the error should only be
+      # logged.
+      logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     shelf.put()
     shelf.stream_to_bq(user_email, _ENROLL_MSG % shelf.identifier)
     return shelf
@@ -236,7 +246,15 @@ class Shelf(base_model.BaseModel):
     self.last_audit_by = user_email
     self.audit_requested = False
     logging.info(_AUDIT_MSG, self.identifier)
-    self = events.raise_event('shelf_audited', shelf=self)
+    event_action = 'shelf_audited'
+    try:
+      self = events.raise_event(event_action, shelf=self)
+    except events.EventActionsError as err:
+      # For any action that is implemented for shelf_audited that is required
+      # for the rest of the logic an error should be raised. If all
+      # actions are not required, eg sending a notification email only,
+      # the error should only be logged.
+      logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     self.put()
     self.stream_to_bq(user_email, _AUDIT_MSG % self.identifier)
 
@@ -267,6 +285,14 @@ class Shelf(base_model.BaseModel):
     """
     self.enabled = False
     logging.info(_DISABLE_MSG, self.identifier)
-    self = events.raise_event('shelf_disable', shelf=self)
+    event_action = 'shelf_disable'
+    try:
+      self = events.raise_event(event_action, shelf=self)
+    except events.EventActionsError as err:
+      # For any action that is implemented for shelf_disable that is required
+      # for the rest of the logic an error should be raised. If all
+      # actions are not required, eg sending a notification email only,
+      # the error should only be logged.
+      logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     self.put()
     self.stream_to_bq(user_email, _DISABLE_MSG % self.identifier)

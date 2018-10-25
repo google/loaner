@@ -152,6 +152,11 @@ class DeviceModelTest(loanertest.TestCase):
     self.testbed.mock_raiseevent.assert_any_call(
         'device_enroll', device=self.test_device)
 
+  def test_enroll_event_error(self):
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
+    with self.assertRaises(device_model.DeviceCreationError):
+      self.enroll_test_device(loanertest.TEST_DIR_DEVICE1)
+
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_new_device_error(self, mock_directoryclass):
     err_message = 'Failed to move device'
@@ -396,7 +401,7 @@ class DeviceModelTest(loanertest.TestCase):
       device_model.Device.enroll(
           user_email=loanertest.USER_EMAIL, serial_number=serial_number)
 
-  def test_unenroll_error(self):
+  def test_unenroll_directory_error(self):
     err_message = 'Failed to move device'
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.mock_directoryclient.reset_mock()
@@ -408,6 +413,14 @@ class DeviceModelTest(loanertest.TestCase):
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
             self.test_device.identifier, unenroll_ou, err_message)):
       self.test_device.unenroll(loanertest.USER_EMAIL)
+
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_unenroll_event_error(self, mock_logging):
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError(
+        'failed.')
+    self.test_device.unenroll(loanertest.USER_EMAIL)
+    self.assertEqual(mock_logging.call_count, 1)
 
   @mock.patch.object(device_model.Device, '_loan_return')
   def test_unenroll(self, mock_return):
@@ -587,6 +600,14 @@ class DeviceModelTest(loanertest.TestCase):
     self.assertEqual(retrieved_device.assigned_user, loanertest.USER_EMAIL)
     self.assertEqual(self.testbed.mock_raiseevent.call_count, 2)
 
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_loan_assign_event_error(self, mock_logging):
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError(
+        'Failed.')
+    self.test_device.loan_assign(loanertest.SUPER_ADMIN_EMAIL)
+    self.assertEqual(mock_logging.call_count, 1)
+
   def test_resume_loan(self):
     """Test that a loan resumes when marked as pending return."""
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -701,6 +722,15 @@ class DeviceModelTest(loanertest.TestCase):
     self.assertIsNone(retrieved_device.next_reminder)
     self.assertFalse(retrieved_device.lost)
     self.assertEqual(mock_unlock.call_count, 1)
+
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_loan_return_event_error(self, mock_logging):
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError(
+        'Failed.')
+    self.test_device._loan_return(loanertest.USER_EMAIL)
+
+    self.assertEqual(mock_logging.call_count, 1)
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_lock(self, mock_directoryclass):

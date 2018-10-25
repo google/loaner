@@ -211,8 +211,8 @@ class RunReminderEventsHandlerTest(handlertest.HandlerTestCase):
         self.device1.identifier, 0, self.reminder_due_event.repeat_interval)
     self.assertFalse(self.testbed.mock_raiseevent.called)
 
-  @mock.patch('__main__.run_reminder_events.logging.info')
-  def test_remind_one(self, mock_loginfo):
+  @mock.patch.object(run_reminder_events, 'logging')
+  def test_remind_one(self, mock_logging):
     """Tests that one device should be reminded."""
     self.setup_events()
     self.setup_devices()  # pylint: disable=no-value-for-parameter
@@ -231,14 +231,17 @@ class RunReminderEventsHandlerTest(handlertest.HandlerTestCase):
     self.device2.put()
 
     self.testbed.mock_raiseevent.reset_mock()
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError(
+        'Failed.')
 
     response = self.testapp.get(
         r'/_cron/run_reminder_events?remind_for_devices=true')
 
     self.assertEqual(response.status_int, 200)
-    mock_loginfo.assert_any_call(
+    mock_logging.info.assert_any_call(
         run_reminder_events._DEVICE_REMINDING_NOW_MSG,
         self.device1.identifier, 0)
+    self.assertEqual(mock_logging.error.call_count, 1)
     self.testbed.mock_raiseevent.assert_called_once_with(
         event_name='reminder_level_0', device=self.device1)
 

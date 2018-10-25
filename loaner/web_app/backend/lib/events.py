@@ -39,6 +39,10 @@ class NoEventsError(Error):
   """Error raised if there are no Events configured in datastore."""
 
 
+class EventActionsError(Error):
+  """Raised when the event actions raised an error."""
+
+
 def raise_event(event_name, device=None, shelf=None):
   """Raises an Event, running its sync and async Actions.
 
@@ -60,6 +64,7 @@ def raise_event(event_name, device=None, shelf=None):
         nor shelf.
     base_action.RedundantModelError: if this method is called with both device
         and shelf.
+    EventActionsError: if the actions raised an error.
   """
   event_actions = get_actions_for_event(event_name)
   event_actions.sort()
@@ -83,13 +88,14 @@ def raise_event(event_name, device=None, shelf=None):
       raise base_action.RedundantModelError(
           'Redundant models passed to raise_event. You must supply either a '
           'device or a shelf, but not both.')
-
+    errors = []
     for action in event_actions:
       if action in actions_dict[base_action.ActionType.SYNC]:
         try:
           model = actions_dict[base_action.ActionType.SYNC][action].run(
               **action_kwargs)
         except base_action.Error as error:
+          errors.append(error)
           logging.error(
               'Skipping Action "%s" because it raised an exception: %s',
               action, str(error))
@@ -99,7 +105,8 @@ def raise_event(event_name, device=None, shelf=None):
         logging.error(
             'Skipping Action %r because it is not loaded in the application.',
             action)
-
+    if errors:
+      raise EventActionsError(errors)
     if event_async_actions:
       action_kwargs['async_actions'] = event_async_actions
       taskqueue.add(

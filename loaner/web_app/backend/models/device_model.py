@@ -61,6 +61,8 @@ _SERIAL_NUMBERS_REQUIRED_MSG = (
 _ASSIGNMENT_MISMATCH_MSG = (
     'Unable to perform this action. Device is currently assigned to another '
     'user.')
+_EVENT_ACTION_ERROR_MSG = (
+    'The following error occurred while trying to perform the action (%s): %s')
 
 
 class Error(Exception):
@@ -117,6 +119,10 @@ class UnassignedDeviceError(Error):
 
 class UnauthorizedError(Error):
   """Raised when the current user is not authorized to perform an action."""
+
+
+class DeviceReturnError(Error):
+  """Raised when a device failed to be returned."""
 
 
 ReturnDates = collections.namedtuple('ReturnDates', ['max', 'default'])
@@ -307,7 +313,14 @@ class Device(base_model.BaseModel):
 
     identifier = serial_number or asset_tag
     logging.info('Enrolling device %s', identifier)
-    device = events.raise_event('device_enroll', device=device)
+    try:
+      device = events.raise_event('device_enroll', device=device)
+    except events.EventActionsError as err:
+      # For any action that is implemented for device_enroll that is required
+      # for the rest of the logic an error should be raised. If all actions are
+      # not required, eg sending a notification email only, the error should
+      # only be logged.
+      raise DeviceCreationError(err)
     if device.serial_number:
       serial_number = device.serial_number
     else:
@@ -390,7 +403,15 @@ class Device(base_model.BaseModel):
     self.mark_pending_return_date = None
     self.last_reminder = None
     self.next_reminder = None
-    self = events.raise_event('device_unenroll', device=self)
+    event_action = 'device_unenroll'
+    try:
+      self = events.raise_event(event_action, device=self)
+    except events.EventActionsError as err:
+      # For any action that is implemented for device_unenroll that is required
+      # for the rest of the logic an error should be raised. If all actions are
+      # not required, eg sending a notification email only, the error should be
+      # logged.
+      logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     self.put()
     self.stream_to_bq(user_email, 'Unenrolling device %s.' % self.identifier)
     return self
@@ -545,7 +566,15 @@ class Device(base_model.BaseModel):
     self.shelf = None
     self.due_date = self.calculate_return_dates().default
     self.move_to_default_ou(user_email=user_email)
-    self = events.raise_event('device_loan_assign', device=self)
+    event_action = 'device_loan_assign'
+    try:
+      self = events.raise_event(event_action, device=self)
+    except events.EventActionsError as err:
+      # For any action that is implemented for device_loan_assign that is
+      # required for the rest of the logic an error should be raised.
+      # If all actions are not required, eg sending a notification email only,
+      # the error should only be logged.
+      logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     self.put()
     self.stream_to_bq(user_email, 'Beginning new loan.')
     return self.key
@@ -615,7 +644,15 @@ class Device(base_model.BaseModel):
     Returns:
       The key of the datastore record.
     """
-    self = events.raise_event('device_loan_return', device=self)
+    event_action = 'device_loan_return'
+    try:
+      self = events.raise_event(event_action, device=self)
+    except events.EventActionsError as err:
+      # For any action that is implemented for device_loan_return that is
+      # required for the rest of the logic, an error should be raised. If all
+      # actions are not required, eg sending a notification email only, the
+      # error should only be logged.
+      logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     if self.lost:
       self.lost = False
     if self.locked:

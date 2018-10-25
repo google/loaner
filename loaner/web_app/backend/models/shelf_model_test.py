@@ -30,6 +30,7 @@ from google.appengine.api import search
 from google.appengine.ext import ndb
 
 from loaner.web_app import constants
+from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
@@ -137,8 +138,10 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
-  def test_enroll_new_shelf_no_lat_long(self, mock_logging, mock_stream):
+  def test_enroll_new_shelf_no_lat_long_event_error(
+      self, mock_logging, mock_stream):
     """Test enrolling a new shelf without latitude and longitude."""
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
     new_location = 'US-NYC2'
     new_capacity = 16
     new_friendly_name = 'Statue of Liberty'
@@ -156,6 +159,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     mock_stream.assert_called_once_with(
         new_shelf, loanertest.USER_EMAIL,
         shelf_model._ENROLL_MSG % new_shelf.identifier)
+    self.assertEqual(mock_logging.error.call_count, 1)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_enroll', shelf=new_shelf)
 
@@ -232,6 +236,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_audit(self, mock_logging, mock_stream):
     """Test that an audit updates the appropriate properties."""
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
     self.test_shelf.audit(loanertest.USER_EMAIL)
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.audit_requested)
@@ -240,6 +245,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
         shelf_model._AUDIT_MSG % self.test_shelf.identifier)
+    self.assertEqual(mock_logging.error.call_count, 1)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_audited', shelf=self.test_shelf)
 
@@ -279,6 +285,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_disable(self, mock_logging, mock_stream):
     """Test the disabling of a shelf."""
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
     self.test_shelf.disable(loanertest.USER_EMAIL)
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.enabled)
@@ -287,6 +294,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
         shelf_model._DISABLE_MSG % self.test_shelf.identifier)
+    self.assertEqual(mock_logging.error.call_count, 1)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_disable', shelf=self.test_shelf)
 

@@ -18,6 +18,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import webapp2
 
 from loaner.web_app.backend.lib import events
@@ -36,5 +37,13 @@ class RunCustomEventsHandler(webapp2.RequestHandler):
       for entity in custom_event.get_matching_entities():
         device = (entity if custom_event.model.lower() == 'device' else None)
         shelf = (entity if custom_event.model.lower() == 'shelf' else None)
-        events.raise_event(
-            event_name=custom_event.name, device=device, shelf=shelf)
+        try:
+          events.raise_event(
+              event_name=custom_event.name, device=device, shelf=shelf)
+        except events.EventActionsError as err:
+          # We log the error instead of raising an error so that we do not
+          # disrupt the handler for executing other devices/shelves when one of
+          # them fails.
+          logging.error(
+              'The following error occurred while trying to perform the event '
+              '%r: %s', custom_event.name, err)

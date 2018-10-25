@@ -19,11 +19,12 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
+import logging
 
 import mock
 
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
-from loaner.web_app.backend.lib import events  # pylint: disable=unused-import
+from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import event_models
 from loaner.web_app.backend.models import shelf_model
@@ -148,6 +149,17 @@ class RunCustomEventsHandlerTest(handlertest.HandlerTestCase):
       self.assertIn(call, self.testbed.mock_raiseevent.mock_calls)
     self.assertEqual(
         len(self.testbed.mock_raiseevent.mock_calls), len(expected_calls))
+
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_events_error(self, mock_logging):
+    """Tests that error is caught when EventActionsError occurs."""
+    self.setup_events()
+    self.setup_shelves()
+    self.shelf1.last_audit_time = _NOW - datetime.timedelta(days=4)
+    self.shelf1.put()
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
+    self.testapp.get(r'/_cron/run_custom_events')
+    self.assertEqual(mock_logging.call_count, 1)
 
 
 if __name__ == '__main__':
