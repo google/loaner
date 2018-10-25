@@ -15,10 +15,12 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+import {DateAdapter} from '@angular/material/core';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {FocusModule} from '../../directives/focus';
 import {LoaderModule} from '../loader';
+import {LoanerDateAdapter} from '../loaner_date_adapter/LoanerDateAdapter';
 
 import {Extend, ExtendDialogComponent} from './extend';
 import {MaterialModule} from './material_module';
@@ -35,7 +37,10 @@ import {MaterialModule} from './material_module';
     MaterialModule,
   ],
   providers: [
-    Extend,
+    Extend, {
+      provide: DateAdapter,
+      useClass: LoanerDateAdapter,
+    }
   ],
 })
 export class ExtendModule {

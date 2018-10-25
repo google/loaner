@@ -15,8 +15,10 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+import {DateAdapter} from '@angular/material/core';
 
 import {LoaderModule} from '../../../../../shared/components/loader';
+import {LoanerDateAdapter} from '../../../../../shared/components/loaner_date_adapter/LoanerDateAdapter';
 import {FocusModule} from '../../../../../shared/directives/focus';
 import {FailureModule} from '../../shared/failure';
 import {Loan} from '../../shared/loan';
@@ -39,6 +41,7 @@ import {ReturnComponent} from './return';
   providers: [
     Loan,
     ReturnDateService,
+    {provide: DateAdapter, useClass: LoanerDateAdapter},
   ],
 })
 export class ReturnModule {

@@ -109,4 +109,12 @@ describe('ExtendDialogComponent', () => {
     fixture.detectChanges();
     expect(compiled.querySelector('#close')!.textContent).toContain('Close');
   });
+
+  it('uses loaner date adapter to display the date', () => {
+    component.ready();
+    fixture.whenStable().then(() => {
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.querySelector('input').value).toBe('February 2, 2018');
+    });
+  });
 });

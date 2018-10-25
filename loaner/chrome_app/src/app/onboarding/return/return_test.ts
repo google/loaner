@@ -16,10 +16,12 @@ import {HttpClient} from '@angular/common/http';
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
+import {DateAdapter} from '@angular/material/core';
 import * as moment from 'moment';
 import {of} from 'rxjs';
 
 import {LoaderModule} from '../../../../../shared/components/loader';
+import {LoanerDateAdapter} from '../../../../../shared/components/loaner_date_adapter/LoanerDateAdapter';
 import {ConfigService} from '../../../../../shared/config';
 import {Device, DeviceApiParams} from '../../../../../shared/models/device';
 import {FailureModule} from '../../shared/failure';
@@ -60,6 +62,10 @@ describe('ReturnComponent', () => {
             HttpClient,
             Loan,
             ReturnDateService,
+            {
+              provide: DateAdapter,
+              useClass: LoanerDateAdapter,
+            },
           ],
         })
         .compileComponents();
@@ -135,5 +141,16 @@ describe('ReturnComponent', () => {
         .toEqual(
             moment(testDeviceInfo.max_extend_date!).format('YYYY[-]MM[-]DD'));
     expect(returnService.changeReturnDate()).toBeFalsy();
+  });
+
+  it('uses loaner date adapter when displaying the date input', () => {
+    spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
+    app.ready();
+    fixture.detectChanges();
+    fixture.whenStable().then(() => {
+      const compiled = fixture.debugElement.nativeElement;
+      expect(compiled.querySelector('input.mat-input-element').value)
+          .toBe('June 4, 2018');
+    });
   });
 });
