@@ -115,7 +115,7 @@ describe('DeviceActionBox', () => {
              compiled.querySelector('.mat-form-field.serial-number');
          const input = formField.querySelector('input');
 
-         expect(formField.textContent).toContain('Serial number');
+         expect(formField.textContent).toContain('Serial Number');
          expect(input).toBeDefined();
          expect(input.getAttribute('required')).not.toBeNull();
        });
@@ -131,7 +131,7 @@ describe('DeviceActionBox', () => {
              compiled.querySelector('.mat-form-field.serial-number');
          const input = formField.querySelector('input');
 
-         expect(formField.textContent).toContain('Serial number');
+         expect(formField.textContent).toContain('Serial Number');
          expect(input).toBeDefined();
          expect(input.getAttribute('required')).not.toBeNull();
        });
