@@ -430,6 +430,12 @@ class DeviceModelTest(loanertest.TestCase):
     self.testbed.mock_raiseevent.return_value = self.test_device
     self.test_device.unenroll(loanertest.USER_EMAIL)
     mock_return.assert_called_once_with(loanertest.USER_EMAIL)
+    self.mock_directoryclient.move_chrome_device_org_unit.assert_has_calls([
+        mock.call(
+            device_id=self.test_device.chrome_device_id,
+            org_unit_path=constants.ORG_UNIT_DICT['DEFAULT']),
+        mock.call(
+            device_id=self.test_device.chrome_device_id, org_unit_path='/')])
     self.assertFalse(self.test_device.enrolled)
     self.assertIsNone(self.test_device.assigned_user)
     self.assertIsNone(self.test_device.assignment_date)

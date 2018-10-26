@@ -383,6 +383,8 @@ class Device(base_model.BaseModel):
     Raises:
       FailedToUnenrollError: raised when moving the device's OU fails.
     """
+    if self.assigned_user:
+      self._loan_return(user_email)
     unenroll_ou = config_model.Config.get('unenroll_ou')
     directory_client = directory.DirectoryApiClient(user_email)
     try:
@@ -391,8 +393,6 @@ class Device(base_model.BaseModel):
     except directory.DirectoryRPCError as err:
       raise FailedToUnenrollError(
           _FAILED_TO_MOVE_DEVICE_MSG % (self.identifier, unenroll_ou, str(err)))
-    if self.assigned_user:
-      self._loan_return(user_email)
     self.enrolled = False
     self.due_date = None
     self.shelf = None
