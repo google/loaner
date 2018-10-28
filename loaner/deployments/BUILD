@@ -3,7 +3,7 @@
 
 package(
     default_visibility = [
-        "//loaner:__subpackages__",
+        "//loaner/deployments:__subpackages__",
     ],
 )
 
@@ -34,6 +34,17 @@ py_binary(
     ],
 )
 
+py_binary(
+    name = "gng_impl",
+    srcs = [
+        "gng_impl.py",
+    ],
+    default_python_version = "PY3",
+    deps = [
+        ":gng_impl_lib",
+    ],
+)
+
 #############
 # Libraries #
 #############
@@ -49,6 +60,27 @@ py_library(
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
         "@six_archive//:six",
+    ],
+)
+
+py_library(
+    name = "gng_impl_lib",
+    srcs = [
+        "gng_impl.py",
+    ],
+    srcs_version = "PY2AND3",
+    deps = [
+        "//loaner/deployments/lib:app_constants_lib",
+        "//loaner/deployments/lib:app_engine_lib",
+        "//loaner/deployments/lib:auth_lib",
+        "//loaner/deployments/lib:common_lib",
+        "//loaner/deployments/lib:datastore_lib",
+        "//loaner/deployments/lib:directory_lib",
+        "//loaner/deployments/lib:storage_lib",
+        "//loaner/deployments/lib:utils_lib",
+        "@absl_archive//absl:app",
+        "@absl_archive//absl/flags",
+        "@absl_archive//absl/logging",
     ],
 )
 
@@ -73,10 +105,32 @@ py_test(
     ],
 )
 
+py_test(
+    name = "gng_impl_test",
+    size = "small",
+    srcs = [
+        "gng_impl_test.py",
+    ],
+    deps = [
+        ":gng_impl_lib",
+        "//loaner/deployments/lib:app_constants_lib",
+        "//loaner/deployments/lib:auth_lib",
+        "//loaner/deployments/lib:common_lib",
+        "//loaner/deployments/lib:utils_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:flagsaver",
+        "@absl_archive//absl/testing:parameterized",
+        "@gcloud_auth_archive//:gcloud_auth",
+        "@mock_archive//:mock",
+        "@pyfakefs_archive//:pyfakefs",
+    ],
+)
+
 test_suite(
     name = "all_tests",
     tests = [
         ":deploy_impl_test",
+        ":gng_impl_test",
         "//loaner/deployments/lib:all_tests",
     ],
 )
