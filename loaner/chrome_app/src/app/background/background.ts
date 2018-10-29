@@ -228,7 +228,10 @@ function launchOnboardingFlow() {
  * Ensure that the app has the most recent version of the Chrome App.
  * If the app doesn't, this will restart the Chrome App.
  */
-chrome.runtime.onUpdateAvailable.addListener(chrome.runtime.reload);
+chrome.runtime.onUpdateAvailable.addListener(() => {
+  console.info('Update available. Installing!');
+  chrome.runtime.reload();
+});
 
 /**
  * Listen for completion of onboarding flow.
