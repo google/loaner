@@ -182,7 +182,7 @@ class ActionTestCase(TestCase):
           'self.testing_action containing the name of the action module you '
           'wish to test, then runs the superclass setUp method.')
     actions = action_loader.load_actions([self.testing_action])  # pylint: disable=no-member
-    if not actions:
+    if not (actions.get('sync') or actions.get('async')):
       raise EnvironmentError(
           'The unit test must import at least one valid action module. Verify '
           'that self.testing_action is a string that is the name of a module '

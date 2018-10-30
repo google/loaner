@@ -37,7 +37,8 @@ def load_actions(filters=None, log_exceptions=True):
 
   Args:
     filters: list, strings with names of action classes to load. Loader will
-        classes not listed. In the absence of this list no filters are applied.
+        skip classes not listed. In the absence of this list no filters are
+        applied.
     log_exceptions: bool, whether to supress exceptions and log their messages
         instead.
 
