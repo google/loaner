@@ -81,6 +81,7 @@ py_library(
         "@absl_archive//absl:app",
         "@absl_archive//absl/flags",
         "@absl_archive//absl/logging",
+        "@six_archive//:six",
     ],
 )
 
@@ -123,6 +124,7 @@ py_test(
         "@gcloud_auth_archive//:gcloud_auth",
         "@mock_archive//:mock",
         "@pyfakefs_archive//:pyfakefs",
+        "@six_archive//:six",
     ],
 )
 

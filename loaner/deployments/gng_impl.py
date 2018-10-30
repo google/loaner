@@ -21,12 +21,15 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import collections
 import inspect
 import sys
 
 from absl import app
 from absl import flags
 from absl import logging
+
+import six
 
 from loaner.deployments.lib import app_constants
 from loaner.deployments.lib import app_engine
@@ -46,6 +49,17 @@ _API_CLIENT_MODULES = (
     directory,
     storage,
 )
+
+_CHANGE_PROJECT = 'change project'
+_HELP = 'help'
+_QUIT = 'quit'
+
+# Main menu options with help descriptions.
+_OPTIONS = collections.OrderedDict([
+    (_CHANGE_PROJECT, 'Change the Cloud Project currently being managed'),
+    (_HELP, 'Show this message'),
+    (_QUIT, 'Quit the Grab n Go Management script'),
+])
 
 
 def _get_oauth_scopes(modules=_API_CLIENT_MODULES):
@@ -141,8 +155,9 @@ class _Manager(object):
           'Failed to initialize project with key %r: %s\n'
           'Attempting to load new config...', project_key, err)
       utils.write(
-          'There does not appear to be a saved configuration for this project:'
-          '%r. Before we can get started, we need to gather some information.\n'
+          'There does not appear to be a saved configuration for this project: '
+          '{!r}. Before we can get started, we need to gather some information.'
+          '\n'.format(project_key)
       )
       config = common.ProjectConfig.from_prompts(project_key, config_file_path)
       config.write()
@@ -170,6 +185,58 @@ class _Manager(object):
         config, constants, cloud_creds, gae_admin_api, datastore_api,
         directory_api, storage_api)
 
+  def run(self):
+    """Runs the Grab n Go manager.
+
+    Returns:
+      An integer representing the exit code. Zero is success and any other
+          number is a failure.
+    """
+    exit_code = 0
+    try:
+      while True:
+        utils.clear_screen()
+        action = utils.prompt_enum(
+            'Which of the following actions would you like to take?',
+            accepted_values=_OPTIONS.keys(),
+            case_sensitive=False).strip().lower()
+        if action == _QUIT:
+          break
+        elif action == _HELP:
+          self._main_help()
+        elif action == _CHANGE_PROJECT:
+          self = self._change_project()
+    finally:
+      utils.write(
+          'Done managing Grab n Go for Cloud Project {!r}.'.format(
+              self._config.project))
+    return exit_code
+
+  def _main_help(self):
+    """Writes main menu help information to the terminal and waits for input."""
+    utils.clear_screen()
+    utils.write(
+        'To take an action type the action into the menu and press <Enter>')
+    utils.write('The following actions are available:\n')
+    for opt, desc in six.iteritems(_OPTIONS):
+      utils.write('Action: {!r}\nDescription: {!r}\n'.format(opt, desc))
+    utils.prompt('Press <Enter> to return to the main menu.', user_prompt='')
+
+  def _change_project(self):
+    """Changes the project configuration being managed.
+
+    Returns:
+      A new instance of _Manager for the selected project.
+    """
+    project_key = utils.prompt_string(
+        'You are currently managing Google Cloud Project {!r}.\n'
+        'This project is currently saved as {!r}.\n'
+        'All of the currently configured projects include: {}.\n'
+        'Which project would you like to switch to?'.format(
+            self._config.project, self._config.key,
+            ', '.join(common.get_available_configs(self._config.path))))
+    return _Manager.new(self._config.path, project_key)
+
 
 def main(argv):
   del argv  # Unused.
@@ -178,12 +245,10 @@ def main(argv):
 
   try:
     manager = _Manager.new(FLAGS.config_file_path, FLAGS.project)
+    exit_code = manager.run()
   except KeyboardInterrupt as err:
     logging.error('Manager received CTRL-C, exiting: %s', err)
     exit_code = 1
-  else:
-    del manager  # Unused for now.
-    exit_code = 0
 
   sys.exit(exit_code)
 
