@@ -51,13 +51,11 @@ _API_CLIENT_MODULES = (
 )
 
 _CHANGE_PROJECT = 'change project'
-_HELP = 'help'
 _QUIT = 'quit'
 
 # Main menu options with help descriptions.
 _OPTIONS = collections.OrderedDict([
     (_CHANGE_PROJECT, 'Change the Cloud Project currently being managed'),
-    (_HELP, 'Show this message'),
     (_QUIT, 'Quit the Grab n Go Management script'),
 ])
 
@@ -196,14 +194,14 @@ class _Manager(object):
     try:
       while True:
         utils.clear_screen()
+        utils.write('Which of the following actions would you like to take?\n')
+        for opt, desc in six.iteritems(_OPTIONS):
+          utils.write('Action: {!r}\nDescription: {!r}'.format(opt, desc))
         action = utils.prompt_enum(
-            'Which of the following actions would you like to take?',
-            accepted_values=_OPTIONS.keys(),
+            '', accepted_values=_OPTIONS.keys(),
             case_sensitive=False).strip().lower()
         if action == _QUIT:
           break
-        elif action == _HELP:
-          self._main_help()
         elif action == _CHANGE_PROJECT:
           self = self._change_project()
     finally:
@@ -211,16 +209,6 @@ class _Manager(object):
           'Done managing Grab n Go for Cloud Project {!r}.'.format(
               self._config.project))
     return exit_code
-
-  def _main_help(self):
-    """Writes main menu help information to the terminal and waits for input."""
-    utils.clear_screen()
-    utils.write(
-        'To take an action type the action into the menu and press <Enter>')
-    utils.write('The following actions are available:\n')
-    for opt, desc in six.iteritems(_OPTIONS):
-      utils.write('Action: {!r}\nDescription: {!r}\n'.format(opt, desc))
-    utils.prompt('Press <Enter> to return to the main menu.', user_prompt='')
 
   def _change_project(self):
     """Changes the project configuration being managed.

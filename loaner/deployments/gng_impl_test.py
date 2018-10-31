@@ -79,23 +79,19 @@ This project is currently saved as 'default'.
 All of the currently configured projects include: default, dev.
 Which project would you like to switch to?''')
 
-_MAIN_HELP_GOLDEN = (
-    '''To take an action type the action into the menu and press <Enter>
-The following actions are available:
+_MAIN_MENU_GOLDEN = (
+    '''Which of the following actions would you like to take?
 
 Action: 'change project'
 Description: 'Change the Cloud Project currently being managed'
-
-Action: 'help'
-Description: 'Show this message'
-
 Action: 'quit'
 Description: 'Quit the Grab n Go Management script'
 
-Press <Enter> to return to the main menu.
+Available options are: change project, quit
 
 --------------------------------------------------------------------------------
 
+Done managing Grab n Go for Cloud Project 'default-project'.
 ''')
 
 
@@ -185,26 +181,24 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
       self.assertEqual(3, mock_prompt_string.call_count)
 
   @mock.patch.object(utils, 'prompt_string', return_value='dev')
-  @mock.patch.object(utils, 'prompt')
-  def test_run(self, mock_prompt, mock_prompt_string):
+  def test_run(self, mock_prompt_string):
     test_manager = gng_impl._Manager.new(
         self._valid_config_path, common.DEFAULT)
     side_effect = [
         gng_impl._CHANGE_PROJECT,
-        gng_impl._HELP,
         gng_impl._QUIT,
     ]
     with mock.patch.object(utils, 'prompt_enum', side_effect=side_effect):
       self.assertEqual(test_manager.run(), 0)
-    self.assertEqual(mock_prompt.call_count, 1)
     self.assertEqual(mock_prompt_string.call_count, 1)
 
   @mock.patch.object(utils, 'clear_screen')
-  def test_main_help(self, mock_clear):
-    with mock.patch.object(utils, 'input', return_value=''):
-      test_manager = gng_impl._Manager(None, [], None)
-      test_manager._main_help()
-    self.assertEqual(self.stdout.getvalue(), _MAIN_HELP_GOLDEN)
+  def test_main_menu_output(self, mock_clear):
+    test_manager = gng_impl._Manager.new(
+        self._valid_config_path, common.DEFAULT)
+    with mock.patch.object(utils, 'input', return_value=gng_impl._QUIT):
+      test_manager.run()
+    self.assertEqual(self.stdout.getvalue(), _MAIN_MENU_GOLDEN)
     self.assertEqual(mock_clear.call_count, 1)
 
   def test_change_project(self):
