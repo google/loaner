@@ -208,20 +208,22 @@ function relaunchOnboarding() {
  * Launches the GnG Onboarding application once installed.
  */
 function launchOnboardingFlow() {
-  const options: ChromeWindowOptions = {
-    bounds: {
-      height: APP_HEIGHT,
-      width: APP_WIDTH,
-    },
-    alwaysOnTop: true,
-    frame: 'none',
-    id: 'onboarding',
-    resizable: false,
-  };
+  setTimeout(() => {
+    const options: ChromeWindowOptions = {
+      bounds: {
+        height: APP_HEIGHT,
+        width: APP_WIDTH,
+      },
+      alwaysOnTop: true,
+      frame: 'none',
+      id: 'onboarding',
+      resizable: false,
+    };
 
-  chrome.app.window.create('onboarding.html', (options), (win) => {
-    win.onClosed.addListener(relaunchOnboarding);
-  });
+    chrome.app.window.create('onboarding.html', (options), (win) => {
+      win.onClosed.addListener(relaunchOnboarding);
+    });
+  }, 2000);
 }
 
 /**
