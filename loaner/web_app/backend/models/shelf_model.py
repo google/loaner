@@ -30,7 +30,7 @@ from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
 
-_AUDIT_MSG = 'Marking shelf with name %s as audited.'
+_AUDIT_MSG = 'Marking shelf with name %s as audited with %s device(s).'
 _AUDIT_REQUEST_MSG = 'Requesting audit for shelf with name %s.'
 _CREATE_NEW_SHELF_MSG = 'Creating a new shelf with name %s.'
 _DISABLE_MSG = 'Disabling shelf with name %s.'
@@ -236,16 +236,17 @@ class Shelf(base_model.BaseModel):
     self.put()
     self.stream_to_bq(user_email, _EDIT_MSG % self.identifier)
 
-  def audit(self, user_email):
+  def audit(self, user_email, num_of_devices):
     """Marks a shelf audited.
 
     Args:
       user_email: str, email of the user auditing the shelf.
+      num_of_devices: int, the number of devices on shelf.
     """
     self.last_audit_time = datetime.datetime.utcnow()
     self.last_audit_by = user_email
     self.audit_requested = False
-    logging.info(_AUDIT_MSG, self.identifier)
+    logging.info(_AUDIT_MSG, self.identifier, num_of_devices)
     event_action = 'shelf_audited'
     try:
       self = events.raise_event(event_action, shelf=self)
@@ -256,7 +257,8 @@ class Shelf(base_model.BaseModel):
       # the error should only be logged.
       logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     self.put()
-    self.stream_to_bq(user_email, _AUDIT_MSG % self.identifier)
+    self.stream_to_bq(
+        user_email, _AUDIT_MSG % (self.identifier, num_of_devices))
 
   def request_audit(self):
     """Requests an audit by marking a shelf as audit_requested."""

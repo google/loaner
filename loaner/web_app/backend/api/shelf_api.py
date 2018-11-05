@@ -197,7 +197,7 @@ class ShelfApi(root_api.Service):
       if device.doc_id not in devices_on_shelf:
         api_utils.get_ndb_key(device.doc_id).get().remove_from_shelf(
             shelf=shelf, user_email=user_email)
-    shelf.audit(user_email=user_email)
+    shelf.audit(user_email=user_email, num_of_devices=len(devices_on_shelf))
 
     return message_types.VoidMessage()
 

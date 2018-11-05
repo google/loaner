@@ -237,14 +237,16 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   def test_audit(self, mock_logging, mock_stream):
     """Test that an audit updates the appropriate properties."""
     self.testbed.mock_raiseevent.side_effect = events.EventActionsError
-    self.test_shelf.audit(loanertest.USER_EMAIL)
+    test_num_of_devices = '10'
+    self.test_shelf.audit(loanertest.USER_EMAIL, test_num_of_devices)
     retrieved_shelf = self.test_shelf.key.get()
     self.assertFalse(retrieved_shelf.audit_requested)
     mock_logging.info.assert_called_once_with(
-        shelf_model._AUDIT_MSG, self.test_shelf.identifier)
+        shelf_model._AUDIT_MSG, self.test_shelf.identifier, test_num_of_devices)
     mock_stream.assert_called_once_with(
         self.test_shelf, loanertest.USER_EMAIL,
-        shelf_model._AUDIT_MSG % self.test_shelf.identifier)
+        shelf_model._AUDIT_MSG % (
+            self.test_shelf.identifier, test_num_of_devices))
     self.assertEqual(mock_logging.error.call_count, 1)
     self.testbed.mock_raiseevent.assert_called_once_with(
         'shelf_audited', shelf=self.test_shelf)
