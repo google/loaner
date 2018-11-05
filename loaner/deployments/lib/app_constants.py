@@ -64,9 +64,10 @@ CUSTOMER_ID = 'customer_id'
 # Required to be provided either by flag or by prompt.
 flags.DEFINE_list(
     APP_DOMAINS, [],
-    'A list of second-level domains that will be authorized to access the '
-    'application. Only add domain names that you want to have access to the web'
-    " application. Domains should be in the following format: 'example.com'"
+    'A comma separated list of second-level domains that will be authorized to '
+    'access the application. Only add domain names that you want to have access'
+    ' to the web application. Domains should be in the following format: '
+    "'example.com'"
 )
 flags.DEFINE_string(
     CHROME_CLIENT_ID, '',

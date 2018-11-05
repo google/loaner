@@ -3,7 +3,7 @@
 
 package(
     default_visibility = [
-        "//loaner:__subpackages__",
+        "//loaner/deployments:__subpackages__",
     ],
 )
 

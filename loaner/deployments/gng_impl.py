@@ -51,11 +51,13 @@ _API_CLIENT_MODULES = (
 )
 
 _CHANGE_PROJECT = 'change project'
+_CONFIGURE = 'configure'
 _QUIT = 'quit'
 
 # Main menu options with help descriptions.
 _OPTIONS = collections.OrderedDict([
     (_CHANGE_PROJECT, 'Change the Cloud Project currently being managed'),
+    (_CONFIGURE, 'Configure project level constants'),
     (_QUIT, 'Quit the Grab n Go Management script'),
 ])
 
@@ -204,6 +206,8 @@ class _Manager(object):
           break
         elif action == _CHANGE_PROJECT:
           self = self._change_project()
+        elif action == _CONFIGURE:
+          self._configure()
     finally:
       utils.write(
           'Done managing Grab n Go for Cloud Project {!r}.'.format(
@@ -224,6 +228,54 @@ class _Manager(object):
             self._config.project, self._config.key,
             ', '.join(common.get_available_configs(self._config.path))))
     return _Manager.new(self._config.path, project_key)
+
+  def _configure(self):
+    """Prompts the user for project wide constants."""
+    opts = sorted(self._constants.keys())
+    opts.append(_QUIT)
+    try:
+      while True:
+        utils.clear_screen()
+        utils.write('Here are the project wide constants for {!r}:\n'.format(
+            self._config.project))
+        configured, unconfigured = [], []
+        for name in sorted(self._constants.keys()):
+          if self._constants[name].valid:
+            configured.append(name)
+          else:
+            unconfigured.append(name)
+          utils.write(
+              'Constant: {!r}\nDescription: {}\nCurrent Value: {}\n'.format(
+                  name, self._constants[name].message,
+                  self._constants[name].value))
+        choice = utils.prompt_enum(
+            'Which constant would you like to configure?\n'
+            'Currently configured constants include: {}\n'
+            'Currently unconfigured constants include: {}\n'.format(
+                ', '.join(configured) or 'None',
+                ', '.join(unconfigured) or 'None'),
+            accepted_values=opts,
+            case_sensitive=False).strip().lower()
+        if choice == _QUIT:
+          break
+        else:
+          self._constants[choice].prompt()
+          self._save_constants()
+    finally:
+      utils.write(
+          'Exiting configuration menu, to return enter {!r} in the main menu.\n'
+          'Returning to the main menu.'.format(_CONFIGURE))
+
+  def _save_constants(self):
+    """Writes constants to the configured Google Cloud Storage Bucket."""
+    try:
+      self._storage_api.insert_blob(
+          self._config.constants_storage_path,
+          {name: const.value for name, const in six.iteritems(self._constants)},
+          bucket_name=self._config.bucket,
+      )
+    except storage.NotFoundError as err:
+      logging.error('Failed to get the bucket for this project: %s', err)
 
 
 def main(argv):

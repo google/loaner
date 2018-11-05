@@ -182,12 +182,12 @@ class ProjectConfig(object):
     """Getter for Google Cloud Storage bucket name."""
     if self._bucket:
       return self._bucket
-    return '{}-gng-loaner'.format(self._project)
+    return '{}.appspot.com'.format(self._project)
 
   @property
-  def configs(self):
+  def constants_storage_path(self):
     """Getter for Google Cloud Storage configuration path."""
-    return '{}/configs'.format(self.bucket)
+    return 'configs/constants.json'
 
   @property
   def local_credentials_file_path(self):

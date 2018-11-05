@@ -84,10 +84,12 @@ _MAIN_MENU_GOLDEN = (
 
 Action: 'change project'
 Description: 'Change the Cloud Project currently being managed'
+Action: 'configure'
+Description: 'Configure project level constants'
 Action: 'quit'
 Description: 'Quit the Grab n Go Management script'
 
-Available options are: change project, quit
+Available options are: change project, configure, quit
 
 --------------------------------------------------------------------------------
 
@@ -96,8 +98,47 @@ Done managing Grab n Go for Cloud Project 'default-project'.
 
 
 class _TestClientAPI(object):
-  """An object to satisfy the _get_oauth_scopes requirements."""
+  """An object to be used in place of actual API objects in tests."""
   SCOPES = ('two', 'one', 'one')
+
+  def __init__(self):
+    self._dict = {}
+
+  def get_blob(self, path, bucket_name=None):
+    """Gets a value for a given key.
+
+    NOTE: This is to be used in testing only.
+
+    Args:
+      path: str, the path used to store the object.
+      bucket_name: str, the bucket name used to store the object.
+
+    Returns:
+      The value stored for the provided key.
+
+    Raises:
+      KeyError: if the values provided do not match a stored object.
+    """
+    if bucket_name is not None:
+      path = '/'.join([bucket_name, path])
+    return self._dict[path]
+
+  def insert_blob(self, path, contents, bucket_name=None):
+    """Inserts a blob into a in memory file system to simulate Cloud Storage.
+
+    This satisfies the `insert_blob` interface on the CloudStorageAPI client
+    and is to be used in testing. When validating the stored object use `get`.
+
+    Args:
+      path: str, the path of the Blob to create relative to the root of the
+          Google Cloud Storage Bucket, including the name of the Blob.
+      contents: dict, a dictionary representing the contents of the new Blob.
+      bucket_name: str, the name of the Google Cloud Storage Bucket to insert
+          the new Blob into.
+    """
+    if bucket_name is not None:
+      path = '/'.join([bucket_name, path])
+    self._dict[path] = contents
 
 
 class ManagerTest(parameterized.TestCase, absltest.TestCase):
@@ -124,6 +165,19 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
     self.fs.CreateFile(self._valid_config_path, contents=_VALID_CONFIG)
     self.fs.CreateFile(self._blank_config_path, contents=_BLANK_CONFIG)
 
+    # Load the default config.
+    self._valid_default_config = common.ProjectConfig.from_yaml(
+        common.DEFAULT, self._valid_config_path)
+
+    # Create test constants.
+    self._constants = {
+        'test': app_constants.Constant(
+            'test', 'message', '',
+            parser=utils.StringParser(allow_empty_string=False),),
+        'other': app_constants.Constant('other', 'other message', 'value'),
+    }
+
+    # Mock out the authentication credentials.
     self.auth_patcher = mock.patch.object(auth, 'CloudCredentials')
     self.mock_creds = self.auth_patcher.start()
     self.mock_creds.return_value.get_credentials.return_value = (
@@ -186,6 +240,8 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
         self._valid_config_path, common.DEFAULT)
     side_effect = [
         gng_impl._CHANGE_PROJECT,
+        gng_impl._CONFIGURE,
+        gng_impl._QUIT,
         gng_impl._QUIT,
     ]
     with mock.patch.object(utils, 'prompt_enum', side_effect=side_effect):
@@ -210,6 +266,34 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual(other_manager._config.project, 'dev-project')
     self.assertEqual(other_manager._config.client_secret, 'dev-secret')
     mock_prompt_string.assert_called_once_with(_CHANGE_PROJECT_GOLDEN)
+
+  def test_configure(self):
+    test_client = _TestClientAPI()
+    test_manager = gng_impl._Manager(
+        self._valid_default_config, self._constants, None,
+        storage_api=test_client,
+    )
+    with mock.patch.object(
+        utils, 'input', side_effect=['test', 'new_value', gng_impl._QUIT]):
+      test_manager._configure()
+    self.assertEqual(
+        test_client.get_blob(
+            test_manager._config.constants_storage_path,
+            test_manager._config.bucket),
+        {'test': 'new_value', 'other': 'value'})
+
+  def test_save_constants(self):
+    test_client = _TestClientAPI()
+    test_manager = gng_impl._Manager(
+        self._valid_default_config, self._constants, None,
+        storage_api=test_client,
+    )
+    test_manager._save_constants()
+    self.assertEqual(
+        test_client.get_blob(
+            test_manager._config.constants_storage_path,
+            test_manager._config.bucket),
+        {'test': '', 'other': 'value'})
 
   @mock.patch.object(utils, 'prompt_enum', return_value=gng_impl._QUIT)
   def test_main(self, mock_prompt_enum):

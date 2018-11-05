@@ -75,7 +75,7 @@ default:
   project_id: default_project
   client_id: default_client_id
   client_secret: default_client_secret
-  bucket: default_project-gng-loaner
+  bucket: default_project.appspot.com
 """
 
 
@@ -139,7 +139,7 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
       {'testcase_name': 'CustomBucketDefined', 'project_name': 'test_project',
        'bucket_name': 'bucket', 'expected_bucket_name': 'bucket'},
       {'testcase_name': 'NoBucketDefined', 'project_name': 'test_project',
-       'bucket_name': None, 'expected_bucket_name': 'test_project-gng-loaner'},
+       'bucket_name': None, 'expected_bucket_name': 'test_project.appspot.com'},
   )
   def test_project_config_constructor(
       self, project_name, bucket_name, expected_bucket_name):
@@ -152,7 +152,7 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
     self.assertEqual('test_client_secret', test_config.client_secret)
     self.assertEqual(expected_bucket_name, test_config.bucket)
     self.assertEqual(
-        '{}/configs'.format(expected_bucket_name), test_config.configs)
+        'configs/constants.json', test_config.constants_storage_path)
     self.assertEqual('/this/config/file.yaml', test_config.path)
     # Test that two objects with the same constructor args are equal.
     self.assertEqual(test_config, common.ProjectConfig(
@@ -208,7 +208,7 @@ class CommonTest(parameterized.TestCase, absltest.TestCase):
         'project_id': 'test_project',
         'client_id': 'test_client_id',
         'client_secret': 'test_client_secret',
-        'bucket': 'test_project-gng-loaner',
+        'bucket': 'test_project.appspot.com',
     }
     self.fs.CreateFile('/this/config/file.yaml', contents=_EMPTY_CONFIG)
     test_config = common.ProjectConfig(
