@@ -187,12 +187,16 @@ class AuthTest(parameterized.TestCase, absltest.TestCase):
 
   def test_remove_creds(self):
     """Test whether or not to remove the local credentials."""
+    FLAGS.unparse_flags()
+    self.assertFalse(auth._remove_creds())
     flags.FLAGS(sys.argv[:1] + ['--remove_creds'])
     FLAGS.mark_as_parsed()
     self.assertTrue(auth._remove_creds())
 
   def test_run_local_web_server_for_auth(self):
     """Test whether or not to run the local web server for authentication."""
+    FLAGS.unparse_flags()
+    self.assertFalse(auth._run_local_web_server_for_auth())
     flags.FLAGS(sys.argv[:1] + ['--automatic_oauth'])
     FLAGS.mark_as_parsed()
     self.assertTrue(auth._run_local_web_server_for_auth())

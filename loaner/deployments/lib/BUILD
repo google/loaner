@@ -109,6 +109,14 @@ py_library(
 )
 
 py_library(
+    name = "menu_lib",
+    srcs = [
+        "menu.py",
+    ],
+    srcs_version = "PY2AND3",
+)
+
+py_library(
     name = "password_lib",
     srcs = [
         "password.py",
@@ -268,6 +276,19 @@ py_test(
 )
 
 py_test(
+    name = "menu_test",
+    size = "small",
+    srcs = [
+        "menu_test.py",
+    ],
+    deps = [
+        ":menu_lib",
+        "@absl_archive//absl/testing:absltest",
+        "@absl_archive//absl/testing:parameterized",
+    ],
+)
+
+py_test(
     name = "password_test",
     size = "small",
     srcs = [
@@ -324,6 +345,7 @@ test_suite(
         ":datastore_test",
         ":directory_test",
         ":google_api_test",
+        ":menu_test",
         ":password_test",
         ":storage_test",
         ":utils_test",

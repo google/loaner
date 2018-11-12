@@ -76,6 +76,7 @@ py_library(
         "//loaner/deployments/lib:common_lib",
         "//loaner/deployments/lib:datastore_lib",
         "//loaner/deployments/lib:directory_lib",
+        "//loaner/deployments/lib:menu_lib",
         "//loaner/deployments/lib:storage_lib",
         "//loaner/deployments/lib:utils_lib",
         "@absl_archive//absl:app",

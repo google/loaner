@@ -83,11 +83,14 @@ _MAIN_MENU_GOLDEN = (
     '''Which of the following actions would you like to take?
 
 Action: 'change project'
-Description: 'Change the Cloud Project currently being managed'
+Description: Change the Cloud Project currently being managed
+
 Action: 'configure'
-Description: 'Configure project level constants'
+Description: Configure project level constants
+
 Action: 'quit'
-Description: 'Quit the Grab n Go Management script'
+Description: Quit the Grab n Go Management script
+
 
 Available options are: change project, configure, quit
 
@@ -244,9 +247,11 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
         gng_impl._QUIT,
         gng_impl._QUIT,
     ]
-    with mock.patch.object(utils, 'prompt_enum', side_effect=side_effect):
-      self.assertEqual(test_manager.run(), 0)
+    with mock.patch.object(
+        utils, 'prompt_enum', side_effect=side_effect) as mock_prompt_enum:
+      test_manager.run()
     self.assertEqual(mock_prompt_string.call_count, 1)
+    self.assertEqual(mock_prompt_enum.call_count, 4)
 
   @mock.patch.object(utils, 'clear_screen')
   def test_main_menu_output(self, mock_clear):
@@ -275,11 +280,11 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
     )
     with mock.patch.object(
         utils, 'input', side_effect=['test', 'new_value', gng_impl._QUIT]):
-      test_manager._configure()
+      other_manager = test_manager._configure()
     self.assertEqual(
         test_client.get_blob(
-            test_manager._config.constants_storage_path,
-            test_manager._config.bucket),
+            other_manager._config.constants_storage_path,
+            other_manager._config.bucket),
         {'test': 'new_value', 'other': 'value'})
 
   def test_save_constants(self):

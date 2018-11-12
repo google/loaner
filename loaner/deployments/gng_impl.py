@@ -37,6 +37,7 @@ from loaner.deployments.lib import auth
 from loaner.deployments.lib import common
 from loaner.deployments.lib import datastore
 from loaner.deployments.lib import directory
+from loaner.deployments.lib import menu
 from loaner.deployments.lib import storage
 from loaner.deployments.lib import utils
 
@@ -50,16 +51,10 @@ _API_CLIENT_MODULES = (
     storage,
 )
 
+# Main menu options.
 _CHANGE_PROJECT = 'change project'
 _CONFIGURE = 'configure'
 _QUIT = 'quit'
-
-# Main menu options with help descriptions.
-_OPTIONS = collections.OrderedDict([
-    (_CHANGE_PROJECT, 'Change the Cloud Project currently being managed'),
-    (_CONFIGURE, 'Configure project level constants'),
-    (_QUIT, 'Quit the Grab n Go Management script'),
-])
 
 
 def _get_oauth_scopes(modules=_API_CLIENT_MODULES):
@@ -111,6 +106,16 @@ class _Manager(object):
     self._datastore_api = datastore_api
     self._directory_api = directory_api
     self._storage_api = storage_api
+    self._options = collections.OrderedDict([
+        (_CHANGE_PROJECT, menu.Option(
+            _CHANGE_PROJECT,
+            'Change the Cloud Project currently being managed',
+            self._change_project,
+        )),
+        (_CONFIGURE, menu.Option(
+            _CONFIGURE, 'Configure project level constants', self._configure)),
+        (_QUIT, menu.Option(_QUIT, 'Quit the Grab n Go Management script')),
+    ])
 
   def __str__(self):
     return '{} for project {!r}'.format(
@@ -186,33 +191,25 @@ class _Manager(object):
         directory_api, storage_api)
 
   def run(self):
-    """Runs the Grab n Go manager.
-
-    Returns:
-      An integer representing the exit code. Zero is success and any other
-          number is a failure.
-    """
-    exit_code = 0
+    """Runs the Grab n Go manager."""
     try:
       while True:
         utils.clear_screen()
         utils.write('Which of the following actions would you like to take?\n')
-        for opt, desc in six.iteritems(_OPTIONS):
-          utils.write('Action: {!r}\nDescription: {!r}'.format(opt, desc))
+        for opt in self._options.values():
+          utils.write('Action: {!r}\nDescription: {}\n'.format(
+              opt.name, opt.description))
         action = utils.prompt_enum(
-            '', accepted_values=_OPTIONS.keys(),
+            '', accepted_values=self._options.keys(),
             case_sensitive=False).strip().lower()
-        if action == _QUIT:
+        callback = self._options[action].callback
+        if callback is None:
           break
-        elif action == _CHANGE_PROJECT:
-          self = self._change_project()
-        elif action == _CONFIGURE:
-          self._configure()
+        self = callback()
     finally:
       utils.write(
           'Done managing Grab n Go for Cloud Project {!r}.'.format(
               self._config.project))
-    return exit_code
 
   def _change_project(self):
     """Changes the project configuration being managed.
@@ -230,7 +227,11 @@ class _Manager(object):
     return _Manager.new(self._config.path, project_key)
 
   def _configure(self):
-    """Prompts the user for project wide constants."""
+    """Prompts the user for project wide constants.
+
+    Returns:
+      An updated instance of _Manager.
+    """
     opts = sorted(self._constants.keys())
     opts.append(_QUIT)
     try:
@@ -265,6 +266,7 @@ class _Manager(object):
       utils.write(
           'Exiting configuration menu, to return enter {!r} in the main menu.\n'
           'Returning to the main menu.'.format(_CONFIGURE))
+    return self
 
   def _save_constants(self):
     """Writes constants to the configured Google Cloud Storage Bucket."""
@@ -284,11 +286,12 @@ def main(argv):
   utils.write('Welcome to the Grab n Go management script!\n')
 
   try:
-    manager = _Manager.new(FLAGS.config_file_path, FLAGS.project)
-    exit_code = manager.run()
+    _Manager.new(FLAGS.config_file_path, FLAGS.project).run()
   except KeyboardInterrupt as err:
     logging.error('Manager received CTRL-C, exiting: %s', err)
     exit_code = 1
+  else:
+    exit_code = 0
 
   sys.exit(exit_code)
 
