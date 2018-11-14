@@ -54,6 +54,14 @@ class SchemaError(Error):
   """Raised when there is an error generating the schema."""
 
 
+class SchemaFieldModeError(Error):
+  """Raised when there is a mode mismatch between two SchemaField objects."""
+
+
+class SchemaFieldTypeError(Error):
+  """Raised when there is a type mismatch between two SchemaField objects."""
+
+
 class InsertError(Error):
   """Raised when there's a problem inserting data into BigQuery."""
 
@@ -90,21 +98,27 @@ class BigQueryClient(object):
     logging.info('BigQuery successfully initialized.')
 
   def _create_table(self, table_name, entity_instance):
-    """Creates a BigQuery Table.
+    """Creates a BigQuery Table or attempts to update an existing schema.
 
     Args:
-      table_name: str, name of the table to be created.
+      table_name: str, name of the table to be created or updated.
       entity_instance: an ndb.Model entity instance to base the schema on.
     """
     table = self._dataset.table(table_name)
-    table_schema = _generate_entity_schema(entity_instance)
-    table.schema = _generate_schema(table_schema)
+    entity_schema = _generate_entity_schema(entity_instance)
+    table_schema = _generate_schema(entity_schema)
+    table.schema = table_schema
     try:
       table.create()
     except cloud.exceptions.Conflict:
-      logging.warning('Table %s already exists, not creating.', table_name)
+      logging.info(
+          'Table %s already exists, attempting to update it.', table_name)
+      table.reload()
+      merged_schema = _merge_schemas(table.schema, table_schema)
+      table.patch(schema=merged_schema)
+      logging.info('Table %s updated.', table_name)
     else:
-      logging.info('%s table created.', table_name)
+      logging.info('Table %s created.', table_name)
 
   def stream_row(self, table, row):
     """Converts datastore entries to Bigquery rows and streams them.
@@ -226,3 +240,61 @@ def _generate_schema(entity_fields=None):
             description='Current attributes of the entity.',
             fields=entity_fields))
   return schema
+
+
+def _merge_schemas(current_fields, new_fields):
+  """Merges two potentially nested bigquery.SchemaField object lists.
+
+  Merges two lists of SchemaField objects, while preserving the nested structure
+  and the unique SchemaField objects from both in the resultant schema, as long
+  as the mode and field type of each field are consistent during the merge. i.e.
+  BigQuery COLUMN deletions or mode, type, and name changes are disallowed.
+  https://cloud.google.com/bigquery/docs/manually-changing-schemas
+
+  Args:
+    current_fields: Iterable[bigquery.SchemaField], current fields to merge to.
+    new_fields: Iterable[bigquery.SchemaField], new fields to merge from.
+
+  Returns:
+    List[bigquery.SchemaField], the merged schemas.
+
+  Raises:
+    SchemaFieldModeError: if two fields with the same name do not match in mode.
+    SchemaFieldTypeError: if two fields with the same name do not match in type.
+  """
+  if not isinstance(current_fields, list):
+    current_fields = list(current_fields)
+
+  current_fields_dict = {field.name: field for field in current_fields}
+
+  for new_field in new_fields:
+    current_field = current_fields_dict.get(new_field.name)
+    if current_field is None:
+      current_fields.append(new_field)
+
+    elif new_field.mode != current_field.mode:
+      raise SchemaFieldModeError(
+          ('New SchemaField {name!r} with mode {new_mode!r} does not match'
+           'current SchemaField with mode {current_mode!r}').format(
+               name=new_field.name,
+               current_mode=current_field.mode,
+               new_mode=new_field.mode))
+
+    elif new_field.field_type != current_field.field_type:
+      raise SchemaFieldTypeError(
+          ('New SchemaField {name!r} with type {new_type!r} does not match'
+           'current SchemaField with type {current_type!r}').format(
+               name=new_field.name,
+               current_type=current_field.field_type,
+               new_type=new_field.field_type))
+
+    elif current_field.fields:
+      merged_fields = _merge_schemas(current_field.fields, new_field.fields)
+      current_fields.remove(current_field)
+      current_fields.append(bigquery.SchemaField(
+          current_field.name,
+          'RECORD',
+          current_field.mode,
+          fields=merged_fields))
+
+  return current_fields

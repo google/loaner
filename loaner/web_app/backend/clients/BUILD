@@ -66,6 +66,7 @@ loaner_appengine_test(
         "//loaner/web_app/backend/models:bigquery_row_model",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@gcloud_bigquery_archive//:gcloud_bigquery",
         "@mock_archive//:mock",
     ],
