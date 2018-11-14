@@ -18,9 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import pickle
 
-from absl import logging
 from google.appengine.api import taskqueue
 
 from loaner.web_app.backend.actions import base_action
@@ -72,7 +72,7 @@ def raise_event(event_name, device=None, shelf=None):
   actions_dict = action_loader.load_actions()
   model = device or shelf
   if not event_actions:
-    logging.warn(_NO_ACTIONS_MSG, event_name)
+    logging.info(_NO_ACTIONS_MSG, event_name)
   else:
     action_kwargs = {}
     if device:

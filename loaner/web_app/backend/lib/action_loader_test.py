@@ -19,9 +19,8 @@ from __future__ import division
 from __future__ import print_function
 
 import inspect
+import logging
 import pkgutil
-
-from absl import logging
 
 import mock
 

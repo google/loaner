@@ -37,10 +37,7 @@ loaner_appengine_library(
     srcs = [
         "action_loader.py",
     ],
-    deps = [
-        "//loaner/web_app/backend/actions",
-        "@absl_archive//absl/logging",
-    ],
+    deps = ["//loaner/web_app/backend/actions"],
 )
 
 loaner_appengine_library(
@@ -71,7 +68,6 @@ loaner_appengine_library(
         "//loaner/web_app/backend/lib:utils",
         "//loaner/web_app/backend/models:bootstrap_status_model",
         "//loaner/web_app/backend/models:config_model",
-        "@absl_archive//absl/logging",
     ],
 )
 
@@ -99,7 +95,6 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app/backend/models:event_models",
-        "@absl_archive//absl/logging",
     ],
 )
 
@@ -110,7 +105,6 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app/backend/api/messages:shared_messages",
-        "@absl_archive//absl/logging",
     ],
 )
 
@@ -135,7 +129,6 @@ loaner_appengine_library(
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/models:user_model",
-        "@absl_archive//absl/logging",
     ],
 )
 
@@ -170,7 +163,6 @@ loaner_appengine_library(
     deps = [
         ":user",
         "//loaner/web_app:constants",
-        "@absl_archive//absl/logging",
         "@oauth2client_archive//:oauth2client",
     ],
 )

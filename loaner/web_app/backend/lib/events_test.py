@@ -18,8 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import pickle
-from absl import logging
+
 import mock
 
 from google.appengine.api import taskqueue
@@ -41,20 +42,20 @@ class EventsTest(loanertest.TestCase):
   """Tests for the Events lib."""
 
   @mock.patch.object(logging, 'error')
-  @mock.patch.object(logging, 'warn')
+  @mock.patch.object(logging, 'info')
   @mock.patch.object(taskqueue, 'add')
   @mock.patch.object(events, 'get_actions_for_event')
   @mock.patch.object(action_loader, 'load_actions')
   def test_raise_event(
       self, mock_loadactions, mock_getactionsforevent,
-      mock_taskqueueadd, mock_logwarn, mock_logerror):
+      mock_taskqueueadd, mock_loginfo, mock_logerror):
     """Tests raising an Action if the Event is configured for Actions."""
     self.testbed.raise_event_patcher.stop()  # Disable patcher; use real method.
 
     # No Actions configured for the Event.
     mock_getactionsforevent.return_value = []
     events.raise_event('sample_event')
-    mock_logwarn.assert_called_with(events._NO_ACTIONS_MSG, 'sample_event')
+    mock_loginfo.assert_called_with(events._NO_ACTIONS_MSG, 'sample_event')
 
     # Everything is running smoothly.
     def side_effect1(device=None):

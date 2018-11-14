@@ -21,10 +21,9 @@ from __future__ import print_function
 import datetime
 import functools
 import inspect
+import logging
 import os
 import sys
-
-from absl import logging
 
 from google.appengine.ext import deferred
 
@@ -48,10 +47,6 @@ _TASK_DESCRIPTIONS = {
 
 
 class Error(Exception):
-  """Base class for exceptions in this module."""
-
-
-class BootstrapError(Error):
   """Exception raised when master method called but ENABLE_BOOTSTRAP False."""
 
 
@@ -178,13 +173,12 @@ def _run_function_as_task(all_functions_list, function_name, kwargs=None):
     The deferred task from AppEngine taskqueue.
 
   Raises:
-    BootstrapError: if requested bootstrap method is not allowed or does not
-        exist.
+    Error: if requested bootstrap method is not allowed or does not exist.
   """
   logging.debug('Running %s as a task.', function_name)
   function = all_functions_list.get(function_name)
   if function is None:
-    raise BootstrapError(
+    raise Error(
         'Requested bootstrap method {} does not exist.'.format(function_name))
   if not kwargs:
     kwargs = {}
@@ -205,10 +199,10 @@ def run_bootstrap(requested_tasks=None):
     being task descriptions as found in _TASK_DESCRIPTIONS.
 
   Raises:
-    BootstrapError: If bootstrap is not enabled for this app.
+    Error: If bootstrap is not enabled for this app.
   """
   if not constants.BOOTSTRAP_ENABLED:
-    raise BootstrapError(
+    raise Error(
         'Requested bootstrap method(s) disallowed. Change '
         'constants.ENABLE_BOOTSTRAP to True to allow this.')
 

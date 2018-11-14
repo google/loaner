@@ -75,9 +75,8 @@ class BootstrapTest(loanertest.TestCase):
   @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', False)
   def test_run_bootstrap_while_disabled(self):
     """Tests that bootstrapping is disallowed when constant False."""
-    self.assertRaises(
-        bootstrap.BootstrapError, bootstrap.run_bootstrap,
-        {'bootstrap_fake_method': {}})
+    with self.assertRaises(bootstrap.Error):
+      bootstrap.run_bootstrap({'bootstrap_fake_method': {}})
 
   @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
   @mock.patch('__main__.bootstrap.datastore_yaml.import_yaml')

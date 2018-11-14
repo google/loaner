@@ -18,10 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-
+import logging
 import math
-
-from absl import logging
 
 from protorpc import messages
 
