@@ -208,7 +208,7 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
             'entity', 'RECORD', 'NULLABLE', fields=expected_entity_schema)
     ]
     merged_schema = bigquery._merge_schemas(schema_1, schema_2)
-    self.assertCountEqual(merged_schema, expected_schema)
+    self.assertEqual(merged_schema, expected_schema)
 
   @parameterized.named_parameters(
       ('type',
