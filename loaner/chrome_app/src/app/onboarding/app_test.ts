@@ -12,14 +12,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {async, ComponentFixture, TestBed} from '@angular/core/testing';
+import {HttpClientTestingModule} from '@angular/common/http/testing';
+import {ComponentFixture, TestBed} from '@angular/core/testing';
 
 import {AnimationMenuService} from '../../../../shared/components/animation_menu';
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
 import {PROGRAM_NAME} from '../../../../shared/config';
+import {NetworkService} from '../../../../shared/services/network_service';
 import {AnimationMenuServiceMock} from '../../../../shared/testing/mocks';
 import {AnalyticsService, AnalyticsServiceMock} from '../shared/analytics';
 import {Background, BackgroundMock} from '../shared/background_service';
+import {Loan, LoanMock} from '../shared/loan';
 
 import {AppModule, AppRoot} from './app';
 
@@ -27,10 +30,10 @@ describe('Onboarding AppRoot', () => {
   let app: AppRoot;
   let fixture: ComponentFixture<AppRoot>;
 
-  beforeEach(async(() => {
+  beforeEach(() => {
     TestBed
         .configureTestingModule({
-          imports: [AppModule],
+          imports: [AppModule, HttpClientTestingModule],
           providers: [
             {
               provide: AnimationMenuService,
@@ -45,9 +48,14 @@ describe('Onboarding AppRoot', () => {
               useClass: BackgroundMock,
             },
             {
+              provide: Loan,
+              useClass: LoanMock,
+            },
+            {
               provide: Survey,
               useClass: SurveyMock,
             },
+            NetworkService,
           ],
         })
         .compileComponents();
@@ -55,7 +63,7 @@ describe('Onboarding AppRoot', () => {
     fixture = TestBed.createComponent(AppRoot);
     app = fixture.componentInstance;
     fixture.detectChanges();
-  }));
+  });
 
   it('shows the title of the page in the toolbar', () => {
     const toolbarDebugEl =

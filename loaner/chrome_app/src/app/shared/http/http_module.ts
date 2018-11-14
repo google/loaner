@@ -14,12 +14,15 @@
 
 import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {NgModule} from '@angular/core';
+import {NetworkService} from '../../../../../shared/services/network_service';
+import {FailureModule} from '../failure';
 
 import {OAuthHttpInterceptor} from './oauth_interceptor';
 
 @NgModule({
   imports: [
     HttpClientModule,
+    FailureModule,
   ],
   providers: [
     {
@@ -27,6 +30,7 @@ import {OAuthHttpInterceptor} from './oauth_interceptor';
       useClass: OAuthHttpInterceptor,
       multi: true,
     },
+    NetworkService,
   ]
 })
 export class HttpModule {

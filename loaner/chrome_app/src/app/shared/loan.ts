@@ -14,7 +14,7 @@
 
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
+import {Observable, of} from 'rxjs';
 import {map, switchMap} from 'rxjs/operators';
 
 import {ConfigService} from '../../../../shared/config';
@@ -116,5 +116,36 @@ export class Loan {
       return this.http.post<Device>(apiUrl, request)
           .pipe(map(deviceApiParams => new Device(deviceApiParams)));
     }));
+  }
+}
+
+/** Loan service mock that don't call any HTTP. */
+@Injectable()
+export class LoanMock {
+  chromeUrl = `chrome`;
+  endpointsDeviceUrl = `device`;
+
+  extend(newDate: string): Observable<boolean> {
+    return of(true);
+  }
+
+  return(): Observable<boolean> {
+    return of(true);
+  }
+
+  damaged(damagedReason?: string): Observable<boolean> {
+    return of(true);
+  }
+
+  enableGuestMode(): Observable<boolean> {
+    return of(true);
+  }
+
+  resumeLoan(): Observable<boolean> {
+    return of(true);
+  }
+
+  getDevice(): Observable<Device> {
+    return of(new Device());
   }
 }
