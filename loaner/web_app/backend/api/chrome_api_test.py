@@ -150,7 +150,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
     self.assertRaisesRegexp(
         endpoints.NotFoundException,
-        'Device ID not found in org.',
+        device_model._DEVICE_ID_NOT_FOUND % UNIQUE_ID,
         self.service.heartbeat, self.chrome_request)
 
 

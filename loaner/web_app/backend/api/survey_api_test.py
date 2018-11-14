@@ -265,7 +265,7 @@ class QuestionEndpointsTest(
     self.service.patch(request)
     self.assertEqual(mock_xsrf_token.call_count, 1)
     # Ensure the new answer was created.
-    self.assertEqual(2, len(question_key.get().answers))
+    self.assertLen(question_key.get().answers, 2)
 
 
 if __name__ == '__main__':

@@ -41,17 +41,17 @@ DEVICE_NOT_ENROLLED_MSG = 'Device %s is not enrolled in the application.'
 _GUEST_MODE_DISABLED_MSG = (
     'Cannot enable Guest mode because the administrator has disabled it.')
 _DEVICE_DAMAGED_MSG = (
-    'Unable to check Device %s into a shelf because it was reported damaged.')
+    'Unable to check device %s into a shelf because it was reported damaged.')
 _DIRECTORY_INFO_INCOMPLETE_MSG = (
     'The information retrieved from the directory API was incomplete, please '
     'try again later.')
-_FAILED_TO_MOVE_DEVICE_MSG = 'Failed to move Device %s to OU %s because %s.'
+_FAILED_TO_MOVE_DEVICE_MSG = 'Failed to move device %s to OU %s because %s.'
 _NOT_ASSIGNED_MSG = (
-    "Can't perform action because Device isn't assigned to anyone.")
+    "Can't perform action because device %s isn't assigned to anyone.")
 _ALREADY_DISABLED_MSG = (
-    'This device is alread disabled, correcting the local status: %s.')
+    'This device %s is already disabled, correcting the local status: %s.')
 _UNASSIGNED_DEVICE = (
-    'This action is not allowed because the device is not assigned.')
+    'This action is not allowed because the device %s is not assigned.')
 _ASSET_TAGS_REQUIRED_MSG = (
     'The administrator requires asset tags to be present when enrolling a '
     'device but one was not provided.')
@@ -63,6 +63,7 @@ _ASSIGNMENT_MISMATCH_MSG = (
     'user.')
 _EVENT_ACTION_ERROR_MSG = (
     'The following error occurred while trying to perform the action (%s): %s')
+_DEVICE_ID_NOT_FOUND = 'Device ID %s not found in org.'
 
 
 class Error(Exception):
@@ -434,7 +435,7 @@ class Device(base_model.BaseModel):
     directory_client = directory.DirectoryApiClient(user_email)
     directory_info = directory_client.get_chrome_device(device_id)
     if not directory_info:
-      raise DeviceCreationError('Device ID not found in org.')
+      raise DeviceCreationError(_DEVICE_ID_NOT_FOUND % device_id)
     try:
       device = cls(
           serial_number=directory_info[directory.SERIAL_NUMBER].upper(),
@@ -492,7 +493,7 @@ class Device(base_model.BaseModel):
           device that has not been assigned.
     """
     if not self.is_assigned:
-      raise ReturnDatesCalculationError(_NOT_ASSIGNED_MSG)
+      raise ReturnDatesCalculationError(_NOT_ASSIGNED_MSG % self.identifier)
     loan_duration = config_model.Config.get(
         'loan_duration')
     max_loan_duration = config_model.Config.get(
@@ -507,7 +508,7 @@ class Device(base_model.BaseModel):
     """Disables a device via the Directory API.
 
     Args:
-      user_email: string, email address of the user making the request.
+      user_email: str, email address of the user making the request.
     """
     logging.info(
         'Contacting Directory to lock (disable) Device %s.',
@@ -516,7 +517,7 @@ class Device(base_model.BaseModel):
     try:
       client.disable_chrome_device(self.chrome_device_id)
     except directory.DeviceAlreadyDisabledError as err:
-      logging.error(_ALREADY_DISABLED_MSG, err)
+      logging.error(_ALREADY_DISABLED_MSG, self.identifier, err)
     else:
       self.stream_to_bq(user_email, 'Disabling device %s.' % self.identifier)
     self.locked = True
@@ -555,7 +556,8 @@ class Device(base_model.BaseModel):
       AssignmentError: if the device is not enrolled.
     """
     if not self.enrolled:
-      raise AssignmentError('Cannot assign an unenrolled device.')
+      raise AssignmentError(
+          'Cannot assign an unenrolled device %s.' % self.identifier)
 
     if self.assigned_user and self.assigned_user != user_email:
       self._loan_return(user_email)
@@ -576,14 +578,16 @@ class Device(base_model.BaseModel):
       # the error should only be logged.
       logging.error(_EVENT_ACTION_ERROR_MSG, event_action, err)
     self.put()
-    self.stream_to_bq(user_email, 'Beginning new loan.')
+    self.stream_to_bq(
+        user_email, 'Beginning new loan for user %s with device %s.' %
+        (self.assigned_user, self.identifier))
     return self.key
 
   def resume_loan(self, user_email, message='Resuming loan.'):
     """Resumes a loan if it has been marked pending return.
 
     Args:
-      user_email: str, email address of the user initiating the resume.
+      user_email: str, email address of the user initiating the loan resume.
       message: str, the optional string to stream to bigquery.
     """
     if self.mark_pending_return_date:
@@ -606,7 +610,9 @@ class Device(base_model.BaseModel):
       if time_since.total_seconds() / 60.0 > config_model.Config.get(
           'return_grace_period'):
         self.resume_loan(
-            user_email, message='Resuming loan, since use continued.')
+            user_email,
+            message='Resuming loan for device %s, since use continued.' %
+            self.identifier)
 
   @validate_assignee_or_admin
   def loan_extend(self, user_email, extend_date_time):
@@ -622,7 +628,7 @@ class Device(base_model.BaseModel):
           not be allowed.
     """
     if not self.is_assigned:
-      raise UnassignedDeviceError(_UNASSIGNED_DEVICE)
+      raise UnassignedDeviceError(_UNASSIGNED_DEVICE % self.identifier)
     extend_date = extend_date_time.date()
     if extend_date < datetime.date.today():
       raise ExtendError('Extension date cannot be in the past.')
@@ -633,7 +639,8 @@ class Device(base_model.BaseModel):
     else:
       raise ExtendError('Extension date outside allowable date range.')
     self.put()
-    self.stream_to_bq(user_email, 'Extending loan.')
+    self.stream_to_bq(
+        user_email, 'Extending loan for device %s.' % self.identifier)
 
   def _loan_return(self, user_email):
     """Returns a device in a loan.
@@ -688,11 +695,11 @@ class Device(base_model.BaseModel):
           not be allowed.
     """
     if not self.is_assigned:
-      raise UnassignedDeviceError(_UNASSIGNED_DEVICE)
+      raise UnassignedDeviceError(_UNASSIGNED_DEVICE % self.identifier)
     self.mark_pending_return_date = datetime.datetime.utcnow()
     self.move_to_default_ou(user_email=user_email)
     self.stream_to_bq(
-        user_email, 'Marking device %s as Pending Return.' % self.identifier)
+        user_email, 'Marking device %s as pending return.' % self.identifier)
     self.put()
 
   def set_last_reminder(self, reminder_level):
@@ -727,8 +734,8 @@ class Device(base_model.BaseModel):
     """Marks a device as damaged.
 
     Args:
-      user_email: string, the user that marked the device as damaged.
-      damaged_reason: string, the reason the device is considered damaged.
+      user_email: str, the user that marked the device as damaged.
+      damaged_reason: str, the reason the device is considered damaged.
     """
     if not damaged_reason:
       damaged_reason = 'No reason provided'
@@ -745,7 +752,7 @@ class Device(base_model.BaseModel):
     """Resets a device's damaged state.
 
     Args:
-      user_email: string, the user that is marking a device as undamaged.
+      user_email: str, the user that is marking a device as undamaged.
     """
     self.damaged = False
     self.damaged_reason = None
@@ -786,7 +793,7 @@ class Device(base_model.BaseModel):
           not be allowed.
     """
     if not self.is_assigned:
-      raise UnassignedDeviceError(_UNASSIGNED_DEVICE)
+      raise UnassignedDeviceError(_UNASSIGNED_DEVICE % self.identifier)
     if config_model.Config.get('allow_guest_mode'):
       directory_client = directory.DirectoryApiClient(user_email)
       guest_ou = constants.ORG_UNIT_DICT['GUEST']
@@ -800,7 +807,8 @@ class Device(base_model.BaseModel):
       else:
         self.current_ou = guest_ou
         self.ou_changed_date = datetime.datetime.utcnow()
-        self.stream_to_bq(user_email, 'Moving device into Guest Mode.')
+        self.stream_to_bq(
+            user_email, 'Moving device %s into Guest Mode.' % self.identifier)
         self.put()
         if config_model.Config.get('timeout_guest_mode'):
           countdown = datetime.timedelta(

@@ -574,7 +574,7 @@ class DeviceModelTest(loanertest.TestCase):
 
     with self.assertRaisesRegexp(
         device_model.ReturnDatesCalculationError,
-        device_model._NOT_ASSIGNED_MSG):
+        device_model._NOT_ASSIGNED_MSG % self.test_device.identifier):
       self.test_device.calculate_return_dates()
 
   def test_loan_assign(self):
@@ -676,7 +676,7 @@ class DeviceModelTest(loanertest.TestCase):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     with self.assertRaisesWithLiteralMatch(
         device_model.UnassignedDeviceError,
-        device_model._UNASSIGNED_DEVICE):
+        device_model._UNASSIGNED_DEVICE % self.test_device.identifier):
       self.test_device.loan_extend(
           loanertest.USER_EMAIL, datetime.datetime.utcnow())
 
@@ -790,7 +790,7 @@ class DeviceModelTest(loanertest.TestCase):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     with self.assertRaisesWithLiteralMatch(
         device_model.UnassignedDeviceError,
-        device_model._UNASSIGNED_DEVICE):
+        device_model._UNASSIGNED_DEVICE % self.test_device.identifier):
       self.test_device.mark_pending_return(loanertest.USER_EMAIL)
 
   def test_mark_damaged_without_reason(self):
@@ -855,7 +855,7 @@ class DeviceModelTest(loanertest.TestCase):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     with self.assertRaisesWithLiteralMatch(
         device_model.UnassignedDeviceError,
-        device_model._UNASSIGNED_DEVICE):
+        device_model._UNASSIGNED_DEVICE % self.test_device.identifier):
       self.test_device.enable_guest_mode(loanertest.USER_EMAIL)
 
   def test_enable_guest_mode_not_allowed(self):

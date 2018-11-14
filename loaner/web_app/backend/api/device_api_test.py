@@ -329,7 +329,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
           query=shared_messages.SearchRequest(query_string='at:12345')), 1,))
   def test_list_devices(self, request, response_length):
     response = self.service.list_devices(request)
-    self.assertEqual(response_length, len(response.devices))
+    self.assertLen(response.devices, response_length)
 
   def test_list_devices_invalid_page_size(self):
     with self.assertRaises(endpoints.BadRequestException):
@@ -386,18 +386,18 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = device_messages.Device(shelf=message)
     response = self.service.list_devices(request)
     mock_get_shelf.assert_called_once_with(shelf_request_message)
-    self.assertEqual(len(response.devices), 2)
+    self.assertLen(response.devices, 2)
 
   def test_list_devices_with_offset(self):
     request = device_messages.Device(page_size=1, page_number=1)
     response = self.service.list_devices(request)
-    self.assertEqual(len(response.devices), 1)
+    self.assertLen(response.devices, 1)
     previouse_response = response
 
     # Get next page results and make sure it's not the same as last.
     request = device_messages.Device(page_size=1, page_number=2)
     response = self.service.list_devices(request)
-    self.assertEqual(len(response.devices), 1)
+    self.assertLen(response.devices, 1)
     self.assertNotEqual(response, previouse_response)
 
   def test_list_devices_inactive_no_shelf(self):
@@ -437,7 +437,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     response = self.service.list_user_devices(request)
     self.assertEqual(response.devices[0].serial_number,
                      self.device.serial_number)
-    self.assertEqual(len(response.devices), 2)
+    self.assertLen(response.devices, 2)
     self.assertEqual(mock_xsrf_token.call_count, 1)
     mock_list_by_user.assert_called_once_with(loanertest.USER_EMAIL)
 
@@ -484,8 +484,9 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     config_model.Config.set('allow_guest_mode', True)
     self.device.assigned_user = None
     self.device.put()
-    with self.assertRaisesRegexp(endpoints.UnauthorizedException,
-                                 device_model._UNASSIGNED_DEVICE):
+    with self.assertRaisesRegexp(
+        endpoints.UnauthorizedException,
+        device_model._UNASSIGNED_DEVICE % self.device.identifier):
       self.service.enable_guest_mode(
           device_messages.DeviceRequest(urlkey=self.device.key.urlsafe()))
 
@@ -525,8 +526,9 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_extend_loan_unassigned(self):
     self.device.assigned_user = None
     self.device.put()
-    with self.assertRaisesRegexp(endpoints.UnauthorizedException,
-                                 device_model._UNASSIGNED_DEVICE):
+    with self.assertRaisesRegexp(
+        endpoints.UnauthorizedException,
+        device_model._UNASSIGNED_DEVICE % self.device.identifier):
       self.service.extend_loan(
           device_messages.ExtendLoanRequest(
               device=device_messages.DeviceRequest(
@@ -615,8 +617,9 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_mark_pending_return_unassigned(self):
     self.device.assigned_user = None
     self.device.put()
-    with self.assertRaisesRegexp(endpoints.UnauthorizedException,
-                                 device_model._UNASSIGNED_DEVICE):
+    with self.assertRaisesRegexp(
+        endpoints.UnauthorizedException,
+        device_model._UNASSIGNED_DEVICE % self.device.identifier):
       self.service.mark_pending_return(
           device_messages.DeviceRequest(urlkey=self.device.key.urlsafe()))
 

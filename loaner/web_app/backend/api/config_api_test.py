@@ -126,7 +126,7 @@ class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = message_types.VoidMessage()
     response = self.service.list_configs(request)
 
-    self.assertEqual(len(response.configs), 4)
+    self.assertLen(response.configs, 4)
 
   def test_update_config_value_does_not_exist(self):
     request = config_messages.UpdateConfigRequest(
