@@ -17,10 +17,7 @@ import {Injectable, NgZone} from '@angular/core';
 import {Observable, timer} from 'rxjs';
 import {delayWhen, finalize, mergeMap, retryWhen, takeWhile} from 'rxjs/operators';
 
-import {NetworkService} from '../../../../../shared/services/network_service';
-import {FailAction, FailType, Failure} from '../failure';
-
-const MAX_RETRIES = 5;
+const MAX_RETRIES = 10;
 
 /**
  * Intercept the HttpRequest and apply the authorization header for the
@@ -29,11 +26,7 @@ const MAX_RETRIES = 5;
 @Injectable()
 export class OAuthHttpInterceptor implements HttpInterceptor {
   private accessToken!: string;
-  constructor(
-      private zone: NgZone,
-      private readonly networkService: NetworkService,
-      private readonly failure: Failure,
-  ) {}
+  constructor(private zone: NgZone) {}
 
   intercept(originalRequest: HttpRequest<{}>, next: HttpHandler):
       Observable<HttpEvent<{}>> {
@@ -46,29 +39,22 @@ export class OAuthHttpInterceptor implements HttpInterceptor {
     return this.prepareRequest(originalRequest)
         .pipe(
             mergeMap((req: HttpRequest<{}>) => {
-              this.networkService.internetStatusUpdater(true);
               request = req;
               return next.handle(request);
             }),
 
             retryWhen((errors: Observable<{}>) => {
-              let debounceTime = 1000;
+              let debounceTime = 100;
               return errors.pipe(
                   takeWhile((_, attemptNumber) => attemptNumber < MAX_RETRIES),
                   delayWhen(() => {
                     console.error('Retrying http connection');
-                    this.networkService.internetStatusUpdater(false);
                     debounceTime = debounceTime * 2;
                     return timer(debounceTime);
                   }),
                   finalize(() => {
-                    const message =
-                        'We had problem while getting your device\'s data. Please contact your admistrator';
-                    this.failure.register(
-                        message, FailType.Network, FailAction.Ignore,
-                        'Http requests failed');
-                    throw new Error(
-                        'Unable to complete http request after 5 retries');
+                    console.error(`Failed to complete http connection after ${
+                        MAX_RETRIES} attempts`);
                   }));
             }));
   }
