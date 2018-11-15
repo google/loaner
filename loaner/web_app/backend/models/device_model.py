@@ -640,7 +640,8 @@ class Device(base_model.BaseModel):
       raise ExtendError('Extension date outside allowable date range.')
     self.put()
     self.stream_to_bq(
-        user_email, 'Extending loan for device %s.' % self.identifier)
+        user_email, 'Extending loan for device %s to %s.' %
+        (self.identifier, self.due_date))
 
   def _loan_return(self, user_email):
     """Returns a device in a loan.
