@@ -147,7 +147,10 @@ def bootstrap_load_config_yaml(**kwargs):
   del kwargs  # Unused, but comes by default.
   config_defaults = utils.load_config_from_yaml()
   for name, value in config_defaults.iteritems():
-    config_model.Config.set(name, value, False)
+    if name == 'bootstrap_started':
+      config_model.Config.set(name, config_model.Config.get(name), False)
+    else:
+      config_model.Config.set(name, value, False)
 
 
 def get_all_bootstrap_functions():

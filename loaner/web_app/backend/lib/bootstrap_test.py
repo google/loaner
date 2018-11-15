@@ -28,6 +28,7 @@ from google.appengine.ext import deferred  # pylint: disable=unused-import
 from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.lib import bootstrap
 from loaner.web_app.backend.lib import datastore_yaml  # pylint: disable=unused-import
+from loaner.web_app.backend.lib import utils
 from loaner.web_app.backend.models import bootstrap_status_model
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.testing import loanertest
@@ -152,11 +153,18 @@ class BootstrapTest(loanertest.TestCase):
     bootstrap.bootstrap_bq_history()
     mock_client.initialize_tables.assert_called()
 
-  def test_bootstrap_load_config_yaml(self):
+  @mock.patch.object(
+      utils, 'load_config_from_yaml',
+      return_value={'test_name': 'test_value', 'bootstrap_started': False})
+  @mock.patch.object(config_model, 'Config')
+  def test_bootstrap_load_config_yaml(
+      self, mock_config, mock_load_config_from_yaml):
     """Tests if config_defaults.yaml is loaded into datastore."""
+    mock_config.get.return_value = True
     bootstrap.bootstrap_load_config_yaml()
-    config_value = config_model.Config.get_by_id('allow_guest_mode')
-    self.assertTrue(config_value.bool_value)
+    mock_config.set.assert_has_calls([
+        mock.call('test_name', 'test_value', False),
+        mock.call('bootstrap_started', True, False)], any_order=True)
 
   def test_is_bootstrap_completed(self):
     """Tests is_bootstrap_completed under myriad circumstances."""

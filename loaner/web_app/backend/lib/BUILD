@@ -212,6 +212,7 @@ loaner_appengine_test(
         ":bootstrap",
         "//loaner/web_app/backend/clients:bigquery",
         "//loaner/web_app/backend/lib:datastore_yaml",
+        "//loaner/web_app/backend/lib:utils",
         "//loaner/web_app/backend/models:bootstrap_status_model",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/testing:loanertest",
