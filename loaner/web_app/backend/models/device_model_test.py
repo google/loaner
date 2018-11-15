@@ -20,6 +20,7 @@ from __future__ import print_function
 
 import datetime
 from absl import logging
+from absl.testing import parameterized
 import freezegun
 import mock
 
@@ -36,7 +37,7 @@ from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class DeviceModelTest(loanertest.TestCase):
+class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   """Tests for the Device class."""
 
   def setUp(self):
@@ -783,8 +784,8 @@ class DeviceModelTest(loanertest.TestCase):
     self.test_device.assigned_user = loanertest.USER_EMAIL
     self.test_device.put()
     self.test_device.mark_pending_return(loanertest.USER_EMAIL)
-    self.assertTrue(isinstance(
-        self.test_device.mark_pending_return_date, datetime.datetime))
+    self.assertIsInstance(
+        self.test_device.mark_pending_return_date, datetime.datetime)
 
   def test_mark_pending_return_unassigned(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
@@ -959,16 +960,24 @@ class DeviceModelTest(loanertest.TestCase):
         device_model.UnableToMoveToShelfError, 'Unable to check device',
         self.test_device.move_to_shelf, self.shelf, loanertest.USER_EMAIL)
 
-  @mock.patch.object(device_model, 'logging', autospec=True)
-  def test_move_to_shelf(self, mock_logging):
+  @parameterized.named_parameters(
+      ('assigned', loanertest.USER_EMAIL, 1),
+      ('not_assigned', None, 0),
+  )
+  def test_move_to_shelf_assigned_user(self, mock_user, mock_call_count):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    now = datetime.datetime(year=2017, month=1, day=1)
-    with freezegun.freeze_time(now):
-      self.test_device.move_to_shelf(
-          shelf=self.shelf, user_email=loanertest.USER_EMAIL)
-      self.assertTrue(self.test_device.is_on_shelf)
-      self.assertEqual(mock_logging.info.call_count, 2)
-      self.assertEqual(now, self.test_device.last_known_healthy)
+    self.test_device.assigned_user = mock_user
+    with mock.patch.object(
+        self.test_device, '_loan_return') as mock_loan_return:
+      with mock.patch.object(logging, 'info', autospec=True) as mock_logging:
+        now = datetime.datetime(year=2017, month=1, day=1)
+        with freezegun.freeze_time(now):
+          self.test_device.move_to_shelf(
+              shelf=self.shelf, user_email=loanertest.USER_EMAIL)
+          self.assertEqual(mock_loan_return.call_count, mock_call_count)
+          self.assertTrue(self.test_device.is_on_shelf)
+          self.assertEqual(mock_logging.call_count, 1)
+          self.assertEqual(now, self.test_device.last_known_healthy)
 
   def test_remove_from_shelf(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)

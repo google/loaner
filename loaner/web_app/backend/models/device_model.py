@@ -879,11 +879,12 @@ class Device(base_model.BaseModel):
       raise UnableToMoveToShelfError(
           'Unable to check device {} to shelf. Shelf {} is not '
           'active.'.format(self.identifier, shelf.location))
+    if self.assigned_user:
+      self._loan_return(user_email=user_email)
     logging.info(
         'Checking device %s into shelf %s.', self.identifier, shelf.location)
     self.shelf = shelf.key
     self.last_known_healthy = datetime.datetime.utcnow()
-    self._loan_return(user_email=user_email)
     self.stream_to_bq(
         user_email, 'Placing device: %s on shelf: %s' % (
             self.identifier, shelf.location))

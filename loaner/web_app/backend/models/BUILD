@@ -213,6 +213,7 @@ loaner_appengine_test(
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@freezegun_archive//:freezegun",
         "@mock_archive//:mock",
     ],
