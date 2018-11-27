@@ -28,6 +28,7 @@ except ImportError:
 
 import sys
 
+from absl import logging
 from absl.testing import flagsaver
 from absl.testing import parameterized
 
@@ -45,6 +46,7 @@ from loaner.deployments import gng_impl
 from loaner.deployments.lib import app_constants
 from loaner.deployments.lib import auth
 from loaner.deployments.lib import common
+from loaner.deployments.lib import storage
 from loaner.deployments.lib import utils
 
 # The following constants are YAML file contents that are written to the fake
@@ -201,11 +203,11 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
     test_config = common.ProjectConfig(
         'KEY', 'PROJECT', 'ID', 'SECRET', 'BUCKET', self._blank_config_path)
     test_constants = app_constants.get_default_constants()
-    test_manager = gng_impl._Manager(test_config, test_constants, None)
+    test_manager = gng_impl._Manager(test_config, test_constants, None, False)
     self.assertEqual(str(test_manager), "_Manager for project 'PROJECT'")
     self.assertEqual(
         repr(test_manager),
-        '<_Manager.new(/testdata/blank_config.yaml, KEY)>')
+        '<_Manager.new(/testdata/blank_config.yaml, False, KEY)>')
 
   @parameterized.named_parameters(
       ('With Project Key From Prompts', 'dev', '/blank_config.yaml',
@@ -218,8 +220,24 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
   def test_new(self, test_key, config_filename, expected_str, test_input):
     with mock.patch.object(utils, 'prompt_string', side_effect=test_input):
       test_manager = gng_impl._Manager.new(
-          self._testdata_path + config_filename, test_key)
+          self._testdata_path + config_filename, False, test_key)
     self.assertEqual(str(test_manager), expected_str)
+
+  def test_new__load_constants(self):
+    test_client = _TestClientAPI()
+    test_client.insert_blob(
+        self._valid_default_config.constants_storage_path,
+        {'test': 'valid', 'other': 'other valid'},
+        bucket_name=self._valid_default_config.bucket,
+    )
+    with mock.patch.object(
+        storage.CloudStorageAPI, 'from_config', return_value=test_client):
+      with mock.patch.object(
+          app_constants, 'get_constants_from_flags',
+          return_value=self._constants):
+        test_manager = gng_impl._Manager.new(
+            self._valid_config_path, True, common.DEFAULT)
+    self.assertEqual(test_manager._constants['test'].value, 'valid')
 
   def test_new__auth_error(self):
     side_effect = [
@@ -234,13 +252,13 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
       with mock.patch.object(
           auth, 'CloudCredentials',
           side_effect=[auth.InvalidCredentials, mock_creds]):
-        gng_impl._Manager.new(self._valid_config_path, common.DEFAULT)
+        gng_impl._Manager.new(self._valid_config_path, False, common.DEFAULT)
       self.assertEqual(3, mock_prompt_string.call_count)
 
   @mock.patch.object(utils, 'prompt_string', return_value='dev')
   def test_run(self, mock_prompt_string):
     test_manager = gng_impl._Manager.new(
-        self._valid_config_path, common.DEFAULT)
+        self._valid_config_path, False, common.DEFAULT)
     side_effect = [
         gng_impl._CHANGE_PROJECT,
         gng_impl._CONFIGURE,
@@ -256,9 +274,9 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
   @mock.patch.object(utils, 'clear_screen')
   def test_main_menu_output(self, mock_clear):
     test_manager = gng_impl._Manager.new(
-        self._valid_config_path, common.DEFAULT)
+        self._valid_config_path, False, common.DEFAULT)
     with mock.patch.object(utils, 'input', return_value=gng_impl._QUIT):
-      test_manager.run()
+      self.assertIsNone(test_manager.run())
     self.assertEqual(self.stdout.getvalue(), _MAIN_MENU_GOLDEN)
     self.assertEqual(mock_clear.call_count, 1)
 
@@ -266,7 +284,7 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
     with mock.patch.object(
         utils, 'prompt_string', return_value='dev') as mock_prompt_string:
       test_manager = gng_impl._Manager.new(
-          self._valid_config_path, common.DEFAULT)
+          self._valid_config_path, False, common.DEFAULT)
       other_manager = test_manager._change_project()
     self.assertEqual(other_manager._config.project, 'dev-project')
     self.assertEqual(other_manager._config.client_secret, 'dev-secret')
@@ -275,7 +293,7 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
   def test_configure(self):
     test_client = _TestClientAPI()
     test_manager = gng_impl._Manager(
-        self._valid_default_config, self._constants, None,
+        self._valid_default_config, self._constants, None, False,
         storage_api=test_client,
     )
     with mock.patch.object(
@@ -290,7 +308,7 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
   def test_save_constants(self):
     test_client = _TestClientAPI()
     test_manager = gng_impl._Manager(
-        self._valid_default_config, self._constants, None,
+        self._valid_default_config, self._constants, None, False,
         storage_api=test_client,
     )
     test_manager._save_constants()
@@ -300,10 +318,62 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
             test_manager._config.bucket),
         {'test': '', 'other': 'value'})
 
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_save_constants__storage_not_found(self, mock_error_logging):
+    test_client = _TestClientAPI()
+    test_manager = gng_impl._Manager(
+        self._valid_default_config, self._constants, None, False,
+        storage_api=test_client,
+    )
+    with mock.patch.object(
+        test_client, 'insert_blob', side_effect=storage.NotFoundError()):
+      test_manager._save_constants()
+    self.assertEqual(mock_error_logging.call_count, 1)
+
+  @mock.patch.object(logging, 'info', autospec=True)
+  def test_load_constants(self, mock_info_logging):
+    test_client = _TestClientAPI()
+    test_manager = gng_impl._Manager(
+        self._valid_default_config, self._constants, None, False,
+        storage_api=test_client,
+    )
+    test_manager._constants['test'].value = 'valid'
+    test_manager._constants['other'].value = 'OVERRIDDEN'
+    test_manager._constants['KeyError'] = app_constants.Constant(
+        'KeyError', 'This constant is not stored and raises a KeyError', '')
+
+    test_client.insert_blob(
+        test_manager._config.constants_storage_path,
+        {'test': '', 'other': 'other valid'},
+        bucket_name=test_manager._config.bucket,
+    )
+
+    test_manager.load_constants_from_storage()
+    # Test the default value is used when the loaded value is invalid.
+    self.assertEqual(test_manager._constants['test'].value, 'valid')
+    # Test loading a valid value overrides the original.
+    self.assertEqual(test_manager._constants['other'].value, 'other valid')
+    # Test that the 'KeyError' constant calls logging.info.
+    self.assertEqual(mock_info_logging.call_count, 1)
+
+  @mock.patch.object(logging, 'error', autospec=True)
+  def test_load_constants__storage_not_found(self, mock_error_logging):
+    test_client = _TestClientAPI()
+    test_manager = gng_impl._Manager(
+        self._valid_default_config, self._constants, None, False,
+        storage_api=test_client,
+    )
+    with mock.patch.object(
+        test_client, 'get_blob', side_effect=storage.NotFoundError()):
+      test_manager.load_constants_from_storage()
+    self.assertEqual(mock_error_logging.call_count, 1)
+
   @mock.patch.object(utils, 'prompt_enum', return_value=gng_impl._QUIT)
   def test_main(self, mock_prompt_enum):
     with flagsaver.flagsaver(
-        project=common.DEFAULT, config_file_path=self._valid_config_path):
+        project=common.DEFAULT,
+        config_file_path=self._valid_config_path,
+        prefer_gcs=False):
       with self.assertRaises(SystemExit) as exit_err:
         gng_impl.main('unused')
         self.assertEqual(exit_err.exception.code, 0)
@@ -314,7 +384,9 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
     with mock.patch.object(
         gng_impl._Manager, method, side_effect=KeyboardInterrupt()):
       with flagsaver.flagsaver(
-          project=common.DEFAULT, config_file_path=self._valid_config_path):
+          project=common.DEFAULT,
+          config_file_path=self._valid_config_path,
+          prefer_gcs=False):
         with self.assertRaises(SystemExit) as exit_err:
           gng_impl.main('unused')
           self.assertEqual(exit_err.exception.code, 1)

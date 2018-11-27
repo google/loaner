@@ -43,6 +43,13 @@ from loaner.deployments.lib import utils
 
 FLAGS = flags.FLAGS
 
+flags.DEFINE_bool(
+    'prefer_gcs', True,
+    'Prefer loading constants from Cloud Storage.\n'
+    'An example motivation for setting this to false would be to automate '
+    'deployments using command line flags.'
+)
+
 # API Client modules from which OAuth2 scopes should be extracted.
 _API_CLIENT_MODULES = (
     app_engine,
@@ -83,8 +90,8 @@ class _Manager(object):
   """Grab n Go management object."""
 
   def __init__(
-      self, config, constants, creds, gae_admin_api=None, datastore_api=None,
-      directory_api=None, storage_api=None,
+      self, config, constants, creds, prefer_gcs, gae_admin_api=None,
+      datastore_api=None, directory_api=None, storage_api=None,
   ):
     """Initializes manager attributes.
 
@@ -94,14 +101,22 @@ class _Manager(object):
           constants.
       creds: auth.CloudCredentials, the credentials to use when making Google
           API calls.
-      gae_admin_api: app_engine.AdminAPI, the App Engine Admin API client.
-      datastore_api: datastore.DatastoreAPI, the Google Datastore API client.
-      directory_api: directory.DirectoryAPI, the Google Directory API client.
-      storage_api: storage.CloudStorageAPI, the Google Cloud Storage API client.
+      prefer_gcs: bool, if True constants will be loaded from Google Cloud
+          Storage and will override any constants provided as command line
+          flags.
+      gae_admin_api: Optional[app_engine.AdminAPI], the Google App Engine Admin
+          API client.
+      datastore_api: Optional[datastore.DatastoreAPI], the Google Datastore API
+          client.
+      directory_api: Optional[directory.DirectoryAPI], the Google Admin SDK
+          Directory API client.
+      storage_api: Optional[storage.CloudStorageAPI], the Google Cloud Storage
+          API client.
     """
     self._config = config
     self._constants = constants
     self._cloud_creds = creds
+    self._prefer_gcs = prefer_gcs
     self._gae_admin_api = gae_admin_api
     self._datastore_api = datastore_api
     self._directory_api = directory_api
@@ -122,15 +137,19 @@ class _Manager(object):
         self.__class__.__name__, self._config.project)
 
   def __repr__(self):
-    return '<{0}.new({1}, {2})>'.format(
-        self.__class__.__name__, self._config.path, self._config.key)
+    return '<{0}.new({1}, {2}, {3})>'.format(
+        self.__class__.__name__, self._config.path, self._prefer_gcs,
+        self._config.key)
 
   @classmethod
-  def new(cls, config_file_path, project_key=None):
+  def new(cls, config_file_path, prefer_gcs, project_key=None):
     """Creates a new instance of a Grab n Go Manager.
 
     Args:
       config_file_path: str, the name or path to the config file.
+      prefer_gcs: bool, if True constants will be loaded from Google Cloud
+          Storage and will override any constants provided as command line
+          flags.
       project_key: Optional[str], the project friendly name, used as the
           top-level key in the config file.
 
@@ -177,7 +196,7 @@ class _Manager(object):
       )
       config = common.ProjectConfig.from_prompts(project_key, config_file_path)
       config.write()
-      return cls.new(config_file_path, project_key)
+      return cls.new(config_file_path, prefer_gcs, project_key)
 
     gae_admin_api = app_engine.AdminAPI.from_config(config, cloud_creds)
     datastore_api = datastore.DatastoreAPI.from_config(config, cloud_creds)
@@ -186,9 +205,18 @@ class _Manager(object):
 
     constants = app_constants.get_constants_from_flags()
 
-    return cls(
-        config, constants, cloud_creds, gae_admin_api, datastore_api,
-        directory_api, storage_api)
+    new_manager = cls(
+        config, constants, cloud_creds, prefer_gcs,
+        gae_admin_api=gae_admin_api,
+        datastore_api=datastore_api,
+        directory_api=directory_api,
+        storage_api=storage_api,
+    )
+
+    if prefer_gcs:
+      new_manager.load_constants_from_storage()
+
+    return new_manager
 
   def run(self):
     """Runs the Grab n Go manager."""
@@ -224,7 +252,7 @@ class _Manager(object):
         'Which project would you like to switch to?'.format(
             self._config.project, self._config.key,
             ', '.join(common.get_available_configs(self._config.path))))
-    return _Manager.new(self._config.path, project_key)
+    return _Manager.new(self._config.path, self._prefer_gcs, project_key)
 
   def _configure(self):
     """Prompts the user for project wide constants.
@@ -279,6 +307,31 @@ class _Manager(object):
     except storage.NotFoundError as err:
       logging.error('Failed to get the bucket for this project: %s', err)
 
+  def load_constants_from_storage(self):
+    """Attempts to load constants from Google Cloud Storage."""
+    try:
+      constants = self._storage_api.get_blob(
+          self._config.constants_storage_path,
+          self._config.bucket,
+      )
+    except storage.NotFoundError as err:
+      logging.error('Constants were not found in storage: %s', err)
+    else:
+      for name in self._constants.keys():
+        try:
+          self._constants[name].value = constants[name]
+        except ValueError:
+          logging.warning(
+              'The value %r for %r stored in Google Cloud Storage does not meet'
+              ' the requirements. Using the default value...',
+              constants[name], name)
+        except KeyError:
+          logging.info(
+              'The key %r was not found in the stored constants, this may be '
+              'because a new constant was added since your most recent '
+              'configuration. To resolve run `configure` in the main menu.',
+              name)
+
 
 def main(argv):
   del argv  # Unused.
@@ -286,7 +339,7 @@ def main(argv):
   utils.write('Welcome to the Grab n Go management script!\n')
 
   try:
-    _Manager.new(FLAGS.config_file_path, FLAGS.project).run()
+    _Manager.new(FLAGS.config_file_path, FLAGS.prefer_gcs, FLAGS.project).run()
   except KeyboardInterrupt as err:
     logging.error('Manager received CTRL-C, exiting: %s', err)
     exit_code = 1
