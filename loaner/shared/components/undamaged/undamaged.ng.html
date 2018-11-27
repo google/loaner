@@ -3,7 +3,7 @@
   <div mat-dialog-content>
     <p>
       Are you sure you want to mark this device {{deviceId}} as no longer being damaged?
-      You should only do this if you've confirmed that the device's reported damage reason as fixed.
+      You should only do this if you have confirmed that the device's reported damage has been fixed.
     </p>
   </div>
   <div mat-dialog-actions>
@@ -30,7 +30,7 @@
 <div *ngIf="!toBeSubmitted && !loading" tabindex="0" loaner-focus>
   <h1 mat-dialog-title>Success!</h1>
   <div mat-dialog-content>
-    <p> Device {{deviceId}} is not longer marked as damaged. </p>
+    <p> Device {{deviceId}} is no longer marked as damaged. </p>
   </div>
   <div mat-dialog-actions>
     <button mat-button

@@ -203,7 +203,7 @@ export class DeviceService extends ApiService {
   markAsUndamaged(device: Device) {
     return this.post('undamaged', device.toApiMessage()).pipe(tap(() => {
       this.snackBar.open(
-          `Device ${device.identifier} is not longer marked as damaged.`);
+          `Device ${device.identifier} is no longer marked as damaged.`);
     }));
   }
 

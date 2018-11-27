@@ -72,7 +72,7 @@ describe('UndamagedDialogComponent', () => {
     expect(compiled.querySelector('.mat-dialog-title')!.textContent)
         .toBe('Success!');
     expect(compiled.querySelector('.mat-dialog-content')!.textContent)
-        .toContain('Device 123 is not longer marked as damaged.');
+        .toContain('Device 123 is no longer marked as damaged.');
   });
 
   it('shows the close button', () => {
