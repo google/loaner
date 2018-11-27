@@ -26,6 +26,8 @@ except ImportError:
   import builtins
 # pylint:enable=g-statement-before-imports,g-import-not-at-top
 
+import datetime
+import getpass
 import sys
 
 from absl import logging
@@ -35,6 +37,7 @@ from absl.testing import parameterized
 from pyfakefs import fake_filesystem
 from pyfakefs import mox3_stubout
 
+import freezegun
 import mock
 
 from six.moves import StringIO
@@ -210,6 +213,21 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
         '<_Manager.new(/testdata/blank_config.yaml, False, KEY)>')
 
   @parameterized.named_parameters(
+      ('Provided', 'user-testing', 'user-testing'),
+      ('Generated', None, 'getuser-2018-01-01'),
+  )
+  def test_manager_version(self, provided_version, expected):
+    # This is to satisfy the freezegun api which requires this file.
+    self.fs.CreateFile('/etc/mime.types')
+    now = datetime.datetime(year=2018, month=1, day=1)
+    test_manager = gng_impl._Manager(
+        self._valid_default_config, self._constants, None,
+        prefer_gcs=False, version=provided_version)
+    with freezegun.freeze_time(now):
+      with mock.patch.object(getpass, 'getuser', return_value='getuser'):
+        self.assertEqual(test_manager.version, expected)
+
+  @parameterized.named_parameters(
       ('With Project Key From Prompts', 'dev', '/blank_config.yaml',
        "_Manager for project 'dev-project'",
        ('dev-project', 'dev.apps.googleusercontent.com', 'dev-secret'),),
@@ -371,9 +389,8 @@ class ManagerTest(parameterized.TestCase, absltest.TestCase):
   @mock.patch.object(utils, 'prompt_enum', return_value=gng_impl._QUIT)
   def test_main(self, mock_prompt_enum):
     with flagsaver.flagsaver(
-        project=common.DEFAULT,
-        config_file_path=self._valid_config_path,
-        prefer_gcs=False):
+        project=common.DEFAULT, config_file_path=self._valid_config_path,
+        prefer_gcs=False, app_version='valid-version'):
       with self.assertRaises(SystemExit) as exit_err:
         gng_impl.main('unused')
         self.assertEqual(exit_err.exception.code, 0)

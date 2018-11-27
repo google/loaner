@@ -47,6 +47,26 @@ _CLIENT_ID_REQUIREMENTS = (
     'the OAuth2 Client ID must be lowercase letters, numbers, and hypens '
     'followed by `.apps.googleusercontent.com`'
 )
+# Version specifics can be found here:
+# https://cloud.google.com/appengine/docs/standard/python/config/appref
+# Characters allowed in the version string.
+# Lowercase letters, numbers, and hyphens.
+_VERSION_CHARS = frozenset((
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
+    'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4',
+    '5', '6', '7', '8', '9', '0', '-',
+))
+# Version strings that are reserved or otherwise not allowed.
+_VERSION_BLACKLIST = frozenset(('default', 'latest'))
+# Version cannot start with ah-
+_VERSION_CANNOT_START_WITH = 'ah-'
+# Version requirements string.
+_VERSION_REQUIREMENTS = (
+    'the version string provided: {!r} does not meet the requirements.\n'
+    'The version string can only be composed of lower case letters, numbers, '
+    "and hyphens. The strings 'default' and 'latest' are reserved and therefore"
+    " not allowed. Finally, the version string may not begin with 'ah-'."
+)
 
 
 def _wrap_lines(lines, wrapper=None):
@@ -294,6 +314,29 @@ class ClientIDParser(RegExParser):
   def __init__(self):
     super(ClientIDParser, self).__init__(
         _CLIENT_ID_REGEX, _CLIENT_ID_REQUIREMENTS)
+
+
+class VersionParser(Parser):
+  """A parser for the Google App Engine Version string."""
+
+  def parse(self, arg):
+    """Parses and validates the provided argument.
+
+    Args:
+      arg: str, the version string to parse.
+
+    Returns:
+      The valid version string.
+
+    Raises:
+      ValueError: if the version string provided does not meet the requirements.
+    """
+    clean_arg = arg.strip().lower()
+    if clean_arg and set(clean_arg).issubset(_VERSION_CHARS):
+      if clean_arg not in _VERSION_BLACKLIST:
+        if not clean_arg.startswith(_VERSION_CANNOT_START_WITH):
+          return clean_arg
+    raise ValueError(_VERSION_REQUIREMENTS.format(arg))
 
 
 class ListParser(flags.ListParser):

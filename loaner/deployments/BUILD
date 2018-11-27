@@ -124,6 +124,7 @@ py_test(
         "@absl_archive//absl/testing:absltest",
         "@absl_archive//absl/testing:flagsaver",
         "@absl_archive//absl/testing:parameterized",
+        "@freezegun_archive//:freezegun",
         "@gcloud_auth_archive//:gcloud_auth",
         "@mock_archive//:mock",
         "@pyfakefs_archive//:pyfakefs",

@@ -22,6 +22,8 @@ from __future__ import division
 from __future__ import print_function
 
 import collections
+import datetime
+import getpass
 import inspect
 import sys
 
@@ -48,6 +50,19 @@ flags.DEFINE_bool(
     'Prefer loading constants from Cloud Storage.\n'
     'An example motivation for setting this to false would be to automate '
     'deployments using command line flags.'
+)
+
+flags.DEFINE_string(
+    'app_version', None,
+    'The version string to use when deploying to App Engine.\n'
+    'NOTE: If supplied it overrides the default version string which consists '
+    'of the username of the user executing this script and the current date. '
+    'The default version is unique for each user on a given day. '
+    'Multiple deployments on a given day without a version specified will '
+    'overwrite the existing App Engine version.\n'
+    'Requirements: The version string must only be composed of lower case '
+    "letters, numbers, and hyphens. The versions 'default' and 'latest' are "
+    "reserved and cannot be used. The version cannot begin with 'ah-'."
 )
 
 # API Client modules from which OAuth2 scopes should be extracted.
@@ -91,7 +106,7 @@ class _Manager(object):
 
   def __init__(
       self, config, constants, creds, prefer_gcs, gae_admin_api=None,
-      datastore_api=None, directory_api=None, storage_api=None,
+      datastore_api=None, directory_api=None, storage_api=None, version=None,
   ):
     """Initializes manager attributes.
 
@@ -112,6 +127,8 @@ class _Manager(object):
           Directory API client.
       storage_api: Optional[storage.CloudStorageAPI], the Google Cloud Storage
           API client.
+      version: Optional[str], the version string to use for the next deployed
+          version.
     """
     self._config = config
     self._constants = constants
@@ -121,6 +138,7 @@ class _Manager(object):
     self._datastore_api = datastore_api
     self._directory_api = directory_api
     self._storage_api = storage_api
+    self._version = version
     self._options = collections.OrderedDict([
         (_CHANGE_PROJECT, menu.Option(
             _CHANGE_PROJECT,
@@ -141,8 +159,37 @@ class _Manager(object):
         self.__class__.__name__, self._config.path, self._prefer_gcs,
         self._config.key)
 
+  @property
+  def version(self):
+    """Getter for the version string.
+
+    If no version was provided upon creation (e.g. via a command line flag), we
+    will attempt to auto generate a version string using the username and the
+    current date.
+
+    Returns:
+      The version as a string.
+    """
+    if self._version is None:
+      self.version = '{user}-{date}'.format(
+          user=getpass.getuser().strip().lower(),
+          date=datetime.datetime.strftime(datetime.datetime.now(), '%Y-%m-%d'))
+    return self._version
+
+  @version.setter
+  def version(self, version):
+    """Setter for the version string.
+
+    Args:
+      version: str, the version string to use for the next deployment.
+
+    Raises:
+      ValueError: when the provided version does not meet the requirements.
+    """
+    self._version = utils.VersionParser().parse(version)
+
   @classmethod
-  def new(cls, config_file_path, prefer_gcs, project_key=None):
+  def new(cls, config_file_path, prefer_gcs, project_key=None, version=None):
     """Creates a new instance of a Grab n Go Manager.
 
     Args:
@@ -152,6 +199,8 @@ class _Manager(object):
           flags.
       project_key: Optional[str], the project friendly name, used as the
           top-level key in the config file.
+      version: Optional[str], the version string to use for the next deployed
+          version.
 
     Returns:
       A new instance of a Grab n Go Manager.
@@ -211,6 +260,7 @@ class _Manager(object):
         datastore_api=datastore_api,
         directory_api=directory_api,
         storage_api=storage_api,
+        version=version,
     )
 
     if prefer_gcs:
@@ -252,7 +302,9 @@ class _Manager(object):
         'Which project would you like to switch to?'.format(
             self._config.project, self._config.key,
             ', '.join(common.get_available_configs(self._config.path))))
-    return _Manager.new(self._config.path, self._prefer_gcs, project_key)
+    return _Manager.new(
+        self._config.path, self._prefer_gcs, project_key=project_key,
+        version=self._version)
 
   def _configure(self):
     """Prompts the user for project wide constants.
@@ -339,7 +391,12 @@ def main(argv):
   utils.write('Welcome to the Grab n Go management script!\n')
 
   try:
-    _Manager.new(FLAGS.config_file_path, FLAGS.prefer_gcs, FLAGS.project).run()
+    _Manager.new(
+        FLAGS.config_file_path,
+        FLAGS.prefer_gcs,
+        project_key=FLAGS.project,
+        version=FLAGS.app_version,
+    ).run()
   except KeyboardInterrupt as err:
     logging.error('Manager received CTRL-C, exiting: %s', err)
     exit_code = 1

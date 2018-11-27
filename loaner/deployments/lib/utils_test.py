@@ -127,6 +127,8 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
       ('Short, upper, False', False, 'N', False),
       ('Long, lower, False', True, 'no', False),
       ('Long, upper, False', True, 'NO', False),
+      ('Bool, False', False, False, False),
+      ('Bool, True', False, True, True),
   )
   def test_yes_no_parser(self, need_full, user_input, expected_return):
     parser = utils.YesNoParser(need_full)
@@ -228,6 +230,29 @@ class UtilTest(parameterized.TestCase, absltest.TestCase):
     parser = utils.ClientIDParser()
     with self.assertRaises(ValueError):
       parser.parse(arg)
+
+  @parameterized.parameters(
+      ('user-01-01-01', 'user-01-01-01'),
+      ('USER-01-01-01', 'user-01-01-01'),
+      ('UsEr-01-01-01', 'user-01-01-01'),
+      ('01user-01', '01user-01'),
+  )
+  def test_version_parser(self, user_input, expected):
+    parser = utils.VersionParser()
+    self.assertEqual(parser.parse(user_input), expected)
+
+  @parameterized.named_parameters(
+      ('Invalid symbol %', '%USER'),
+      ('Invalid symbol $', 'user$'),
+      ('Invalid symbol ?', 'user?-01'),
+      ('Reserved version: default', 'default'),
+      ('Reserved version: latest', 'latest'),
+      ('Cannot start with ah-', 'ah-user-01'),
+  )
+  def test_version_parser__invalid(self, user_input):
+    parser = utils.VersionParser()
+    with self.assertRaises(ValueError):
+      parser.parse(user_input)
 
   @parameterized.named_parameters(
       ('Empty Allowed', True, '', []),
