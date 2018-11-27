@@ -42,6 +42,7 @@ ON_GAE = (
     os.getenv('SERVER_SOFTWARE') and
     os.getenv('SERVER_SOFTWARE').startswith('Google App Engine/'))
 
+
 ################################################################################
 # Everything in this comment block must be configured before the app can be
 # built and deployed, see the developer docs for more detail.
