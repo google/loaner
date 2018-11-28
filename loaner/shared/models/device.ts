@@ -153,7 +153,8 @@ export class Device {
    */
   get canExtend(): boolean {
     return !this.pendingReturn &&
-        moment(this.dueDate).diff(this.maxExtendDate, 'days') <= -1;
+        moment().isBefore(this.maxExtendDate, 'day') &&
+        moment(this.dueDate).isBefore(this.maxExtendDate, 'day');
   }
 
   /**

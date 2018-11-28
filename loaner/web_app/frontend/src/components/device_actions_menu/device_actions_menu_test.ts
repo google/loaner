@@ -27,7 +27,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, DEVICE_GUEST_PERMITTED, DEVICE_LOST, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, DEVICE_GUEST_PERMITTED, DEVICE_LOST, DEVICE_OVERDUE, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
@@ -45,6 +45,7 @@ describe('DeviceActionsMenu', () => {
   let deviceActionsMenu: DeviceActionsMenu;
   let dummyComponent: DummyComponent;
   let overlayContainerElement: HTMLElement;
+  let compiled: HTMLElement;
 
   beforeEach(fakeAsync(() => {
     TestBed
@@ -69,122 +70,140 @@ describe('DeviceActionsMenu', () => {
     deviceActionsMenu =
         fixture.debugElement.query(By.directive(DeviceActionsMenu))
             .componentInstance;
+    compiled = fixture.debugElement.nativeElement;
     overlayContainerElement =
         TestBed.get(OverlayContainer).getContainerElement();
   }));
+
+  // Fake the jasmine clock to allow for extension.
+  beforeEach(() => {
+    jasmine.clock().mockDate(new Date(2018, 1, 2));
+  });
+
+  // Clean up the Jasmine clock mocks.
+  afterEach(() => {
+    jasmine.clock().uninstall();
+  });
 
   it('creates the DeviceActionsMenu', () => {
     expect(DummyComponent).toBeTruthy();
   });
 
   it('renders the Extend button after more is clicked', () => {
+    dummyComponent.testDevice = DEVICE_ASSIGNED;
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-extend'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-extend') as HTMLElement;
     expect(button.textContent).toContain('Extend');
+    expect(button.getAttribute('disabled')).toBeFalsy();
+  });
+
+  it('renders the Extend button, but DISABLED after "more" is clicked', () => {
+    dummyComponent.testDevice = DEVICE_OVERDUE;
+    fixture.detectChanges();
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
+    fixture.detectChanges();
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-extend') as HTMLElement;
+    expect(button.textContent).toContain('Extend');
+    expect(button.getAttribute('disabled')).toBe('true');
   });
 
   it('renders the Return button after more is clicked', () => {
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-return'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-return') as HTMLElement;
     expect(button.textContent).toContain('Return');
   });
 
   it('renders the Enable guest button after more is clicked', () => {
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-guest'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-guest') as HTMLElement;
     expect(button.textContent).toContain('Enable guest');
   });
 
   it('renders the Damaged button after more is clicked', () => {
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-damaged'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-damaged') as HTMLElement;
     expect(button.textContent).toContain('Mark as damaged');
   });
 
   it('renders the Lost button after more is clicked', () => {
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-lost'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-lost') as HTMLElement;
     expect(button.textContent).toContain('Mark as lost');
   });
 
   it('renders the Mark as Repaired button after more is clicked', () => {
     dummyComponent.testDevice = DEVICE_DAMAGED;
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-undamaged'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-undamaged') as HTMLElement;
     expect(button.textContent).toContain('Mark as Repaired');
   });
 
   it('renders the Unlock button after more is clicked', () => {
     dummyComponent.testDevice = DEVICE_LOST;
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    expect(overlayContainerElement.textContent).toContain('Unlock');
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-unlock') as HTMLElement;
+    expect(button.textContent).toContain('Unlock');
   });
 
   it('renders a disabled Enable Guest button after more is clicked', () => {
     dummyComponent.testDevice = DEVICE_GUEST_NOT_PERMITTED;
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-guest'))
-                       .nativeElement as HTMLButtonElement;
-    expect(button.disabled).toBeTruthy();
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-guest') as HTMLElement;
+    expect(button.getAttribute('disabled')).toBe('true');
   });
 
   it('renders an enabled Enable Guest button after more is clicked', () => {
     dummyComponent.testDevice = DEVICE_GUEST_PERMITTED;
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-guest'))
-                       .nativeElement as HTMLButtonElement;
-    expect(button.disabled).toBeFalsy();
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-guest') as HTMLElement;
+    expect(button.getAttribute('disabled')).toBeFalsy();
   });
 
 
   it('renders the Unenroll button after more is clicked', () => {
     fixture.detectChanges();
-    const actionsButton = fixture.debugElement.query(By.css('.icon-more'));
-    actionsButton.triggerEventHandler('click', null);
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
     fixture.detectChanges();
-    const button = fixture.debugElement.query(By.css('.actions-menu'))
-                       .query(By.css('.button-unenroll'))
-                       .nativeElement as HTMLElement;
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-unenroll') as HTMLElement;
     expect(button.textContent).toContain('Unenroll');
   });
 
@@ -192,16 +211,15 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       const compiled = fixture.debugElement.nativeElement;
        spyOn(deviceService, 'extend').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
-       const actionsButton = compiled.querySelector('.icon-more');
+       const actionsButton =
+           compiled.querySelector('.icon-more') as HTMLElement;
        actionsButton.click();
        fixture.detectChanges();
-       const button =
-           (overlayContainerElement.querySelector('.button-extend') as
-            HTMLElement);
+       const button = overlayContainerElement.querySelector(
+                          '.actions-menu .button-extend') as HTMLElement;
        button.click();
        fixture.detectChanges();
        expect(deviceService.extend).toHaveBeenCalled();
@@ -212,16 +230,15 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       const compiled = fixture.debugElement.nativeElement;
        spyOn(deviceService, 'returnDevice').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
-       const actionsButton = compiled.querySelector('.icon-more');
+       const actionsButton =
+           compiled.querySelector('.icon-more') as HTMLElement;
        actionsButton.click();
        fixture.detectChanges();
-       const button =
-           (overlayContainerElement.querySelector('.button-return') as
-            HTMLElement);
+       const button = overlayContainerElement.querySelector(
+                          '.actions-menu .button-return') as HTMLElement;
        button.click();
        fixture.detectChanges();
        expect(deviceService.returnDevice).toHaveBeenCalled();
@@ -232,16 +249,15 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       const compiled = fixture.debugElement.nativeElement;
        spyOn(deviceService, 'enableGuestMode').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
-       const actionsButton = compiled.querySelector('.icon-more');
+       const actionsButton =
+           compiled.querySelector('.icon-more') as HTMLElement;
        actionsButton.click();
        fixture.detectChanges();
-       const button =
-           (overlayContainerElement.querySelector('.button-guest') as
-            HTMLElement);
+       const button = overlayContainerElement.querySelector(
+                          '.actions-menu .button-guest') as HTMLElement;
        button.click();
        fixture.detectChanges();
        expect(deviceService.enableGuestMode).toHaveBeenCalled();
@@ -252,16 +268,15 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       const compiled = fixture.debugElement.nativeElement;
        spyOn(deviceService, 'markAsDamaged').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
-       const actionsButton = compiled.querySelector('.icon-more');
+       const actionsButton =
+           compiled.querySelector('.icon-more') as HTMLElement;
        actionsButton.click();
        fixture.detectChanges();
-       const button =
-           (overlayContainerElement.querySelector('.button-damaged') as
-            HTMLElement);
+       const button = overlayContainerElement.querySelector(
+                          '.actions-menu .button-damaged') as HTMLElement;
        button.click();
        fixture.detectChanges();
        expect(deviceService.markAsDamaged).toHaveBeenCalled();
@@ -272,16 +287,15 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       const compiled = fixture.debugElement.nativeElement;
        spyOn(deviceService, 'markAsLost').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
-       const actionsButton = compiled.querySelector('.icon-more');
+       const actionsButton =
+           compiled.querySelector('.icon-more') as HTMLElement;
        actionsButton.click();
        fixture.detectChanges();
-       const button =
-           (overlayContainerElement.querySelector('.button-lost') as
-            HTMLElement);
+       const button = overlayContainerElement.querySelector(
+                          '.actions-menu .button-lost') as HTMLElement;
        button.click();
        fixture.detectChanges();
        expect(deviceService.markAsLost).toHaveBeenCalled();
@@ -292,16 +306,15 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       const compiled = fixture.debugElement.nativeElement;
        spyOn(deviceService, 'unenroll').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
-       const actionsButton = compiled.querySelector('.icon-more');
+       const actionsButton =
+           compiled.querySelector('.icon-more') as HTMLElement;
        actionsButton.click();
        fixture.detectChanges();
-       const button =
-           (overlayContainerElement.querySelector('.button-unenroll') as
-            HTMLElement);
+       const button = overlayContainerElement.querySelector(
+                          '.actions-menu .button-unenroll') as HTMLElement;
        button.click();
        fixture.detectChanges();
        expect(deviceService.unenroll).toHaveBeenCalled();

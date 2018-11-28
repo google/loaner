@@ -66,6 +66,12 @@ describe('LoanActionsCardComponent ExtendButton', () => {
     app = fixture.debugElement.componentInstance;
     fixture.detectChanges();
     compiled = fixture.debugElement.nativeElement;
+    // Fake the jasmine clock to allow for extension.
+    jasmine.clock().mockDate(new Date(2018, 1, 2));
+  });
+
+  afterEach(() => {
+    jasmine.clock().uninstall();
   });
 
   it('renders extend button.', () => {

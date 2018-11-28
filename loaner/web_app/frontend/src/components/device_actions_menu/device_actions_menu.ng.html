@@ -7,13 +7,15 @@
   </mat-icon>
 </button>
 <mat-menu #actionsMenu="matMenu" class="actions-menu">
-  <button mat-menu-item
-          [disabled]="!device.assignedUser"
-          (click)="extendDevice(device)"
-          class="button-extend">
-    <mat-icon>update</mat-icon>
-    Extend
-  </button>
+  <span [matTooltip]="!device.canExtend ? 'This loan cannot be extended.' : ''">
+    <button mat-menu-item
+            [disabled]="!device.assignedUser || !device.canExtend"
+            (click)="extendDevice(device)"
+            class="button-extend">
+      <mat-icon>update</mat-icon>
+      Extend
+    </button>
+  </span>
   <button mat-menu-item
           [disabled]="device.pendingReturn || !device.assignedUser"
           (click)="onReturned(device)"
