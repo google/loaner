@@ -247,11 +247,17 @@ export class AppRoot implements AfterViewInit, OnInit {
     this.bg.onboardingComplete();
     if (this.surveyAnswer) {
       this.surveyComponent.waiting();
-      this.survey.submitSurvey(this.surveyAnswer).subscribe(() => {
-        this.surveyComponent.ready();
-      });
+      this.survey.submitSurvey(this.surveyAnswer)
+          .subscribe(
+              () => {
+                this.surveyComponent.ready();
+                this.bg.openView('manage');
+              },
+              error => {
+                console.error('The survey failed to submit: ', error);
+                this.bg.openView('manage');
+              });
     }
-    this.bg.openView('manage');
   }
 
   // Survey related items

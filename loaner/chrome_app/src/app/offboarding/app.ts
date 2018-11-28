@@ -247,11 +247,17 @@ device to your nearest shelf as soon as possible.`,
   closeApplication() {
     if (this.surveyAnswer) {
       this.surveyComponent.waiting();
-      this.survey.submitSurvey(this.surveyAnswer).subscribe(() => {
-        this.surveyComponent.ready();
-      });
+      this.survey.submitSurvey(this.surveyAnswer)
+          .subscribe(
+              () => {
+                this.surveyComponent.ready();
+                this.bg.closeView('offboarding');
+              },
+              error => {
+                console.error('The survey failed to submit: ', error);
+                this.bg.closeView('offboarding');
+              });
     }
-    this.bg.closeView('offboarding');
   }
 
   // Survey related items
