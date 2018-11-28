@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// <reference types="chrome/chrome-app" />
+/// <reference types="chrome-apps" />
 
 import {Injectable} from '@angular/core';
 import {Observable} from 'rxjs';

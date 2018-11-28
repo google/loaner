@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/// <reference types="chrome/chrome-app" />
+/// <reference types="chrome-apps" />
 
 import {Observable, of} from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
@@ -85,7 +85,7 @@ function launchManage() {
   checkLoanerStatus().subscribe(
       status => {
         if (status.enrolled && status.onboardingComplete) {
-          const options: ChromeWindowOptions = {
+          const options: chrome.app.CreateWindowOptions = {
             bounds: {
               height: APP_HEIGHT,
               width: APP_WIDTH,
@@ -163,7 +163,7 @@ function manageValueUpdater(): Observable<LoanerStorage> {
  */
 function createNotification(
     notificationID: string, message: string, title: string, type = 'basic') {
-  const options: ChromeNotificationOptions = {
+  const options: chrome.notifications.NotificationOptions = {
     iconUrl: 'assets/icons/gng128.png',
     message: `${message}`,
     requireInteraction: true,
@@ -180,7 +180,7 @@ function createNotification(
 function launchOffboardingFlow() {
   checkLoanerStatus().subscribe(status => {
     if (status.enrolled && status.onboardingComplete) {
-      const options: ChromeWindowOptions = {
+      const options: chrome.app.CreateWindowOptions = {
         bounds: {
           height: APP_HEIGHT,
           width: APP_WIDTH,
@@ -208,7 +208,7 @@ function relaunchOnboarding() {
  * Launches the GnG Onboarding application once installed.
  */
 function launchOnboardingFlow() {
-  const options: ChromeWindowOptions = {
+  const options: chrome.app.CreateWindowOptions = {
     bounds: {
       height: APP_HEIGHT,
       width: APP_WIDTH,
@@ -219,9 +219,10 @@ function launchOnboardingFlow() {
     resizable: false,
   };
 
-  chrome.app.window.create('onboarding.html', (options), (win) => {
-    win.onClosed.addListener(relaunchOnboarding);
-  });
+  chrome.app.window.create(
+      'onboarding.html', options, (win: chrome.app.AppWindow) => {
+        win.onClosed.addListener(relaunchOnboarding);
+      });
 }
 
 /**

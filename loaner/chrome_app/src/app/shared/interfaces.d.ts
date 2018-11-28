@@ -12,24 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** Represents the options for a Chrome App Window. */
-declare interface ChromeWindowOptions {
-  alwaysOnTop?: boolean;
-  bounds: {height: number; width: number;};
-  frame?: string;
-  id: string;
-  resizable?: boolean;
-}
-
-/** Represents the options for a Chrome Notification. */
-declare interface ChromeNotificationOptions {
-  iconUrl: string;
-  message: string;
-  requireInteraction: boolean;
-  title: string;
-  type: string;
-}
-
 /** Interface for the heartbeat configuration parameters. */
 declare interface HeartbeatConfiguration {
   duration: number;

@@ -46,7 +46,7 @@
     "@angular/compiler-cli": "6.1.10",
     "@ngtools/webpack": "1.10.1",
     "@types/bluebird": "3.5.21",
-    "@types/chrome": "0.0.63",
+    "@types/chrome-apps": "0.0.7",
     "@types/gapi": "0.0.35",
     "@types/gapi.auth2": "0.0.47",
     "@types/jasmine": "2.8.6",
