@@ -482,28 +482,6 @@ class Device(base_model.BaseModel):
     else:
       raise DeviceIdentifierError('No identifier supplied to get device.')
 
-  def calculate_return_dates(self):
-    """Calculates maximum and default return dates for a loan.
-
-    Returns:
-      A ReturnDates NamedTuple of datetimes.
-
-    Raises:
-      ReturnDatesCalculationError: When trying to calculate return dates for a
-          device that has not been assigned.
-    """
-    if not self.is_assigned:
-      raise ReturnDatesCalculationError(_NOT_ASSIGNED_MSG % self.identifier)
-    loan_duration = config_model.Config.get(
-        'loan_duration')
-    max_loan_duration = config_model.Config.get(
-        'maximum_loan_duration')
-    default_date = self.assignment_date + datetime.timedelta(days=loan_duration)
-    max_loan_date = self.assignment_date + datetime.timedelta(
-        days=max_loan_duration)
-
-    return ReturnDates(max_loan_date, default_date)
-
   def lock(self, user_email):
     """Disables a device via the Directory API.
 
@@ -566,7 +544,7 @@ class Device(base_model.BaseModel):
     self.assignment_date = datetime.datetime.utcnow()
     self.mark_pending_return_date = None
     self.shelf = None
-    self.due_date = self.calculate_return_dates().default
+    self.due_date = calculate_return_dates(self.assignment_date).default
     self.move_to_default_ou(user_email=user_email)
     event_action = 'device_loan_assign'
     try:
@@ -632,7 +610,7 @@ class Device(base_model.BaseModel):
     extend_date = extend_date_time.date()
     if extend_date < datetime.date.today():
       raise ExtendError('Extension date cannot be in the past.')
-    return_dates = self.calculate_return_dates()
+    return_dates = calculate_return_dates(self.assignment_date)
     if extend_date <= return_dates.max.date():
       self.due_date = datetime.datetime.combine(
           extend_date, return_dates.default.time())
@@ -937,3 +915,23 @@ def _update_existing_device(device, user_email, asset_tag=None):
   device.shelf = None
   device.damaged = False
   return device
+
+
+def calculate_return_dates(assignment_date):
+  """Calculates maximum and default return dates for a loan.
+
+  Args:
+    assignment_date: datetime, The date the device was assigned to a user.
+
+  Returns:
+    A ReturnDates NamedTuple of datetimes.
+  """
+  loan_duration = config_model.Config.get(
+      'loan_duration')
+  max_loan_duration = config_model.Config.get(
+      'maximum_loan_duration')
+  default_date = assignment_date + datetime.timedelta(days=loan_duration)
+  max_loan_date = assignment_date + datetime.timedelta(
+      days=max_loan_duration)
+
+  return ReturnDates(max_loan_date, default_date)

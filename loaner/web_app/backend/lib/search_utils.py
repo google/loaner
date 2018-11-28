@@ -26,6 +26,7 @@ from protorpc import messages
 from google.appengine.api import search
 
 from loaner.web_app.backend.api.messages import shared_messages
+from loaner.web_app.backend.models import device_model
 
 
 _CORRUPT_KEY_MSG = 'The key provided for submission was not found.'
@@ -64,6 +65,10 @@ def document_to_message(document, message):
     A constructed ProtoRPC message.
   """
   for field in document.fields:
+    if field.name == 'assignment_date':
+      setattr(
+          message, 'max_extend_date',
+          device_model.calculate_return_dates(field.value).max)
     try:
       setattr(message, field.name, field.value)
     except messages.ValidationError:

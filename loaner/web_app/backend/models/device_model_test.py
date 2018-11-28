@@ -554,30 +554,6 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
       self.test_device.due_date = now + datetime.timedelta(days=2)
       self.assertFalse(self.test_device.overdue)
 
-  def test_calculate_return_dates(self):
-    now = datetime.datetime.utcnow()
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.test_device.assigned_user = loanertest.USER_EMAIL
-    self.test_device.assignment_date = now
-    config_model.Config.set('loan_duration', 3)
-    config_model.Config.set('maximum_loan_duration', 14)
-
-    dates = self.test_device.calculate_return_dates()
-
-    self.assertIsInstance(dates, device_model.ReturnDates)
-    self.assertEqual(dates.default, now + datetime.timedelta(days=3))
-    self.assertEqual(dates.max, now + datetime.timedelta(days=14))
-
-  def test_calculate_return_dates_raises_if_not_assigned(self):
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.test_device.assigned_user = None
-    self.test_device.put()
-
-    with self.assertRaisesRegexp(
-        device_model.ReturnDatesCalculationError,
-        device_model._NOT_ASSIGNED_MSG % self.test_device.identifier):
-      self.test_device.calculate_return_dates()
-
   def test_loan_assign(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.shelf = self.shelf.key
@@ -595,7 +571,8 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.assertEqual(retrieved_device.mark_pending_return_date, None)
     self.assertEqual(
         retrieved_device.due_date,
-        self.test_device.calculate_return_dates().default)
+        device_model.calculate_return_dates(
+            self.test_device.assignment_date).default)
     self.assertIsNone(self.test_device.shelf)
 
     self.assertEqual(self.testbed.mock_raiseevent.call_count, 1)
@@ -986,6 +963,20 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.test_device.remove_from_shelf(
         shelf=self.shelf, user_email=loanertest.USER_EMAIL)
     self.assertIsNone(self.test_device.shelf)
+
+  @mock.patch.object(config_model, 'Config', autospec=True)
+  def test_calculate_return_dates(self, mock_config):
+    now = datetime.datetime.utcnow()
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.test_device.assignment_date = now
+    mock_config.get.side_effect = [3, 14]
+
+    dates = device_model.calculate_return_dates(
+        self.test_device.assignment_date)
+
+    self.assertIsInstance(dates, device_model.ReturnDates)
+    self.assertEqual(dates.default, now + datetime.timedelta(days=3))
+    self.assertEqual(dates.max, now + datetime.timedelta(days=14))
 
 
 class DecoratorTest(loanertest.TestCase):

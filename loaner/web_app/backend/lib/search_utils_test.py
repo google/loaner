@@ -18,11 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import datetime
 from absl.testing import parameterized
 import mock
 
 from google.appengine.api import search
 
+from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.lib import search_utils
@@ -31,6 +33,8 @@ from loaner.web_app.backend.testing import loanertest
 
 
 class SearchTest(loanertest.EndpointsTestCase, parameterized.TestCase):
+
+  _ASSIGNED_DATE = datetime.datetime(year=2017, month=1, day=1)
 
   @parameterized.parameters(
       (shelf_messages.Shelf(location='NY', capacity=50),
@@ -44,28 +48,43 @@ class SearchTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     #  model_class._properties. This test would be flaky otherwise.
     self.assertCountEqual(query.split(' '), expected_query.split(' '))
 
-  @mock.patch.object(search_utils, 'logging', autospec=True)
-  def test_document_to_message(self, mock_logging):
+  @parameterized.named_parameters(
+      ('Shelf Message', shelf_messages.Shelf(), search.ScoredDocument(
+          doc_id='test_doc_id',
+          fields=[
+              search.NumberField(name='capacity', value=20.0),
+              search.TextField(name='location', value='US MTV'),
+              search.AtomField(name='location', value='US-MTV'),
+              search.AtomField(name='enabled', value='True'),
+              search.GeoField(
+                  name='lat_long', value=search.GeoPoint(52.37, 4.88)),
+              search.TextField(name='not_present', value='MTV')]),
+       shelf_messages.Shelf(
+           enabled=True, location='US-MTV', capacity=20, latitude=52.37,
+           longitude=4.88), 1),
+      ('Device Message', device_messages.Device(), search.ScoredDocument(
+          doc_id='test_doc_id',
+          fields=[
+              search.DateField(
+                  name='assignment_date',
+                  value=_ASSIGNED_DATE),
+              search.TextField(name='serial_number', value='1234'),
+              search.AtomField(name='enrolled', value='True'),
+              search.TextField(name='assigned_user', value='user')]),
+       device_messages.Device(
+           enrolled=True, serial_number='1234', assigned_user='user',
+           max_extend_date=_ASSIGNED_DATE + datetime.timedelta(days=14),
+           assignment_date=_ASSIGNED_DATE), 0)
+  )
+  def test_document_to_message(
+      self, message, test_search_document, expected_message, log_call_count):
     """Tests the creation of a protorpc message from a search document."""
-    test_search_document = search.ScoredDocument(
-        doc_id='test_doc_id',
-        fields=[
-            search.NumberField(name='capacity', value=20.0),
-            search.TextField(name='location', value='US MTV'),
-            search.AtomField(name='location', value='US-MTV'),
-            search.AtomField(name='enabled', value='True'),
-            search.GeoField(
-                name='lat_long', value=search.GeoPoint(52.37, 4.88)),
-            search.TextField(name='not_present', value='MTV')])
-    expected_message = shelf_messages.Shelf(
-        enabled=True, location='US-MTV', capacity=20, latitude=52.37,
-        longitude=4.88)
-
-    response_message = search_utils.document_to_message(
-        test_search_document, shelf_messages.Shelf())
-    self.assertEqual(response_message, expected_message)
-    self.assertTrue(response_message.enabled)
-    assert mock_logging.error.call_count == 1
+    with mock.patch.object(
+        search_utils, 'logging', autospec=True) as mock_logging:
+      response_message = search_utils.document_to_message(
+          test_search_document, message)
+      self.assertEqual(response_message, expected_message)
+      self.assertEqual(mock_logging.error.call_count, log_call_count)
 
   def test_calculate_page_offset(self):
     """Tests the calculation of page offset."""
