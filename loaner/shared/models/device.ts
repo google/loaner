@@ -26,6 +26,7 @@ export declare interface DeviceApiParams {
   identifier?: string;
   urlkey?: string;
   damaged?: boolean;
+  damaged_reason?: string;
   device_model?: string;
   shelf?: ShelfApiParams;
   assigned_user?: string;
@@ -98,6 +99,8 @@ export class Device {
   assignmentDate!: Date;
   /** If the device is marked as damaged. */
   damaged = false;
+  /** Reason for the device being reported as damaged. */
+  damagedReason?: string;
   /** Which date the device should be returned to the shelf. */
   dueDate!: Date;
   /** The last heartbeat from the device to the backend. */
@@ -129,6 +132,7 @@ export class Device {
     this.identifier = device.identifier || this.identifier;
     this.urlkey = device.urlkey || this.urlkey;
     this.damaged = !!device.damaged || this.damaged;
+    this.damagedReason = device.damaged_reason || this.damagedReason;
     this.deviceModel = device.device_model || this.deviceModel;
     this.shelf = new Shelf(device.shelf) || this.shelf;
     this.assignedUser = device.assigned_user || this.assignedUser;

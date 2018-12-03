@@ -17,7 +17,7 @@ import {ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_DAMAGED, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceDetails, DeviceDetailsModule} from './';
 
@@ -107,5 +107,23 @@ describe('DeviceDetails', () => {
     const datePipe = new DatePipe('en');
     expect(compiled.querySelector('.lastKnownHealthy').textContent)
         .toContain(datePipe.transform(deviceDetails.device.lastKnownHealthy));
+  });
+
+  it('renders Damaged reason inside .mat-list', () => {
+    deviceDetails.device = DEVICE_DAMAGED;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .toContain('Damaged reason');
+    expect(compiled.querySelector('.damagedReason').textContent)
+        .toContain('Broken keyboard.');
+  });
+
+  it('DOES NOT render Damaged reason inside .mat-list', () => {
+    deviceDetails.device = DEVICE_1;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .not.toContain('Damaged reason');
   });
 });

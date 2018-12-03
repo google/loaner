@@ -275,6 +275,7 @@ export const DEVICE_DAMAGED = new Device({
   last_known_healthy: new Date(2018, 1, 1),
   due_date: new Date(2018, 1, 1),
   damaged: true,
+  damaged_reason: 'Broken keyboard.',
 });
 
 export const DEVICE_LOCKED = new Device({

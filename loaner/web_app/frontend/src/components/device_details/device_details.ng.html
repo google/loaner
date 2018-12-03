@@ -58,7 +58,16 @@
           <mat-list-item class="lastKnownHealthy" fxFlex>
             <p mat-line>Last known healthy</p>
             <p mat-line class="secondary-text">
-              {{ device.lastKnownHealthy | date }}
+              {{device.lastKnownHealthy | date}}
+            </p>
+          </mat-list-item>
+        </section>
+        <mat-divider *ngIf="device.damaged"></mat-divider>
+        <section *ngIf="device.damaged" fxLayout="row" fxLayout.xs="column">
+          <mat-list-item class="damagedReason" fxflex>
+            <p mat-line>Damaged reason</p>
+            <p mat-line class="secondary-text wrap-text">
+              {{device.damagedReason}}
             </p>
           </mat-list-item>
         </section>
