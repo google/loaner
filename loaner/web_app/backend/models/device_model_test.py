@@ -941,11 +941,12 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
       ('assigned', loanertest.USER_EMAIL, 1),
       ('not_assigned', None, 0),
   )
-  def test_move_to_shelf_assigned_user(self, mock_user, mock_call_count):
+  def test_move_to_shelf(self, mock_user, mock_call_count):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.assigned_user = mock_user
     with mock.patch.object(
         self.test_device, '_loan_return') as mock_loan_return:
+      self.assertFalse(self.test_device.is_on_shelf)
       with mock.patch.object(logging, 'info', autospec=True) as mock_logging:
         now = datetime.datetime(year=2017, month=1, day=1)
         with freezegun.freeze_time(now):

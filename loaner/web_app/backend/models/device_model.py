@@ -867,6 +867,7 @@ class Device(base_model.BaseModel):
     self.stream_to_bq(
         user_email, 'Placing device: %s on shelf: %s' % (
             self.identifier, shelf.location))
+    self.put()
 
   def remove_from_shelf(self, shelf, user_email):
     """Removes a device's associated shelf.
