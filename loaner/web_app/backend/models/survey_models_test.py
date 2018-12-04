@@ -211,7 +211,7 @@ class QuestionTest(loanertest.TestCase):
         self.question1, 'stream_to_bq', autospec=True) as mock_stream:
       self.question1.submit(
           selected_answer=self.answer1, acting_user=loanertest.USER_EMAIL)
-      self.question1.selected_answer = self.answer1
+      self.assertEqual(self.question1.response, self.answer1)
       mock_stream.assert_called_once_with(
           survey_models.constants.DEFAULT_ACTING_USER,
           'Filing survey question response.')
@@ -222,7 +222,7 @@ class QuestionTest(loanertest.TestCase):
           selected_answer=self.answer2,
           acting_user=survey_models.constants.DEFAULT_ACTING_USER,
           more_info_text='More info!')
-      self.question2.selected_answer = self.answer2
+      self.assertEqual(self.question2.response, self.answer2)
       mock_stream.assert_called_once_with(
           survey_models.constants.DEFAULT_ACTING_USER,
           'Filing survey question response.')
@@ -234,7 +234,7 @@ class QuestionTest(loanertest.TestCase):
         self.question1, 'stream_to_bq', autospec=True) as mock_stream:
       self.question1.submit(
           selected_answer=self.answer1, acting_user=loanertest.USER_EMAIL)
-      self.question1.selected_answer = self.answer1
+      self.assertEqual(self.question1.response, self.answer1)
       mock_stream.assert_called_once_with(
           loanertest.USER_EMAIL, 'Filing survey question response.')
 
@@ -244,7 +244,7 @@ class QuestionTest(loanertest.TestCase):
           selected_answer=self.answer2,
           acting_user=loanertest.USER_EMAIL,
           more_info_text='More info!')
-      self.question2.selected_answer = self.answer2
+      self.assertEqual(self.question2.response, self.answer2)
       mock_stream.assert_called_once_with(
           loanertest.USER_EMAIL, 'Filing survey question response.')
 

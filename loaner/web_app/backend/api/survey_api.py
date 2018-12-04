@@ -98,9 +98,13 @@ class SurveyApi(root_api.Service):
     user_email = user_lib.get_user_email()
     question = api_utils.get_ndb_key(
         urlsafe_key=request.question_urlsafe_key).get()
+    selected_answer = survey_models.Answer.create(
+        text=request.selected_answer.text,
+        more_info_enabled=request.selected_answer.more_info_enabled,
+        placeholder_text=request.selected_answer.placeholder_text)
     question.submit(
         acting_user=user_email,
-        selected_answer=request.selected_answer,
+        selected_answer=selected_answer,
         more_info_text=request.more_info_text)
     return message_types.VoidMessage()
 

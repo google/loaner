@@ -207,7 +207,7 @@ class Question(base_model.BaseModel):
     """
     if config_model.Config.get('anonymous_surveys'):
       acting_user = constants.DEFAULT_ACTING_USER
-    self.selected_answer = selected_answer
+    self.response = selected_answer
     self.more_info_text = more_info_text
     self.stream_to_bq(acting_user, 'Filing survey question response.')
     # The instance is not self.put() on purpose: it is meant to be a container

@@ -205,6 +205,10 @@ class QuestionEndpointsTest(
     answer_message = survey_messages.Answer(
         text=answers[0].text, more_info_enabled=answers[0].more_info_enabled,
         placeholder_text=answers[0].placeholder_text)
+    expected_answer = survey_models.Answer.create(
+        text=answer_message.text,
+        more_info_enabled=answer_message.more_info_enabled,
+        placeholder_text=answer_message.placeholder_text)
     request = survey_messages.QuestionSubmission(
         question_urlsafe_key=question_keys[0].urlsafe(),
         selected_answer=answer_message, more_info_text=more_info_text)
@@ -212,7 +216,7 @@ class QuestionEndpointsTest(
     self.assertIsInstance(response, message_types.VoidMessage)
     mock_submit.assert_called_once_with(
         acting_user=loanertest.SUPER_ADMIN_EMAIL,
-        selected_answer=answer_message, more_info_text=more_info_text)
+        selected_answer=expected_answer, more_info_text=more_info_text)
 
   def test_list_surveys(self):
     """Test the list surveys api method."""
