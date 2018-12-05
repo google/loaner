@@ -28,6 +28,7 @@ loaner_appengine_library(
         ":event_models",
         ":shelf_model",
         ":survey_models",
+        ":tag_model",
         ":template_model",
         ":user_model",
     ],
@@ -124,6 +125,17 @@ loaner_appengine_library(
         ":base_model",
         ":config_model",
         "//loaner/web_app:constants",
+    ],
+)
+
+loaner_appengine_library(
+    name = "tag_model",
+    srcs = [
+        "tag_model.py",
+    ],
+    deps = [
+        ":base_model",
+        "//loaner/web_app/backend/lib:api_utils",
     ],
 )
 
@@ -269,6 +281,20 @@ loaner_appengine_test(
 )
 
 loaner_appengine_test(
+    name = "tag_model_test",
+    srcs = [
+        "tag_model_test.py",
+    ],
+    deps = [
+        ":base_model",
+        ":tag_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
+        "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
     name = "template_model_test",
     srcs = [
         "template_model_test.py",
@@ -303,6 +329,7 @@ test_suite(
         ":event_models_test",
         ":shelf_model_test",
         ":survey_models_test",
+        ":tag_model_test",
         ":template_model_test",
         ":user_model_test",
     ],

@@ -93,11 +93,13 @@ class TestCase(absltest.TestCase):
     self.testbed.init_memcache_stub()
     self.testbed.init_user_stub()
     self.testbed.init_search_stub()
+    self.testbed.init_taskqueue_stub()
     self.login_user()
 
     taskqueue_patcher = mock.patch.object(taskqueue, 'add')
     self.addCleanup(taskqueue_patcher.stop)
     self.taskqueue_add = taskqueue_patcher.start()
+    self.taskqueue_stub = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
 
     # The events.raise_event method raises an exception if there are no events
     # in datastore. It's called often in the model methods, many of which are
