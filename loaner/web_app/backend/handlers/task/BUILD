@@ -72,6 +72,7 @@ loaner_appengine_test(
     deps = [
         ":stream_to_bigquery",
         "//loaner/web_app/backend/testing:handlertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )

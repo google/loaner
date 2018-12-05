@@ -19,25 +19,33 @@ from __future__ import division
 from __future__ import print_function
 
 import pickle
-
+from absl.testing import parameterized
 import mock
 
-from loaner.web_app.backend.handlers.task import stream_to_bigquery  # pylint: disable=unused-import
+from google.appengine.ext import deferred
+
+from loaner.web_app.backend.handlers.task import stream_to_bigquery
 from loaner.web_app.backend.testing import handlertest
 
 
-class StreamToBigQueryHandlerTest(handlertest.HandlerTestCase):
+class StreamToBigQueryHandlerTest(
+    handlertest.HandlerTestCase, parameterized.TestCase):
 
-  @mock.patch('__main__.stream_to_bigquery.bigquery_row_model.BigQueryRow')
-  def test_post(self, mock_row_model):
+  @parameterized.named_parameters(
+      ('threshold_reached', True, 1),
+      ('threshold_not_reached', False, 0))
+  @mock.patch.object(deferred, 'defer', autospec=True)
+  @mock.patch.object(stream_to_bigquery.bigquery_row_model, 'BigQueryRow')
+  def test_post(
+      self, threshold_return, stream_call_count, mock_row_model, mock_defer):
     payload_dict = {'test': 'test'}
     payload = pickle.dumps(payload_dict)
-
+    mock_row_model.threshold_reached.return_value = threshold_return
     response = self.testapp.post(r'/_ah/queue/stream-bq', payload)
 
     self.assertEqual(response.status_int, 200)
     mock_row_model.add.assert_called_once_with(**payload_dict)
-
+    self.assertEqual(mock_defer.call_count, stream_call_count)
 
 if __name__ == '__main__':
   handlertest.main()

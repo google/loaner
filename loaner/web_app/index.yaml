@@ -26,3 +26,8 @@ indexes:
   - name: audit_notification_enabled
   - name: audit_requested
   - name: last_audit_time
+
+- kind: BigQueryRow
+  properties:
+  - name: streamed
+  - name: timestamp

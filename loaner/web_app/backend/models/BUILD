@@ -40,7 +40,6 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app/backend/lib:utils",
-        "@absl_archive//absl/logging",
     ],
 )
 
@@ -51,6 +50,7 @@ loaner_appengine_library(
     ],
     deps = [
         ":base_model",
+        "//loaner/web_app:constants",
         "//loaner/web_app/backend/clients:bigquery",
         "@absl_archive//absl/logging",
     ],
@@ -169,8 +169,13 @@ loaner_appengine_test(
     ],
     deps = [
         ":bigquery_row_model",
+        ":device_model",
         ":shelf_model",
+        "//loaner/web_app:constants",
+        "//loaner/web_app/backend/clients:bigquery",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
+        "@freezegun_archive//:freezegun",
         "@mock_archive//:mock",
     ],
 )

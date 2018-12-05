@@ -18,10 +18,13 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from absl import logging
+import collections
+import datetime
+import logging
 
 from google.appengine.ext import ndb
 
+from loaner.web_app import constants
 from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.models import base_model
 
@@ -74,35 +77,76 @@ class BigQueryRow(base_model.BaseModel):
     return row
 
   @classmethod
-  def fetch_unstreamed_rows(cls):
+  def _fetch_unstreamed_rows(cls):
     """Retrieves all rows that have not been streamed."""
-    return cls.query(cls.streamed == False).fetch()  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
+    return cls.query(cls.streamed == False).fetch(  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
+        limit=constants.BIGQUERY_ROW_MAX_BATCH_SIZE)
 
-  def stream(self):
-    """Streams the row to BigQuery."""
-    logging.info('Streaming row to table %s', self.model_type)
-    bq_client = bigquery.BigQueryClient()
-    try:
-      bq_client.stream_row(self.model_type, self._to_bq_format())
-    except bigquery.InsertError:
-      logging.error('Unable to stream row, see logs.')
+  @classmethod
+  def _get_last_unstreamed_row(cls):
+    """Retrieves the last row that was not streamed."""
+    return cls.query(cls.streamed == False).order(  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
+        cls.streamed, cls.timestamp).get()
+
+  @classmethod
+  def _time_threshold_reached(cls):
+    """Checks if the time threshold for a BigQuery stream was met."""
+    threshold = datetime.datetime.utcnow() - datetime.timedelta(
+        minutes=constants.BIGQUERY_ROW_TIME_THRESHOLD)
+    return cls._get_last_unstreamed_row().timestamp <= threshold
+
+  @classmethod
+  def _row_threshold_reached(cls):
+    """Checks if the unstreamed row threshold for a BigQuery stream was met."""
+    return (cls.query(cls.streamed == False).count(  # pylint: disable=g-explicit-bool-comparison,singleton-comparison
+        limit=constants.BIGQUERY_ROW_MAX_BATCH_SIZE) >=
+            constants.BIGQUERY_ROW_SIZE_THRESHOLD)
+
+  @classmethod
+  def threshold_reached(cls):
+    """Determines whether or not entities should be streamed to BigQuery."""
+    return cls._time_threshold_reached() or cls._row_threshold_reached()
+
+  @classmethod
+  def stream_rows(cls):
+    """Streams all unstreamed rows if a threshold has been reached."""
+    logging.info('Streaming rows to BigQuery.')
+    if not cls.threshold_reached():
+      logging.info('Not streaming rows, thresholds not met.')
       return
-    else:
-      self._set_streamed()
+    bq_client = bigquery.BigQueryClient()
+    rows = cls._fetch_unstreamed_rows()
+    tables = _format_for_bq(rows)
+    try:
+      for table_name in tables:
+        bq_client.stream_table(table_name, tables[table_name])
+    except bigquery.InsertError:
+      logging.error('Unable to stream rows.')
+      return
+    _set_streamed(rows)
 
-  def _to_bq_format(self):
-    """Converts row model to formatted tuple.
 
-    Returns:
-      Tuple of row data.
-    """
-    entity_dict = self.to_json_dict()
-    return (
-        entity_dict['ndb_key'], entity_dict['timestamp'],
-        entity_dict['actor'], entity_dict['method'], entity_dict['summary'],
-        entity_dict['entity'])
+def _set_streamed(rows):
+  """Sets the rows as streamed to BigQuery."""
+  for row in rows:
+    row.streamed = True
+  ndb.put_multi(rows)
 
-  def _set_streamed(self):
-    """Sets the row as streamed to BigQuery."""
-    self.streamed = True
-    self.put()
+
+def _format_for_bq(rows):
+  """Formats BigQueryRow entities and metadata for the BigQuery API.
+
+  Args:
+    rows: List[BigQueryRow], a list of rows to format for the BigQuery API.
+
+  Returns:
+    A Dictionary keyed by model type with rows for a given table.
+  """
+  tables = collections.defaultdict(list)
+  for row in rows:
+    entity_dict = row.to_json_dict()
+    tables[row.model_type].append(
+        (entity_dict['ndb_key'], entity_dict['timestamp'],
+         entity_dict['actor'], entity_dict['method'], entity_dict['summary'],
+         entity_dict['entity']))
+  return tables

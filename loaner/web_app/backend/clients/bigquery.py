@@ -120,12 +120,18 @@ class BigQueryClient(object):
     else:
       logging.info('Table %s created.', table_name)
 
-  def stream_row(self, table, row):
-    """Converts datastore entries to Bigquery rows and streams them.
+  def stream_table(self, table_name, table):
+    """Inserts table rows into BigQuery.
+
+      For each row in a given table, we include a row_id, which is derived
+      using the BigQueryRow Model metadata, to supply the BigQuery API with an
+      'InsertID' to help ensure consistency.
+
+      https://cloud.google.com/bigquery/streaming-data-into-bigquery#dataconsistency
 
     Args:
-      table: string, table name to stream to.
-      row: JSON-friendly dictionary representation of the row.
+      table_name: str, table name to stream to.
+      table: List[tuple], rows for the insert request to the BigQuery API.
 
     Raises:
       GetTableError: if an invalid table is passed in or the table is not
@@ -136,14 +142,15 @@ class BigQueryClient(object):
       logging.debug('On local, not connecting to BQ.')
       return
 
-    bq_table = self._dataset.table(table)
+    bq_table = self._dataset.table(table_name)
 
     if not bq_table.exists():
       raise GetTableError(
           'Table {} does not exist or is not initialized'.format(table))
     bq_table.reload()
-
-    errors = bq_table.insert_data([row])
+    # A row_id is comprised of each row's ndb key, timestamp, actor, and method.
+    row_ids = [str(row[:5]) for row in table]
+    errors = bq_table.insert_data(table, row_ids=row_ids)
     if errors:
       logging.error('BigQuery insert generated errors.')
       logging.error(errors)

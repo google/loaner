@@ -20,22 +20,47 @@ from __future__ import print_function
 
 import datetime
 
+from absl.testing import parameterized
+import freezegun
 import mock
 
+from google.appengine.ext import ndb
+
+from loaner.web_app import constants
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.models import bigquery_row_model
+from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
 from loaner.web_app.backend.testing import loanertest
 
 
-class BigQueryRowModelTest(loanertest.TestCase):
+class BigQueryRowModelTest(loanertest.TestCase, parameterized.TestCase):
   """Tests for BigQueryModel class."""
 
   def setUp(self):
     super(BigQueryRowModelTest, self).setUp()
-    test_shelf = shelf_model.Shelf(
+
+    self.test_shelf = shelf_model.Shelf(
         friendly_name='Test', location='Here', capacity=16)
-    test_shelf.put()
-    self.test_shelf = test_shelf
+    self.test_shelf.put()
+
+    self.test_device = device_model.Device(
+        serial_number='VOID', enrolled=False,
+        device_model='HP Chromebook 13 G1', current_ou='/',
+        shelf=self.test_shelf.key, chrome_device_id='unique_id_8',
+        damaged=False)
+    self.test_device.put()
+
+    self.test_row_1 = bigquery_row_model.BigQueryRow.add(
+        self.test_shelf, datetime.datetime.utcnow(),
+        'test@{}'.format(loanertest.USER_DOMAIN),
+        'test', 'This is a test')
+
+    self.test_row_2 = bigquery_row_model.BigQueryRow.add(
+        self.test_device, datetime.datetime.utcnow(),
+        'test@{}'.format(loanertest.USER_DOMAIN),
+        'test', 'This is a test')
+
     mock_bigquery = mock.patch.object(
         bigquery_row_model, 'bigquery', autospec=True)
     self.addCleanup(mock_bigquery.stop)
@@ -44,44 +69,87 @@ class BigQueryRowModelTest(loanertest.TestCase):
     self.mock_bigquery.BigQueryClient.return_value = self.mock_bigquery_client
 
   def test_add(self):
-    test_row = bigquery_row_model.BigQueryRow.add(
-        self.test_shelf, datetime.datetime.utcnow(),
-        'test@{}'.format(loanertest.USER_DOMAIN),
-        'test', 'This is a test')
-
-    retrieved_row = test_row.key.get()
+    retrieved_row = self.test_row_1.key.get()
     self.assertEqual(retrieved_row.ndb_key, self.test_shelf.key)
 
   def test_fetch_unstreamed_rows(self):
-    test_row = bigquery_row_model.BigQueryRow.add(
-        self.test_shelf, datetime.datetime.utcnow(),
-        'test@{}'.format(loanertest.USER_DOMAIN),
-        'test', 'This is a test')
+    self.assertLen(bigquery_row_model.BigQueryRow._fetch_unstreamed_rows(), 2)
+    self.test_row_1.streamed = True
+    self.test_row_1.put()
+    self.assertLen(bigquery_row_model.BigQueryRow._fetch_unstreamed_rows(), 1)
 
-    self.assertLen(bigquery_row_model.BigQueryRow.fetch_unstreamed_rows(), 1)
+  @freezegun.freeze_time('1956-01-31')
+  def test_time_threshold_reached(self):
+    threshold = datetime.datetime.utcnow() - datetime.timedelta(
+        minutes=constants.BIGQUERY_ROW_TIME_THRESHOLD)
+    self.test_row_1.timestamp = threshold
+    self.test_row_1.streamed = False
+    self.test_row_1.put()
+    self.assertTrue(bigquery_row_model.BigQueryRow._time_threshold_reached())
 
-    test_row.streamed = True
-    test_row.put()
+  @freezegun.freeze_time('1956-01-31')
+  def test_time_threshold_reached_fail(self):
+    threshold = datetime.datetime.utcnow() - datetime.timedelta(
+        minutes=constants.BIGQUERY_ROW_TIME_THRESHOLD - 1)
+    self.test_row_1.timestamp = threshold
+    self.test_row_1.streamed = False
+    self.test_row_1.put()
+    self.assertFalse(bigquery_row_model.BigQueryRow._time_threshold_reached())
 
-    self.assertLen(bigquery_row_model.BigQueryRow.fetch_unstreamed_rows(), 0)
+  def test_row_threshold_reached(self):
+    for insert in range(constants.BIGQUERY_ROW_SIZE_THRESHOLD):
+      row = bigquery_row_model.BigQueryRow.add(
+          self.test_shelf, datetime.datetime.utcnow(),
+          'test@{}'.format(loanertest.USER_DOMAIN),
+          'test', 'This is a test ' + str(insert))
+      row.streamed = False
+      row.put()
+    self.assertTrue(bigquery_row_model.BigQueryRow._row_threshold_reached())
 
-  def test_stream(self):
-    test_row = bigquery_row_model.BigQueryRow.add(
-        self.test_shelf, datetime.datetime.utcnow(),
-        'test@{}'.format(loanertest.USER_DOMAIN),
-        'test', 'This is a test')
-    test_row_dict = test_row.to_json_dict()
-    expected_bq_row = (
-        test_row_dict['ndb_key'], test_row_dict['timestamp'],
-        'test@{}'.format(loanertest.USER_DOMAIN), 'test', 'This is a test',
-        test_row_dict['entity'])
+  def test_row_threshold_reached_fail(self):
+    self.test_row_1.streamed = False
+    self.test_row_1.put()
+    self.assertFalse(bigquery_row_model.BigQueryRow._row_threshold_reached())
 
-    test_row.stream()
+  @parameterized.named_parameters(
+      ('time', '_time_threshold_reached'),
+      ('rows', '_row_threshold_reached'))
+  @mock.patch.object(ndb, 'put_multi', autospec=True)
+  def test_stream_rows(self, threshold_function, mock_put_multi):
+    test_row_dict_1 = self.test_row_1.to_json_dict()
+    test_row_dict_2 = self.test_row_2.to_json_dict()
+    test_row_1 = (test_row_dict_1['ndb_key'], test_row_dict_1['timestamp'],
+                  test_row_dict_1['actor'], test_row_dict_1['method'],
+                  test_row_dict_1['summary'], test_row_dict_1['entity'])
+    test_row_2 = (test_row_dict_2['ndb_key'], test_row_dict_2['timestamp'],
+                  test_row_dict_2['actor'], test_row_dict_2['method'],
+                  test_row_dict_2['summary'], test_row_dict_2['entity'])
+    expected_tables = {
+        self.test_row_1.model_type: [test_row_1],
+        self.test_row_2.model_type: [test_row_2]
+    }
 
-    self.mock_bigquery_client.stream_row.assert_called_once_with(
-        'Shelf', expected_bq_row)
-    self.assertTrue(test_row.streamed)
+    with mock.patch.object(
+        bigquery_row_model.BigQueryRow,
+        threshold_function, return_value=True):
+      bigquery_row_model.BigQueryRow.stream_rows()
 
+    self.mock_bigquery_client.stream_table.assert_any_call(
+        self.test_row_1.model_type, expected_tables[self.test_row_1.model_type])
+    self.mock_bigquery_client.stream_table.assert_any_call(
+        self.test_row_2.model_type, expected_tables[self.test_row_2.model_type])
+    self.assertEqual(self.mock_bigquery_client.stream_table.call_count, 2)
+    self.assertTrue(self.test_row_1.streamed)
+    self.assertTrue(self.test_row_2.streamed)
+    self.assertEqual(mock_put_multi.call_count, 1)
+
+  def test_stream_rows_insert_error(self):
+    self.mock_bigquery_client.stream_table.side_effect = bigquery.InsertError
+    with mock.patch.object(
+        bigquery_row_model.BigQueryRow,
+        'threshold_reached', return_value=True):
+      with self.assertRaises(bigquery.InsertError):
+        bigquery_row_model.BigQueryRow.stream_rows()
 
 if __name__ == '__main__':
   loanertest.main()

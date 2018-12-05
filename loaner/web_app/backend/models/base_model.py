@@ -20,11 +20,10 @@ from __future__ import print_function
 
 import datetime
 import inspect
+import logging
 import numbers
 import pickle
 import string
-
-from absl import logging
 
 from protorpc import messages
 
@@ -52,7 +51,7 @@ class SearchQueryError(Error):
   """Raised when attempting to search the index fails."""
 
 
-class BaseModel(ndb.Model):  # pylint: disable=too-few-public-methods
+class BaseModel(ndb.Model):
   """Base model class for the loaner project."""
 
   _INDEX_NAME = None

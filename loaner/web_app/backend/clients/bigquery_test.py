@@ -65,6 +65,20 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
             'nested_attribute', 'RECORD', 'NULLABLE', fields=self.nested_schema)
     ]
 
+    test_device = device_model.Device(
+        serial_number='abc123', chrome_device_id='123123')
+    test_device.put()
+    test_row = bigquery_row_model.BigQueryRow.add(
+        test_device, datetime.datetime.utcnow(),
+        loanertest.USER_EMAIL, 'Enroll', 'This is a test')
+    self.test_row_dict = test_row.to_json_dict()
+    self.test_table = [(self.test_row_dict['ndb_key'],
+                        self.test_row_dict['timestamp'],
+                        self.test_row_dict['actor'],
+                        self.test_row_dict['method'],
+                        self.test_row_dict['summary'],
+                        self.test_row_dict['entity'])]
+
   @mock.patch.object(bigquery, '_generate_schema')
   def test_initialize_tables(self, mock_schema):
     with mock.patch.object(bigquery, 'bigquery'):
@@ -101,36 +115,27 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
     mock_schema.assert_called()
     mock_client._dataset.create.assert_called()
 
-  def test_stream_row(self):
-    now = datetime.datetime.utcnow()
-    test_device = device_model.Device(
-        serial_number='abc123', chrome_device_id='123123')
-    test_device.put()
-    row = bigquery_row_model.BigQueryRow.add(
-        test_device, now, loanertest.USER_EMAIL, 'Enroll', 'This is a test')
-
-    self.client.stream_row('Test table', row._to_bq_format())
-
-    self.assertEqual(self.table.insert_data.call_count, 1)
+  def test_stream_table(self):
+    self.client.stream_table('Device', self.test_table)
+    row_id = str((self.test_row_dict['ndb_key'],
+                  self.test_row_dict['timestamp'],
+                  self.test_row_dict['actor'],
+                  self.test_row_dict['method'],
+                  self.test_row_dict['summary']))
+    self.table.insert_data.assert_called_once_with(
+        self.test_table, row_ids=[row_id])
 
   def test_stream_row_no_table(self):
     self.table.exists.return_value = False
-
     self.assertRaises(
-        bigquery.GetTableError, self.client.stream_row, 'test', None)
+        bigquery.GetTableError,
+        self.client.stream_table, 'Device', self.test_table)
 
   def test_stream_row_bq_errors(self):
     self.table.insert_data.return_value = 'Oh no it exploded'
-    now = datetime.datetime.utcnow()
-    test_device = device_model.Device(
-        serial_number='abc123', chrome_device_id='123123')
-    test_device.put()
-    row = bigquery_row_model.BigQueryRow.add(
-        test_device, now, loanertest.USER_EMAIL, 'Enroll', 'This is a test')
-
     self.assertRaises(
-        bigquery.InsertError, self.client.stream_row, 'test',
-        row._to_bq_format())
+        bigquery.InsertError,
+        self.client.stream_table, 'Device', self.test_table)
 
   def test_generate_schema_no_entity(self):
     generated_schema = bigquery._generate_schema()

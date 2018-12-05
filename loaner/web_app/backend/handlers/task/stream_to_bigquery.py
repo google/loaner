@@ -12,22 +12,38 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Streams an unstreamed BigQuery row to BigQuery."""
+"""Streams any unstreamed BigQuery Datastore rows to BigQuery."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import pickle
 import webapp2
+
+from google.appengine.ext import deferred
 
 from loaner.web_app.backend.models import bigquery_row_model
 
 
 class StreamToBigQueryHandler(webapp2.RequestHandler):
-  """Handler for streaming a single queued row to BigQuery."""
+  """Handler to add a row and stream to BigQuery if a threshold is reached."""
 
   def post(self):
+    """Adds a BigQuery row to Datastore and streams it using a deferred task.
+
+    Raises:
+      deferred.PermanentTaskFailure: if we encounter any exception to avoid
+        adding duplicate rows during task retries.
+    """
     payload = pickle.loads(self.request.body)
-    row = bigquery_row_model.BigQueryRow.add(**payload)
-    row.stream()
+    bigquery_row_model.BigQueryRow.add(**payload)
+    try:
+      if bigquery_row_model.BigQueryRow.threshold_reached():
+        deferred.defer(bigquery_row_model.BigQueryRow.stream_rows)
+      else:
+        logging.info('Not streaming rows, thresholds not met.')
+    except Exception as e:  # pylint: disable=broad-except
+      raise deferred.PermanentTaskFailure(
+          'Exception caught for BigQuery streaming: %s.' % e)
