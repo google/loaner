@@ -17,7 +17,7 @@ import {ComponentFixture, ComponentFixtureAutoDetect, fakeAsync, flushMicrotasks
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DEVICE_DAMAGED, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_UNASSIGNED, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceDetails, DeviceDetailsModule} from './';
 
@@ -107,6 +107,25 @@ describe('DeviceDetails', () => {
     const datePipe = new DatePipe('en');
     expect(compiled.querySelector('.lastKnownHealthy').textContent)
         .toContain(datePipe.transform(deviceDetails.device.lastKnownHealthy));
+  });
+
+  it('renders the assignment datetime inside .mat-list', () => {
+    deviceDetails.device = DEVICE_ASSIGNED;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .toContain('Assignment date');
+    const datePipe = new DatePipe('en');
+    expect(compiled.querySelector('.assignment-date').textContent)
+        .toContain(datePipe.transform(deviceDetails.device.assignmentDate));
+  });
+
+  it('DOES NOT render the assignment datetime inside .mat-list', () => {
+    deviceDetails.device = DEVICE_UNASSIGNED;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-list').textContent)
+        .not.toContain('Assignment date');
   });
 
   it('renders Damaged reason inside .mat-list', () => {

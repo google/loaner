@@ -61,6 +61,13 @@
               {{device.lastKnownHealthy | date}}
             </p>
           </mat-list-item>
+          <mat-list-item class="assignment-date" *ngIf="device.assignedUser" fxFlex>
+            <p mat-line>Assignment date</p>
+            <p mat-line class="secondary-text">
+              {{device.assignmentDate ? (device.assignmentDate | date) : ""}}
+            </p>
+          </mat-list-item>
+          <span fxFlex></span>
         </section>
         <mat-divider *ngIf="device.damaged"></mat-divider>
         <section *ngIf="device.damaged" fxLayout="row" fxLayout.xs="column">
