@@ -226,6 +226,29 @@ describe('AuditTableComponent', () => {
         .toBe(1);
   });
 
+  it('increments devicesToBeChecked when Add button is clicked for a device with a space',
+     () => {
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const matCard = compiled.querySelector('.mat-card');
+       const matCardTitle = matCard.querySelector('.mat-card-title');
+       const matCardContent = matCard.querySelector('.mat-card-content');
+       const inputElement = matCardTitle.querySelector('mat-form-field input');
+       const addButton =
+           matCardTitle.querySelector('.add-to-audit-list-button');
+
+       inputElement.value = ' 123123 ';
+       addButton.dispatchEvent(new Event('click'));
+
+       expect(auditTable.devicesToBeCheckedIn.length).toBe(1);
+       expect(auditTable.devicesToBeCheckedIn[0].deviceId).toBe('123123');
+
+       fixture.detectChanges();
+       expect(
+           matCardContent.querySelectorAll('.mat-list > .mat-list-item').length)
+           .toBe(1);
+     });
+
   it('decrement devicesToBeChecked when "Close" button is clicked.', () => {
     auditTable.devicesToBeCheckedIn = [
       {

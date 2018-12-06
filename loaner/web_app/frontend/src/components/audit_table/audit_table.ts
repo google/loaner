@@ -77,7 +77,7 @@ export class AuditTable implements OnInit {
    *              in.
    */
   addDevice(input: HTMLInputElement) {
-    const deviceId = input.value;
+    const deviceId = input.value.trim();
     let deviceToBeCheckedIn: DeviceOnAction;
     if (deviceId) {
       deviceToBeCheckedIn = {
