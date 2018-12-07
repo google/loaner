@@ -928,6 +928,37 @@ Returns                   | Attributes
 :------------------------ | :---------
 message_types.VoidMessage | None
 
+### Tag_api
+
+API endpoint that handles requests related to tags.
+
+#### Methods
+
+##### create
+
+Create a new tag.
+
+| Requests                      | Attributes
+| :---------------------------- | :---------
+| tag_messages.CreateTagRequest | tag: tag_messages.Tag, the attributes of a Tag.
+
+Returns                   | Attributes
+:------------------------ | :---------
+message_types.VoidMessage | None
+
+##### destroy
+
+Destroy a tag.
+
+| Requests                       | Attributes
+| :----------------------------- | :---------
+| tag_messages.DestroyTagRequest | urlsafe_key: str, the urlsafe representation
+|                                | of the ndb.Key for the tag to be destroyed.
+
+Returns                   | Attributes
+:------------------------ | :---------
+message_types.VoidMessage | None
+
 ### User_api
 
 API endpoint that handles requests related to users.

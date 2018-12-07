@@ -31,6 +31,7 @@ loaner_appengine_library(
         ":search_api",
         ":shelf_api",
         ":survey_api",
+        ":tag_api",
         ":user_api",
     ],
 )
@@ -205,6 +206,23 @@ loaner_appengine_library(
         "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:survey_models",
+        "@endpoints_archive//:endpoints",
+    ],
+)
+
+loaner_appengine_library(
+    name = "tag_api",
+    srcs = [
+        "tag_api.py",
+    ],
+    deps = [
+        ":auth",
+        ":permissions",
+        ":root_api",
+        "//loaner/web_app/backend/api/messages:tag_messages",
+        "//loaner/web_app/backend/lib:api_utils",
+        "//loaner/web_app/backend/lib:user",
+        "//loaner/web_app/backend/models:tag_model",
         "@endpoints_archive//:endpoints",
     ],
 )
@@ -391,6 +409,21 @@ loaner_appengine_test(
 )
 
 loaner_appengine_test(
+    name = "tag_api_test",
+    srcs = [
+        "tag_api_test.py",
+    ],
+    deps = [
+        ":tag_api",
+        "//loaner/web_app/backend/api/messages:tag_messages",
+        "//loaner/web_app/backend/models:tag_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@endpoints_archive//:endpoints",
+        "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
     name = "user_api_test",
     srcs = [
         "user_api_test.py",
@@ -416,6 +449,7 @@ test_suite(
         ":search_api_test",
         ":shelf_api_test",
         ":survey_api_test",
+        ":tag_api_test",
         ":user_api_test",
     ],
 )

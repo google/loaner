@@ -68,6 +68,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/api:device_api",
         "//loaner/web_app/backend/api:root_api",
         "//loaner/web_app/backend/api:shelf_api",
+        "//loaner/web_app/backend/api:tag_api",
         "//loaner/web_app/backend/api:user_api",
         "@endpoints_archive//:endpoints",
     ],
