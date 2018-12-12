@@ -257,6 +257,8 @@ export class AppRoot implements AfterViewInit, OnInit {
                 console.error('The survey failed to submit: ', error);
                 this.bg.openView('manage');
               });
+    } else {
+      this.bg.openView('manage');
     }
   }
 

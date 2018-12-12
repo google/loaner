@@ -119,4 +119,14 @@ describe('Onboarding AppRoot', () => {
     fixture.detectChanges();
     expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
   });
+
+  it('should open the manage view and NOT send the survey', () => {
+    expect(app.surveySent).toBeFalsy();
+    expect(app.surveyAnswer).toBeFalsy();
+    const bg: Background = TestBed.get(Background);
+    spyOn(bg, 'openView');
+    app.launchManageView();
+    fixture.detectChanges();
+    expect(bg.openView).toHaveBeenCalledWith('manage');
+  });
 });
