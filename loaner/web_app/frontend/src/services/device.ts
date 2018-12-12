@@ -161,12 +161,8 @@ export class DeviceService extends ApiService {
    * Enables Guest mode in a particular device.
    * @param device Device to have Guest mode enabled.
    */
-  enableGuestMode(device: Device) {
-    return this.post('user/enable_guest_mode', device.toApiMessage())
-        .pipe(tap(() => {
-          this.snackBar.open(
-              `Enabled guest mode for device ${device.identifier}.`);
-        }));
+  enableGuestMode(device: Device): Observable<void> {
+    return this.post('user/enable_guest_mode', device.toApiMessage());
   }
 
   /**
