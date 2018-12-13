@@ -257,6 +257,8 @@ device to your nearest shelf as soon as possible.`,
                 console.error('The survey failed to submit: ', error);
                 this.bg.closeView('offboarding');
               });
+    } else {
+      this.bg.closeView('offboarding');
     }
   }
 

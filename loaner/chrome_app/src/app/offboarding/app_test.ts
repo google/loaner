@@ -112,4 +112,14 @@ describe('Offboarding AppRoot', () => {
     fixture.detectChanges();
     expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
   });
+
+  it('should close the offboarding view and NOT send the survey', () => {
+    expect(app.surveySent).toBeFalsy();
+    expect(app.surveyAnswer).toBeFalsy();
+    const bg: Background = TestBed.get(Background);
+    spyOn(bg, 'closeView');
+    app.closeApplication();
+    fixture.detectChanges();
+    expect(bg.closeView).toHaveBeenCalledWith('offboarding');
+  });
 });
