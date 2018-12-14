@@ -78,20 +78,39 @@ class TagApiTest(loanertest.EndpointsTestCase):
       self.service.create(request)
 
   def test_destroy_tag(self):
-    request = tag_messages.DestroyTagRequest(
+    request = tag_messages.TagRequest(
         urlsafe_key=self.test_tag.key.urlsafe())
     with mock.patch.object(
         self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
       response = self.service.destroy(request)
       self.assertEqual(mock_xsrf_token.call_count, 1)
       self.assertIsNone(
-          tag_model.Tag.get_by_urlsafe_key(self.test_tag.key.urlsafe()))
+          tag_model.Tag.get(self.test_tag.key.urlsafe()))
       self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_destroy_not_existing(self):
-    request = tag_messages.DestroyTagRequest(urlsafe_key='nonexistent_tag')
+    request = tag_messages.TagRequest(urlsafe_key='nonexistent_tag')
     with self.assertRaises(endpoints.BadRequestException):
       self.service.destroy(request)
+
+  def test_get_tag(self):
+    request = tag_messages.TagRequest(urlsafe_key=self.test_tag.key.urlsafe())
+    expected_response = tag_messages.Tag(
+        name=self.test_tag.name,
+        hidden=self.test_tag.hidden,
+        color=self.test_tag.color,
+        protect=self.test_tag.protect,
+        description=self.test_tag.description)
+    with mock.patch.object(
+        self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
+      response = self.service.get(request)
+      self.assertEqual(mock_xsrf_token.call_count, 1)
+      self.assertEqual(response, expected_response)
+
+  def test_get_tag_bad_request(self):
+    request = tag_messages.TagRequest(urlsafe_key='fake_urlsafe_key')
+    with self.assertRaises(endpoints.BadRequestException):
+      self.service.get(request)
 
 
 if __name__ == '__main__':

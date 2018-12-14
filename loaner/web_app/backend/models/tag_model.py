@@ -80,7 +80,7 @@ class Tag(base_model.BaseModel):
     return tag
 
   @classmethod
-  def get_by_urlsafe_key(cls, urlsafe_key):
+  def get(cls, urlsafe_key):
     """Gets a Tag by its urlsafe key.
 
     Args:

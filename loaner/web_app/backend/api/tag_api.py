@@ -65,7 +65,7 @@ class TagApi(root_api.Service):
     return message_types.VoidMessage()
 
   @auth.method(
-      tag_messages.DestroyTagRequest,
+      tag_messages.TagRequest,
       message_types.VoidMessage,
       name='destroy',
       path='destroy',
@@ -77,3 +77,20 @@ class TagApi(root_api.Service):
     api_utils.get_ndb_key(urlsafe_key=request.urlsafe_key).delete()
 
     return message_types.VoidMessage()
+
+  @auth.method(
+      tag_messages.TagRequest,
+      tag_messages.Tag,
+      name='get',
+      path='get',
+      http_method='POST')
+  def get(self, request):
+    """Gets a tag by its urlsafe key."""
+    self.check_xsrf_token(self.request_state)
+    tag = tag_model.Tag.get(request.urlsafe_key)
+    return tag_messages.Tag(
+        name=tag.name,
+        hidden=tag.hidden,
+        color=tag.color,
+        protect=tag.protect,
+        description=tag.description)

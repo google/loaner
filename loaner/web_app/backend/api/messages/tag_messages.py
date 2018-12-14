@@ -48,11 +48,11 @@ class CreateTagRequest(messages.Message):
   tag = messages.MessageField(Tag, 1)
 
 
-class DestroyTagRequest(messages.Message):
-  """DestroyTagRequest ProtoRPC message.
+class TagRequest(messages.Message):
+  """TagRequest ProtoRPC message.
 
   Attributes:
     urlsafe_key: str, The urlsafe representation of the ndb.Key for the
-      tag to be destroyed.
+      requested tag.
   """
   urlsafe_key = messages.StringField(1)

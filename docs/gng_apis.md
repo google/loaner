@@ -952,12 +952,33 @@ Destroy a tag.
 
 | Requests                       | Attributes
 | :----------------------------- | :---------
-| tag_messages.DestroyTagRequest | urlsafe_key: str, the urlsafe representation
-|                                | of the ndb.Key for the tag to be destroyed.
+| tag_messages.TagRequest        | urlsafe_key: str, the urlsafe representation
+|                                | of the ndb.Key for the tag being requested.
 
 Returns                   | Attributes
 :------------------------ | :---------
 message_types.VoidMessage | None
+
+##### get
+
+Destroy a tag.
+
+| Requests                       | Attributes
+| :----------------------------- | :---------
+| tag_messages.TagRequest        | urlsafe_key: str, the urlsafe representation
+|                                | of the ndb.Key for the tag being requested.
+
+Returns           | Attributes
+:---------------- | :---------
+tag_messages.Tag  | name: str, the unique name of the tag.
+                  | hidden: bool, whether the tag is hidden in the frontend,
+                  | defaults to False.
+                  | color: str, the color of the tag, one of the material
+                  | design palette.
+                  | protect: bool, whether the tag is protected from user
+                  | manipulation; this field will only be included in response
+                  | messages.
+                  | description: str, the description for the tag.
 
 ### User_api
 

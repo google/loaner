@@ -76,7 +76,7 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
         color='red',
         description='Description 4.')
     self.assertEqual(
-        tag_entity, tag_model.Tag.get_by_urlsafe_key(
+        tag_entity, tag_model.Tag.get(
             urlsafe_key=tag_entity.key.urlsafe()))
     self.assertEqual(mock_stream_to_bq.call_count, 1)
 
