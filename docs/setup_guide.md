@@ -52,6 +52,12 @@ configure a Google Cloud Platform project:
         Changing this setting has a propagation delay, so if you are getting
         origin errors you will need to set this and then wait a few minutes.
 
+    1.  Visit the OAuth consent screen tab and ensure that the Application type
+        is listed as "Public".
+
+        **WARNING:**  The Chrome App will be unable to generate any
+        OAuth tokens if the Application type isn't listed as Public.
+
     1.  The GnG application requires a service account on your G Suite Domain
         configured with **G Suite Domain-Wide Delegated Authority** in order to
         access the G Suite APIs to move devices to and from organizational
