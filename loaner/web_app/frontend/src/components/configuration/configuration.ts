@@ -17,7 +17,7 @@ import {NgForm} from '@angular/forms';
 import {Router} from '@angular/router';
 
 import {CONFIG} from '../../app.config';
-import {Config, ConfigType, ConfigUpdate, SearchIndexType} from '../../models/config';
+import {Config, ConfigType, ConfigUpdate, DeviceIdentifierModeType, SearchIndexType} from '../../models/config';
 import {ConfigService} from '../../services/config';
 import {SearchService} from '../../services/search';
 
@@ -32,6 +32,7 @@ import {SearchService} from '../../services/search';
 export class Configuration implements OnInit {
   config: Config = this.config;
   searchIndexType = SearchIndexType;
+  deviceIdentifierModeType = DeviceIdentifierModeType;
 
   @ViewChild(NgForm) configurationForm: NgForm = this.configurationForm;
 

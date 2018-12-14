@@ -27,6 +27,16 @@ export enum SearchIndexType {
   User = 'user',
 }
 
+/**
+ * Device identifier supported modes, needs to match modes on
+ * web_app/config_defaults.yaml
+ */
+export enum DeviceIdentifierModeType {
+  ASSET_TAG = 'asset_tag',
+  SERIAL_NUMBER = 'serial_number',
+  BOTH_REQUIRED = 'both_required'
+}
+
 export declare interface GetConfigRequest {
   name: string;
   config_type: ConfigType;
@@ -91,7 +101,6 @@ export class Config {
   supportContact?: string;
   timeoutGuestMode?: boolean;
   unenrollOU?: string;
-  useAssetTags?: boolean;
   silentOnboarding?: boolean;
 
   constructor(response: ConfigResponse[]) {
@@ -174,9 +183,6 @@ export class Config {
         boolean;
     this.unenrollOU =
         response.find(a => a.name === 'unenroll_ou')!.string_value as string;
-    this.useAssetTags =
-        response.find(a => a.name === 'use_asset_tags')!.boolean_value as
-        boolean;
     this.silentOnboarding =
         response.find(a => a.name === 'silent_onboarding')!.boolean_value as
         boolean;

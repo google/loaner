@@ -18,19 +18,10 @@ import {NgForm} from '@angular/forms';
 import {NavigationEnd, Router} from '@angular/router';
 import {fromEvent} from 'rxjs';
 
+import {DeviceIdentifierModeType} from '../../models/config';
 import {Actions, Device} from '../../models/device';
 import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
-
-/**
- * Device identifier supported modes, needs to match modes on
- * web_app/config_defaults.yaml
- */
-export enum DeviceIdentifierMode {
-  ASSET_TAG = 'asset_tag',
-  SERIAL_NUMBER = 'serial_number',
-  BOTH_REQUIRED = 'both_required'
-}
 
 /** Possible states that the action box can have: expanded or collapsed. */
 export type ExpansionState = 'expanded'|'collapsed';
@@ -64,19 +55,19 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   /** Device model that will be added. */
   device = new Device();
   /** Which device identifier mode the app is currently configured to use. */
-  private deviceIdentifierMode: DeviceIdentifierMode =
-      DeviceIdentifierMode.SERIAL_NUMBER;
+  private deviceIdentifierMode?: DeviceIdentifierModeType;
 
   /** If asset tag should be used on this instace of the app. */
   get useAssetTag() {
-    return this.deviceIdentifierMode === DeviceIdentifierMode.ASSET_TAG ||
-        this.deviceIdentifierMode === DeviceIdentifierMode.BOTH_REQUIRED;
+    return this.deviceIdentifierMode === DeviceIdentifierModeType.ASSET_TAG ||
+        this.deviceIdentifierMode === DeviceIdentifierModeType.BOTH_REQUIRED;
   }
 
   /** If serial number should be used on this instace of the app. */
   get useSerialNumber() {
-    return this.deviceIdentifierMode === DeviceIdentifierMode.SERIAL_NUMBER ||
-        this.deviceIdentifierMode === DeviceIdentifierMode.BOTH_REQUIRED;
+    return this.deviceIdentifierMode ===
+        DeviceIdentifierModeType.SERIAL_NUMBER ||
+        this.deviceIdentifierMode === DeviceIdentifierModeType.BOTH_REQUIRED;
   }
 
   @ViewChild('mainIdentifier') mainIdentifier!: ElementRef;
@@ -96,7 +87,7 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   ngOnInit() {
     this.configService.getStringConfig('device_identifier_mode')
         .subscribe(response => {
-          this.deviceIdentifierMode = response as DeviceIdentifierMode;
+          this.deviceIdentifierMode = response as DeviceIdentifierModeType;
           this.state = 'expanded';
         });
 

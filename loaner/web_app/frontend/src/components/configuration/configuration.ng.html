@@ -250,13 +250,26 @@
         </section>
         <section class="control-set">
           <div class="label">
-            Use asset tags
+            Device identifier mode
             <div class="sublabel">
-              Require asset tags when enrolling new devices. If unchecked, only serial numbers will be required.
+              Defines the primary type of identification to be used when enrolling/unenrolling a device.
             </div>
           </div>
           <div class="control">
-            <mat-slide-toggle name="use_asset_tags_boolean" [(ngModel)]="config.useAssetTags"></mat-slide-toggle>
+            <mat-form-field>
+              <mat-select name="device_identifier_mode_string"
+                          [(ngModel)]="config.deviceIdentifierMode">
+                <mat-option [value]="deviceIdentifierModeType.ASSET_TAG">
+                  Asset Tag
+                </mat-option>
+                <mat-option [value]="deviceIdentifierModeType.SERIAL_NUMBER">
+                  Serial Number
+                </mat-option>
+                <mat-option [value]="deviceIdentifierModeType.BOTH_REQUIRED">
+                  Both
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
           </div>
         </section>
         <section class="control-set">

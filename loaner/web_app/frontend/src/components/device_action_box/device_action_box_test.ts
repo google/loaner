@@ -19,12 +19,13 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
+import {DeviceIdentifierModeType} from '../../models/config';
 import {Device} from '../../models/device';
 import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
 import {ConfigServiceMock} from '../../testing/mocks';
 
-import {DeviceActionBox, DeviceActionBoxModule, DeviceIdentifierMode} from '.';
+import {DeviceActionBox, DeviceActionBoxModule} from '.';
 
 @Component({
   preserveWhitespaces: true,
@@ -72,7 +73,8 @@ describe('DeviceActionBox', () => {
 
     configService = TestBed.get(ConfigService);
     configServiceSpy = spyOn(configService, 'getStringConfig');
-    configServiceSpy.and.returnValue(of(DeviceIdentifierMode.SERIAL_NUMBER));
+    configServiceSpy.and.returnValue(
+        of(DeviceIdentifierModeType.SERIAL_NUMBER));
 
     actionBox.ngOnInit();
   }));
@@ -107,7 +109,7 @@ describe('DeviceActionBox', () => {
     it('renders serial input if device_identifier_mode is set to serial_number',
        () => {
          configServiceSpy.and.returnValue(
-             of(DeviceIdentifierMode.SERIAL_NUMBER));
+             of(DeviceIdentifierModeType.SERIAL_NUMBER));
          actionBox.ngOnInit();
          fixture.detectChanges();
          const compiled = fixture.debugElement.nativeElement;
@@ -123,7 +125,7 @@ describe('DeviceActionBox', () => {
     it('renders serial input if device_identifier_mode is set to both_required',
        () => {
          configServiceSpy.and.returnValue(
-             of(DeviceIdentifierMode.BOTH_REQUIRED));
+             of(DeviceIdentifierModeType.BOTH_REQUIRED));
          actionBox.ngOnInit();
          fixture.detectChanges();
          const compiled = fixture.debugElement.nativeElement;
@@ -138,7 +140,8 @@ describe('DeviceActionBox', () => {
 
     it('renders asset input if device_identifier_mode is set to asset_tag',
        () => {
-         configServiceSpy.and.returnValue(of(DeviceIdentifierMode.ASSET_TAG));
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierModeType.ASSET_TAG));
          actionBox.ngOnInit();
          fixture.detectChanges();
          const compiled = fixture.debugElement.nativeElement;
@@ -153,7 +156,7 @@ describe('DeviceActionBox', () => {
     it('renders asset input if device_identifier_mode is set to both_required',
        () => {
          configServiceSpy.and.returnValue(
-             of(DeviceIdentifierMode.BOTH_REQUIRED));
+             of(DeviceIdentifierModeType.BOTH_REQUIRED));
          actionBox.ngOnInit();
          fixture.detectChanges();
          const compiled = fixture.debugElement.nativeElement;
@@ -168,7 +171,7 @@ describe('DeviceActionBox', () => {
     it('renders 2 inputs if device_identifier_mode is set to both_required',
        () => {
          configServiceSpy.and.returnValue(
-             of(DeviceIdentifierMode.BOTH_REQUIRED));
+             of(DeviceIdentifierModeType.BOTH_REQUIRED));
          actionBox.ngOnInit();
          fixture.detectChanges();
          const compiled = fixture.debugElement.nativeElement;
@@ -179,7 +182,8 @@ describe('DeviceActionBox', () => {
 
     it('renders 1 input if device_identifier_mode is not set to both_required',
        fakeAsync(() => {
-         configServiceSpy.and.returnValue(of(DeviceIdentifierMode.ASSET_TAG));
+         configServiceSpy.and.returnValue(
+             of(DeviceIdentifierModeType.ASSET_TAG));
          actionBox.ngOnInit();
          tick();
          fixture.detectChanges();
@@ -189,7 +193,7 @@ describe('DeviceActionBox', () => {
          expect(inputFields.length).toBe(1);
 
          configServiceSpy.and.returnValue(
-             of(DeviceIdentifierMode.SERIAL_NUMBER));
+             of(DeviceIdentifierModeType.SERIAL_NUMBER));
          actionBox.ngOnInit();
          fixture.detectChanges();
          compiled = fixture.debugElement.nativeElement;
@@ -199,7 +203,8 @@ describe('DeviceActionBox', () => {
        }));
 
     it('only emits the device when button is pressed with asset tag', () => {
-      configServiceSpy.and.returnValue(of(DeviceIdentifierMode.BOTH_REQUIRED));
+      configServiceSpy.and.returnValue(
+          of(DeviceIdentifierModeType.BOTH_REQUIRED));
       spyOn(testComponent, 'takeAction');
       actionBox.device.serialNumber = '123123';
       actionBox.ngOnInit();
@@ -260,7 +265,7 @@ describe('DeviceActionBox', () => {
          expect(input.getAttribute('required')).not.toBeNull();
 
          configServiceSpy.and.returnValue(
-             of(DeviceIdentifierMode.BOTH_REQUIRED));
+             of(DeviceIdentifierModeType.BOTH_REQUIRED));
          actionBox.ngOnInit();
          fixture.detectChanges();
 
