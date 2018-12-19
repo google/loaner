@@ -244,7 +244,7 @@ auth login"
   info_message "Initiating the build of the python deployment script..."
   bazel build //loaner/deployments:deploy_impl
 
-  ../bazel-bin/loaner/deployments/deploy_impl \
+  ../bazel-out/k8-py3-fastbuild/bin/loaner/deployments/deploy_impl \
     --loaner_path "$(pwd -P)" \
     --app_servers "${APP_SERVERS}" \
     --build_target "${BUILD_TARGET}" \
