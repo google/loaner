@@ -10,8 +10,26 @@ branch. While we try to keep the master branch working we consider it
 "unstable" and don't recommend using it unless you want to develop for the
 project.
 
+## [Alpha 0.7.1](https://github.com/google/loaner/tree/Alpha-(0.7.1))
+Released 2018-12-19
+
+#### Features added
+* No major functionality has been added, but this release includes many
+  bug fixes and stability improvements.
+* This release includes the framework of our new deployment system that we will
+  continue to build on in 2019. While there is no added functionality yet it
+  will soon be the easiest way to automatically configure, deploy, and update
+  your GnG experience.
+
+#### Known issues
+* You must manually [create the GSuite Chrome organizational units](gsuite_config.md)
+  as the app cannot yet create them.
+* You may need to run 'npm install' to update to the latest NPM packages.
+* There may be additional incompatibilities with older versions of this app. If
+  you experience any problems please use GitHub's issue tracker.
+
 ## [Alpha 0.7](https://github.com/google/loaner/tree/Alpha-(0.7))
-Released:
+Released 2018-09-08
 
 Warning: This is a breaking change. If you are running earlier versions of the
 app you will need to take the following steps after upgrading for the app to
@@ -48,7 +66,7 @@ continue functioning correctly.
   bootstrap_completed to true.
 
 ## [Alpha 0.6a](https://github.com/google/loaner/tree/Alpha-(0.6))
-Released 06/08/18
+Released 2018-06-08
 
 Warning: This is a breaking change. If you are running earlier versions of the
 app you will need to take the following steps after upgrading for the app to
@@ -84,7 +102,7 @@ navigate to Datastore > Entities.
 
 
 ## [Alpha 0.5a](https://github.com/google/loaner/tree/Alpha-(0.5))
-Released 03/30/18
+Released 2018-03-30
 
 #### Known issues
 * There is no configuration view. Configurations must be changed by calling

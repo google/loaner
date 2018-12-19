@@ -24,7 +24,7 @@ The program is comprised of three parts:
 *   A Google App Engine (GAE) application
 *   A Chrome App that runs on each Chrome OS device
 
-## Current release: [Alpha (v0.7a)](https://github.com/google/loaner/tree/Alpha-(0.7))
+## Current release: [Alpha (v0.7.1a)](https://github.com/google/loaner/tree/Alpha-(0.7.1))
 
 Please note that the current release of this application is in ALPHA.
 We will be actively contributing to the project. Please keep an eye out for
