@@ -110,6 +110,7 @@ describe('Offboarding AppRoot', () => {
     app.surveyAnswer = fakeSurveyData;
     app.closeApplication();
     fixture.detectChanges();
+    expect(app.flowSequenceButtons.canProceed).toBe(false);
     expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
   });
 
@@ -120,6 +121,7 @@ describe('Offboarding AppRoot', () => {
     spyOn(bg, 'closeView');
     app.closeApplication();
     fixture.detectChanges();
+    expect(app.flowSequenceButtons.canProceed).toBe(false);
     expect(bg.closeView).toHaveBeenCalledWith('offboarding');
   });
 });

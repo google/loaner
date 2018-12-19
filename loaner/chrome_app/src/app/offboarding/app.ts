@@ -245,6 +245,7 @@ device to your nearest shelf as soon as possible.`,
    * application window.
    */
   closeApplication() {
+    this.flowSequenceButtons.canProceed = false;
     if (this.surveyAnswer) {
       this.surveyComponent.waiting();
       this.survey.submitSurvey(this.surveyAnswer)

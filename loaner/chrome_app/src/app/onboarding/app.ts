@@ -245,6 +245,7 @@ export class AppRoot implements AfterViewInit, OnInit {
 
   launchManageView() {
     this.bg.onboardingComplete();
+    this.flowSequenceButtons.canProceed = false;
     if (this.surveyAnswer) {
       this.surveyComponent.waiting();
       this.survey.submitSurvey(this.surveyAnswer)

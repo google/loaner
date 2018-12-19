@@ -117,6 +117,7 @@ describe('Onboarding AppRoot', () => {
     app.surveyAnswer = fakeSurveyData;
     app.launchManageView();
     fixture.detectChanges();
+    expect(app.flowSequenceButtons.canProceed).toBe(false);
     expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
   });
 
@@ -127,6 +128,7 @@ describe('Onboarding AppRoot', () => {
     spyOn(bg, 'openView');
     app.launchManageView();
     fixture.detectChanges();
+    expect(app.flowSequenceButtons.canProceed).toBe(false);
     expect(bg.openView).toHaveBeenCalledWith('manage');
   });
 });
