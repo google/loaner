@@ -84,6 +84,21 @@ describe('DeviceListTableComponent', () => {
         .toContain('Assigned to');
   });
 
+  it('does NOT render the assigned or due date title inside mat-header-row ',
+     () => {
+       deviceListTable.displayedColumns = ['id', 'device_model'];
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       expect(compiled.querySelector('.mat-header-row').textContent)
+           .not.toContain('Assigned to');
+       expect(compiled.querySelector('.mat-header-row').textContent)
+           .not.toContain('Due date');
+       expect(compiled.querySelector('.mat-header-row').textContent)
+           .toContain('Identifier');
+       expect(compiled.querySelector('.mat-header-row').textContent)
+           .toContain('Device Model');
+     });
+
   it('pauses loading when a row is in focus', () => {
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;

@@ -41,13 +41,19 @@ export class DeviceListTable implements OnInit {
   @Input() showStatus = true;
   /** The shelf that is being used to filter devices. */
   @Input() shelf!: Shelf;
+  /** Columns that should be rendered on the frontend table. */
+  @Input()
+  displayedColumns = [
+    'id',
+    'assigned_user',
+    'due_date',
+    'device_model',
+  ];
   /** Observable that iterates once the component is about to be destroyed. */
   private onDestroy = new Subject<void>();
-  /** Columns that should be rendered on the frontend table */
-  displayedColumns!: string[];
   /** Type of data source that will be used on this implementation. */
   dataSource = new MatTableDataSource<Device>();
-  /** Total number of shelves returned from the back end */
+  /** Total number of shelves returned from the backend. */
   totalResults = 0;
   /* When true, pauseLoading will prevent auto refresh on the table. */
   pauseLoading = false;
@@ -61,13 +67,6 @@ export class DeviceListTable implements OnInit {
   ) {}
 
   setDisplayColumns() {
-    this.displayedColumns = [
-      'id',
-      'assigned_user',
-      'due_date',
-      'device_model',
-    ];
-
     if (this.showStatus) {
       this.displayedColumns = [...this.displayedColumns, 'status'];
     }
