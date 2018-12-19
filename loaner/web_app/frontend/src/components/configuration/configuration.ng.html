@@ -250,6 +250,15 @@
         </section>
         <section class="control-set">
           <div class="label">
+            Require surveys
+            <div class="sublabel">Require users to answer the surveys they are presented.</div>
+          </div>
+          <div class="control">
+            <mat-slide-toggle name="require_surveys_boolean" [(ngModel)]="config.requireSurveys"></mat-slide-toggle>
+          </div>
+        </section>
+        <section class="control-set">
+          <div class="label">
             Device identifier mode
             <div class="sublabel">
               Defines the primary type of identification to be used when enrolling/unenrolling a device.
