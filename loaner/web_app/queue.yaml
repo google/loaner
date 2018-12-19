@@ -24,4 +24,3 @@ queue:
       task_age_limit: 10m
       min_backoff_seconds: 15
       max_doublings: 2
-
