@@ -55,8 +55,8 @@ class Shelf(messages.Message):
     responsible_for_audit: str, The party responsible for audits.
     last_audit_time: datetime,  Indicates the last audit time.
     last_audit_by: str, Indicates the last user to audit the shelf.
+    page_token: str, a page token to query next page results.
     page_size: int, The number of results to query for and display.
-    page_number: int, The page index to offset the results.
     shelf_request: ShelfRequest, A message containing the unique identifier to
         be used to retrieve the shelf.
     query: shared_message.SearchRequest, a message containing query options to
@@ -76,8 +76,8 @@ class Shelf(messages.Message):
   responsible_for_audit = messages.StringField(11)
   last_audit_time = message_types.DateTimeField(12)
   last_audit_by = messages.StringField(13)
-  page_size = messages.IntegerField(14, default=10)
-  page_number = messages.IntegerField(15, default=1)
+  page_token = messages.StringField(14)
+  page_size = messages.IntegerField(15, default=25)
   shelf_request = messages.MessageField(ShelfRequest, 16)
   query = messages.MessageField(shared_messages.SearchRequest, 17)
   audit_interval_override = messages.IntegerField(18)
@@ -143,13 +143,13 @@ class ListShelfResponse(messages.Message):
 
   Attributes:
     shelves: List[Shelf], The list of shelves being returned.
-    total_results: int, The total number of results for a query.
-    total_pages: int, The total number of pages needed to display all of the
-        results.
+    has_additional_results: bool, If there are more results to be displayed.
+    page_token: str, A page token that will allow be used to query for
+        additional results.
   """
   shelves = messages.MessageField(Shelf, 1, repeated=True)
-  total_results = messages.IntegerField(2)
-  total_pages = messages.IntegerField(3)
+  has_additional_results = messages.BooleanField(2)
+  page_token = messages.StringField(3)
 
 
 class ShelfAuditRequest(messages.Message):

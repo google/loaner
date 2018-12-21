@@ -18,23 +18,17 @@ import {FlexLayoutModule} from '@angular/flex-layout';
 import {MatAutocompleteModule, MatBadgeModule, MatButtonModule, MatCardModule, MatCheckboxModule, MatChipsModule, MatDatepickerModule, MatDialogModule, MatExpansionModule, MatGridListModule, MatIconModule, MatIconRegistry, MatInputModule, MatListModule, MatMenuModule, MatNativeDateModule, MatPaginatorModule, MatProgressBarModule, MatProgressSpinnerModule, MatSelectModule, MatSidenavModule, MatSlideToggleModule, MatSnackBarModule, MatSortModule, MatTableModule, MatTabsModule, MatToolbarModule, MatTooltipModule,} from '@angular/material';
 
 const MATERIAL_MODULES = [
-  CdkTableModule,        FlexLayoutModule,
-  MatAutocompleteModule, MatBadgeModule,
-  CdkTableModule,        FlexLayoutModule,
-  MatAutocompleteModule, MatButtonModule,
-  MatCardModule,         MatCheckboxModule,
-  MatDialogModule,       MatExpansionModule,
-  MatGridListModule,     MatIconModule,
-  MatInputModule,        MatListModule,
-  MatMenuModule,         MatPaginatorModule,
-  MatProgressBarModule,  MatProgressSpinnerModule,
-  MatSelectModule,       MatSidenavModule,
-  MatSlideToggleModule,  MatSnackBarModule,
-  MatSortModule,         MatTableModule,
-  MatTabsModule,         MatToolbarModule,
-  MatTooltipModule,      MatDatepickerModule,
-  MatNativeDateModule,   MatChipsModule,
-  MatSlideToggleModule,
+  CdkTableModule,        FlexLayoutModule,     MatAutocompleteModule,
+  MatBadgeModule,        CdkTableModule,       FlexLayoutModule,
+  MatAutocompleteModule, MatButtonModule,      MatCardModule,
+  MatCheckboxModule,     MatDialogModule,      MatExpansionModule,
+  MatGridListModule,     MatIconModule,        MatInputModule,
+  MatListModule,         MatProgressBarModule, MatProgressSpinnerModule,
+  MatSelectModule,       MatSidenavModule,     MatSlideToggleModule,
+  MatSnackBarModule,     MatSortModule,        MatTableModule,
+  MatTabsModule,         MatToolbarModule,     MatTooltipModule,
+  MatDatepickerModule,   MatNativeDateModule,  MatChipsModule,
+  MatSlideToggleModule,  MatMenuModule,
 ];
 
 @NgModule({

@@ -26,6 +26,7 @@ function setupQueryFilters(
     filters: DeviceApiParams,
     activeSortField: string,
     sortDirection: SortDirection,
+    pageToken: string,
 ) {
   const expressions: SearchExpression = {
     expression: activeSortField,
@@ -79,8 +80,10 @@ export class DeviceService extends ApiService {
       filters: DeviceApiParams = {},
       activeSortField = 'id',
       sortDirection: SortDirection = 'asc',
+      pageToken = '',
       ): Observable<ListDevicesResponse> {
-    filters = setupQueryFilters(filters, activeSortField, sortDirection);
+    filters =
+        setupQueryFilters(filters, activeSortField, sortDirection, pageToken);
 
     return this.post<ListDevicesResponseApiParams>('list', filters)
         .pipe(map(res => {
@@ -88,8 +91,8 @@ export class DeviceService extends ApiService {
               res.devices && res.devices.map(d => new Device(d)) || [];
           const retrievedDevices: ListDevicesResponse = {
             devices,
-            totalResults: res.total_results,
-            totalPages: res.total_pages
+            has_additional_results: res.has_additional_results,
+            page_token: res.page_token,
           };
           return retrievedDevices;
         }));

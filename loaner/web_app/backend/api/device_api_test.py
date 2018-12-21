@@ -36,6 +36,7 @@ from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
+from loaner.web_app.backend.lib import search_utils
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
@@ -331,26 +332,21 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     response = self.service.list_devices(request)
     self.assertLen(response.devices, response_length)
 
-  def test_list_devices_invalid_page_size(self):
-    with self.assertRaises(endpoints.BadRequestException):
-      request = device_messages.Device(page_size=0)
-      self.service.list_devices(request)
-
   def test_list_devices_with_search_constraints(self):
     expressions = shared_messages.SearchExpression(expression='serial_number')
     expected_response = device_messages.ListDevicesResponse(
-        devices=[
-            device_messages.Device(serial_number='6789', guest_permitted=True)
-        ],
-        total_results=1,
-        total_pages=1)
+        devices=[device_messages.Device(serial_number='6789')],
+        has_additional_results=False)
     request = device_messages.Device(
         query=shared_messages.SearchRequest(
             query_string='sn:6789',
             expressions=[expressions],
             returned_fields=['serial_number']))
     response = self.service.list_devices(request)
-    self.assertEqual(response, expected_response)
+    self.assertEqual(
+        response.devices[0].serial_number,
+        expected_response.devices[0].serial_number)
+    self.assertFalse(response.has_additional_results)
 
   def test_list_devices_with_filter_message(self):
     message = device_messages.Device(
@@ -372,8 +368,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
                 damaged=False,
                 guest_permitted=True)
         ],
-        total_results=1,
-        total_pages=1)
+        has_additional_results=False)
     self.assertEqual(response, expected_response)
 
   @mock.patch('__main__.device_api.shelf_api.get_shelf')
@@ -388,17 +383,27 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     mock_get_shelf.assert_called_once_with(shelf_request_message)
     self.assertLen(response.devices, 2)
 
-  def test_list_devices_with_offset(self):
-    request = device_messages.Device(page_size=1, page_number=1)
-    response = self.service.list_devices(request)
-    self.assertLen(response.devices, 1)
-    previouse_response = response
+  def test_list_devices_with_page_token(self):
+    request = device_messages.Device(enrolled=True, page_size=1)
+    response_devices = []
+    while True:
+      response = self.service.list_devices(request)
+      for device in response.devices:
+        response_devices.append(device)
+      request = device_messages.Device(
+          enrolled=True, page_size=1, page_token=response.page_token)
+      if not response.has_additional_results:
+        break
+    self.assertLen(response_devices, 2)
 
-    # Get next page results and make sure it's not the same as last.
-    request = device_messages.Device(page_size=1, page_number=2)
-    response = self.service.list_devices(request)
-    self.assertLen(response.devices, 1)
-    self.assertNotEqual(response, previouse_response)
+  @mock.patch.object(
+      search_utils, 'to_query', return_value='enrolled:enrolled',
+      autospec=True)
+  def test_list_devices_with_malformed_page_token(self, mock_to_query):
+    """Test list devices with a fake token, raises BadRequestException."""
+    request = device_messages.Device(page_token='malformedtoken')
+    with self.assertRaises(endpoints.BadRequestException):
+      self.service.list_devices(request)
 
   def test_list_devices_inactive_no_shelf(self):
     request = device_messages.Device(enrolled=False, page_size=1)
@@ -417,8 +422,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
                 damaged=self.unenrolled_device.damaged,
                 guest_permitted=True)
         ],
-        total_results=1,
-        total_pages=1)
+        has_additional_results=False)
     self.assertEqual(expected_response, response)
 
   @mock.patch('__main__.device_model.Device.list_by_user')

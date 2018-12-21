@@ -102,8 +102,8 @@ export class ShelfServiceMock {
   list(): Observable<ListShelfResponse> {
     return of({
       shelves: this.data,
-      totalResults: this.data.length,
-      totalPages: 1,
+      has_additional_results: false,
+      page_token: '',
     });
   }
 
@@ -344,8 +344,8 @@ export class DeviceServiceMock {
   list(): Observable<ListDevicesResponse> {
     return of({
       devices: this.data,
-      totalResults: this.data.length,
-      totalPages: 1,
+      has_additional_results: false,
+      page_token: '',
     });
   }
 

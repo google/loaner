@@ -39,23 +39,26 @@ export declare interface ShelfApiParams {
   responsible_for_audit?: string;
   device_identifiers?: string[];
   shelf_request?: ShelfRequestParams;
+  page_token?: string;
   page_size?: number;
-  page_number?: number;
   query?: SearchQuery;
 }
 
+/** Interface of listShelfResponseApiParams. */
 export declare interface ListShelfResponseApiParams {
   shelves: ShelfApiParams[];
-  total_results: number;
-  total_pages: number;
+  has_additional_results: boolean;
+  page_token: string;
 }
 
+/** Interface of listShelfResponse. */
 export interface ListShelfResponse {
   shelves: Shelf[];
-  totalResults: number;
-  totalPages: number;
+  has_additional_results: boolean;
+  page_token: string;
 }
 
+/** Shelf class. */
 export class Shelf {
   /** The friendly name of a given shelf. */
   friendlyName = '';

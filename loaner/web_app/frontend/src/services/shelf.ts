@@ -25,6 +25,7 @@ function setupQueryFilters(
     filters: ShelfApiParams,
     activeSortField: string,
     sortDirection: SortDirection,
+    pageToken: string,
 ) {
   const expressions: SearchExpression = {
     expression: activeSortField,
@@ -39,8 +40,8 @@ function setupQueryFilters(
   return filters;
 }
 
-@Injectable()
 /** Class to connect to the backend's Shelf Service API methods. */
+@Injectable()
 export class ShelfService extends ApiService {
   /** Implements ApiService's apiEndpoint requirement. */
   apiEndpoint = 'shelf';
@@ -92,8 +93,10 @@ export class ShelfService extends ApiService {
       filters: ShelfApiParams = {},
       activeSortField = 'id',
       sortDirection: SortDirection = 'asc',
+      pageToken = '',
       ): Observable<ListShelfResponse> {
-    filters = setupQueryFilters(filters, activeSortField, sortDirection);
+    filters =
+        setupQueryFilters(filters, activeSortField, sortDirection, pageToken);
 
     return this.post<ListShelfResponseApiParams>('list', filters)
         .pipe(map(res => {
@@ -101,8 +104,8 @@ export class ShelfService extends ApiService {
               res.shelves && res.shelves.map(s => new Shelf(s)) || [];
           const retrievedShelves: ListShelfResponse = {
             shelves,
-            totalResults: res.total_results,
-            totalPages: res.total_pages,
+            has_additional_results: res.has_additional_results,
+            page_token: res.page_token,
           };
           return retrievedShelves;
         }));

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
-import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import {MatSort, MatTableDataSource} from '@angular/material';
 import {interval, merge, NEVER, Subject} from 'rxjs';
 import {startWith, takeUntil, tap} from 'rxjs/operators';
 
@@ -59,7 +59,17 @@ export class DeviceListTable implements OnInit {
   pauseLoading = false;
 
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  /** Token needed on backend in order to return more results. */
+  pageToken?: string;
+  /** Backend response if there is more results to be retrieved. */
+  hasMoreResults = false;
+  /** Controls the state if is a refresh or request for more results. */
+  gettingMoreData = false;
+  /** Controls how many results it will get from backend. */
+  pageSize = 25;
+  /** Query filter to send to backend to get more results. */
+  filters: DeviceApiParams = {};
+
 
   constructor(
       private readonly changeDetector: ChangeDetectorRef,
@@ -83,7 +93,7 @@ export class DeviceListTable implements OnInit {
   ngAfterViewInit() {
     const intervalObservable = interval(60000).pipe(startWith(0));
 
-    merge(intervalObservable, this.sort.sortChange, this.paginator.page)
+    merge(intervalObservable, this.sort.sortChange)
         .pipe(takeUntil(this.onDestroy), tap(() => {
                 if (!this.pauseLoading) {
                   this.getDeviceList();
@@ -109,20 +119,35 @@ export class DeviceListTable implements OnInit {
     return filters;
   }
 
+  getMoreResults() {
+    this.gettingMoreData = true;
+    this.getDeviceList();
+    this.pageSize += 25;
+  }
+
   private getDeviceList() {
-    let filters: DeviceApiParams = {
-      page_number: this.paginator.pageIndex + 1,
-      page_size: this.paginator.pageSize,
-    };
+    if (this.gettingMoreData) {
+      this.filters = {
+        page_token: this.pageToken,
+      };
+    } else {
+      this.filters = {page_size: this.pageSize};
+    }
+
     const sort = this.sort.active;
     const sortDirection = this.sort.direction || 'asc';
 
-    filters = this.setupShelfFilters(filters);
-
-    this.deviceService.list(filters, sort, sortDirection)
-        .subscribe(response => {
-          this.totalResults = response.totalResults;
-          this.dataSource.data = response.devices;
+    this.deviceService.list(this.filters, sort, sortDirection)
+        .subscribe(listReponse => {
+          if (this.gettingMoreData) {
+            this.dataSource.data =
+                this.dataSource.data.concat(listReponse.devices);
+          } else {
+            this.dataSource.data = listReponse.devices;
+          }
+          this.gettingMoreData = false;
+          this.hasMoreResults = listReponse.has_additional_results;
+          this.pageToken = listReponse.page_token;
           // We need to manually call change detection here because of
           // https://github.com/angular/angular/issues/14748
           this.changeDetector.detectChanges();

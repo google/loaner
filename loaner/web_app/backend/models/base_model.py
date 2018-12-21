@@ -252,15 +252,15 @@ class BaseModel(ndb.Model):
 
   @classmethod
   def search(
-      cls, query_string='', query_limit=20, offset=0, sort_options=None,
+      cls, query_string='', query_limit=20, cursor=None, sort_options=None,
       returned_fields=None):
     """Searches for documents that match a given query string.
 
     Args:
       query_string: str, the query to match against documents in the index
       query_limit: int, the limit on number of documents to return in results.
-      offset: int, the number of matched documents to skip before beginning to
-          return results.
+      cursor: search.Cursor, a cursor describing where to get the next set of
+          results, or to provide next cursors in SearchResults.
       sort_options: search.SortOptions, an object specifying a multi-dimensional
           sort over search results.
       returned_fields: List[str], an iterable of names of fields to return in
@@ -276,7 +276,7 @@ class BaseModel(ndb.Model):
       query = search.Query(
           query_string=cls.format_query(query_string),
           options=search.QueryOptions(
-              offset=offset, limit=query_limit, sort_options=sort_options,
+              cursor=cursor, limit=query_limit, sort_options=sort_options,
               returned_fields=returned_fields),
       )
     except search.QueryError:

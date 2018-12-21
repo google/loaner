@@ -131,23 +131,19 @@ class ShelfApi(root_api.Service):
   def list_shelves(self, request):
     """Lists enabled or all shelves based on any shelf attribute."""
     self.check_xsrf_token(self.request_state)
-    if request.page_size <= 0:
-      raise endpoints.BadRequestException(
-          'The value for page_size must be greater than 0.')
     query, sort_options, returned_fields = (
         search_utils.set_search_query_options(request.query))
     if not query:
       query = search_utils.to_query(request, shelf_model.Shelf)
 
-    offset = search_utils.calculate_page_offset(
-        page_size=request.page_size, page_number=request.page_number)
-
+    cursor = search_utils.get_search_cursor(request.page_token)
     search_results = shelf_model.Shelf.search(
         query_string=query, query_limit=request.page_size,
-        offset=offset, sort_options=sort_options,
+        cursor=cursor, sort_options=sort_options,
         returned_fields=returned_fields)
-    total_pages = search_utils.calculate_total_pages(
-        page_size=request.page_size, total_results=search_results.number_found)
+    new_search_cursor = None
+    if search_results.cursor:
+      new_search_cursor = search_results.cursor.web_safe_string
 
     shelves_messages = []
     for document in search_results.results:
@@ -160,8 +156,8 @@ class ShelfApi(root_api.Service):
 
     return shelf_messages.ListShelfResponse(
         shelves=shelves_messages,
-        total_results=search_results.number_found,
-        total_pages=total_pages)
+        has_additional_results=bool(new_search_cursor),
+        page_token=new_search_cursor)
 
   @auth.method(
       shelf_messages.ShelfAuditRequest,

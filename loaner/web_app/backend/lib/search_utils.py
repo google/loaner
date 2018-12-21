@@ -19,11 +19,12 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
-import math
 
 from protorpc import messages
 
 from google.appengine.api import search
+
+import endpoints
 
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.models import device_model
@@ -88,31 +89,26 @@ def document_to_message(document, message):
   return message
 
 
-def calculate_page_offset(page_size, page_number):
-  """Calculates the page offset for a given page size and number.
+def get_search_cursor(web_safe_string):
+  """Converts the web_safe_string from search results into a cursor.
 
   Args:
-    page_size: int, the size of the amount of items for a page.
-    page_number: int, the page number to calculate an offset for.
+    web_safe_string: str, the web_safe_string from a search query cursor.
 
   Returns:
-    The calculated integer value for the offset.
+    A tuple consisting of a search.Cursor or None and a boolean for whether or
+        not more results exist.
+
+  Raises:
+    endpoints.BadRequestException: if the creation of the search.Cursor fails.
   """
-  return (page_number - 1) * page_size
+  try:
+    cursor = search.Cursor(
+        web_safe_string=web_safe_string)
+  except ValueError:
+    raise endpoints.BadRequestException(_CORRUPT_KEY_MSG)
 
-
-def calculate_total_pages(page_size, total_results):
-  """Calculates the number of pages for a given page size and number of results.
-
-  Args:
-    page_size: int, the size of the amount of items for a page.
-    total_results: int, the number of results.
-
-  Returns:
-    The calculated integer value of the total number of pages.
-  """
-  total_pages = total_results/page_size
-  return int(math.ceil(total_pages))
+  return cursor
 
 
 def set_search_query_options(request):
@@ -145,7 +141,7 @@ def set_search_query_options(request):
     if expressions:
       sort_options = search.SortOptions(expressions=expressions)
   except AttributeError:
-    # We do not want to so anything if the message does not have expressions
+    # We do not want to do anything if the message does not have expressions
     # since sort_options is already set to None above.
     pass
 

@@ -397,8 +397,8 @@ Lists all devices based on any device attribute.
 |                          | of the next reminder.                             |
 |                          | page_size: int, The number of results to query    |
 |                          | for and display.                                  |
-|                          | page_number: int, the page index to offset the    |
-|                          | results                                           |
+|                          | page_token: str, A page token to query next page  |
+|                          | results.                                          |
 |                          | max_extend_date: datetime, Indicates maximum      |
 |                          | extend date a device can have.                    |
 |                          | guest_enabled: bool, Indicates if guest mode has  |
@@ -414,10 +414,11 @@ Lists all devices based on any device attribute.
 | :---------------------------- | :------------------------------------------ |
 | List device response ProtoRPC | devices: Device, A device to display.       |
 | message.                      |                                             |
-|                               | total_results: int, the total number of     |
-|                               | results for a query.                        |
-|                               | total_pages: int, the total number of pages |
-|                               | needed to display all of the results.       |
+|                               | has_additional_results: bool, If there are  |
+|                               | more results to be displayed.               |
+|                               | page_token: str, A page token that will     |
+|                               | allow be used to query for additional       |
+|                               | results.                                    |
 
 ##### mark_damaged
 
@@ -531,8 +532,8 @@ message_types.VoidMessage | None
 | :---------------------------- | :------------------------------------------ |
 | List device response ProtoRPC | devices: Device, A device to display.       |
 | message.                      |                                             |
-|                               | additional_results: bool, If there are more |
-|                               | results to be displayed.                    |
+|                               | has_additional_results: bool, If there are  |
+|                               | more results to be displayed.               |
 |                               | page_token: str, A page token that will     |
 |                               | allow be used to query for additional       |
 |                               | results.                                    |
@@ -760,8 +761,8 @@ List enabled or all shelves based on any shelf attribute.
 |                         | audit the shelf.                                   |
 |                         | page_size: int, The number of results to query for |
 |                         | and display.                                       |
-|                         | page_number: int, the page index to offset the     |
-|                         | results                                            |
+|                         | page_token: str, A page token to query next page   |
+|                         | results.                                           |
 |                         | shelf_request: ShelfRequest, A message containing  |
 |                         | the unique identifier to be used to retrieve the   |
 |                         | shelf.                                             |
@@ -773,10 +774,10 @@ List enabled or all shelves based on any shelf attribute.
 | :--------------------------- | :-------------------------------------------- |
 | List Shelf Response ProtoRPC | shelves: Shelf, The list of shelves being     |
 | message.                     | returned.                                     |
-|                              | total_results: int, the total number of       |
-|                              | results for a query.                          |
-|                              | total_pages: int, the total number of pages   |
-|                              | needed to display all of the results.         |
+|                              | has_additional_results: bool, If there are    |
+|                              | more results to be displayed.                 |
+|                              | page_token: str, A page token that will allow |
+|                              | be used to query for additional results.      |
 
 ##### update
 

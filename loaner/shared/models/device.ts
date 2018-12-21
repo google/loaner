@@ -43,7 +43,7 @@ export declare interface DeviceApiParams {
   guest_enabled?: boolean;
   guest_permitted?: boolean;
   page_size?: number;
-  page_number?: number;
+  page_token?: string;
   query?: SearchQuery;
   overdue?: boolean;
 }
@@ -68,14 +68,14 @@ export declare interface MarkAsDamagedRequestApiParams {
 
 export declare interface ListDevicesResponseApiParams {
   devices: DeviceApiParams[];
-  total_results: number;
-  total_pages: number;
+  has_additional_results: boolean;
+  page_token: string;
 }
 
 export interface ListDevicesResponse {
   devices: Device[];
-  totalResults: number;
-  totalPages: number;
+  has_additional_results: boolean;
+  page_token: string;
 }
 
 

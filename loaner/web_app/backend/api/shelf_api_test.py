@@ -175,11 +175,6 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertLen(response.shelves, response_length)
 
-  def test_list_shelves_invalid_page_size(self):
-    with self.assertRaises(endpoints.BadRequestException):
-      request = shelf_messages.Shelf(page_size=0)
-      self.service.list_shelves(request)
-
   def test_list_shelves_with_search_constraints(self):
     expressions = shared_messages.SearchExpression(expression='location')
     expected_response = shelf_messages.ListShelfResponse(
@@ -188,7 +183,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
             shelf_request=shelf_messages.ShelfRequest(
                 location=self.shelf.location,
                 urlsafe_key=self.shelf.key.urlsafe()))],
-        total_results=1, total_pages=1)
+        has_additional_results=False)
     request = shelf_messages.Shelf(
         query=shared_messages.SearchRequest(
             query_string='location:NYC',
@@ -197,26 +192,19 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     response = self.service.list_shelves(request)
     self.assertEqual(response, expected_response)
 
-  def test_list_shelves_with_offset(self):
-    previouse_shelf_locations = []
-    request = shelf_messages.Shelf(enabled=True, page_size=1, page_number=1)
-    response = self.service.list_shelves(request)
-    self.assertLen(response.shelves, 1)
-    previouse_shelf_locations.append(response.shelves[0].location)
-
-    # Get next page results and make sure it's not the same as last.
-    request = shelf_messages.Shelf(enabled=True, page_size=1, page_number=2)
-    response = self.service.list_shelves(request)
-    self.assertLen(response.shelves, 1)
-    self.assertNotIn(response.shelves[0], previouse_shelf_locations)
-    previouse_shelf_locations.append(response.shelves[0].location)
-
-    # Get next page results and make sure it's not the same as last 2.
-    request = shelf_messages.Shelf(enabled=True, page_size=1, page_number=3)
-    response = self.service.list_shelves(request)
-    self.assertLen(response.shelves, 1)
-    self.assertNotIn(response.shelves[0], previouse_shelf_locations)
-    previouse_shelf_locations.append(response.shelves[0].location)
+  def test_list_shelves_with_page_token(self):
+    request = shelf_messages.Shelf(enabled=True, page_size=1)
+    response_shelves = []
+    while True:
+      response = self.service.list_shelves(request)
+      for shelf in response.shelves:
+        self.assertIn(shelf.location, self.shelf_locations)
+        response_shelves.append(shelf)
+      request = shelf_messages.Shelf(
+          enabled=True, page_size=1, page_token=response.page_token)
+      if not response.has_additional_results:
+        break
+    self.assertLen(response_shelves, 3)
 
   @mock.patch('__main__.root_api.Service.check_xsrf_token')
   @mock.patch('__main__.shelf_api.logging.info')

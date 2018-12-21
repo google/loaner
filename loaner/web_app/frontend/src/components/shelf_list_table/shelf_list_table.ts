@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {ChangeDetectorRef, Component, Input, OnDestroy, ViewChild} from '@angular/core';
-import {MatPaginator, MatSort, MatTableDataSource} from '@angular/material';
+import {MatSort, MatTableDataSource} from '@angular/material';
 import {interval, merge, NEVER, Subject} from 'rxjs';
 import {startWith, switchMap, takeUntil} from 'rxjs/operators';
 
@@ -50,8 +50,17 @@ export class ShelfListTable implements OnDestroy {
   totalResults = 0;
 
   @ViewChild(MatSort) sort!: MatSort;
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
-
+  /** Token needed on backend in order to return more results. */
+  pageToken?: string;
+  /** Backend response if there is more results to be retrieved. */
+  hasMoreResults = false;
+  /** Controls the state if is a refresh or request for more results. */
+  gettingMoreData = false;
+  /** Controls how many results it will get from backend. */
+  pageSize = 25;
+  /** Query filter to send to backend to get more results. */
+  filters: ShelfApiParams = {};
+  /* When true, pauseLoading will prevent auto refresh on the table. */
   pauseLoading = false;
 
   constructor(
@@ -59,34 +68,54 @@ export class ShelfListTable implements OnDestroy {
       private readonly shelfService: ShelfService) {}
 
   ngAfterViewInit() {
-    const intervalObservable = interval(60000).pipe(startWith(0));
+    this.getShelves();
+  }
 
-    merge(intervalObservable, this.sort.sortChange, this.paginator.page)
-        .pipe(
-            takeUntil(this.onDestroy),
-            switchMap(() => {
-              if (this.pauseLoading) return NEVER;
-
-              const filters: ShelfApiParams = {
-                page_number: this.paginator.pageIndex + 1,
-                page_size: this.paginator.pageSize,
-              };
-              const sort = this.sort.active || 'id';
-              const sortDirection = this.sort.direction || 'asc';
-              return this.shelfService.list(filters, sort, sortDirection);
-            }),
-            )
-        .subscribe(listReponse => {
-          this.totalResults = listReponse.totalResults;
-          this.dataSource.data = listReponse.shelves;
-          // We need to manually call change detection here because of
-          // https://github.com/angular/angular/issues/14748
-          this.changeDetector.detectChanges();
-        });
+  getMoreResults() {
+    this.gettingMoreData = true;
+    this.getShelves();
+    this.pageSize += 25;
   }
 
   ngOnDestroy() {
     this.dataSource.data = [];
     this.onDestroy.next();
+  }
+
+  private getShelves() {
+    const intervalObservable = interval(60000).pipe(startWith(0));
+    merge(intervalObservable, this.sort.sortChange)
+        .pipe(
+            takeUntil(this.onDestroy),
+            switchMap(() => {
+              if (this.pauseLoading) return NEVER;
+
+              if (this.gettingMoreData) {
+                this.filters = {
+                  page_token: this.pageToken,
+                };
+              } else {
+                this.filters = {page_size: this.pageSize};
+              }
+
+              const sort = this.sort.active || 'id';
+              const sortDirection = this.sort.direction || 'asc';
+              return this.shelfService.list(this.filters, sort, sortDirection);
+            }),
+            )
+        .subscribe(listReponse => {
+          if (this.gettingMoreData) {
+            this.dataSource.data =
+                this.dataSource.data.concat(listReponse.shelves);
+          } else {
+            this.dataSource.data = listReponse.shelves;
+          }
+          this.gettingMoreData = false;
+          this.hasMoreResults = listReponse.has_additional_results;
+          this.pageToken = listReponse.page_token;
+          // We need to manually call change detection here because of
+          // https://github.com/angular/angular/issues/14748
+          this.changeDetector.detectChanges();
+        });
   }
 }
