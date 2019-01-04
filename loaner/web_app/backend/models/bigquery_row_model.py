@@ -93,7 +93,10 @@ class BigQueryRow(base_model.BaseModel):
     """Checks if the time threshold for a BigQuery stream was met."""
     threshold = datetime.datetime.utcnow() - datetime.timedelta(
         minutes=constants.BIGQUERY_ROW_TIME_THRESHOLD)
-    return cls._get_last_unstreamed_row().timestamp <= threshold
+    last_unstreamed_row = cls._get_last_unstreamed_row()
+    if last_unstreamed_row:
+      return last_unstreamed_row.timestamp <= threshold
+    return False
 
   @classmethod
   def _row_threshold_reached(cls):

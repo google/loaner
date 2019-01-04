@@ -88,6 +88,14 @@ class BigQueryRowModelTest(loanertest.TestCase, parameterized.TestCase):
     self.assertTrue(bigquery_row_model.BigQueryRow._time_threshold_reached())
 
   @freezegun.freeze_time('1956-01-31')
+  def test_time_threshold_reached_fail_no_unstreamed_rows(self):
+    self.test_row_1.streamed = True
+    self.test_row_1.put()
+    self.test_row_2.streamed = True
+    self.test_row_2.put()
+    self.assertFalse(bigquery_row_model.BigQueryRow._time_threshold_reached())
+
+  @freezegun.freeze_time('1956-01-31')
   def test_time_threshold_reached_fail(self):
     threshold = datetime.datetime.utcnow() - datetime.timedelta(
         minutes=constants.BIGQUERY_ROW_TIME_THRESHOLD - 1)
