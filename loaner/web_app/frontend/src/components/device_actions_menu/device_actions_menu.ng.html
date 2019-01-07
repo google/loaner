@@ -43,7 +43,7 @@
           (click)="onUndamaged(device)"
           class="button-undamaged">
     <mat-icon>check</mat-icon>
-    Mark as Repaired
+    Mark as repaired
   </button>
   <button *ngIf="!device.lost"
           mat-menu-item
@@ -52,12 +52,12 @@
     <mat-icon>gps_off</mat-icon>
     Mark as lost
   </button>
-  <button *ngIf="device.locked"
+  <button *ngIf="device.lost || device.locked"
           mat-menu-item
           (click)="unlock(device)"
           class="button-unlock">
     <mat-icon>lock_open</mat-icon>
-    Unlock
+    {{ device.lost ? 'Mark as found' : 'Unlock' }}
   </button>
   <button mat-menu-item
           class="remove-device"

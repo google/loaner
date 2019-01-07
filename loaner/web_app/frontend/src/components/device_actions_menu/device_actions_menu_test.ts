@@ -27,7 +27,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {Unenroll} from '../../../../../shared/components/unenroll';
 import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, DEVICE_GUEST_PERMITTED, DEVICE_LOST, DEVICE_OVERDUE, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, DEVICE_GUEST_PERMITTED, DEVICE_LOCKED, DEVICE_LOST, DEVICE_OVERDUE, DeviceServiceMock} from '../../testing/mocks';
 
 import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
 
@@ -153,7 +153,7 @@ describe('DeviceActionsMenu', () => {
     expect(button.textContent).toContain('Mark as lost');
   });
 
-  it('renders the Mark as Repaired button after more is clicked', () => {
+  it('renders the Mark as repaired button after more is clicked', () => {
     dummyComponent.testDevice = DEVICE_DAMAGED;
     fixture.detectChanges();
     const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
@@ -161,11 +161,21 @@ describe('DeviceActionsMenu', () => {
     fixture.detectChanges();
     const button = overlayContainerElement.querySelector(
                        '.actions-menu .button-undamaged') as HTMLElement;
-    expect(button.textContent).toContain('Mark as Repaired');
+    expect(button.textContent).toContain('Mark as repaired');
+  });
+
+  it('renders the Mark as found button after more is clicked', () => {
+    dummyComponent.testDevice = DEVICE_LOST;
+    const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
+    actionsButton.click();
+    fixture.detectChanges();
+    const button = overlayContainerElement.querySelector(
+                       '.actions-menu .button-unlock') as HTMLElement;
+    expect(button.textContent).toContain('Mark as found');
   });
 
   it('renders the Unlock button after more is clicked', () => {
-    dummyComponent.testDevice = DEVICE_LOST;
+    dummyComponent.testDevice = DEVICE_LOCKED;
     const actionsButton = compiled.querySelector('.icon-more') as HTMLElement;
     actionsButton.click();
     fixture.detectChanges();
