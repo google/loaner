@@ -24,6 +24,7 @@
                      placeholder="Serial Number"
                      [(ngModel)]="device.serialNumber"
                      name="serialNumber"
+                     autocomplete="off"
                      required>
             </mat-form-field>
             <mat-form-field *ngIf="useAssetTag" fxFlex class="asset-tag">
@@ -34,6 +35,7 @@
                      placeholder="Asset tag"
                      [(ngModel)]="device.assetTag"
                      name="assetTag"
+                     autocomplete="off"
                      required>
             </mat-form-field>
           </section>
@@ -48,6 +50,7 @@
                      [placeholder]="mainIdentifierName"
                      [(ngModel)]="device.identifier"
                      name="mainIdentifier"
+                     autocomplete="off"
                      required>
             </mat-form-field>
           </section>
