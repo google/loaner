@@ -196,29 +196,13 @@ export class Device {
    */
   private makeChips(): DeviceChip[] {
     const chipsToReturn: DeviceChip[] = [];
-    if (!this.assignedUser) {
-      chipsToReturn.push({
-        icon: 'person_outline',
-        label: 'Unassigned',
-        tooltip: 'This device is unassigned.',
-        color: DeviceChipColor.OK,
-        status: DeviceChipStatus.UNASSIGNED,
-      });
-    } else if (this.overdue) {
+    if (this.overdue) {
       chipsToReturn.push({
         icon: 'event_busy',
         label: 'Overdue',
         tooltip: 'This device is being held past its due date.',
         color: DeviceChipColor.WARNING,
         status: DeviceChipStatus.OVERDUE,
-      });
-    } else if (this.assignedUser) {
-      chipsToReturn.push({
-        icon: 'person',
-        label: 'Assigned',
-        tooltip: `This device is assigned to ${this.assignedUser}`,
-        color: DeviceChipColor.PRIMARY,
-        status: DeviceChipStatus.ASSIGNED,
       });
     }
     if (this.locked) {
@@ -294,13 +278,11 @@ export enum DeviceChipColor {
 }
 
 export enum DeviceChipStatus {
-  ASSIGNED = 'Assigned',
   DAMAGED = 'Damaged',
   LOCKED = 'Locked',
   LOST = 'Lost',
   PENDING_RETURN = 'Pending return',
   OVERDUE = 'Overdue',
-  UNASSIGNED = 'Unassigned',
 }
 
 export interface DeviceChip {

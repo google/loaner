@@ -119,21 +119,6 @@ describe('DeviceListTableComponent', () => {
     expect(deviceListTable.pauseLoading).toBe(false);
   });
 
-  it('shows the assigned chip when device is assigned', fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
-       spyOn(deviceService, 'list').and.returnValue(of({
-         devices: [DEVICE_ASSIGNED],
-         totalResults: 1,
-         totalPages: 1,
-       }));
-       deviceListTable.ngAfterViewInit();
-       const matChipListContent =
-           fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-               .textContent;
-       expect(matChipListContent).toContain('Assigned');
-       discardPeriodicTasks();
-     }));
-
   it('shows the damaged chip when device is damaged', fakeAsync(() => {
        const deviceService: DeviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
@@ -229,14 +214,4 @@ describe('DeviceListTableComponent', () => {
 
        discardPeriodicTasks();
      }));
-
-  it('shows the unassigned chip when device is unassigned', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'list').and.returnValue(of([DEVICE_UNASSIGNED]));
-    fixture.detectChanges();
-    const matChipListContent =
-        fixture.debugElement.nativeElement.querySelector('mat-chip-list')
-            .textContent;
-    expect(matChipListContent).toContain('Unassigned');
-  });
 });
