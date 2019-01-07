@@ -63,6 +63,14 @@
                                fxFlex="50%">
           </loaner-viewonly-label>
       </section>
+      <section fxLayout="row" fxLayout.xs="column">
+        <loaner-viewonly-label topLabel="Last Audit Time" class="last-audit-time"
+                text="{{shelf.lastAuditTime | date:'long'}}" fxFlex>
+        </loaner-viewonly-label>
+        <loaner-viewonly-label topLabel="Last Audit By" class="last-audit-by"
+                text="{{shelf.lastAuditBy}}" fxFlex>
+        </loaner-viewonly-label>
+      </section>
     </div>
   </mat-card-content>
 </mat-card>

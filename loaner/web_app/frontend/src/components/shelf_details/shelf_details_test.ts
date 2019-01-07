@@ -135,6 +135,20 @@ describe('ShelfDetailsComponent', () => {
         .toContain('Responsible');
   });
 
+  it('renders the last audit time inside loaner-viewonly-label', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.last-audit-time').textContent)
+        .toContain('Last Audit Time');
+  });
+
+  it('renders the last audit by inside loaner-viewonly-label', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.last-audit-by').textContent)
+        .toContain('Last Audit By');
+  });
+
   it('renders the shelf audit notifications inside loaner-viewonly-label',
      () => {
        fixture.detectChanges();
