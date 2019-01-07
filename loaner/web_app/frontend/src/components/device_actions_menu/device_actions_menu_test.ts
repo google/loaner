@@ -232,7 +232,7 @@ describe('DeviceActionsMenu', () => {
                           '.actions-menu .button-extend') as HTMLElement;
        button.click();
        fixture.detectChanges();
-       expect(deviceService.extend).toHaveBeenCalled();
+       expect(deviceService.extend).toHaveBeenCalledTimes(1);
        expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
      });
 
@@ -251,7 +251,7 @@ describe('DeviceActionsMenu', () => {
                           '.actions-menu .button-return') as HTMLElement;
        button.click();
        fixture.detectChanges();
-       expect(deviceService.returnDevice).toHaveBeenCalled();
+       expect(deviceService.returnDevice).toHaveBeenCalledTimes(1);
        expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
      });
 
@@ -270,7 +270,7 @@ describe('DeviceActionsMenu', () => {
                           '.actions-menu .button-guest') as HTMLElement;
        button.click();
        fixture.detectChanges();
-       expect(deviceService.enableGuestMode).toHaveBeenCalled();
+       expect(deviceService.enableGuestMode).toHaveBeenCalledTimes(1);
        expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
      });
 
@@ -289,7 +289,7 @@ describe('DeviceActionsMenu', () => {
                           '.actions-menu .button-damaged') as HTMLElement;
        button.click();
        fixture.detectChanges();
-       expect(deviceService.markAsDamaged).toHaveBeenCalled();
+       expect(deviceService.markAsDamaged).toHaveBeenCalledTimes(1);
        expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
      });
 
@@ -308,7 +308,7 @@ describe('DeviceActionsMenu', () => {
                           '.actions-menu .button-lost') as HTMLElement;
        button.click();
        fixture.detectChanges();
-       expect(deviceService.markAsLost).toHaveBeenCalled();
+       expect(deviceService.markAsLost).toHaveBeenCalledTimes(1);
        expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
      });
 
@@ -327,7 +327,7 @@ describe('DeviceActionsMenu', () => {
                           '.actions-menu .button-unenroll') as HTMLElement;
        button.click();
        fixture.detectChanges();
-       expect(deviceService.unenroll).toHaveBeenCalled();
+       expect(deviceService.unenroll).toHaveBeenCalledTimes(1);
        expect(deviceActionsMenu.refreshDevice.emit).toHaveBeenCalled();
      });
 });

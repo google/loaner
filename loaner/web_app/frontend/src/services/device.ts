@@ -188,11 +188,9 @@ export class DeviceService extends ApiService {
       'device': device.toApiMessage(),
       'damaged_reason': reason,
     };
-    const httpObservable = this.post<void>('user/mark_damaged', request);
-    httpObservable.subscribe(() => {
+    return this.post<void>('user/mark_damaged', request).pipe(tap(() => {
       this.snackBar.open(`Device ${device.identifier} marked as damaged.`);
-    });
-    return httpObservable;
+    }));
   }
 
   /**
