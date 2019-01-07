@@ -21,10 +21,13 @@ from __future__ import print_function
 import mock
 
 from protorpc import message_types
+from google.appengine.api import datastore_errors
+
 import endpoints
 
 from loaner.web_app.backend.api import tag_api
 from loaner.web_app.backend.api.messages import tag_messages
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.models import tag_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -40,6 +43,24 @@ class TagApiTest(loanertest.EndpointsTestCase):
     self.test_tag = tag_model.Tag.create(
         user_email=loanertest.USER_EMAIL, name='tag-one',
         hidden=False, protect=False, color='amber')
+    self.test_tag_response = tag_messages.Tag(
+        name=self.test_tag.name,
+        hidden=self.test_tag.hidden,
+        protect=self.test_tag.protect,
+        color=self.test_tag.color,
+        description=self.test_tag.description,
+        urlsafe_key=self.test_tag.key.urlsafe())
+
+    self.hidden_tag = tag_model.Tag.create(
+        user_email=loanertest.USER_EMAIL, name='tag-two',
+        hidden=True, protect=False, color='red', description='test-description')
+    self.hidden_tag_response = tag_messages.Tag(
+        name=self.hidden_tag.name,
+        hidden=self.hidden_tag.hidden,
+        protect=self.hidden_tag.protect,
+        color=self.hidden_tag.color,
+        description=self.hidden_tag.description,
+        urlsafe_key=self.hidden_tag.key.urlsafe())
 
   def tearDown(self):
     super(TagApiTest, self).tearDown()
@@ -79,19 +100,19 @@ class TagApiTest(loanertest.EndpointsTestCase):
 
   def test_destroy_tag(self):
     request = tag_messages.TagRequest(
-        urlsafe_key=self.test_tag.key.urlsafe())
+        urlsafe_key=self.hidden_tag.key.urlsafe())
     with mock.patch.object(
         self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
       response = self.service.destroy(request)
       self.assertEqual(mock_xsrf_token.call_count, 1)
       self.assertIsNone(
-          tag_model.Tag.get(self.test_tag.key.urlsafe()))
+          tag_model.Tag.get(self.hidden_tag.key.urlsafe()))
       self.assertIsInstance(response, message_types.VoidMessage)
 
   def test_destroy_not_existing(self):
-    request = tag_messages.TagRequest(urlsafe_key='nonexistent_tag')
     with self.assertRaises(endpoints.BadRequestException):
-      self.service.destroy(request)
+      self.service.destroy(
+          tag_messages.TagRequest(urlsafe_key='nonexistent_tag'))
 
   def test_get_tag(self):
     request = tag_messages.TagRequest(urlsafe_key=self.test_tag.key.urlsafe())
@@ -111,6 +132,45 @@ class TagApiTest(loanertest.EndpointsTestCase):
     request = tag_messages.TagRequest(urlsafe_key='fake_urlsafe_key')
     with self.assertRaises(endpoints.BadRequestException):
       self.service.get(request)
+
+  def test_list_tags(self):
+    with mock.patch.object(
+        self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
+      response = self.service.list(tag_messages.ListTagRequest(page_size=10000))
+      self.assertEqual(mock_xsrf_token.call_count, 1)
+      self.assertListEqual(response.tags,
+                           [self.test_tag_response, self.hidden_tag_response])
+
+  def test_list_tags_additional_results(self):
+    first_response = self.service.list(tag_messages.ListTagRequest(page_size=1))
+    self.assertListEqual(first_response.tags, [self.test_tag_response])
+    self.assertTrue(first_response.has_additional_results)
+
+    second_response = self.service.list(tag_messages.ListTagRequest(
+        page_size=10000, cursor=first_response.cursor))
+    self.assertEqual(second_response.tags, [self.hidden_tag_response])
+    self.assertFalse(second_response.has_additional_results)
+    self.assertIsNotNone(second_response.cursor)
+
+  def test_list_tags_none(self):
+    self.test_tag.key.delete()
+    self.hidden_tag.key.delete()
+
+    response = self.service.list(tag_messages.ListTagRequest())
+    self.assertEmpty(response.tags)
+    self.assertFalse(response.has_additional_results)
+    self.assertIsNone(response.cursor)
+
+  def test_list_tags_no_cursor(self):
+    with mock.patch.object(
+        api_utils, 'get_datastore_cursor',
+        autospec=True) as mock_get_datastore_cursor:
+      self.service.list(tag_messages.ListTagRequest())
+      self.assertFalse(mock_get_datastore_cursor.called)
+
+  def test_list_tags_bad_request(self):
+    with self.assertRaises(datastore_errors.BadValueError):
+      self.service.list(tag_messages.ListTagRequest(cursor='bad_cursor_value'))
 
 
 if __name__ == '__main__':

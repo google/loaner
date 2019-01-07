@@ -94,3 +94,33 @@ class TagApi(root_api.Service):
         color=tag.color,
         protect=tag.protect,
         description=tag.description)
+
+  @auth.method(
+      tag_messages.ListTagRequest,
+      tag_messages.ListTagResponse,
+      name='list',
+      path='list',
+      http_method='POST',
+      permission=permissions.Permissions.READ_CONFIGS)
+  def list(self, request):
+    """Lists tags in datastore."""
+    self.check_xsrf_token(self.request_state)
+    cursor = None
+    if request.cursor:
+      cursor = api_utils.get_datastore_cursor(urlsafe_cursor=request.cursor)
+
+    tag_results, next_cursor, has_additional_results = tag_model.Tag.list(
+        page_size=request.page_size, cursor=cursor)
+    tags_messages = []
+    for tag in tag_results:
+      message = tag_messages.Tag(
+          name=tag.name, hidden=tag.hidden, color=tag.color,
+          protect=tag.protect, description=tag.description,
+          urlsafe_key=tag.key.urlsafe())
+      tags_messages.append(message)
+
+    return tag_messages.ListTagResponse(
+        tags=tags_messages,
+        cursor=next_cursor.urlsafe() if next_cursor else None,
+        has_additional_results=has_additional_results)
+

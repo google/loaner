@@ -290,6 +290,7 @@ loaner_appengine_test(
         ":tag_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:parameterized",
+        "@endpoints_archive//:endpoints",
         "@mock_archive//:mock",
     ],
 )

@@ -31,12 +31,15 @@ class Tag(messages.Message):
     protect: bool, Whether the tag is protected from user manipulation; this
       field will only be included in response messages.
     description: str, The description for the tag.
+    urlsafe_key: str, The urlsafe representation of the ndb.Key of the tag; this
+      field will only be included in response messages.
   """
   name = messages.StringField(1)
   hidden = messages.BooleanField(2, default=False)
   color = messages.StringField(3)
   protect = messages.BooleanField(4)
   description = messages.StringField(5)
+  urlsafe_key = messages.StringField(6)
 
 
 class CreateTagRequest(messages.Message):
@@ -56,3 +59,30 @@ class TagRequest(messages.Message):
       requested tag.
   """
   urlsafe_key = messages.StringField(1)
+
+
+class ListTagRequest(messages.Message):
+  """ListTagRequest ProtoRPC message.
+
+  Attributes:
+    page_size: int, The number of results to return.
+    cursor: str, The base64-encoded cursor string specifying where to start the
+      query.
+  """
+  page_size = messages.IntegerField(1, default=10)
+  cursor = messages.StringField(2)
+
+
+class ListTagResponse(messages.Message):
+  """ListTagResponse ProtoRPC message.
+
+  Attributes:
+    tags: List[Tag], The list of tags being returned.
+    cursor: str, The base64-encoded cursor string denoting the position of the
+      last result retrieved.
+    has_additional_results: bool, Whether there are additional results to be
+      retrieved.
+  """
+  tags = messages.MessageField(Tag, 1, repeated=True)
+  cursor = messages.StringField(2)
+  has_additional_results = messages.BooleanField(3)

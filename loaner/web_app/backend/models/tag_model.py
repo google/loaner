@@ -137,6 +137,26 @@ class Tag(base_model.BaseModel):
     for model in _MODELS_WITH_TAGS:
       deferred.defer(_delete_tags, model, key)
 
+  @classmethod
+  def list(cls, page_size=10, cursor=None):
+    """Fetches all tags entities from datastore.
+
+    Args:
+      page_size: int, The number of results to return.
+      cursor: Optional[datastore_query.Cursor], pointing to the last
+        result.
+
+    Returns:
+      A tuple of a list of Tag instances, a datastore_query.Cursor instance,
+      and a boolean representing whether or not there are additional results to
+      retrieve. For example:
+
+      ([tag_model.Tag instance_1, ..., tag_model.Tag instance_pagesize - 1],
+       datastore_query.Cursor instance,
+       True)
+    """
+    return cls.query().fetch_page(page_size=page_size, start_cursor=cursor)
+
 
 def _delete_tags(model, key, cursor=None, num_updated=0, batch_size=100):
   """Cleans up any entities on the given model that reference the given key.

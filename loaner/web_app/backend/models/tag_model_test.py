@@ -23,8 +23,11 @@ from absl.testing import parameterized
 import mock
 
 from google.appengine.api import datastore_errors
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
+
+import endpoints
 
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import tag_model
@@ -163,6 +166,43 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
     self.assertNotIn(self.tag1_data, self.entity1.tags)
     self.assertNotIn(self.tag1_data, self.entity2.tags)
     self.assertNotIn(self.tag1_data, self.entity3.tags)
+
+  def test_get_tag(self):
+    self.assertEqual(
+        tag_model.Tag.get(urlsafe_key=self.tag1.key.urlsafe()), self.tag1)
+
+  def test_get_tag_bad_request(self):
+    with self.assertRaises(endpoints.BadRequestException):
+      tag_model.Tag.get(urlsafe_key='fake_urlsafe_key')
+
+  def test_list_all_tags(self):
+    """Test listing all tag entities by using an unreasonbly high page_size."""
+    query_results, cursor, has_additional_results = tag_model.Tag.list(
+        page_size=1000)
+    self.assertListEqual(query_results, [self.tag1, self.tag2])
+    self.assertIsInstance(cursor, datastore_query.Cursor)
+    self.assertFalse(has_additional_results)
+
+  def test_list_tags_more(self):
+    page_one_result, first_cursor, has_additional_results = tag_model.Tag.list(
+        page_size=1, cursor=None)
+    self.assertListEqual(page_one_result, [self.tag1])
+    self.assertTrue(has_additional_results)
+
+    page_two_result, next_cursor, has_additional_results = tag_model.Tag.list(
+        page_size=10000, cursor=first_cursor)
+    self.assertListEqual(page_two_result, [self.tag2])
+    self.assertIsInstance(next_cursor, datastore_query.Cursor)
+    self.assertFalse(has_additional_results)
+
+  def test_list_tags_none(self):
+    self.tag1.key.delete()
+    self.tag2.key.delete()
+    query_results, cursor, has_additional_results = tag_model.Tag.list()
+    self.assertEmpty(query_results)
+    self.assertIsNone(cursor)
+    self.assertFalse(has_additional_results)
+
 
 if __name__ == '__main__':
   loanertest.main()

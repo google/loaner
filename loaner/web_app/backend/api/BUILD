@@ -416,6 +416,7 @@ loaner_appengine_test(
     deps = [
         ":tag_api",
         "//loaner/web_app/backend/api/messages:tag_messages",
+        "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/models:tag_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@endpoints_archive//:endpoints",
