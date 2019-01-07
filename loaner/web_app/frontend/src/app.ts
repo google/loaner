@@ -18,7 +18,7 @@ import {Title} from '@angular/platform-browser';
 import {NavigationEnd, Router} from '@angular/router';
 
 import {LoaderService, LoaderView} from '../../../shared/components/loader';
-import {ConfigService} from '../../../shared/config';
+import {ConfigService, ENVIRONMENTS} from '../../../shared/config';
 
 import {CONFIG} from './app.config';
 import {SEARCH_PERMISSIONS} from './app.routing';
@@ -133,7 +133,8 @@ export class AppComponent extends LoaderView {
     });
 
     // Handles the content pushes to Google Analytics if enabled.
-    if (this.config.analyticsEnabled) {
+    if (this.config.analyticsEnabled &&
+        this.config.appMode === ENVIRONMENTS.PROD) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
           // tslint:disable:no-any DefinitelyTyped does not yet support gtag so

@@ -24,7 +24,7 @@ import {LoanerTextCardModule} from '../../../../shared/components/info_card';
 import {LoanerProgressModule} from '../../../../shared/components/progress';
 import {FlowsEnum, LoanerReturnInstructions, LoanerReturnInstructionsModule} from '../../../../shared/components/return_instructions';
 import {Survey, SurveyAnswer, SurveyComponent, SurveyModule, SurveyType} from '../../../../shared/components/survey';
-import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, ConfigService, PROGRAM_NAME, RETURN_ANIMATION_ALT_TEXT, RETURN_ANIMATION_ENABLED, RETURN_ANIMATION_URL, TOOLBAR_ICON, TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
+import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, CHROME_MODE, ConfigService, PROGRAM_NAME, RETURN_ANIMATION_ALT_TEXT, RETURN_ANIMATION_ENABLED, RETURN_ANIMATION_URL, TOOLBAR_ICON, TOOLBAR_ICON_ENABLED} from '../../../../shared/config';
 import {ApiConfig, apiConfigFactory} from '../../../../shared/services/api_config';
 import {NetworkService} from '../../../../shared/services/network_service';
 import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
@@ -138,7 +138,8 @@ device to your nearest shelf as soon as possible.`,
    * @param view represents the current page/view.
    */
   private updateAnalytics(view: string) {
-    if (this.config.analyticsEnabled) {
+    if (this.config.analyticsEnabled &&
+        this.config.chromeMode === CHROME_MODE.PROD) {
       this.analyticsService.sendView('offboarding', view).subscribe(url => {
         if (this.analyticsImg) {
           this.analyticsImg.src = window.URL.createObjectURL(url);

@@ -21,7 +21,7 @@ import {NavigationEnd, Router, RouterModule, Routes} from '@angular/router';
 import {DamagedModule} from '../../../../shared/components/damaged';
 import {ExtendModule} from '../../../../shared/components/extend';
 import {GuestModeModule} from '../../../../shared/components/guest';
-import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, ConfigService} from '../../../../shared/config';
+import {BACKGROUND_LOGO, BACKGROUND_LOGO_ENABLED, CHROME_MODE, ConfigService} from '../../../../shared/config';
 import {AnalyticsModule, AnalyticsService} from '../shared/analytics';
 import {ChromeAppPlatformLocation,} from '../shared/chrome_app_platform_location';
 import {HttpModule} from '../shared/http/http_module';
@@ -73,7 +73,8 @@ export class AppRoot {
   ) {}
 
   ngAfterViewInit() {
-    if (this.config.analyticsEnabled) {
+    if (this.config.analyticsEnabled &&
+        this.config.chromeMode === CHROME_MODE.PROD) {
       this.router.events.subscribe(route => {
         if (route instanceof NavigationEnd) {
           this.analyticsService
