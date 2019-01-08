@@ -40,6 +40,24 @@ const ENROLLED_AND_NOT_ONBOARDED: LoanerStorage = {
 /** Represent the name of the local storage key name. */
 const LOANER_STATUS_NAME = 'loanerStatus';
 
+/** Notification identifiers. */
+const UNHANDLED_ERROR = 'unhandledError';
+const NOT_ENROLLED = 'notEnrolled';
+const NO_INTERNET_MANAGEMENT = 'noInternet-management';
+const NOT_ONBOARDED = 'notOnboarded';
+const PLEASE_WAIT = 'pleaseWait';
+
+/**
+ * Checks if the ID provided is approved for the debug listener.
+ * @param id string that represents the name of the notification.
+ */
+function debugApproved(id: string) {
+  return (
+      id === UNHANDLED_ERROR || id === NOT_ENROLLED ||
+      id === NO_INTERNET_MANAGEMENT || id === NOT_ONBOARDED ||
+      id === PLEASE_WAIT);
+}
+
 /**
  * On launch of the application check the source and open the management
  * application. This also does a check to see if an internet connection is
@@ -56,7 +74,7 @@ chrome.app.runtime.onLaunched.addListener((launchData) => {
       const offlineNotification = 'You have no internet connection so the ' +
           PROGRAM_NAME + ' app is unavailable.';
       createNotification(
-          'noInternet-management', offlineNotification, 'You\'re offline');
+          NO_INTERNET_MANAGEMENT, offlineNotification, 'You\'re offline');
     }
   }
 });
@@ -99,14 +117,14 @@ function launchManage() {
               'the ' + PROGRAM_NAME + ' program. Please contact your ' +
               'administrator.';
           createNotification(
-              'notEnrolled', notEnrolledNotification,
+              NOT_ENROLLED, notEnrolledNotification,
               'This device is not enrolled');
           console.error('Enrollment status: ', status.enrolled);
         } else if (!status.onboardingComplete) {
           const notOnboardedNotification = 'Please try again after ' +
               'completing the onboarding process.';
           createNotification(
-              'notOnboarded', notOnboardedNotification,
+              NOT_ONBOARDED, notOnboardedNotification,
               'Please complete the onboarding process first');
           console.error(
               'Onboarding complete status: ', status.onboardingComplete);
@@ -124,7 +142,7 @@ function manageValueUpdater(): Observable<LoanerStorage> {
   // Adds a warning and notification that the values are being updated.
   console.warn('Attempting to update the local storage values.');
   const waitNotification = 'We are checking this devices current status.';
-  createNotification('pleaseWait', waitNotification, 'Please wait');
+  createNotification(PLEASE_WAIT, waitNotification, 'Please wait');
   return new Observable(observer => {
     Heartbeat.sendHeartbeat().subscribe(
         deviceInfo => {
@@ -148,7 +166,7 @@ function manageValueUpdater(): Observable<LoanerStorage> {
           const unhandledNotification =
               'Oh no! We were unable to retrieve the devices current state.';
           createNotification(
-              'unhandledError', unhandledNotification, 'Something happened');
+              UNHANDLED_ERROR, unhandledNotification, 'Something happened');
           console.error(error);
         });
   });
@@ -169,6 +187,7 @@ function createNotification(
     requireInteraction: true,
     title: `${title}`,
     type: 'basic',
+    buttons: [{title: 'Debug'}]
   };
 
   chrome.notifications.create(notificationID, options);
@@ -419,4 +438,20 @@ function keepTrying(alarm: chrome.alarms.Alarm) {
               console.error(error);
             });
   }
+}
+
+/**
+ * Add a listener to allow for notifications to generate a debug view for
+ * given views.
+ */
+chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
+  if (buttonIndex === 0 && debugApproved(id)) {
+    createDebugView();
+  }
+});
+
+/** Generates the debug view for debugging the Chrome App and its state. */
+function createDebugView() {
+  chrome.app.window.create(
+      'debug.html', {id: 'debug', minWidth: 800, minHeight: 650});
 }

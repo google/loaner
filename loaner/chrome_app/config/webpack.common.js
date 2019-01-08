@@ -78,6 +78,11 @@ module.exports = {
       {
         from: './chrome_app/src/app/assets/animations/',
         to: './assets/animations/'
+      },
+      // Debug view
+      {from: './chrome_app/src/app/debug/debug.html', to: './'}, {
+        from: './chrome_app/src/app/debug/debug.js',
+        to: './debug_script-bundle.js'
       }
     ]),
   ]
