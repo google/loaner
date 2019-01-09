@@ -40,7 +40,7 @@ export declare interface SearchType {
   templateUrl: 'search_box.ng.html',
 })
 export class SearchBox implements OnInit {
-  isFocused!: boolean;
+  isFocused = false;
   /* Defines the default search options. */
   defaultSearchType: SearchType[] = [
     {
@@ -60,8 +60,8 @@ export class SearchBox implements OnInit {
       name: 'User',
     },
   ];
-  searchType!: SearchType[];
-  searchText!: string;
+  searchType: SearchType[] = [];
+  searchText = '';
   @ViewChild('searchBox') searchInputElement!: ElementRef;
   @ViewChild(MatAutocompleteTrigger)
   autocompleteTrigger!: MatAutocompleteTrigger;
@@ -136,14 +136,16 @@ export class SearchBox implements OnInit {
   }
 }
 
-
+/**
+ * Implements search helper.
+ */
 @Component({
   selector: 'loaner-search-helper',
   styleUrls: ['search_box.scss'],
   templateUrl: 'search_box_helper.ng.html',
 })
 export class SearchHelper implements OnInit {
-  sanitizedHelperContent!: string|null;
+  sanitizedHelperContent: string|null = null;
 
   constructor(
       private dialogRef: MatDialogRef<SearchHelper>,

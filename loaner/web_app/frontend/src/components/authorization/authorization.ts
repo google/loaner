@@ -33,7 +33,7 @@ export class Authorization extends LoaderView implements OnInit {
   /** Title for the component. */
   private readonly title = `Authorization - ${CONFIG.appName}`;
   /** Url to be redirected after login. */
-  private returnUrl!: string;
+  private returnUrl = '/';
 
   constructor(
       private readonly authService: AuthService,
@@ -48,7 +48,8 @@ export class Authorization extends LoaderView implements OnInit {
   }
 
   ngOnInit() {
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
+    this.returnUrl =
+        this.route.snapshot.queryParams['returnUrl'] || this.returnUrl;
     this.titleService.setTitle(this.title);
     if (this.authService.isSignedIn) {
       this.router.navigateByUrl(this.returnUrl);

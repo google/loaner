@@ -48,7 +48,7 @@ export class ShelfListTable implements OnDestroy {
   dataSource = new MatTableDataSource<Shelf>();
   /** Total number of shelves returned from the back end */
   totalResults = 0;
-
+  /** Sort object */
   @ViewChild(MatSort) sort!: MatSort;
   /** Token needed on backend in order to return more results. */
   pageToken?: string;

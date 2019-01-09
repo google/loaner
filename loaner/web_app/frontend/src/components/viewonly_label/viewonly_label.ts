@@ -25,6 +25,6 @@ import {Component, Input} from '@angular/core';
   templateUrl: 'viewonly_label.ng.html',
 })
 export class ViewonlyLabel {
-  @Input() topLabel!: string;
-  @Input() text!: string;
+  @Input() topLabel = '';
+  @Input() text = '';
 }

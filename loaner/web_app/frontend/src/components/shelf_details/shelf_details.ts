@@ -34,7 +34,7 @@ import {UserService} from '../../services/user';
 })
 export class ShelfDetails implements OnInit {
   /** Shelf that will have the details displayed in the template. */
-  @Input() shelf!: Shelf;
+  @Input() shelf?: Shelf;
 
   showAdvancedOptions = false;
   showQuickAudit = false;
@@ -66,8 +66,10 @@ export class ShelfDetails implements OnInit {
    * back looping between shelf details and shelf update.
    */
   edit() {
-    this.router.navigate(
-        ['shelf', this.shelf.location, 'update'], {skipLocationChange: true});
+    if (this.shelf) {
+      this.router.navigate(
+          ['shelf', this.shelf.location, 'update'], {skipLocationChange: true});
+    }
   }
 
   /** Dialog for removing a shelf. */
@@ -78,7 +80,9 @@ export class ShelfDetails implements OnInit {
     const dialogContent = 'Are you sure do you want to remove this shelf?';
     this.dialogBox.confirm(dialogTitle, dialogContent).subscribe(result => {
       if (result) {
-        this.shelfService.disable(this.shelf);
+        if (this.shelf) {
+          this.shelfService.disable(this.shelf);
+        }
         this.back();
       }
     });

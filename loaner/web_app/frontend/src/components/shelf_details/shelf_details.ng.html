@@ -1,4 +1,4 @@
-<mat-card class="loaner-table">
+<mat-card class="loaner-table" *ngIf="shelf">
   <mat-card-title class="title">
     <button (click)="back()" class="button-icon" mat-icon-button>
       <mat-icon matTooltip="Back" matTooltipPosition="above">
@@ -29,49 +29,47 @@
     </mat-menu>
   </mat-card-title>
   <mat-card-content>
-    <div *ngIf="shelf">
-      <section fxLayout="row" fxLayout.xs="column">
-        <loaner-viewonly-label topLabel="Location" class="location"
-                text="{{shelf.location}}" fxFlex>
+    <section fxLayout="row" fxLayout.xs="column">
+      <loaner-viewonly-label topLabel="Location" class="location"
+              text="{{shelf.location}}" fxFlex>
+      </loaner-viewonly-label>
+      <loaner-viewonly-label topLabel="Friendly Name" class="friendlyName"
+              text="{{shelf.friendlyName}}" fxFlex>
+      </loaner-viewonly-label>
+    </section>
+    <section fxLayout="row" fxLayout.xs="column">
+      <loaner-viewonly-label topLabel="Capacity" class="capacity"
+              text="{{shelf.capacity}}" fxFlex>
+      </loaner-viewonly-label>
+      <loaner-viewonly-label topLabel="Latitude" class="latitude"
+              text="{{shelf.latitude}}" fxFlex>
+      </loaner-viewonly-label>
+      <loaner-viewonly-label topLabel="Longitude" class="longitude"
+              text="{{shelf.longitude}}" fxFlex>
+      </loaner-viewonly-label>
+      <loaner-viewonly-label topLabel="Altitude" class="altitude"
+              text="{{shelf.altitude}}" fxFlex>
+      </loaner-viewonly-label>
+    </section>
+    <section fxLayout="row" fxLayout.xs="column">
+      <loaner-viewonly-label class="auditNotificationEnabled"
+                             text="Audit notification is {{shelf.auditNotificationEnabled ? 'enabled' : 'disabled'}}"
+                             fxFlex="50%">
+      </loaner-viewonly-label>
+      <loaner-viewonly-label topLabel="Responsible"
+                             class="responsible"
+                             text="{{shelf.responsibleForAudit}}"
+                             fxFlex="50%">
         </loaner-viewonly-label>
-        <loaner-viewonly-label topLabel="Friendly Name" class="friendlyName"
-                text="{{shelf.friendlyName}}" fxFlex>
-        </loaner-viewonly-label>
-      </section>
-      <section fxLayout="row" fxLayout.xs="column">
-        <loaner-viewonly-label topLabel="Capacity" class="capacity"
-                text="{{shelf.capacity}}" fxFlex>
-        </loaner-viewonly-label>
-        <loaner-viewonly-label topLabel="Latitude" class="latitude"
-                text="{{shelf.latitude}}" fxFlex>
-        </loaner-viewonly-label>
-        <loaner-viewonly-label topLabel="Longitude" class="longitude"
-                text="{{shelf.longitude}}" fxFlex>
-        </loaner-viewonly-label>
-        <loaner-viewonly-label topLabel="Altitude" class="altitude"
-                text="{{shelf.altitude}}" fxFlex>
-        </loaner-viewonly-label>
-      </section>
-      <section fxLayout="row" fxLayout.xs="column">
-        <loaner-viewonly-label class="auditNotificationEnabled"
-                               text="Audit notification is {{shelf.auditNotificationEnabled ? 'enabled' : 'disabled'}}"
-                               fxFlex="50%">
-        </loaner-viewonly-label>
-        <loaner-viewonly-label topLabel="Responsible"
-                               class="responsible"
-                               text="{{shelf.responsibleForAudit}}"
-                               fxFlex="50%">
-          </loaner-viewonly-label>
-      </section>
-      <section fxLayout="row" fxLayout.xs="column">
-        <loaner-viewonly-label topLabel="Last Audit Time" class="last-audit-time"
-                text="{{shelf.lastAuditTime | date:'long'}}" fxFlex>
-        </loaner-viewonly-label>
-        <loaner-viewonly-label topLabel="Last Audit By" class="last-audit-by"
-                text="{{shelf.lastAuditBy}}" fxFlex>
-        </loaner-viewonly-label>
-      </section>
-    </div>
+    </section>
+    <section fxLayout="row" fxLayout.xs="column">
+      <loaner-viewonly-label topLabel="Last Audit Time" class="last-audit-time"
+              text="{{shelf.lastAuditTime | date:'long'}}" fxFlex>
+      </loaner-viewonly-label>
+      <loaner-viewonly-label topLabel="Last Audit By" class="last-audit-by"
+              text="{{shelf.lastAuditBy}}" fxFlex>
+      </loaner-viewonly-label>
+    </section>
   </mat-card-content>
 </mat-card>
 

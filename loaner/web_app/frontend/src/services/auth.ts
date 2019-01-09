@@ -36,9 +36,9 @@ export class AuthService {
   /** Whether the user is currently signed into OAuth. */
   isSignedIn = false;
   /** Logged in user token ID. */
-  token!: string;
+  token?: string;
   /** Time at which token will expire in the next 5 minutes. */
-  tokenExpirationTime!: number;
+  tokenExpirationTime?: number;
   /** Whether the API has completed loading. */
   loaded = false;
   /** A subject the latest token id retrieved from gapi. */

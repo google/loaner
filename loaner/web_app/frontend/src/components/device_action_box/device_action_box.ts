@@ -71,8 +71,8 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   }
 
   @ViewChild('mainIdentifier') mainIdentifier!: ElementRef;
-  @ViewChild('serialNumber') serialNumber!: ElementRef;
-  @ViewChild('assetTag') assetTag!: ElementRef;
+  @ViewChild('serialNumber') serialNumber?: ElementRef;
+  @ViewChild('assetTag') assetTag?: ElementRef;
   @ViewChild('actionForm') actionForm!: NgForm;
 
   /** Emits a device when an action is ready to be taken. */
@@ -108,6 +108,7 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit() {
+    this.setUpMainIdentifier();
     this.setUpInput();
   }
 
@@ -127,8 +128,10 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
   private setUpMainIdentifier() {
     if (this.action === Actions.ENROLL) {
       if (this.useSerialNumber) {
-        this.mainIdentifier = this.serialNumber;
-      } else {
+        if (this.serialNumber) {
+          this.mainIdentifier = this.serialNumber;
+        }
+      } else if (this.assetTag) {
         this.mainIdentifier = this.assetTag;
       }
     }
@@ -161,9 +164,13 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
 
   private takeEnrollActions() {
     if (this.useSerialNumber && !this.device.serialNumber) {
-      this.serialNumber.nativeElement.focus();
+      if (this.serialNumber) {
+        this.serialNumber.nativeElement.focus();
+      }
     } else if (this.useAssetTag && !this.device.assetTag) {
-      this.assetTag.nativeElement.focus();
+      if (this.assetTag) {
+        this.assetTag.nativeElement.focus();
+      }
     } else {
       this.emitDevice();
     }

@@ -21,7 +21,8 @@ import {Device, ListDevicesResponse} from '../models/device';
 import {ListShelfResponse, Shelf, ShelfRequestParams} from '../models/shelf';
 import {User} from '../models/user';
 
-
+/* Disabling jsdocs on this file because they do not add much information   */
+// tslint:disable:enforce-comments-on-exported-symbols
 export class ShelfServiceMock {
   dataChange = new BehaviorSubject<Shelf[]>([
     new Shelf({

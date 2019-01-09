@@ -34,8 +34,6 @@ export class Configuration implements OnInit {
   searchIndexType = SearchIndexType;
   deviceIdentifierModeType = DeviceIdentifierModeType;
 
-  @ViewChild(NgForm) configurationForm: NgForm = this.configurationForm;
-
   shelfAuditEmailToList = '';
 
   constructor(

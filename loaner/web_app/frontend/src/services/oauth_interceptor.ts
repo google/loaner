@@ -44,8 +44,8 @@ const EXCLUDED_INTERCEPT_URLS: string[] = [
  */
 @Injectable()
 export class LoanerOAuthInterceptor implements HttpInterceptor {
-  private authToken!: string;
-  private authExpirationTime!: number;
+  private authToken?: string;
+  private authExpirationTime?: number;
   private urlsToIntercept: string[];
   private excludedUrlsToIntercept: string[];
   private counter = 0;
@@ -104,7 +104,7 @@ export class LoanerOAuthInterceptor implements HttpInterceptor {
   private prepareRequest(originalRequest: HttpRequest<{}>):
       Observable<HttpRequest<{}>> {
     return new Observable(observer => {
-      if (this.authExpirationTime < Date.now()) {
+      if (this.authExpirationTime && this.authExpirationTime < Date.now()) {
         this.authService.reloadAuth();
       }
 

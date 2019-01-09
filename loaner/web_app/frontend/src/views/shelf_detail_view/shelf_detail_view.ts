@@ -31,7 +31,7 @@ import {ShelfService} from '../../services/shelf';
 export class ShelfDetailView extends LoaderView implements OnInit {
   /** Title for the component. */
   readonly title = `Shelf Details - ${CONFIG.appName}`;
-  shelf!: Shelf;
+  shelf?: Shelf;
 
   constructor(
       private readonly shelfService: ShelfService,

@@ -36,9 +36,9 @@ export class ShelfActionsCard implements OnInit {
   /** Shelf that will be displayed in the template and created. */
   shelf = new Shelf();
   /** A bool indicating of a shelf already exists. */
-  editing!: boolean;
+  editing = false;
   /** List of possible teams that are responsible for a shelf. */
-  responsiblesForAuditList!: string[];
+  responsiblesForAuditList: string[] = [];
   /** Access properties in the form. */
   @ViewChild('shelfActionsForm') shelfActionsForm!: NgForm;
 
@@ -76,7 +76,9 @@ export class ShelfActionsCard implements OnInit {
   create() {
     this.shelfService.create(this.shelf).subscribe(() => {
       this.shelf = new Shelf();
-      this.shelfActionsForm.form.markAsPristine();
+      if (this.shelfActionsForm) {
+        this.shelfActionsForm.form.markAsPristine();
+      }
       this.backToShelves();
     });
   }
@@ -90,7 +92,9 @@ export class ShelfActionsCard implements OnInit {
         .pipe(switchMap(() => this.shelfService.getShelf(this.shelf.location)))
         .subscribe(shelf => {
           this.shelf = shelf;
-          this.shelfActionsForm.form.markAsPristine();
+          if (this.shelfActionsForm) {
+            this.shelfActionsForm.form.markAsPristine();
+          }
           this.backToShelfDetails();
         });
   }
