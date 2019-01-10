@@ -120,7 +120,6 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
           self.mock_directoryclient.move_chrome_device_org_unit.called)
 
   def test_identifier(self):
-
     # Devices without an asset tag should return the serial number.
     self.device1.asset_tag = None
     self.assertEqual(self.device1.serial_number, self.device1.identifier)
@@ -128,6 +127,24 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     # Devices with an asset tag should return the asset tag.
     self.device1.asset_tag = '123456'
     self.assertEqual(self.device1.asset_tag, self.device1.identifier)
+
+  @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
+  def test_enroll_new_device_whitespace_identifiers(self, mock_directoryclass):
+    self.patcher_directory = mock.patch.object(
+        directory, 'DirectoryApiClient', autospec=True)
+    self.mock_directoryclass = self.patcher_directory.start()
+    self.addCleanup(self.patcher_directory.stop)
+    self.mock_directoryclient = self.mock_directoryclass.return_value
+    self.mock_directoryclient.get_chrome_device_by_serial.return_value = (
+        loanertest.TEST_DIR_DEVICE1)
+
+    test_device = device_model.Device.enroll(
+        user_email=loanertest.USER_EMAIL,
+        serial_number=' 123456 ',
+        asset_tag=' 123ABC ')
+    self.assertEqual(
+        device_model.Device.get(serial_number='123456'), test_device)
+    self.assertEqual(device_model.Device.get(asset_tag='123ABC'), test_device)
 
   @mock.patch.object(logging, 'info')
   def test_enroll_new_device(self, mock_loginfo):
@@ -512,7 +529,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         device_model.Device.get(chrome_device_id='chrome_id_2').asset_tag,
         'ASSET_TAG_2')
 
-    # Identifier is can take either an asset tag or serial number.
+    # Identifier can take either an asset tag or serial number.
     self.assertEqual(
         device_model.Device.get(identifier='asset_tag_0').asset_tag,
         'ASSET_TAG_0')
@@ -520,6 +537,32 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         device_model.Device.get(
             identifier='serial_number_1').serial_number,
         'SERIAL_NUMBER_1')
+
+  def test_get_whitespace_identifiers(self):
+    whitespace_test_device = device_model.Device(
+        enrolled=False,
+        serial_number='123456',
+        asset_tag='ABCDE',
+        chrome_device_id='unique_id').put().get()
+
+    self.assertEqual(
+        device_model.Device.get(asset_tag=' ABCDE '),
+        whitespace_test_device)
+    self.assertEqual(
+        device_model.Device.get(serial_number=' 123456 '),
+        whitespace_test_device)
+    self.assertEqual(
+        device_model.Device.get(chrome_device_id=' unique_id '),
+        whitespace_test_device)
+
+    # Tests using the identifier argument with a serial number.
+    self.assertEqual(
+        device_model.Device.get(identifier=' ABCDE '),
+        whitespace_test_device)
+    # Tests using the identifier argument with an asset tag.
+    self.assertEqual(
+        device_model.Device.get(identifier=' 123456 '),
+        whitespace_test_device)
 
   def test_is_overdue(self):
     now = datetime.datetime(year=2017, month=1, day=1)

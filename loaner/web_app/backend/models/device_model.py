@@ -290,9 +290,9 @@ class Device(base_model.BaseModel):
           not found in the directory API.
     """
     if serial_number:
-      serial_number = serial_number.upper()
+      serial_number = serial_number.upper().strip()
     if asset_tag:
-      asset_tag = asset_tag.upper()
+      asset_tag = asset_tag.upper().strip()
     device_identifier_mode = config_model.Config.get('device_identifier_mode')
     if not asset_tag and device_identifier_mode in (
         config_model.DeviceIdentifierMode.BOTH_REQUIRED,
@@ -470,15 +470,15 @@ class Device(base_model.BaseModel):
           invalid URL-safe key is supplied.
     """
     if asset_tag:
-      return cls.query(cls.asset_tag == asset_tag.upper()).get()
+      return cls.query(cls.asset_tag == asset_tag.upper().strip()).get()
     elif chrome_device_id:
-      return cls.query(cls.chrome_device_id == chrome_device_id).get()
+      return cls.query(cls.chrome_device_id == chrome_device_id.strip()).get()
     elif serial_number:
-      return cls.query(cls.serial_number == serial_number.upper()).get()
+      return cls.query(cls.serial_number == serial_number.upper().strip()).get()
     elif identifier:
       return (
-          cls.query(cls.serial_number == identifier.upper()).get() or
-          cls.query(cls.asset_tag == identifier.upper()).get())
+          cls.query(cls.serial_number == identifier.upper().strip()).get() or
+          cls.query(cls.asset_tag == identifier.upper().strip()).get())
     else:
       raise DeviceIdentifierError('No identifier supplied to get device.')
 
