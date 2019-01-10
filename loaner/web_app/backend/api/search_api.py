@@ -20,6 +20,8 @@ from __future__ import print_function
 
 from protorpc import message_types
 
+from google.appengine.ext import deferred
+
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
@@ -42,9 +44,9 @@ class SearchApi(root_api.Service):
   def clear(self, request):
     """Clears a search index for the given type."""
     if request.model == search_messages.SearchIndexEnum.DEVICE:
-      device_model.Device.clear_index()
+      deferred.defer(device_model.Device.clear_index)
     elif request.model == search_messages.SearchIndexEnum.SHELF:
-      shelf_model.Shelf.clear_index()
+      deferred.defer(shelf_model.Shelf.clear_index)
     return message_types.VoidMessage()
 
   @auth.method(
@@ -57,7 +59,7 @@ class SearchApi(root_api.Service):
   def reindex(self, request):
     """Reindexes a search index for the given type."""
     if request.model == search_messages.SearchIndexEnum.DEVICE:
-      device_model.Device.index_entities_for_search()
+      deferred.defer(device_model.Device.index_entities_for_search)
     elif request.model == search_messages.SearchIndexEnum.SHELF:
-      shelf_model.Shelf.index_entities_for_search()
+      deferred.defer(shelf_model.Shelf.index_entities_for_search)
     return message_types.VoidMessage()
