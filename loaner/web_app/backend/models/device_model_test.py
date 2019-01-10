@@ -184,13 +184,11 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT)
     mock_directoryclient.get_chrome_device_by_serial.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
-    device = device_model.Device()
-    device.enrolled = False
-    device.model = 'HP Chromebook 13 G1'
-    device.serial_number = '123456'
-    device.asset_tag = '123ABC'
-    device.chrome_device_id = 'unique_id'
-    device.put()
+    device_model.Device(
+        enrolled=False,
+        serial_number='123456',
+        asset_tag='123ABC',
+        chrome_device_id='unique_id').put()
 
     self.assertEqual(mock_to_document.call_count, 1)
 
@@ -228,16 +226,14 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT)
     mock_directoryclient.get_chrome_device_by_serial.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
-    device = device_model.Device()
-    device.enrolled = False
-    device.model = 'HP Chromebook 13 G1'
-    device.serial_number = '123456'
-    device.chrome_device_id = 'unique_id'
-    device.put()
+    device_model.Device(
+        enrolled=False,
+        serial_number='123456',
+        chrome_device_id='unique_id').put()
 
     self.assertEqual(mock_to_document.call_count, 1)
 
-    device = device_model.Device.enroll(
+    device_model.Device.enroll(
         user_email=loanertest.USER_EMAIL, asset_tag='123ABC')
 
     self.assertEqual(mock_logging.info.call_count, 2)
@@ -275,17 +271,15 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT)
     mock_directoryclient.get_chrome_device_by_serial.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
-    device = device_model.Device()
-    device.enrolled = False
-    device.model = 'HP Chromebook 13 G1'
-    device.asset_tag = 'OLD_TAG'
-    device.serial_number = '123456'
-    device.chrome_device_id = 'unique_id'
-    device.put()
+    device_model.Device(
+        enrolled=False,
+        serial_number='123456',
+        asset_tag='OLD_TAG',
+        chrome_device_id='unique_id').put()
 
     self.assertEqual(mock_to_document.call_count, 1)
 
-    device = device_model.Device.enroll(
+    device_model.Device.enroll(
         user_email=loanertest.USER_EMAIL, asset_tag='123ABC')
 
     self.assertEqual(mock_logging.info.call_count, 2)
@@ -306,13 +300,11 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT)
     mock_directoryclient.get_chrome_device_by_serial.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
-    device = device_model.Device()
-    device.locked = True
-    device.enrolled = False
-    device.model = 'HP Chromebook 13 G1'
-    device.serial_number = '123456'
-    device.chrome_device_id = 'unique_id'
-    device.put()
+    device_model.Device(
+        locked=True,
+        enrolled=False,
+        serial_number='123456',
+        chrome_device_id='unique_id').put()
 
     device = device_model.Device.enroll(
         user_email=loanertest.USER_EMAIL, serial_number='123456')
@@ -332,13 +324,11 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT)
     mock_directoryclient.get_chrome_device_by_serial.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
-    device = device_model.Device()
-    device.lost = True
-    device.enrolled = False
-    device.model = 'HP Chromebook 13 G1'
-    device.serial_number = '123456'
-    device.chrome_device_id = 'unique_id'
-    device.put()
+    device_model.Device(
+        lost=True,
+        enrolled=False,
+        serial_number='123456',
+        chrome_device_id='unique_id').put()
 
     device = device_model.Device.enroll(
         user_email=loanertest.USER_EMAIL, serial_number='123456')
@@ -355,13 +345,10 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.get_chrome_device_by_serial.return_value = (
         loanertest.TEST_DIR_DEVICE_DEFAULT)
-    device = device_model.Device()
-    device.damaged = True
-    device.enrolled = False
-    device.serial_number = '123456'
-    device.put()
 
-    device = device_model.Device.enroll(
+    device_model.Device(
+        damaged=True, enrolled=False, serial_number='123456').put()
+    device_model.Device.enroll(
         user_email=loanertest.USER_EMAIL, serial_number='123456')
 
     retrieved_device = device_model.Device.get(serial_number='123456')
@@ -370,13 +357,11 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_enroll_move_ou_error(self, mock_directoryclass):
-    device = device_model.Device()
-    device.enrolled = False
-    device.model = 'HP Chromebook 13 G1'
-    device.serial_number = '5467FD'
-    device.chrome_device_id = 'unique_id_09'
-    device.current_ou = 'not_default'
-    device.put()
+    device_model.Device(
+        enrolled=False,
+        serial_number='5467FD',
+        chrome_device_id='unique_id_09',
+        current_ou='not_deafult').put()
     err_message = 'Failed to move device'
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.move_chrome_device_org_unit.side_effect = (
@@ -967,7 +952,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
   @mock.patch.object(config_model, 'Config', autospec=True)
   def test_calculate_return_dates(self, mock_config):
-    now = datetime.datetime.utcnow()
+    now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.assignment_date = now
     mock_config.get.side_effect = [3, 14]
