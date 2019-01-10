@@ -6,28 +6,33 @@
     <p class="card-description">
         {{ troubleshootingInformation }}
     </p>
-    <div>
+    <div fxLayout="column" fxLayoutAlign="center center">
+      <strong *ngIf="contactPhone">Phone Support</strong>
       <div fxLayout="row"
            fxLayoutAlign="center center"
            *ngFor="let phone of contactPhone">
-        <mat-icon>phone</mat-icon>
-        <span class="icon-padding"></span>
         {{ phone }}
       </div>
+      <strong *ngIf="contactEmail">E-mail Support </strong>
       <div *ngIf="contactEmail"
            fxLayout="row"
            fxLayoutAlign="center center">
-        <mat-icon>email</mat-icon>
-        <span class="icon-padding"></span>
         {{ contactEmail }}
       </div>
+      <strong *ngIf="contactWebsite">Web Support </strong>
       <div *ngIf="contactWebsite"
            fxLayout="row"
            fxLayoutAlign="center center">
-        <mat-icon>web</mat-icon>
-        <span class="icon-padding"></span>
         <a target="_blank" [href]="contactWebsite">{{ contactWebsite }}</a>
       </div>
+    </div>
+    <div fxLayout="column" fxLayoutAlign="center end">
+      <button mat-icon-button
+              (click)="openDebugView()"
+              id="debug"
+              matTooltip="Open the debugger">
+        <mat-icon>error_outline</mat-icon>
+      </button>
     </div>
   </mat-card>
 </div>

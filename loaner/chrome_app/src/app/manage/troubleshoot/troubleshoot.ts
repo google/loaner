@@ -14,6 +14,7 @@
 
 import {Component} from '@angular/core';
 import {IT_CONTACT_EMAIL, IT_CONTACT_PHONE, IT_CONTACT_WEBSITE, TROUBLESHOOTING_INFORMATION} from '../../../../../shared/config';
+import {Background} from '../../shared/background_service';
 
 @Component({
   host: {
@@ -29,7 +30,7 @@ export class TroubleshootComponent {
   contactWebsite?: string;
   troubleshootingInformation: string;
 
-  constructor() {
+  constructor(private readonly background: Background) {
     if (IT_CONTACT_EMAIL.length > 0) {
       this.contactEmail = IT_CONTACT_EMAIL;
     }
@@ -48,5 +49,10 @@ export class TroubleshootComponent {
       this.troubleshootingInformation =
           'Contact your IT department for assistance.';
     }
+  }
+
+  /** Opens the debug view of the Chrome App. */
+  openDebugView() {
+    this.background.openView('debug', true);
   }
 }

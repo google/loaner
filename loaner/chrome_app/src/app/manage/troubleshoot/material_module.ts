@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import {NgModule} from '@angular/core';
-import {MatCardModule, MatIconModule} from '@angular/material';
+import {MatButtonModule, MatCardModule, MatIconModule, MatTooltipModule} from '@angular/material';
 
 const MATERIAL_MODULES = [
+  MatButtonModule,
   MatCardModule,
   MatIconModule,
+  MatTooltipModule,
 ];
 
 @NgModule({

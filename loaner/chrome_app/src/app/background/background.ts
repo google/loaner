@@ -277,6 +277,9 @@ chrome.runtime.onMessage.addListener(
             case 'offboarding':
               launchOffboardingFlow();
               break;
+            case 'debug':
+              createDebugView();
+              break;
             default:
               // Do nothing
               break;

@@ -15,6 +15,8 @@
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FlexLayoutModule} from '@angular/flex-layout';
 
+import {Background, BackgroundMock} from '../../shared/background_service';
+
 import {TroubleshootComponent} from './index';
 import {MaterialModule} from './material_module';
 
@@ -30,6 +32,7 @@ describe('TroubleshootComponent', () => {
             FlexLayoutModule,
             MaterialModule,
           ],
+          providers: [{provide: Background, useClass: BackgroundMock}],
         })
         .compileComponents();
   });
@@ -39,11 +42,11 @@ describe('TroubleshootComponent', () => {
     app = fixture.debugElement.componentInstance;
   });
 
-  it('should render content on the page', () => {
+  it('renders content on the page', () => {
     expect(fixture.nativeElement.textContent).toContain('Having issues?');
   });
 
-  it('should show the contact information on the page', () => {
+  it('shows the contact information on the page', () => {
     app.contactEmail = 'support@example.com';
     app.contactPhone = ['12345678', '910111213'];
     app.contactWebsite = 'support.example.com';
@@ -54,6 +57,15 @@ describe('TroubleshootComponent', () => {
     expect(fixture.nativeElement.textContent).toContain('12345678');
     expect(fixture.nativeElement.textContent).toContain('support.example.com');
     expect(fixture.nativeElement.textContent).toContain('Contact IT');
+  });
+
+  it('opens the debug view when the button is clicked', () => {
+    const bg: Background = TestBed.get(Background);
+    spyOn(bg, 'openView');
+    const debugButton =
+        fixture.debugElement.nativeElement.querySelector('#debug');
+    debugButton.click();
+    expect(bg.openView).toHaveBeenCalledWith('debug', true);
   });
 
 });
