@@ -134,6 +134,18 @@ export class BootstrapServiceMock {
   }
 }
 
+export const SHELF_CAPACITY_1 = new Shelf({
+  friendly_name: 'The smallest shelf',
+  location: 'Location 6',
+  last_audit_by: 'user',
+  capacity: 1,
+  last_audit_time: new Date(2018, 1, 1),
+  shelf_request: {
+    location: 'Location 6',
+    urlsafe_key: 'urlsafekey6',
+  }
+});
+
 export const DEVICE_1 = new Device({
   asset_tag: 'device1',
   device_model: 'chromebook',

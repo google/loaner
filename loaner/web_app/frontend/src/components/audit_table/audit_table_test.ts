@@ -17,12 +17,12 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, Router} from '@angular/router';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
-import {Status} from '../../models/device';
 
+import {Status} from '../../models/device';
 import {DeviceService} from '../../services/device';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
-import {ActivatedRouteMock, DeviceServiceMock, ShelfServiceMock} from '../../testing/mocks';
+import {ActivatedRouteMock, DeviceServiceMock, SHELF_CAPACITY_1, ShelfServiceMock} from '../../testing/mocks';
 
 import {AuditTable, AuditTableModule} from '.';
 
@@ -145,6 +145,39 @@ describe('AuditTableComponent', () => {
        flushMicrotasks();
        expect(shelfService.audit).toHaveBeenCalledWith(auditTable.shelf, [
          '321653'
+       ]);
+     }));
+
+  it('successfully calls shelf service with 3 devices when shelf capacity is 1',
+     fakeAsync(() => {
+       auditTable.devicesToBeCheckedIn = [
+         {
+           deviceId: '321653',
+           status: Status.READY,
+         },
+         {
+           deviceId: '123456',
+           status: Status.READY,
+         },
+         {
+           deviceId: '7891011',
+           status: Status.READY,
+         },
+       ];
+       expect(auditTable.isEmpty).not.toBeTruthy();
+       auditTable.shelf = SHELF_CAPACITY_1;
+
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const auditButton = compiled.querySelector('button.audit');
+
+       const shelfService = TestBed.get(ShelfService);
+       spyOn(shelfService, 'audit').and.callThrough();
+       spyOn(router, 'navigate');
+       auditButton.click();
+       flushMicrotasks();
+       expect(shelfService.audit).toHaveBeenCalledWith(auditTable.shelf, [
+         '321653', '123456', '7891011'
        ]);
      }));
 

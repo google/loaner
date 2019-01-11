@@ -91,23 +91,16 @@ export class AuditTable implements OnInit {
 
       const devicesWithReadyState = this.devicesToBeCheckedIn.filter(
           device => device.status === Status.READY);
-
-      if (this.shelf.capacity >= devicesWithReadyState.length) {
-        this.deviceService.checkReadyForAudit(deviceId).subscribe(
-            success => {
-              deviceToBeCheckedIn.status = Status.READY;
-              deviceToBeCheckedIn.message = success;
-            },
-            error => {
-              deviceToBeCheckedIn.status = Status.ERROR;
-              deviceToBeCheckedIn.message = error;
-            },
-        );
-      } else {
-        deviceToBeCheckedIn.status = Status.ERROR;
-        deviceToBeCheckedIn.message =
-            `Device can't be checked in because shelf has exceed its capacity.`;
-      }
+      this.deviceService.checkReadyForAudit(deviceId).subscribe(
+          success => {
+            deviceToBeCheckedIn.status = Status.READY;
+            deviceToBeCheckedIn.message = success;
+          },
+          error => {
+            deviceToBeCheckedIn.status = Status.ERROR;
+            deviceToBeCheckedIn.message = error;
+          },
+      );
     }
   }
 
