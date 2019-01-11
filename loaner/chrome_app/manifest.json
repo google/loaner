@@ -28,5 +28,13 @@
     "scopes": [
       "https://www.googleapis.com/auth/userinfo.email"
     ]
+  },
+  "commands": {
+    "open-debug": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+9"
+      },
+      "description": "Opens the debug view."
+    }
   }
 }

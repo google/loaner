@@ -448,9 +448,14 @@ function keepTrying(alarm: chrome.alarms.Alarm) {
  * given views.
  */
 chrome.notifications.onButtonClicked.addListener((id, buttonIndex) => {
-  if (buttonIndex === 0 && debugApproved(id)) {
-    createDebugView();
-  }
+  if (buttonIndex === 0 && debugApproved(id)) createDebugView();
+});
+
+/**
+ * Adds a listener to allow for the defined hotkey set to generate a debug view.
+ */
+chrome.commands.onCommand.addListener(command => {
+  if (command === 'open-debug') createDebugView();
 });
 
 /** Generates the debug view for debugging the Chrome App and its state. */
