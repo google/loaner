@@ -182,7 +182,7 @@ export class Device {
       lost: this.lost,
       pending_return: this.pendingReturn,
       serial_number: this.serialNumber,
-      shelf: this.shelf.toApiMessage(),
+      shelf: this.shelf.location ? this.shelf.toApiMessage() : undefined,
       assigned_user: this.assignedUser,
       guest_enabled: this.guestEnabled,
       guest_permitted: this.guestAllowed,
