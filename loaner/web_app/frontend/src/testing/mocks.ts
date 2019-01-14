@@ -12,13 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {BehaviorSubject, Observable, of} from 'rxjs';
+import {BehaviorSubject, Observable, Observer, of} from 'rxjs';
 
 import {CONFIG} from '../app.config';
 import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
 import {Device, ListDevicesResponse} from '../models/device';
 import {ListShelfResponse, Shelf, ShelfRequestParams} from '../models/shelf';
+import {CreateTagRequest, Tag} from '../models/tag';
 import {User} from '../models/user';
 
 /* Disabling jsdocs on this file because they do not add much information   */
@@ -544,6 +545,23 @@ export const TEST_SHELF = new Shelf({
   responsible_for_audit: 'me',
   shelf_request: TEST_SHELF_REQUEST,
 });
+
+/** A class which mocks TagService calls without making any HTTP calls. */
+export class TagServiceMock {
+  private tags: Tag[] = [];
+
+  create(tagParams: CreateTagRequest) {
+    return Observable.create((observer: Observer<boolean>) => {
+      if (tagParams.tag.name === '') {
+        observer.error(false);
+        observer.complete();
+      }
+      this.tags.push(new Tag(tagParams.tag));
+      observer.next(true);
+      observer.complete();
+    });
+  }
+}
 
 export class ActivatedRouteMock {
   get params(): Observable<{[key: string]: {}}> {
