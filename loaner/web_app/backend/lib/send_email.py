@@ -23,7 +23,7 @@ import logging
 
 import html2text
 
-from google.appengine.api import mail
+from google.appengine.api import taskqueue
 from loaner.web_app import constants
 from loaner.web_app.backend.models import config_model
 
@@ -124,9 +124,5 @@ def _send_email(**kwargs):
       kwargs['subject'] = '[local] ' + kwargs['subject']
     elif constants.ON_QA:
       kwargs['subject'] = '[qa] ' + kwargs['subject']
-  try:
-    mail.send_mail(**kwargs)
-  except mail.InvalidEmailError as error:
-    logging.error(
-        'Email helper failed to send mail due to an error: %s. (Kwargs: %s)',
-        error.message, kwargs)
+
+  taskqueue.add(queue_name='send-email', params=kwargs, target='default')

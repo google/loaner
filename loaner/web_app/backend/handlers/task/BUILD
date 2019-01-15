@@ -21,6 +21,7 @@ loaner_appengine_library(
     name = "task",
     srcs = [
         ":process_action",
+        ":process_emails",
         ":stream_to_bigquery",
     ],
 )
@@ -33,6 +34,13 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app/backend/lib:action_loader",
         "@absl_archive//absl/logging",
+    ],
+)
+
+loaner_appengine_library(
+    name = "process_emails",
+    srcs = [
+        "process_emails.py",
     ],
 )
 
@@ -60,6 +68,17 @@ loaner_appengine_test(
         "//loaner/web_app/backend/lib:action_loader",
         "//loaner/web_app/backend/testing:handlertest",
         "@absl_archive//absl/logging",
+        "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
+    name = "process_emails_test",
+    srcs = [
+        "process_emails_test.py",
+    ],
+    deps = [
+        "//loaner/web_app/backend/testing:handlertest",
         "@mock_archive//:mock",
     ],
 )

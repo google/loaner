@@ -19,12 +19,11 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
-import logging
 
 from absl.testing import parameterized
 import mock
 
-from google.appengine.api import mail
+from google.appengine.api import taskqueue
 
 from loaner.web_app import constants
 from loaner.web_app.backend.lib import send_email
@@ -62,18 +61,12 @@ class EmailTest(parameterized.TestCase, loanertest.TestCase):
     constants.ON_QA = on_qa
     constants.ON_DEV = on_dev
     constants.ON_LOCAL = on_local
-    with mock.patch.object(mail, 'send_mail') as mock_gae_sendmail:
+    with mock.patch.object(taskqueue, 'add') as mock_taskqueue_add:
       send_email._send_email(**self.default_kwargs)
       self.default_kwargs['subject'] = (
           instance_subject + self.default_kwargs['subject'])
-      mock_gae_sendmail.assert_called_once_with(**self.default_kwargs)
-
-  @mock.patch.object(mail, 'send_mail', side_effect=mail.InvalidEmailError)
-  @mock.patch.object(logging, 'error')
-  def test_send_email_error(self, mock_logerror, mock_gae_sendmail):
-    send_email.constants.ON_PROD = True
-    send_email._send_email(**self.default_kwargs)
-    assert mock_logerror.called
+      mock_taskqueue_add.assert_called_once_with(
+          queue_name='send-email', params=self.default_kwargs, target='default')
 
   @mock.patch('__main__.send_email.logging')
   @mock.patch('__main__.send_email._send_email')

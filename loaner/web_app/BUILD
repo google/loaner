@@ -99,6 +99,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/handlers/cron:run_shelf_audit_events",
         "//loaner/web_app/backend/handlers/cron:sync_user_roles",
         "//loaner/web_app/backend/handlers/task:process_action",
+        "//loaner/web_app/backend/handlers/task:process_emails",
         "//loaner/web_app/backend/handlers/task:stream_to_bigquery",
     ],
 )

@@ -28,11 +28,13 @@ from loaner.web_app.backend.handlers.cron import run_reminder_events
 from loaner.web_app.backend.handlers.cron import run_shelf_audit_events
 from loaner.web_app.backend.handlers.cron import sync_user_roles
 from loaner.web_app.backend.handlers.task import process_action
+from loaner.web_app.backend.handlers.task import process_emails
 from loaner.web_app.backend.handlers.task import stream_to_bigquery
 
 
 web_app_routes = [
     (r'/_ah/queue/process-action', process_action.ProcessActionHandler),
+    (r'/_ah/queue/send-email', process_emails.EmailTaskHandler),
     (r'/_ah/queue/stream-bq', stream_to_bigquery.StreamToBigQueryHandler),
     (r'/_cron/run_custom_events', run_custom_events.RunCustomEventsHandler),
     (r'/_cron/run_reminder_events',
