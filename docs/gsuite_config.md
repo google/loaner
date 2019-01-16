@@ -24,7 +24,7 @@ enables you to:
 *   Enable or disable guest mode on devices in the loaner program. Disabled
     devices are moved to a separate OU.
 
-![Image](./images/gng_ou.png){width="450"}
+![Image](./images/gng_ou.png)
 
 NOTE: Creating either a device or user OU is fine as the OUs will be able to be
 used for both user and device management.
