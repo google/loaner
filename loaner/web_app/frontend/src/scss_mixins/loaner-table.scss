@@ -28,21 +28,21 @@
       margin-top: 10px;
       font-size: 12px;
 
-      /deep/ .mat-input-element {
+      ::ng-deep .mat-input-element {
         // caret-color is actually correct and working as intended.
         // scss-lint:disable PropertySpelling
         caret-color: $white;
       }
 
-      /deep/ .mat-form-field-label {
+      ::ng-deep .mat-form-field-label {
         color: $white;
       }
 
-      /deep/ .mat-form-field-underline {
+      ::ng-deep .mat-form-field-underline {
         background-color: $white;
       }
 
-      /deep/ .mat-form-field-ripple {
+      ::ng-deep .mat-form-field-ripple {
         background-color: $white;
       }
     }
