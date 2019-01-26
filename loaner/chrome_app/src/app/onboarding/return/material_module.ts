@@ -13,7 +13,11 @@
 // limitations under the License.
 
 import {NgModule} from '@angular/core';
-import {MatButtonModule, MatCardModule, MatDatepickerModule, MatInputModule, MatNativeDateModule} from '@angular/material';
+import {MatButtonModule} from '@angular/material/button';
+import {MatCardModule} from '@angular/material/card';
+import {MatNativeDateModule} from '@angular/material/core';
+import {MatDatepickerModule} from '@angular/material/datepicker';
+import {MatInputModule} from '@angular/material/input';
 
 const MATERIAL_MODULES = [
   MatButtonModule,

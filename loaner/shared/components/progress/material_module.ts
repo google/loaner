@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {NgModule} from '@angular/core';
-import {MatProgressBarModule} from '@angular/material';
+import {MatProgressBarModule} from '@angular/material/progress-bar';
 
 const MATERIAL_MODULES = [MatProgressBarModule];
 

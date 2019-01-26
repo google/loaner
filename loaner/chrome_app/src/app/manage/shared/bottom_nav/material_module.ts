@@ -13,7 +13,8 @@
 // limitations under the License.
 
 import {NgModule} from '@angular/core';
-import {MatIconModule, MatRippleModule} from '@angular/material';
+import {MatRippleModule} from '@angular/material/core';
+import {MatIconModule} from '@angular/material/icon';
 
 const MATERIAL_MODULES = [
   MatIconModule,

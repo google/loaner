@@ -13,7 +13,9 @@
 // limitations under the License.
 
 import {Component, ElementRef, OnInit, SecurityContext, ViewChild} from '@angular/core';
-import {MatAutocompleteTrigger, MatDialog, MatDialogRef, MatOptionSelectionChange} from '@angular/material';
+import {MatAutocompleteTrigger} from '@angular/material/autocomplete';
+import {MatOptionSelectionChange} from '@angular/material/core';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {DomSanitizer} from '@angular/platform-browser';
 import {Router} from '@angular/router';
 

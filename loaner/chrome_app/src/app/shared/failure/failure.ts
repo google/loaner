@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Component, Inject, Injectable} from '@angular/core';
-import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material';
+import {MAT_DIALOG_DATA, MatDialog, MatDialogRef} from '@angular/material/dialog';
 
 import {ConfigService, FAILURE_MESSAGE} from '../../../../../shared/config';
 import {Background} from '../background_service';

@@ -17,7 +17,7 @@ import {HttpClientModule} from '@angular/common/http';
 import {DebugElement} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
-import {MatRadioButton} from '@angular/material';
+import {MatRadioButton} from '@angular/material/radio';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {NgModule} from '@angular/core';
-import {MatToolbarModule} from '@angular/material';
+import {MatToolbarModule} from '@angular/material/toolbar';
 
 const MATERIAL_MODULES = [MatToolbarModule];
 
