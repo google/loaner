@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {MatDialogRef} from '@angular/material';
+import {MatDialogRef} from '@angular/material/dialog';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 

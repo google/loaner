@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Component, Injectable} from '@angular/core';
-import {MatDialog, MatDialogRef} from '@angular/material';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Subject} from 'rxjs';
 
 import {LoaderView} from '../loader';

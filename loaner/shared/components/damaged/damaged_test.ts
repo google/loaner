@@ -15,7 +15,7 @@
 import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
-import {MatDialogRef} from '@angular/material';
+import {MatDialogRef} from '@angular/material/dialog';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
