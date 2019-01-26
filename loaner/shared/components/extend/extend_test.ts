@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {MatDialogRef} from '@angular/material';
+import {MatDialogRef} from '@angular/material/dialog';
 import * as moment from 'moment';
 
 import {ExtendDialogComponent, ExtendModule} from './index';

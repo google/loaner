@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
-import {MatDialog} from '@angular/material';
+import {MatDialog} from '@angular/material/dialog';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 

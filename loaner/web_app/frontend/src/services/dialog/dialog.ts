@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Injectable} from '@angular/core';
-import {MatDialog, MatDialogRef} from '@angular/material';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import {Observable} from 'rxjs';
 import {ConfirmDialog} from './confirm_dialog';
 

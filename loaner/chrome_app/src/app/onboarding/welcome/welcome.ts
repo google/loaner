@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
-import {MatDialog} from '@angular/material';
+import {MatDialog} from '@angular/material/dialog';
 
 import {AnimationMenuComponent} from '../../../../../shared/components/animation_menu';
 import {PROGRAM_NAME, WELCOME_ANIMATATION_ALT_TEXT, WELCOME_ANIMATION_ENABLED, WELCOME_ANIMATION_URL} from '../../../../../shared/config';

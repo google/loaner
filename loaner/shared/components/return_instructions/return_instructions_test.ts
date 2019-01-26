@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {async, ComponentFixture, TestBed} from '@angular/core/testing';
-import {MatDialog, MatDialogRef} from '@angular/material';
+import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 
 import {AnimationMenuService} from '../../services/animation_menu_service';
 import {AnimationMenuServiceMock} from '../../testing/mocks';
