@@ -20,7 +20,7 @@ import {of} from 'rxjs';
 import {GuestMode} from '../../../../../shared/components/guest';
 import {GuestModeMock} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
-import {DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_LOCKED, DEVICE_LOST, DEVICE_LOST_AND_MORE, DEVICE_MARKED_FOR_RETURN, DEVICE_OVERDUE, DEVICE_UNASSIGNED, DeviceServiceMock} from '../../testing/mocks';
+import {DEVICE_DAMAGED, DEVICE_LOCKED, DEVICE_LOST_AND_MORE, DEVICE_MARKED_FOR_RETURN, DEVICE_OVERDUE, DeviceServiceMock, TEST_SHELF, TEST_SHELF_REQUEST} from '../../testing/mocks';
 
 import {DeviceListTable, DeviceListTableModule} from '.';
 
@@ -117,6 +117,17 @@ describe('DeviceListTableComponent', () => {
     expect(deviceListTable.pauseLoading).toBe(true);
     element.dispatchEvent(new Event('blur'));
     expect(deviceListTable.pauseLoading).toBe(false);
+  });
+
+  it('calls DeviceService with shelf filter when shelf is present.', () => {
+    const deviceService: DeviceService = TestBed.get(DeviceService);
+    const deviceServiceSpy = spyOn(deviceService, 'list').and.callThrough();
+    const shelfRequest = {shelf_request: TEST_SHELF_REQUEST};
+    deviceListTable.shelf = TEST_SHELF;
+    deviceListTable.ngAfterViewInit();
+    expect(deviceServiceSpy)
+        .toHaveBeenCalledWith(
+            {page_size: 25, shelf: shelfRequest}, 'identifier', 'asc');
   });
 
   it('shows the damaged chip when device is damaged', fakeAsync(() => {

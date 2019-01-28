@@ -128,11 +128,9 @@ export class DeviceListTable implements OnInit {
 
   private getDeviceList() {
     if (this.gettingMoreData) {
-      this.filters = {
-        page_token: this.pageToken,
-      };
+      this.filters = this.setupShelfFilters({page_token: this.pageToken});
     } else {
-      this.filters = {page_size: this.pageSize};
+      this.filters = this.setupShelfFilters({page_size: this.pageSize});
     }
 
     const sort = this.sort.active;
