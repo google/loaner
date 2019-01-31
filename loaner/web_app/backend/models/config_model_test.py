@@ -24,9 +24,11 @@ import os
 
 from absl.testing import parameterized
 from pyfakefs import fake_filesystem
+import mock
 from pyfakefs import mox3_stubout
 
 from google.appengine.api import memcache
+from google.appengine.ext import ndb
 
 from absl.testing import absltest
 from loaner.web_app import constants
@@ -106,12 +108,16 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
     self.assertEqual(config_memcache, config_value)
     self.assertEqual(reference_datastore_config.string_value, 'config value 1')
 
-  def test_get_from_default(self):
+  @mock.patch.object(config_model.Config, 'set')
+  @mock.patch.object(memcache, 'get', return_value=None)
+  @mock.patch.object(ndb.Model, 'get_by_id', return_value=None)
+  def test_get_from_default(
+      self, mock_get_by_id, mock_memcache_get, mock_config_model_set):
     config = 'test_config'
+    expected_value = 'test_value'
     config_datastore = config_model.Config.get(config)
-    self.assertEqual(config_datastore, 'test_value')
-    self.assertIsNone(memcache.get(config))
-    self.assertIsNone(config_model.Config.get_by_id(config))
+    mock_config_model_set.assert_called_once_with(config, expected_value)
+    self.assertEqual(config_datastore, expected_value)
 
   def test_get_identifier_with_use_asset(self):
     config_model.Config.set('use_asset_tags', True)

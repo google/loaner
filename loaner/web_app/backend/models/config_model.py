@@ -57,33 +57,35 @@ class Config(ndb.Model):
     Raises:
       KeyError: An error occurred when name does not exist.
     """
-    config_defaults = utils.load_config_from_yaml()
     memcache_config = memcache.get(name)
     cached_config = None
     if memcache_config:
       return memcache_config
-    else:
-      stored_config = cls.get_by_id(name, use_memcache=False)
-      if stored_config:
-        if stored_config.string_value:
-          cached_config = stored_config.string_value
-        elif stored_config.integer_value:
-          cached_config = stored_config.integer_value
-        elif stored_config.bool_value is not None:
-          cached_config = stored_config.bool_value
-        elif stored_config.list_value:
-          cached_config = stored_config.list_value
-      # Conversion from use_asset_tags to device_identifier_mode.
-      if name == 'device_identifier_mode' and not cached_config:
-        if cls.get('use_asset_tags'):
-          cached_config = DeviceIdentifierMode.BOTH_REQUIRED
-          cls.set(name, cached_config)
-          memcache.set(name, cached_config)
-      if cached_config is not None:
+
+    stored_config = cls.get_by_id(name, use_memcache=False)
+    if stored_config:
+      if stored_config.string_value:
+        cached_config = stored_config.string_value
+      elif stored_config.integer_value:
+        cached_config = stored_config.integer_value
+      elif stored_config.bool_value is not None:
+        cached_config = stored_config.bool_value
+      elif stored_config.list_value:
+        cached_config = stored_config.list_value
+    # Conversion from use_asset_tags to device_identifier_mode.
+    if name == 'device_identifier_mode' and not cached_config:
+      if cls.get('use_asset_tags'):
+        cached_config = DeviceIdentifierMode.BOTH_REQUIRED
+        cls.set(name, cached_config)
         memcache.set(name, cached_config)
-        return cached_config
-      elif name in config_defaults:
-        return config_defaults[name]
+    if cached_config is not None:
+      memcache.set(name, cached_config)
+      return cached_config
+    config_defaults = utils.load_config_from_yaml()
+    if name in config_defaults:
+      value = config_defaults[name]
+      cls.set(name, value)
+      return value
 
     raise KeyError(_CONFIG_NOT_FOUND_MSG, name)
 

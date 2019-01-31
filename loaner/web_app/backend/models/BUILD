@@ -213,6 +213,7 @@ loaner_appengine_test(
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:absltest",
         "@absl_archive//absl/testing:parameterized",
+        "@mock_archive//:mock",
         "@pyfakefs_archive//:pyfakefs",
     ],
 )
