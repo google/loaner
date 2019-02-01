@@ -67,6 +67,9 @@ class Tag(base_model.BaseModel):
 
     Returns:
       The new Tag entity.
+
+    Raises:
+      datastore_errors.BadValueError: If the tag name is an empty string.
     """
     tag = cls(
         name=name,
@@ -74,6 +77,8 @@ class Tag(base_model.BaseModel):
         protect=protect,
         color=color,
         description=description)
+    if not name:
+      raise datastore_errors.BadValueError('The tag name must not be empty.')
     tag.put()
     logging.info('Creating a new tag with name %r.', name)
     tag.stream_to_bq(user_email, 'Created a new tag with name %r.' % name)
@@ -97,7 +102,13 @@ class Tag(base_model.BaseModel):
     Args:
       user_email: str, email of the user creating the tag.
       **kwargs: kwargs for the update API.
+
+    Raises:
+      datastore_errors.BadValueError: If the tag name is an empty string.
     """
+    if not kwargs['name']:
+      raise datastore_errors.BadValueError('The tag name must not be empty.')
+
     if kwargs['name'] != self.name:
       logging.info(
           'Renaming the tag with name %r to %r.', self.name, kwargs['name'])

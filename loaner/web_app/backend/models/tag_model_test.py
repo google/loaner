@@ -94,6 +94,17 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
           color='red',
           description='A description.')
 
+  def test_create_tag_name_with_empty_string(self):
+    """Test the creation of a Tag with an empty string."""
+    with self.assertRaises(datastore_errors.BadValueError):
+      tag_model.Tag.create(
+          user_email=loanertest.USER_EMAIL,
+          name='',
+          hidden=False,
+          protect=False,
+          color='red',
+          description='A description.')
+
   def test_update(self):
     """Test updating a Tag."""
     self.tag2.update(
@@ -134,6 +145,17 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
           color='red',
           description='A new description.',
           name='TestTag1')
+
+  def test_update_tag_name_with_empty_string(self):
+    """Test updating a Tag with an empty string."""
+    with self.assertRaises(datastore_errors.BadValueError):
+      self.tag2.update(
+          user_email=loanertest.USER_EMAIL,
+          hidden=False,
+          protect=False,
+          color='red',
+          description='A new description.',
+          name='')
 
   @parameterized.parameters(
       ('TestTag1', 'tag1_data info.'),
