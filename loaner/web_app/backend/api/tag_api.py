@@ -74,8 +74,12 @@ class TagApi(root_api.Service):
   def destroy(self, request):
     """Destroys a tag and removes all references via _pre_delete_hook method."""
     self.check_xsrf_token(self.request_state)
-    api_utils.get_ndb_key(urlsafe_key=request.urlsafe_key).delete()
-
+    key = api_utils.get_ndb_key(urlsafe_key=request.urlsafe_key)
+    tag = key.get()
+    if tag.protect:
+      raise endpoints.BadRequestException(
+          'Cannot destroy tag %s because it is protected.' % tag.protect)
+    key.delete()
     return message_types.VoidMessage()
 
   @auth.method(

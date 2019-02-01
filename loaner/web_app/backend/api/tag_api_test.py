@@ -62,6 +62,17 @@ class TagApiTest(loanertest.EndpointsTestCase):
         description=self.hidden_tag.description,
         urlsafe_key=self.hidden_tag.key.urlsafe())
 
+    self.protected_tag = tag_model.Tag.create(
+        user_email=loanertest.USER_EMAIL, name='tag-three',
+        hidden=False, protect=True, color='amber')
+    self.protected_tag_response = tag_messages.Tag(
+        name=self.protected_tag.name,
+        hidden=self.protected_tag.hidden,
+        protect=self.protected_tag.protect,
+        color=self.protected_tag.color,
+        description=self.protected_tag.description,
+        urlsafe_key=self.protected_tag.key.urlsafe())
+
   def tearDown(self):
     super(TagApiTest, self).tearDown()
     self.service = None
@@ -114,6 +125,12 @@ class TagApiTest(loanertest.EndpointsTestCase):
       self.service.destroy(
           tag_messages.TagRequest(urlsafe_key='nonexistent_tag'))
 
+  def test_destroy_protected(self):
+    with self.assertRaises(endpoints.BadRequestException):
+      self.service.destroy(
+          tag_messages.TagRequest(
+              urlsafe_key=self.protected_tag.key.urlsafe()))
+
   def test_get_tag(self):
     request = tag_messages.TagRequest(urlsafe_key=self.test_tag.key.urlsafe())
     expected_response = tag_messages.Tag(
@@ -138,8 +155,11 @@ class TagApiTest(loanertest.EndpointsTestCase):
         self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
       response = self.service.list(tag_messages.ListTagRequest(page_size=10000))
       self.assertEqual(mock_xsrf_token.call_count, 1)
-      self.assertListEqual(response.tags,
-                           [self.test_tag_response, self.hidden_tag_response])
+      self.assertListEqual(
+          response.tags,
+          [self.test_tag_response,
+           self.hidden_tag_response,
+           self.protected_tag_response])
 
   def test_list_tags_additional_results(self):
     first_response = self.service.list(tag_messages.ListTagRequest(page_size=1))
@@ -147,14 +167,21 @@ class TagApiTest(loanertest.EndpointsTestCase):
     self.assertTrue(first_response.has_additional_results)
 
     second_response = self.service.list(tag_messages.ListTagRequest(
-        page_size=10000, cursor=first_response.cursor))
+        page_size=1, cursor=first_response.cursor))
     self.assertEqual(second_response.tags, [self.hidden_tag_response])
-    self.assertFalse(second_response.has_additional_results)
+    self.assertTrue(second_response.has_additional_results)
+
+    third_response = self.service.list(tag_messages.ListTagRequest(
+        page_size=10000, cursor=second_response.cursor))
+    self.assertEqual(third_response.tags, [self.protected_tag_response])
+    self.assertFalse(third_response.has_additional_results)
+
     self.assertIsNotNone(second_response.cursor)
 
   def test_list_tags_none(self):
     self.test_tag.key.delete()
     self.hidden_tag.key.delete()
+    self.protected_tag.key.delete()
 
     response = self.service.list(tag_messages.ListTagRequest())
     self.assertEmpty(response.tags)
