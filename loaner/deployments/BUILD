@@ -97,7 +97,7 @@ py_test(
         "deploy_impl_test.py",
     ],
     deps = [
-        ":deploy_impl",
+        ":deploy_impl_lib",
         "@absl_archive//absl:app",
         "@absl_archive//absl/flags",
         "@absl_archive//absl/testing:absltest",
