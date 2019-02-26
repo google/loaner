@@ -447,7 +447,9 @@ export const CONFIG_RESPONSE_MOCK = [
   {integer_value: '24', name: 'shelf_audit_interval'},
   {integer_value: '1', name: 'datastore_version'},
   {boolean_value: true, name: 'anonymous_surveys'},
-  {boolean_value: false, name: 'silent_onboarding'}
+  {boolean_value: false, name: 'silent_onboarding'},
+  {boolean_value: false, name: 'enable_backups'},
+  {name: 'gcp_cloud_storage_bucket', string_value: 'test_bucket'},
 ];
 
 export class ConfigServiceMock {
@@ -548,138 +550,138 @@ export const TEST_SHELF = new Shelf({
 
 /** A class which mocks TagService calls without making any HTTP calls. */
 export class TagServiceMock {
-  private tags: Tag[] = [
-    new Tag({
-      name: 'Executive',
-      hidden: true,
-      color: 'purple',
-      protect: false,
-      description: 'Devices reserved for executives'
-    }),
-    new Tag({
-      name: 'Business Unit',
-      hidden: true,
-      color: 'Green',
-      protect: false,
-      description: 'Tag for chromebook used only for the Business Unit shelf'
-    }),
-    new Tag({
-      name: 'Firmware',
-      hidden: true,
-      color: 'Orange',
-      protect: true,
-      description: 'Security vulnerability update required'
-    }),
-    new Tag({
-      name: 'Executive 2',
-      hidden: true,
-      color: 'purple',
-      protect: false,
-      description: 'Devices reserved for executives'
-    }),
-    new Tag({
-      name: 'Business Unit 2',
-      hidden: true,
-      color: 'Green',
-      protect: false,
-      description: 'Tag for chromebook used only for the Business Unit shelf'
-    }),
-    new Tag({
-      name: 'Firmware 2',
-      hidden: true,
-      color: 'Orange',
-      protect: true,
-      description: 'Security vulnerability update required'
-    }),
-    new Tag({
-      name: 'Executive 3',
-      hidden: true,
-      color: 'purple',
-      protect: false,
-      description: 'Devices reserved for executives'
-    }),
-    new Tag({
-      name: 'Business Unit 3',
-      hidden: true,
-      color: 'Green',
-      protect: false,
-      description: 'Tag for chromebook used only for the Business Unit shelf'
-    }),
-    new Tag({
-      name: 'Firmware 3',
-      hidden: true,
-      color: 'Orange',
-      protect: true,
-      description: 'Security vulnerability update required'
-    }),
-    new Tag({
-      name: 'Executive 4',
-      hidden: true,
-      color: 'purple',
-      protect: false,
-      description: 'Devices reserved for executives'
-    }),
-    new Tag({
-      name: 'Business Unit 4',
-      hidden: true,
-      color: 'Green',
-      protect: false,
-      description: 'Tag for chromebook used only for the Business Unit shelf'
-    }),
-    new Tag({
-      name: 'Firmware 4',
-      hidden: true,
-      color: 'Orange',
-      protect: true,
-      description: 'Security vulnerability update required'
-    }),
-    new Tag({
-      name: 'Executive 5',
-      hidden: true,
-      color: 'purple',
-      protect: false,
-      description: 'Devices reserved for executives'
-    }),
-    new Tag({
-      name: 'Business Unit 5',
-      hidden: true,
-      color: 'Green',
-      protect: false,
-      description: 'Tag for chromebook used only for the Business Unit shelf'
-    }),
-    new Tag({
-      name: 'Firmware 5',
-      hidden: true,
-      color: 'Orange',
-      protect: true,
-      description: 'Security vulnerability update required'
-    }),
-    new Tag({
-      name: 'Executive 6',
-      hidden: true,
-      color: 'purple',
-      protect: false,
-      description: 'Devices reserved for executives'
-    }),
-    new Tag({
-      name: 'Business Unit 6',
-      hidden: true,
-      color: 'Green',
-      protect: false,
-      description: 'Tag for chromebook used only for the Business Unit shelf'
-    }),
-    new Tag({
-      name: 'Firmware 6',
-      hidden: true,
-      color: 'Orange',
-      protect: true,
-      description: 'Security vulnerability update required'
-    })
-
-
-  ];
+  tags: Tag[];
 
   constructor() {
+    this.tags = [
+      new Tag({
+        name: 'Executive',
+        hidden: true,
+        color: 'purple',
+        protect: false,
+        description: 'Devices reserved for executives'
+      }),
+      new Tag({
+        name: 'Business Unit',
+        hidden: true,
+        color: 'Green',
+        protect: false,
+        description: 'Tag for chromebook used only for the Business Unit shelf'
+      }),
+      new Tag({
+        name: 'Firmware',
+        hidden: true,
+        color: 'Orange',
+        protect: true,
+        description: 'Security vulnerability update required'
+      }),
+      new Tag({
+        name: 'Executive 2',
+        hidden: true,
+        color: 'purple',
+        protect: false,
+        description: 'Devices reserved for executives'
+      }),
+      new Tag({
+        name: 'Business Unit 2',
+        hidden: true,
+        color: 'Green',
+        protect: false,
+        description: 'Tag for chromebook used only for the Business Unit shelf'
+      }),
+      new Tag({
+        name: 'Firmware 2',
+        hidden: true,
+        color: 'Orange',
+        protect: true,
+        description: 'Security vulnerability update required'
+      }),
+      new Tag({
+        name: 'Executive 3',
+        hidden: true,
+        color: 'purple',
+        protect: false,
+        description: 'Devices reserved for executives'
+      }),
+      new Tag({
+        name: 'Business Unit 3',
+        hidden: true,
+        color: 'Green',
+        protect: false,
+        description: 'Tag for chromebook used only for the Business Unit shelf'
+      }),
+      new Tag({
+        name: 'Firmware 3',
+        hidden: true,
+        color: 'Orange',
+        protect: true,
+        description: 'Security vulnerability update required'
+      }),
+      new Tag({
+        name: 'Executive 4',
+        hidden: true,
+        color: 'purple',
+        protect: false,
+        description: 'Devices reserved for executives'
+      }),
+      new Tag({
+        name: 'Business Unit 4',
+        hidden: true,
+        color: 'Green',
+        protect: false,
+        description: 'Tag for chromebook used only for the Business Unit shelf'
+      }),
+      new Tag({
+        name: 'Firmware 4',
+        hidden: true,
+        color: 'Orange',
+        protect: true,
+        description: 'Security vulnerability update required'
+      }),
+      new Tag({
+        name: 'Executive 5',
+        hidden: true,
+        color: 'purple',
+        protect: false,
+        description: 'Devices reserved for executives'
+      }),
+      new Tag({
+        name: 'Business Unit 5',
+        hidden: true,
+        color: 'Green',
+        protect: false,
+        description: 'Tag for chromebook used only for the Business Unit shelf'
+      }),
+      new Tag({
+        name: 'Firmware 5',
+        hidden: true,
+        color: 'Orange',
+        protect: true,
+        description: 'Security vulnerability update required'
+      }),
+      new Tag({
+        name: 'Executive 6',
+        hidden: true,
+        color: 'purple',
+        protect: false,
+        description: 'Devices reserved for executives'
+      }),
+      new Tag({
+        name: 'Business Unit 6',
+        hidden: true,
+        color: 'Green',
+        protect: false,
+        description: 'Tag for chromebook used only for the Business Unit shelf'
+      }),
+      new Tag({
+        name: 'Firmware 6',
+        hidden: true,
+        color: 'Orange',
+        protect: true,
+        description: 'Security vulnerability update required'
+      })
+    ];
+
     this.tags.forEach(tag => {
       tag.urlSafeKey = this.urlSafeKeyGenerator();
     });
@@ -692,13 +694,12 @@ export class TagServiceMock {
         observer.complete();
       } else if (this.tags.find((tag) => tag.name === createTag.name)) {
         observer.error(new Error('A tag with this name already exists'));
-        observer.complete();
       } else {
         createTag.urlSafeKey = this.urlSafeKeyGenerator();
         this.tags.push(createTag);
         observer.next(true);
-        observer.complete();
       }
+      observer.complete();
     });
   }
 
@@ -709,12 +710,25 @@ export class TagServiceMock {
       if (deleteIndex > -1) {
         this.tags.splice(deleteIndex, 1);
         observer.next(true);
-        observer.complete();
       } else {
         observer.error(new Error(
             `No Tag found with urlSafeKey: ${destroyTag.urlSafeKey}`));
-        observer.complete();
       }
+      observer.complete();
+    });
+  }
+
+  update(updateTag: Tag) {
+    return Observable.create((observer: Observer<boolean>) => {
+      const updateIndex =
+          this.tags.findIndex((tag) => tag.urlSafeKey === updateTag.urlSafeKey);
+      if (updateIndex > -1) {
+        this.tags.splice(updateIndex, 1, updateTag);
+        observer.next(true);
+      } else {
+        observer.error(new Error(`No Tag found for: ${updateTag.name}`));
+      }
+      observer.complete();
     });
   }
 

@@ -38,7 +38,7 @@ export class ShelfActionsView implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
-      if (params.id) {
+      if (params['id']) {
         this.titleService.setTitle(this.updateShelfTitle);
       } else {
         this.titleService.setTitle(this.createShelfTitle);

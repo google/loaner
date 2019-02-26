@@ -14,7 +14,7 @@
 
 import {Component} from '@angular/core';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
-import {RemoveWhitespacesModule} from '.';
+import {RemoveWhitespacesModule} from './index';
 
 @Component({
   preserveWhitespaces: true,

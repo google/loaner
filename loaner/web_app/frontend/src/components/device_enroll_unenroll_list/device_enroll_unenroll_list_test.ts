@@ -22,7 +22,7 @@ import {DeviceService} from '../../services/device';
 import {DEVICE_1, DEVICE_2} from '../../testing/mocks';
 import {DeviceServiceMock} from '../../testing/mocks';
 
-import {DeviceEnrollUnenrollList, DeviceEnrollUnenrollListModule} from '.';
+import {DeviceEnrollUnenrollList, DeviceEnrollUnenrollListModule} from './index';
 
 @Component({
   template:

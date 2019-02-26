@@ -23,6 +23,7 @@ import webapp2
 from loaner.web_app import constants
 from loaner.web_app.backend.handlers import frontend
 from loaner.web_app.backend.handlers import maintenance
+from loaner.web_app.backend.handlers.cron import cloud_datastore_export
 from loaner.web_app.backend.handlers.cron import run_custom_events
 from loaner.web_app.backend.handlers.cron import run_reminder_events
 from loaner.web_app.backend.handlers.cron import run_shelf_audit_events
@@ -36,6 +37,7 @@ web_app_routes = [
     (r'/_ah/queue/process-action', process_action.ProcessActionHandler),
     (r'/_ah/queue/send-email', process_emails.EmailTaskHandler),
     (r'/_ah/queue/stream-bq', stream_to_bigquery.StreamToBigQueryHandler),
+    (r'/_cron/cloud_datastore_export', cloud_datastore_export.DatastoreExport),
     (r'/_cron/run_custom_events', run_custom_events.RunCustomEventsHandler),
     (r'/_cron/run_reminder_events',
      run_reminder_events.RunReminderEventsHandler),

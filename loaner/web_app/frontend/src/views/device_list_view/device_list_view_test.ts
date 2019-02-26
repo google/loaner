@@ -19,7 +19,7 @@ import {ConfigService} from '../../services/config';
 import {DeviceService} from '../../services/device';
 import {ConfigServiceMock, DeviceServiceMock} from '../../testing/mocks';
 
-import {DeviceListView, DeviceListViewModule} from '.';
+import {DeviceListView, DeviceListViewModule} from './index';
 
 describe('DeviceListView', () => {
   let fixture: ComponentFixture<DeviceListView>;

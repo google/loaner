@@ -17,7 +17,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {ShelfService} from '../../services/shelf';
 import {ShelfServiceMock} from '../../testing/mocks';
 
-import {ShelfListView, ShelfListViewModule} from '.';
+import {ShelfListView, ShelfListViewModule} from './index';
 
 describe('ShelfListView', () => {
   let fixture: ComponentFixture<ShelfListView>;

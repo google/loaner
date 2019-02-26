@@ -24,7 +24,7 @@ import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {ActivatedRouteMock, DeviceServiceMock, SHELF_CAPACITY_1, ShelfServiceMock} from '../../testing/mocks';
 
-import {AuditTable, AuditTableModule} from '.';
+import {AuditTable, AuditTableModule} from './index';
 
 describe('AuditTableComponent', () => {
   let fixture: ComponentFixture<AuditTable>;

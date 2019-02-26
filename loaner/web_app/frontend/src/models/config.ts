@@ -102,6 +102,8 @@ export class Config {
   timeoutGuestMode?: boolean;
   unenrollOU?: string;
   silentOnboarding?: boolean;
+  gcpBackupBucket?: string;
+  backupDatastore?: boolean;
 
   constructor(response: ConfigResponse[]) {
     // tslint:disable:no-unnecessary-type-assertion Fix after b/110225001
@@ -185,6 +187,13 @@ export class Config {
         response.find(a => a.name === 'unenroll_ou')!.string_value as string;
     this.silentOnboarding =
         response.find(a => a.name === 'silent_onboarding')!.boolean_value as
+        boolean;
+    this.gcpBackupBucket =
+        response.find(
+                    a => a.name === 'gcp_cloud_storage_bucket')!.string_value as
+        string;
+    this.backupDatastore =
+        response.find(a => a.name === 'enable_backups')!.boolean_value as
         boolean;
     // tslint:enable:no-unnecessary-type-assertion
   }

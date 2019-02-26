@@ -66,7 +66,6 @@ class BootstrapApi(root_api.Service):
     """Gets general bootstrap status, and task status if not yet completed."""
     self.check_xsrf_token(self.request_state)
     response_message = bootstrap_messages.BootstrapStatusResponse()
-    response_message.enabled = bootstrap.is_bootstrap_enabled()
     response_message.started = bootstrap.is_bootstrap_started()
     response_message.completed = bootstrap.is_bootstrap_completed()
     for name, status in bootstrap.get_bootstrap_task_status().iteritems():

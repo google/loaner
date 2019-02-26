@@ -201,6 +201,26 @@
         </section>
         <section class="control-set">
           <div class="label">
+            Enable Backups
+            <div class="sublabel">Enable datastore backups.</div>
+          </div>
+          <div class="control">
+            <mat-slide-toggle name="enable_backups_boolean" [(ngModel)]="config.backupDatastore"></mat-slide-toggle>
+          </div>
+        </section>
+        <section class="control-set">
+          <div class="label">
+            Cloud Storage Bucket Name
+            <div class="sublabel">The bucket that will be used for Datastore Exports.</div>
+          </div>
+          <div class="control">
+            <mat-form-field class="email-value">
+              <input matInput name="gcp_cloud_storage_bucket_string" type="text" [(ngModel)]="config.gcpBackupBucket">
+            </mat-form-field>
+          </div>
+        </section>
+        <section class="control-set">
+          <div class="label">
             Org unit prefix
             <div class="sublabel">
               The organizational unit to be the root for the GnG

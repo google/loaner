@@ -93,7 +93,7 @@ export class DeviceInfoCard implements OnInit {
         .pipe(
             tap(user => this.user = user),
             switchMap(() => this.route.queryParams),
-            map(params => params.user),
+            map(params => params['user']),
             switchMap(
                 (userToImitate: string|undefined) =>
                     this.getDevicesForUser(userToImitate)),
@@ -110,9 +110,9 @@ export class DeviceInfoCard implements OnInit {
 
           // Represents the device ID to be highlighted if given.
           this.route.params.subscribe((params) => {
-            if (params.id) {
+            if (params['id']) {
               this.selectedTab = this.loanedDevices.findIndex(
-                  device => device.identifier === params.id);
+                  device => device.identifier === params['id']);
             }
           });
         });

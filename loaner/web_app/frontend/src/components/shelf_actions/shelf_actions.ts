@@ -52,8 +52,8 @@ export class ShelfActionsCard implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe((params) => {
-      if (params.id) {
-        this.shelfService.getShelf(params.id).subscribe((shelf: Shelf) => {
+      if (params['id']) {
+        this.shelfService.getShelf(params['id']).subscribe((shelf: Shelf) => {
           if (!this.shelf) {
             this.backToShelves();
           }

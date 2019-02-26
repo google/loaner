@@ -545,3 +545,29 @@ G Suite accounts and public Gmail addresses are not supported.
    Autocomplete Domain option as it may cause some confusion (it's not very
    intuitive that you can override the sign-in screen by typing your full email
    address).
+
+#### Datastore backups (Optional, but Recommended).
+
+A cron is used to schedule an automatic export of the Google Cloud Datastore
+entities for backup purposes. The export is done directly to a Google Cloud
+Storage bucket.
+
+Requirements:
+
++   [Create a Cloud Storage bucket for your project](https://cloud.google.com/storage/docs/creating-buckets).
+    All exports and imports rely on Cloud Storage. You must use the same
+    location for your Cloud Storage bucket and Cloud Datastore. For example, if
+    you chose your Project location to be US, make sure that same location is
+    chosen when creating the bucket.
++   [Configure access permissions](https://cloud.google.com/datastore/docs/schedule-export#setting_up_scheduled_exports)
+    for the default service account and the Cloud Storage bucket created above.
++   Enter the name of the bucket in the configuration page of the application.
++   Toggle datastore backups to on in the configuration page of the
+    application.
+
+NOTE: Please review the
+[Object Lifecycle Management](https://cloud.google.com/storage/docs/lifecycle)
+feature of Cloud Storage buckets in order to get familiar with retention
+policies. For example, policies can be set on GCS buckets such that objects can
+be deleted after a specified interval. This is to avoid additional
+costs associated with Cloud Storage.

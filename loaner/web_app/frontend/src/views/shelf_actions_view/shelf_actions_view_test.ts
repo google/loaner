@@ -19,7 +19,7 @@ import {ShelfService} from '../../services/shelf';
 
 import {ConfigServiceMock, ShelfServiceMock} from '../../testing/mocks';
 
-import {ShelfActionsView, ShelfActionsViewModule} from '.';
+import {ShelfActionsView, ShelfActionsViewModule} from './index';
 
 
 describe('ShelfActionsView', () => {

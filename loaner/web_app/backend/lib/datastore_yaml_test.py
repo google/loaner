@@ -167,7 +167,6 @@ class ImportYamlTest(loanertest.TestCase):
       self.assertTrue(device.shelf in [shelf.key for shelf in shelves])
 
   @mock.patch('__main__.directory.DirectoryApiClient', autospec=True)
-  @mock.patch('__main__.constants.BOOTSTRAP_ENABLED', True)
   def test_yaml_import_with_wipe(self, mock_directoryclass):
     """Tests YAML importing with a datastore wipe."""
     mock_directoryclient = mock_directoryclass.return_value
@@ -183,11 +182,15 @@ class ImportYamlTest(loanertest.TestCase):
         capacity=42,
         friendly_name='Nice shelf',
         responsible_for_audit='inventory')
+    user_model.User(id=loanertest.USER_EMAIL).put()
+    template_model.Template.create('template_1')
+    template_model.Template.create('template_2')
     test_event = event_models.CoreEvent.create('test_event')
     test_event.description = 'A test event'
     test_event.enabled = True
     test_event.actions = ['some_action', 'another_action']
     test_event.put()
+    event_models.CustomEvent.create('test_custom_event')
 
     datastore_yaml.import_yaml(ALL_YAML, loanertest.USER_EMAIL, wipe=True)
 
@@ -202,15 +205,15 @@ class ImportYamlTest(loanertest.TestCase):
     templates = template_model.Template.query().fetch()
     users = user_model.User.query().fetch()
 
-    self.assertEqual(len(shelves), 2)
-    self.assertEqual(len(devices), 2)
-    self.assertEqual(len(core_events), 1)
-    self.assertEqual(len(shelf_audit_events), 1)
-    self.assertEqual(len(custom_events), 1)
-    self.assertEqual(len(reminder_events), 1)
-    self.assertEqual(len(survey_questions), 1)
-    self.assertEqual(len(templates), 1)
-    self.assertEqual(len(users), 2)
+    self.assertLen(shelves, 2)
+    self.assertLen(devices, 2)
+    self.assertLen(core_events, 1)
+    self.assertLen(shelf_audit_events, 1)
+    self.assertLen(custom_events, 1)
+    self.assertLen(reminder_events, 1)
+    self.assertLen(survey_questions, 1)
+    self.assertLen(templates, 1)
+    self.assertLen(users, 2)
 
     self.assertTrue(test_device.serial_number not in
                     [device.serial_number for device in devices])
@@ -220,16 +223,6 @@ class ImportYamlTest(loanertest.TestCase):
         test_event.name not in [event.name for event in core_events])
     self.assertTrue(isinstance(
         custom_events[0].conditions[0].value, datetime.timedelta))
-
-  @mock.patch('__main__.constants.BOOTSTRAP_ENABLED', False)
-  def test_datastore_wipe_without_enablement(self):
-    """Tests that an exception is raised when datastore can't be wiped."""
-    self.assertRaises(
-        datastore_yaml.DatastoreWipeError,
-        datastore_yaml.import_yaml,
-        ALL_YAML,
-        loanertest.USER_EMAIL,
-        wipe=True)
 
 
 if __name__ == '__main__':

@@ -56,14 +56,14 @@ export class SearchResultsComponent implements OnDestroy, OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      if (params.model && params.query) {
-        this.model = params.model;
-        this.query = params.query;
-        this.search(params.model, params.query);
-      } else if (!params.model) {
+      if (params['model'] && params['query']) {
+        this.model = params['model'];
+        this.query = params['query'];
+        this.search(params['model'], params['query']);
+      } else if (!params['model']) {
         this.snackBar.open(`You haven't searched for anything!`);
         this.back();
-      } else if (!params.query && params.model) {
+      } else if (!params['query'] && params['model']) {
         this.snackBar.open(`You haven't provided a query for your search!`);
         this.back();
       } else {

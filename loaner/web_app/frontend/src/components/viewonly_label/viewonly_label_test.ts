@@ -17,7 +17,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/co
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
-import {ViewonlyLabelModule} from '.';
+import {ViewonlyLabelModule} from './index';
 
 @Component({
   preserveWhitespaces: true,

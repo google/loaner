@@ -29,7 +29,7 @@ import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
 import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
-import {DeviceInfoCard, DeviceInfoCardModule} from '.';
+import {DeviceInfoCard, DeviceInfoCardModule} from './index';
 
 @Component({
   preserveWhitespaces: true,

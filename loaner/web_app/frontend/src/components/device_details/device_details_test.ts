@@ -19,7 +19,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {DeviceService} from '../../services/device';
 import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_UNASSIGNED, DeviceServiceMock} from '../../testing/mocks';
 
-import {DeviceDetails, DeviceDetailsModule} from './';
+import {DeviceDetails, DeviceDetailsModule} from './index';
 
 describe('DeviceDetails', () => {
   let fixture: ComponentFixture<DeviceDetails>;

@@ -17,7 +17,7 @@ import {MatDialog} from '@angular/material/dialog';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 
-import {Dialog, DialogsModule} from '.';
+import {Dialog, DialogsModule} from './index';
 
 class MatDialogMock {
   open() {

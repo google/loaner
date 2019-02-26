@@ -79,7 +79,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
 
   def test_create(self):
     request = tag_messages.CreateTagRequest(tag=tag_messages.Tag(
-        name='restricted_location', hidden=False, color='red',
+        name='restricted_location', hidden=False, protect=False, color='red',
         description='leadership circle'))
     with mock.patch.object(
         self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
@@ -89,7 +89,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
 
   def test_create_defaults(self):
     request = tag_messages.CreateTagRequest(tag=tag_messages.Tag(
-        name='restricted_location', color='blue'))
+        name='restricted_location', color='blue', protect=False))
     with mock.patch.object(
         self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
       response = self.service.create(request)
@@ -198,6 +198,87 @@ class TagApiTest(loanertest.EndpointsTestCase):
   def test_list_tags_bad_request(self):
     with self.assertRaises(datastore_errors.BadValueError):
       self.service.list(tag_messages.ListTagRequest(cursor='bad_cursor_value'))
+
+  def test_update(self):
+    new_color = 'blue'
+    new_description = 'An updated description.'
+    request = tag_messages.UpdateTagRequest(
+        tag=tag_messages.Tag(
+            urlsafe_key=self.test_tag.key.urlsafe(),
+            name=self.test_tag.name,
+            hidden=self.test_tag.hidden,
+            protect=self.test_tag.protect,
+            color=new_color,
+            description=new_description))
+    with mock.patch.object(
+        self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
+      response = self.service.update(request)
+      self.assertEqual(mock_xsrf_token.call_count, 1)
+    self.assertIsInstance(response, message_types.VoidMessage)
+    # Ensure that the new tag was updated.
+    tag = tag_model.Tag.get(self.test_tag.key.urlsafe())
+    self.assertEqual(tag.name, self.test_tag.name)
+    self.assertEqual(tag.hidden, self.test_tag.hidden)
+    self.assertEqual(tag.protect, self.test_tag.protect)
+    self.assertEqual(tag.color, new_color)
+    self.assertEqual(tag.description, new_description)
+
+  def test_update_rename(self):
+    """Tests updating a tag with a rename."""
+    new_name = 'A new tag name.'
+    request = tag_messages.UpdateTagRequest(
+        tag=tag_messages.Tag(
+            urlsafe_key=self.test_tag.key.urlsafe(),
+            name=new_name,
+            hidden=self.test_tag.hidden,
+            protect=self.test_tag.protect,
+            color=self.test_tag.color,
+            description=self.test_tag.description))
+    response = self.service.update(request)
+    self.assertIsInstance(response, message_types.VoidMessage)
+    tag = tag_model.Tag.get(self.test_tag.key.urlsafe())
+    self.assertEqual(tag.name, new_name)
+    self.assertEqual(tag.hidden, self.test_tag.hidden)
+    self.assertEqual(tag.protect, self.test_tag.protect)
+    self.assertEqual(tag.color, self.test_tag.color)
+    self.assertEqual(tag.description, self.test_tag.description)
+
+  def test_update_nonexistent(self):
+    """Tests updating a nonexistent tag."""
+    request = tag_messages.UpdateTagRequest(
+        tag=tag_messages.Tag(
+            urlsafe_key='nonexistent_urlsafe_key',
+            name='nonexistent tag',
+            hidden=False,
+            protect=False,
+            color='blue',
+            description=None))
+    with mock.patch.object(
+        self.service, 'check_xsrf_token', autospec=True):
+      with self.assertRaises(tag_api.endpoints.BadRequestException):
+        self.service.update(request)
+
+  def test_update_protected(self):
+    """Tests updating a nonexistent tag."""
+    request = tag_messages.UpdateTagRequest(
+        tag=tag_messages.Tag(
+            urlsafe_key=self.protected_tag.key.urlsafe(),
+            name=self.protected_tag.name,
+            hidden=self.protected_tag.hidden,
+            protect=self.protected_tag.protect,
+            color=self.protected_tag.color,
+            description='A new description for a protected tag.'))
+    with self.assertRaises(tag_api.endpoints.BadRequestException):
+      self.service.update(request)
+
+  def test_update_bad_request(self):
+    """Tests update raises BadRequestException with required fields missing."""
+    request = tag_messages.UpdateTagRequest(
+        tag=tag_messages.Tag(
+            urlsafe_key=self.test_tag.key.urlsafe(),
+            name='tag name'))
+    with self.assertRaises(endpoints.BadRequestException):
+      self.service.update(request)
 
 
 if __name__ == '__main__':

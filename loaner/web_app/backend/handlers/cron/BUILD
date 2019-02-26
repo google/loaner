@@ -20,9 +20,21 @@ load(
 loaner_appengine_library(
     name = "cron",
     srcs = [
+        ":cloud_datastore_export",
         ":run_custom_events",
         ":run_reminder_events",
         ":sync_user_roles",
+    ],
+)
+
+loaner_appengine_library(
+    name = "cloud_datastore_export",
+    srcs = [
+        "cloud_datastore_export.py",
+    ],
+    deps = [
+        "//loaner/web_app:constants",
+        "//loaner/web_app/backend/models:config_model",
     ],
 )
 
@@ -78,6 +90,22 @@ loaner_appengine_library(
 # ==============================================================================
 # Tests
 # ==============================================================================
+
+loaner_appengine_test(
+    name = "cloud_datastore_export_test",
+    srcs = [
+        "cloud_datastore_export_test.py",
+    ],
+    deps = [
+        ":cloud_datastore_export",
+        "//loaner/web_app:constants",
+        "//loaner/web_app/backend/models:config_model",
+        "//loaner/web_app/backend/testing:handlertest",
+        "@absl_archive//absl/testing:parameterized",
+        "@freezegun_archive//:freezegun",
+        "@mock_archive//:mock",
+    ],
+)
 
 loaner_appengine_test(
     name = "run_custom_events_test",

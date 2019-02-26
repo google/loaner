@@ -18,7 +18,7 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {DeviceService} from '../../services/device';
 import {DeviceServiceMock} from '../../testing/mocks';
 
-import {DeviceActionsView, DeviceActionsViewModule} from '.';
+import {DeviceActionsView, DeviceActionsViewModule} from './index';
 
 describe('DeviceActionsView', () => {
   let fixture: ComponentFixture<DeviceActionsView>;

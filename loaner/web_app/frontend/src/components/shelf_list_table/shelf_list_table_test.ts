@@ -22,7 +22,7 @@ import {MatIconRegistry} from '../../core/material_module';
 import {ShelfService} from '../../services/shelf';
 import {ShelfServiceMock} from '../../testing/mocks';
 
-import {ShelfListTable, ShelfListTableModule} from '.';
+import {ShelfListTable, ShelfListTableModule} from './index';
 
 
 describe('ShelfListTableComponent', () => {

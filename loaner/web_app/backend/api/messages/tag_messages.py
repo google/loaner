@@ -51,6 +51,15 @@ class CreateTagRequest(messages.Message):
   tag = messages.MessageField(Tag, 1)
 
 
+class UpdateTagRequest(messages.Message):
+  """UpdateTagRequest ProtoRPC message.
+
+  Attributes:
+    tag: Tag, A tag to update.
+  """
+  tag = messages.MessageField(Tag, 1)
+
+
 class TagRequest(messages.Message):
   """TagRequest ProtoRPC message.
 

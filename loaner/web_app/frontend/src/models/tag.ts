@@ -27,6 +27,11 @@ export declare interface CreateTagRequest {
   tag: TagApiParams;
 }
 
+/** Interface with fields to update a new tag. */
+export declare interface UpdateTagRequest {
+  tag: TagApiParams;
+}
+
 /** A Tag model with all properties and methods. */
 export class Tag {
   /** Name of the tag. */

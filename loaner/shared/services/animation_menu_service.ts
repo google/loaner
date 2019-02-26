@@ -24,8 +24,8 @@ export class AnimationMenuService {
   constructor() {
     chrome.storage.sync.get(
         'animationSpeed', (result: {[key: string]: number}) => {
-          if (result.animationSpeed != null) {
-            this.setAnimationSpeed(result.animationSpeed);
+          if (result['animationSpeed'] != null) {
+            this.setAnimationSpeed(result['animationSpeed']);
           } else {
             this.setAnimationSpeed(100);
           }

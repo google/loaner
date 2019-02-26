@@ -981,6 +981,18 @@ tag_messages.Tag  | name: str, the unique name of the tag.
                   | messages.
                   | description: str, the description for the tag.
 
+##### update
+
+Updates a tag.
+
+Requests                      | Attributes
+:---------------------------- | :----------------------------------------------
+tag_messages.UpdateTagRequest | tag: tag_messages.Tag, the attributes of a Tag.
+
+Returns                   | Attributes
+:------------------------ | :---------
+message_types.VoidMessage | None
+
 ### User_api
 
 API endpoint that handles requests related to users.

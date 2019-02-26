@@ -94,6 +94,7 @@ loaner_appengine_library(
         ":constants",
         "//loaner/web_app/backend/handlers:frontend",
         "//loaner/web_app/backend/handlers:maintenance",
+        "//loaner/web_app/backend/handlers/cron:cloud_datastore_export",
         "//loaner/web_app/backend/handlers/cron:run_custom_events",
         "//loaner/web_app/backend/handlers/cron:run_reminder_events",
         "//loaner/web_app/backend/handlers/cron:run_shelf_audit_events",

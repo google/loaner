@@ -48,7 +48,7 @@ export class AuditTable implements OnInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      this.shelfService.getShelf(params.id).subscribe(shelf => {
+      this.shelfService.getShelf(params['id']).subscribe(shelf => {
         this.shelf = shelf;
       });
     });

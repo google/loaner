@@ -48,15 +48,12 @@ class TagApi(root_api.Service):
     """Creates a new tag and inserts the instance into datastore."""
     self.check_xsrf_token(self.request_state)
     try:
-      # The protect attribute will always be set to false because an
-      # end-user will not have the ability to mark a tag as protected using the
-      # API.
       tag_model.Tag.create(
           user_email=user.get_user_email(),
           name=request.tag.name,
           hidden=request.tag.hidden,
           color=request.tag.color,
-          protect=False,
+          protect=request.tag.protect,
           description=request.tag.description)
     except datastore_errors.BadValueError as err:
       raise endpoints.BadRequestException(
@@ -78,7 +75,7 @@ class TagApi(root_api.Service):
     tag = key.get()
     if tag.protect:
       raise endpoints.BadRequestException(
-          'Cannot destroy tag %s because it is protected.' % tag.protect)
+          'Cannot destroy tag %s because it is protected.' % tag.name)
     key.delete()
     return message_types.VoidMessage()
 
@@ -128,3 +125,30 @@ class TagApi(root_api.Service):
         cursor=next_cursor.urlsafe() if next_cursor else None,
         has_additional_results=has_additional_results)
 
+  @auth.method(
+      tag_messages.UpdateTagRequest,
+      message_types.VoidMessage,
+      name='update',
+      path='update',
+      http_method='POST',
+      permission=permissions.Permissions.MODIFY_TAG)
+  def update(self, request):
+    """Updates an existing tag."""
+    self.check_xsrf_token(self.request_state)
+    key = api_utils.get_ndb_key(urlsafe_key=request.tag.urlsafe_key)
+    tag = key.get()
+    if tag.protect:
+      raise endpoints.BadRequestException(
+          'Cannot update tag %s because it is protected.' % tag.name)
+    try:
+      tag.update(
+          user_email=user.get_user_email(),
+          name=request.tag.name,
+          hidden=request.tag.hidden,
+          protect=request.tag.protect,
+          color=request.tag.color,
+          description=request.tag.description)
+    except datastore_errors.BadValueError as err:
+      raise endpoints.BadRequestException(
+          'Tag update failed due to: %s' % str(err))
+    return message_types.VoidMessage()

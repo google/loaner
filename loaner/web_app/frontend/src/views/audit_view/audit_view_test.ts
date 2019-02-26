@@ -20,7 +20,7 @@ import {ShelfService} from '../../services/shelf';
 import {DeviceServiceMock} from '../../testing/mocks';
 import {ShelfServiceMock} from '../../testing/mocks';
 
-import {AuditView, AuditViewModule} from '.';
+import {AuditView, AuditViewModule} from './index';
 
 describe('AuditView', () => {
   let fixture: ComponentFixture<AuditView>;

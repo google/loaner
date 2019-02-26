@@ -16,7 +16,7 @@ import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/co
 import {RouterTestingModule} from '@angular/router/testing';
 import {BootstrapService} from '../../services/bootstrap';
 
-import {BootstrapView, BootstrapViewModule} from '.';
+import {BootstrapView, BootstrapViewModule} from './index';
 
 class BootstrapServiceMock {}
 

@@ -42,7 +42,7 @@ export class ShelfDetailView extends LoaderView implements OnInit {
   ngOnInit() {
     this.titleService.setTitle(this.title);
     this.route.params.subscribe((params) => {
-      this.shelfService.getShelf(params.id).subscribe((shelf: Shelf) => {
+      this.shelfService.getShelf(params['id']).subscribe((shelf: Shelf) => {
         this.shelf = shelf;
       });
     });

@@ -20,7 +20,7 @@ import {of} from 'rxjs';
 import {BootstrapService} from '../../services/bootstrap';
 import {BootstrapServiceMock} from '../../testing/mocks';
 
-import {Bootstrap, BootstrapModule} from '.';
+import {Bootstrap, BootstrapModule} from './index';
 
 describe('BootstrapComponent', () => {
   let fixture: ComponentFixture<Bootstrap>;

@@ -22,7 +22,7 @@ import {ConfigService} from '../../services/config';
 import {SearchService} from '../../services/search';
 import {ConfigServiceMock, SearchServiceMock} from '../../testing/mocks';
 
-import {Configuration, ConfigurationModule} from '.';
+import {Configuration, ConfigurationModule} from './index';
 
 describe('ConfigurationComponent', () => {
   let fixture: ComponentFixture<Configuration>;

@@ -20,7 +20,7 @@ import {SearchService} from '../../services/search';
 import {UserService} from '../../services/user';
 import {ConfigServiceMock, DeviceServiceMock, SearchServiceMock, UserServiceMock} from '../../testing/mocks';
 
-import {UserView, UserViewModule} from '.';
+import {UserView, UserViewModule} from './index';
 
 
 describe('UserView', () => {

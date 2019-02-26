@@ -18,7 +18,7 @@ import {DeviceService} from '../../services/device';
 import {DeviceServiceMock} from '../../testing/mocks';
 
 
-import {DeviceDetailView, DeviceDetailViewModule} from '.';
+import {DeviceDetailView, DeviceDetailViewModule} from './index';
 
 describe('DeviceDetailView', () => {
   let fixture: ComponentFixture<DeviceDetailView>;

@@ -29,7 +29,7 @@ import {SharedMocksModule} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
 import {DEVICE_1, DEVICE_ASSIGNED, DEVICE_DAMAGED, DEVICE_GUEST_NOT_PERMITTED, DEVICE_GUEST_PERMITTED, DEVICE_LOCKED, DEVICE_LOST, DEVICE_OVERDUE, DeviceServiceMock} from '../../testing/mocks';
 
-import {DeviceActionsMenu, DeviceActionsMenuModule} from '.';
+import {DeviceActionsMenu, DeviceActionsMenuModule} from './index';
 
 @Component({
   template: `

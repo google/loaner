@@ -28,7 +28,7 @@ import {ShelfService} from '../../services/shelf';
 import {UserService} from '../../services/user';
 import {ShelfServiceMock, TEST_SHELF, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
-import {ShelfDetails, ShelfDetailsModule} from '.';
+import {ShelfDetails, ShelfDetailsModule} from './index';
 
 @Component({
   preserveWhitespaces: true,

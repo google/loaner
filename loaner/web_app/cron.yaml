@@ -37,3 +37,8 @@ cron:
   url: /_cron/sync_user_roles
   schedule: every 30 minutes
   target: default
+
+- description: daily cloud datastore export
+  url: /_cron/cloud_datastore_export
+  schedule: every 24 hours
+  target: default

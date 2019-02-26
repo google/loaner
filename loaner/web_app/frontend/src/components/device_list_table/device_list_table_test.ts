@@ -22,7 +22,7 @@ import {GuestModeMock} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
 import {DEVICE_DAMAGED, DEVICE_LOCKED, DEVICE_LOST_AND_MORE, DEVICE_MARKED_FOR_RETURN, DEVICE_OVERDUE, DeviceServiceMock, TEST_SHELF, TEST_SHELF_REQUEST} from '../../testing/mocks';
 
-import {DeviceListTable, DeviceListTableModule} from '.';
+import {DeviceListTable, DeviceListTableModule} from './index';
 
 describe('DeviceListTableComponent', () => {
   let fixture: ComponentFixture<DeviceListTable>;

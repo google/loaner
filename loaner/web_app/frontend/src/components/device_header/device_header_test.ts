@@ -18,7 +18,7 @@ import {DeviceService} from '../../services/device';
 import {DeviceServiceMock} from '../../testing/mocks';
 
 
-import {DeviceHeader, DeviceHeaderModule} from '.';
+import {DeviceHeader, DeviceHeaderModule} from './index';
 
 describe('DeviceHeader', () => {
   let fixture: ComponentFixture<DeviceHeader>;

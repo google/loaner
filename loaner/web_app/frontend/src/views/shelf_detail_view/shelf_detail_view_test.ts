@@ -24,7 +24,7 @@ import {ShelfService} from '../../services/shelf';
 import {UserService} from '../../services/user';
 import {ConfigServiceMock, DeviceServiceMock, ShelfServiceMock, UserServiceMock} from '../../testing/mocks';
 
-import {ShelfDetailView, ShelfDetailViewModule} from '.';
+import {ShelfDetailView, ShelfDetailViewModule} from './index';
 
 
 describe('ShelfDetailView', () => {

@@ -105,17 +105,31 @@ export class LoanerOAuthInterceptor implements HttpInterceptor {
       Observable<HttpRequest<{}>> {
     return new Observable(observer => {
       if (this.authExpirationTime && this.authExpirationTime < Date.now()) {
-        this.authService.reloadAuth();
-      }
-
-      if (this.authToken) {
-        originalRequest = originalRequest.clone({
-          setHeaders: {
-            'Authorization': `Bearer ${this.authToken}`,
-          }
+        console.info('Token is expired. Grabbing a fresh authorization token!');
+        this.authService.reloadAuth().subscribe(response => {
+          observer.next(
+              this.buildRequest(originalRequest, response.access_token));
         });
+      } else if (this.authToken) {
+        observer.next(this.buildRequest(originalRequest, this.authToken));
+      } else {
+        observer.error(
+            `Unknown authorization error while preparing the HTTP request.`);
       }
-      observer.next(originalRequest);
+    });
+  }
+
+  /**
+   * Takes the original request and the token and updates the request header
+   * accordingly for the request.
+   * @param originalRequest The original HTTP request.
+   * @param token The current/updated token to embed in the request.
+   */
+  private buildRequest(originalRequest: HttpRequest<{}>, token: string) {
+    return originalRequest.clone({
+      setHeaders: {
+        'Authorization': `Bearer ${token}`,
+      }
     });
   }
 

@@ -25,7 +25,6 @@ import re
 import yaml
 from google.appengine.ext import ndb
 
-from loaner.web_app import constants
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import event_models
 from loaner.web_app.backend.models import shelf_model
@@ -40,57 +39,42 @@ class Error(Exception):
   """Base class for exceptions in this module."""
 
 
-class DatastoreWipeError(Error):
-  """Exception raised when DS wipe requested but BOOTSTRAP_ENABLED is False."""
-
-
 def import_yaml(yaml_data, user_email, wipe=False, randomize_shelving=False):
   """Imports YAML data and creates app datastore entities.
 
-  This allows wiping of the entire datastore, so for safety this option is
-  disallowed if the constants module's BOOTSTRAP_ENABLED option is False.
+  This function optionally wipes and populates datastore with default values.
 
   Args:
     yaml_data: str, the YAML data containing device, shelf, core_event,
         custom_event, and user data.
     user_email: str, email address of the user making the request.
-    wipe: bool, whether to delete the existing datastore contents. Ignored if
-        constants.BOOTSTRAP_ENABLED is False.
+    wipe: bool, whether to delete the existing datastore contents.
     randomize_shelving: bool, whether to assign Devices to Shelves randomly,
         which may be useful in app testing.
-
-  Raises:
-    DatastoreWipeError: if a datastore wipe is requested but BOOTSTRAP_ENABLED
-        is False.
   """
   yaml_data = yaml.load(yaml_data)
 
   if wipe:
-    if not constants.BOOTSTRAP_ENABLED:
-      raise DatastoreWipeError(
-          'Requested datastore wipe disallowed. Change '
-          'constants.BOOTSTRAP_ENABLED to True to permit wiping.')
-    else:
-      logging.info(
-          'Wiping existing datastore entities for kinds found in YAML.')
-      if yaml_data.get('core_events'):
-        ndb.delete_multi(event_models.CoreEvent.query().fetch(keys_only=True))
-      if yaml_data.get('custom_events'):
-        ndb.delete_multi(event_models.CustomEvent.query().fetch(keys_only=True))
-      if yaml_data.get('devices'):
-        ndb.delete_multi(device_model.Device.query().fetch(keys_only=True))
-      if yaml_data.get('reminder_events'):
-        ndb.delete_multi(
-            event_models.ReminderEvent.query().fetch(keys_only=True))
-      if yaml_data.get('shelves'):
-        ndb.delete_multi(shelf_model.Shelf.query().fetch(keys_only=True))
-      if yaml_data.get('survey_questions'):
-        ndb.delete_multi(
-            survey_models.Question.query().fetch(keys_only=True))
-      if yaml_data.get('templates'):
-        ndb.delete_multi(template_model.Template.query().fetch(keys_only=True))
-      if yaml_data.get('users'):
-        ndb.delete_multi(user_model.User.query().fetch(keys_only=True))
+    logging.info(
+        'Wiping existing datastore entities for kinds found in YAML.')
+    if yaml_data.get('core_events'):
+      ndb.delete_multi(event_models.CoreEvent.query().fetch(keys_only=True))
+    if yaml_data.get('custom_events'):
+      ndb.delete_multi(event_models.CustomEvent.query().fetch(keys_only=True))
+    if yaml_data.get('devices'):
+      ndb.delete_multi(device_model.Device.query().fetch(keys_only=True))
+    if yaml_data.get('reminder_events'):
+      ndb.delete_multi(
+          event_models.ReminderEvent.query().fetch(keys_only=True))
+    if yaml_data.get('shelves'):
+      ndb.delete_multi(shelf_model.Shelf.query().fetch(keys_only=True))
+    if yaml_data.get('survey_questions'):
+      ndb.delete_multi(
+          survey_models.Question.query().fetch(keys_only=True))
+    if yaml_data.get('templates'):
+      ndb.delete_multi(template_model.Template.query().fetch(keys_only=True))
+    if yaml_data.get('users'):
+      ndb.delete_multi(user_model.User.query().fetch(keys_only=True))
 
   shelf_keys = []
 

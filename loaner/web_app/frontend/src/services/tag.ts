@@ -14,7 +14,9 @@
 
 import {Injectable} from '@angular/core';
 import {tap} from 'rxjs/operators';
-import {Tag} from '../models/tag';
+
+import {CreateTagRequest, Tag, UpdateTagRequest} from '../models/tag';
+
 import {ApiService} from './api';
 
 /** A tag service that manages API calls to the backend. */
@@ -24,7 +26,8 @@ export class TagService extends ApiService {
   apiEndpoint = 'tag';
 
   create(tag: Tag) {
-    return this.post('create', {'tag': tag.toApiMessage()}).pipe(tap(() => {
+    const params: CreateTagRequest = {'tag': tag.toApiMessage()};
+    return this.post('create', params).pipe(tap(() => {
       this.snackBar.open(`Tag ${tag.name} created.`);
     }));
   }
@@ -34,5 +37,12 @@ export class TagService extends ApiService {
         .pipe(tap(() => {
           this.snackBar.open(`Tag ${tag.name} has been deleted`);
         }));
+  }
+
+  update(tag: Tag) {
+    const params: UpdateTagRequest = {'tag': tag.toApiMessage()};
+    return this.post('update', params).pipe(tap(() => {
+      this.snackBar.open(`Tag: ${tag.name} has been updated.`);
+    }));
   }
 }

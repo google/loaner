@@ -23,7 +23,7 @@ import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {ActivatedRouteMock, ConfigServiceMock, ShelfServiceMock, TEST_SHELF} from '../../testing/mocks';
 
-import {ShelfActionsCard, ShelfActionsModule} from '.';
+import {ShelfActionsCard, ShelfActionsModule} from './index';
 
 describe('ShelfActionsComponent', () => {
   let fixture: ComponentFixture<ShelfActionsCard>;

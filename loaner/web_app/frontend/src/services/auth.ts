@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Injectable, NgZone} from '@angular/core';
-import {Observable, of, ReplaySubject} from 'rxjs';
+import {from, Observable, of, ReplaySubject} from 'rxjs';
 import {switchMap} from 'rxjs/operators';
 
 import {CONFIG} from '../app.config';
@@ -121,15 +121,19 @@ export class AuthService {
     return this.isSignedInSubject.asObservable();
   }
 
-  /** Reloads the token ID with gapi client. */
+  /**
+   * Returns an observable that reloads the OAuth2 token with the gapi client.
+   */
   reloadAuth() {
-    this.currentUser.reloadAuthResponse().then(newAuthResponse => {
-      const token: Token = {
-        id: newAuthResponse.access_token,
-        expirationTime: newAuthResponse.expires_at,
+    const newAuthResponse = from(this.currentUser.reloadAuthResponse());
+    newAuthResponse.subscribe(response => {
+      const token = {
+        id: response.access_token,
+        expirationTime: response.expires_at,
       };
       this.updateToken(token);
     });
+    return newAuthResponse;
   }
 
   /** Updates the sign in status based on the signin result. */

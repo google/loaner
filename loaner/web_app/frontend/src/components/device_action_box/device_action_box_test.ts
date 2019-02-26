@@ -25,7 +25,7 @@ import {ConfigService} from '../../services/config';
 import {LoanerSnackBar} from '../../services/snackbar';
 import {ConfigServiceMock} from '../../testing/mocks';
 
-import {DeviceActionBox, DeviceActionBoxModule} from '.';
+import {DeviceActionBox, DeviceActionBoxModule} from './index';
 
 @Component({
   preserveWhitespaces: true,

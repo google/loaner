@@ -19,7 +19,7 @@ import {ConfigService} from '../../services/config';
 import {SearchService} from '../../services/search';
 import {ConfigServiceMock, SearchServiceMock} from '../../testing/mocks';
 
-import {ConfigurationView, ConfigurationViewModule} from '.';
+import {ConfigurationView, ConfigurationViewModule} from './index';
 
 
 

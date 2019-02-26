@@ -14,7 +14,7 @@
 
 import {Component} from '@angular/core';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
-import {UppercaseModule} from '.';
+import {UppercaseModule} from './index';
 
 @Component({
   preserveWhitespaces: true,
