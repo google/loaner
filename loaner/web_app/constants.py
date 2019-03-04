@@ -27,10 +27,6 @@ import endpoints
 
 from loaner.web_app.backend.models import template_model
 
-# The application version (MAJOR.MINOR.PATCH-[pre-release]).
-# This should be iterated on all official releases or for any bootstrap
-# affecting changes.
-APP_VERSION = '0.7.1-alpha'
 
 # The application id for this project otherwise known as the Google Cloud
 # Project ID.
@@ -132,6 +128,10 @@ else:
   SECRETS_FILE = ''
   PARENT_ORG_UNIT = 'Grab n Go/Dev'
 
+# When set to True the Application will Bootstrap, performing initialization of
+# the application. On first deployment this should be set to True, for all
+# following deployments this should be set to False.
+BOOTSTRAP_ENABLED = True
 ################################################################################
 
 if ON_LOCAL:

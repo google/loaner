@@ -24,9 +24,8 @@ import os
 
 import mock
 
-from google.appengine.ext import deferred
+from google.appengine.ext import deferred  # pylint: disable=unused-import
 
-from loaner.web_app import constants
 from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import bootstrap
@@ -40,9 +39,10 @@ from loaner.web_app.backend.testing import loanertest
 class BootstrapTest(loanertest.TestCase):
   """Tests for the datastore YAML importer lib."""
 
-  @mock.patch.object(deferred, 'defer', autospec=True)
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
+  @mock.patch('google.appengine.ext.deferred.defer')
   def test_run_bootstrap(self, mock_defer):
-    """Tests that run_bootstrap defers tasks for 2 methods."""
+    """Tests that run_bootstrap defers tasks for all four methods."""
     mock_defer.return_value = 'fake-task'
     self.assertFalse(config_model.Config.get(
         'bootstrap_started'))
@@ -59,47 +59,30 @@ class BootstrapTest(loanertest.TestCase):
          'bootstrap_datastore_yaml':
              bootstrap._TASK_DESCRIPTIONS['bootstrap_datastore_yaml']})
     self.assertEqual(len(mock_defer.mock_calls), 2)
-    self.assertTrue(config_model.Config.get('bootstrap_started'))
+    self.assertTrue(config_model.Config.get(
+        'bootstrap_started'))
 
-  @mock.patch.object(deferred, 'defer', autospec=True)
-  def test_run_bootstrap_update(self, mock_defer):
-    """Tests that run_bootstrap defers the correct tasks for an update."""
-    mock_defer.return_value = 'fake-task'
-    config_model.Config.set('running_version', '0.0.1-alpha')
-    # This bootstrap task being completed would indicate that this is an update.
-    bootstrap_status_model.BootstrapStatus.get_or_insert(
-        'bootstrap_datastore_yaml').put()
-    self.assertFalse(config_model.Config.get('bootstrap_started'))
-    self.assertFalse(bootstrap._is_latest_version())
-    run_status_dict = bootstrap.run_bootstrap()
-    # Ensure that only _BOOTSTRAP_UPDATE_TASKS were run during an update.
-    update_task_descriptions = {
-        key: value for key, value in bootstrap._TASK_DESCRIPTIONS.iteritems()
-        if key in bootstrap._BOOTSTRAP_UPDATE_TASKS
-    }
-    self.assertDictEqual(run_status_dict, update_task_descriptions)
-    self.assertEqual(
-        len(mock_defer.mock_calls), len(update_task_descriptions))
-    self.assertTrue(config_model.Config.get('bootstrap_started'))
-
-  @mock.patch.object(deferred, 'defer', autospec=True)
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
+  @mock.patch('google.appengine.ext.deferred.defer')
   def test_run_bootstrap_all_functions(self, mock_defer):
-    """Tests that run_bootstrap defers all tasks for a new deployment."""
+    """Tests that run_bootstrap defers tasks for all four methods."""
     mock_defer.return_value = 'fake-task'
     self.assertFalse(config_model.Config.get(
         'bootstrap_started'))
     run_status_dict = bootstrap.run_bootstrap()
     self.assertDictEqual(run_status_dict, bootstrap._TASK_DESCRIPTIONS)
-    self.assertEqual(
-        len(mock_defer.mock_calls), len(bootstrap._TASK_DESCRIPTIONS))
+    self.assertEqual(len(mock_defer.mock_calls), 4)
     self.assertTrue(config_model.Config.get(
         'bootstrap_started'))
 
-  def test_run_bootstrap_bad_function(self):
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', False)
+  def test_run_bootstrap_while_disabled(self):
+    """Tests that bootstrapping is disallowed when constant False."""
     with self.assertRaises(bootstrap.Error):
-      bootstrap.run_bootstrap({'bootstrap_bad_function': {}})
+      bootstrap.run_bootstrap({'bootstrap_fake_method': {}})
 
-  @mock.patch.object(datastore_yaml, 'import_yaml', autospec=True)
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
+  @mock.patch('__main__.bootstrap.datastore_yaml.import_yaml')
   def test_manage_task_being_called(self, mock_importyaml):
     """Tests that the manage_task decorator is doing its task management."""
     del mock_importyaml  # Unused.
@@ -112,7 +95,8 @@ class BootstrapTest(loanertest.TestCase):
     self.assertTrue(expected_model.success)
     self.assertLess(expected_model.timestamp, datetime.datetime.utcnow())
 
-  @mock.patch.object(datastore_yaml, 'import_yaml', autospec=True)
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
+  @mock.patch('__main__.bootstrap.datastore_yaml.import_yaml')
   def test_manage_task_handles_exception(self, mock_importyaml):
     """Tests that the manage_task decorator kandles an exception."""
     mock_importyaml.side_effect = KeyError('task-exception')
@@ -125,7 +109,8 @@ class BootstrapTest(loanertest.TestCase):
     self.assertFalse(expected_model.success)
     self.assertLess(expected_model.timestamp, datetime.datetime.utcnow())
 
-  @mock.patch.object(datastore_yaml, 'import_yaml', autospec=True)
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
+  @mock.patch('__main__.bootstrap.datastore_yaml.import_yaml')
   def test_bootstrap_datastore_yaml(self, mock_importyaml):
     """Tests bootstrap_datastore_yaml."""
     bootstrap.bootstrap_datastore_yaml(user_email='foo')
@@ -161,7 +146,7 @@ class BootstrapTest(loanertest.TestCase):
         org_unit_name in bootstrap.constants.ORG_UNIT_DICT
     ])
 
-  @mock.patch.object(bigquery, 'BigQueryClient', autospec=True)
+  @mock.patch.object(bigquery, 'BigQueryClient')
   def test_bootstrap_bq_history(self, mock_clientclass):
     """Tests bootstrap_bq_history."""
     mock_client = mock.Mock()
@@ -182,74 +167,29 @@ class BootstrapTest(loanertest.TestCase):
         mock.call('test_name', 'test_value', False),
         mock.call('bootstrap_started', True, False)], any_order=True)
 
-  def test_is_bootstrap_completed_true_up_to_date(self):
-    config_model.Config.set('bootstrap_completed', True)
-    config_model.Config.set('running_version', constants.APP_VERSION)
-    self.assertTrue(bootstrap.is_bootstrap_completed())
-
-  def test_is_bootstrap_completed_false_needs_update(self):
-    config_model.Config.set('running_version', '0.0.1-alpha')
+  def test_is_bootstrap_completed(self):
+    """Tests is_bootstrap_completed under myriad circumstances."""
     self.assertFalse(bootstrap.is_bootstrap_completed())
 
-  def test_is_bootstrap_started_and_completed(self):
-    config_model.Config.set('bootstrap_completed', True)
-    config_model.Config.set('bootstrap_started', True)
-    # bootstrap_started is false (not in progress) if bootstrap completed.
+    bootstrap.config_model.Config.set('bootstrap_started', True)
+    self.assertFalse(bootstrap.is_bootstrap_completed())
+
+    bootstrap.config_model.Config.set('bootstrap_completed', False)
+    self.assertFalse(bootstrap.is_bootstrap_completed())
+
+    bootstrap.config_model.Config.set('bootstrap_completed', True)
+    self.assertTrue(bootstrap.is_bootstrap_completed())
+
+  def test_is_bootstrap_started(self):
     self.assertFalse(bootstrap.is_bootstrap_started())
 
-  def test_is_new_deployment_false(self):
-    config_model.Config.set('running_version', constants.APP_VERSION)
-    self.assertFalse(bootstrap._is_new_deployment())
+    bootstrap.config_model.Config.set('bootstrap_started', True)
+    self.assertTrue(bootstrap.is_bootstrap_started())
 
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=True)
-  @mock.patch.object(bootstrap, 'is_update', autospec=True)
-  def test_get_bootstrap_functions_new_deployment(
-      self, mock_is_update, mock_is_new_deployment):
-    # Ensure that all initial deployment tasks are included.
-    self.assertTrue(
-        all(task in bootstrap.get_bootstrap_functions()
-            for task in bootstrap._BOOTSTRAP_INIT_TASKS))
-    self.assertEqual(mock_is_update.call_count, 0)
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=False)
-  def test_get_bootstrap_functions_update(self, mock_is_new_deployment):
-    # Ensure that all initial deployment tasks are not included.
-    self.assertFalse(
-        any(task in bootstrap._BOOTSTRAP_INIT_TASKS
-            for task in bootstrap.get_bootstrap_functions()))
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=False)
-  def test_get_bootstrap_functions_get_all(self, mock_is_new_deployment):
-    self.assertLen(
-        bootstrap.get_bootstrap_functions(get_all=True),
-        len(bootstrap._TASK_DESCRIPTIONS))
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=False)
-  def test_get_bootstrap_functions_failed(self, mock_is_new_deployment):
-    config_model.Config.set('running_version', constants.APP_VERSION)
-    # Initialize all task statuses to successful.
-    for task_name in bootstrap._TASK_DESCRIPTIONS.keys():
-      task_entity = bootstrap_status_model.BootstrapStatus.get_or_insert(
-          task_name)
-      task_entity.success = True
-      task_entity.put()
-    # Mock 1 task failure.
-    task_entity = bootstrap_status_model.BootstrapStatus.get_by_id(
-        'bootstrap_datastore_yaml')
-    task_entity.success = False
-    task_entity.put()
-    # Ensure that only failed and all update tasks are included.
-    functions = bootstrap.get_bootstrap_functions()
-    self.assertCountEqual(
-        list(bootstrap._BOOTSTRAP_UPDATE_TASKS) + ['bootstrap_datastore_yaml'],
-        functions.keys())
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=False)
-  @mock.patch.object(bootstrap, 'get_bootstrap_functions', autospec=True)
-  def test_get_bootstrap_task_status(
-      self, mock_get_bootstrap_functions, mock_is_new_deployment):
+  @mock.patch('__main__.bootstrap.constants.BOOTSTRAP_ENABLED', True)
+  @mock.patch('__main__.bootstrap.get_all_bootstrap_functions')
+  def test_get_bootstrap_task_status(self, mock_getall):
     """Tests get_bootstrap_task_status."""
-    config_model.Config.set('bootstrap_started', True)
     yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=-1)
 
     def fake_function1():
@@ -258,7 +198,7 @@ class BootstrapTest(loanertest.TestCase):
     def fake_function2():
       pass
 
-    mock_get_bootstrap_functions.return_value = {
+    mock_getall.return_value = {
         'fake_function1': fake_function1,
         'fake_function2': fake_function2
     }
@@ -272,65 +212,13 @@ class BootstrapTest(loanertest.TestCase):
 
     fake_entity2 = bootstrap_status_model.BootstrapStatus.get_or_insert(
         'fake_function2')
-    fake_entity2.success = True
+    fake_entity2.success = False
     fake_entity2.timestamp = yesterday
-    fake_entity2.details = ''
+    fake_entity2.details = 'Exception raise we failed oh no.'
     fake_entity2.put()
 
     status = bootstrap.get_bootstrap_task_status()
-    self.assertLen(status, 2)
-    self.assertTrue(bootstrap.is_bootstrap_completed())
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=False)
-  def test_is_latest_version_true(self, mock_is_new_deployment):
-    config_model.Config.set('running_version', constants.APP_VERSION)
-    self.assertTrue(bootstrap._is_latest_version())
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', return_value=True)
-  def test_is_latest_version_false_new_deployment(self, mock_is_new_deployment):
-    config_model.Config.set('running_version', constants.APP_VERSION)
-    self.assertFalse(bootstrap._is_latest_version())
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', autospec=True)
-  def test_is_latest_version_false_update(self, mock_is_new_deployment):
-    # Mock the state of an application requiring an update.
-    mock_is_new_deployment.return_value = False
-    config_model.Config.set('bootstrap_completed', True)
-    config_model.Config.set('running_version', '0.0.1-alpha')
-    for task in bootstrap._TASK_DESCRIPTIONS.keys():
-      fake_entity2 = bootstrap_status_model.BootstrapStatus.get_or_insert(task)
-      fake_entity2.success = True
-      fake_entity2.put()
-
-    self.assertFalse(bootstrap._is_latest_version())
-    # If we are not at the latest version, bootstrap should be incomplete.
-    self.assertFalse(config_model.Config.get('bootstrap_completed'))
-    # Update tasks should be marked as not completed when there is an update.
-    for task in bootstrap._BOOTSTRAP_UPDATE_TASKS:
-      status_entity = bootstrap_status_model.BootstrapStatus.get_by_id(task)
-      self.assertFalse(status_entity.success)
-    # All init task statuses should still be true in the case of an update.
-    for task in bootstrap._BOOTSTRAP_INIT_TASKS:
-      status_entity = bootstrap_status_model.BootstrapStatus.get_by_id(task)
-      self.assertTrue(status_entity.success)
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', autospec=True)
-  def test_is_update_new(self, mock_is_new_deployment):
-    mock_is_new_deployment.return_value = True
-    config_model.Config.set('running_version', '0.0')
-    self.assertFalse(bootstrap.is_update())
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', autospec=True)
-  def test_is_update_up_to_date(self, mock_is_new_deployment):
-    config_model.Config.set('running_version', bootstrap.constants.APP_VERSION)
-    self.assertFalse(bootstrap.is_update())
-
-  @mock.patch.object(bootstrap, '_is_new_deployment', autospec=True)
-  def test_is_update_needs_update(self, mock_is_new_deployment):
-    # Mock the state of an application requiring an update.
-    mock_is_new_deployment.return_value = False
-    config_model.Config.set('running_version', '0.0.1-alpha')
-    self.assertTrue(bootstrap.is_update())
+    self.assertEqual(len(status), 2)
 
 
 if __name__ == '__main__':
