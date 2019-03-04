@@ -251,6 +251,10 @@ class Device(base_model.BaseModel):
   def guest_enabled(self):
     return self.current_ou == constants.ORG_UNIT_DICT['GUEST']
 
+  @property
+  def return_dates(self):
+    return calculate_return_dates(self.assignment_date)
+
   def _post_put_hook(self, future):
     """Overrides the _post_put_hook method."""
     del future  # Unused.
@@ -544,7 +548,7 @@ class Device(base_model.BaseModel):
     self.assignment_date = datetime.datetime.utcnow()
     self.mark_pending_return_date = None
     self.shelf = None
-    self.due_date = calculate_return_dates(self.assignment_date).default
+    self.due_date = self.return_dates.default
     self.move_to_default_ou(user_email=user_email)
     event_action = 'device_loan_assign'
     try:
@@ -610,10 +614,9 @@ class Device(base_model.BaseModel):
     extend_date = extend_date_time.date()
     if extend_date < datetime.date.today():
       raise ExtendError('Extension date cannot be in the past.')
-    return_dates = calculate_return_dates(self.assignment_date)
-    if extend_date <= return_dates.max.date():
+    if extend_date <= self.return_dates.max.date():
       self.due_date = datetime.datetime.combine(
-          extend_date, return_dates.default.time())
+          extend_date, self.return_dates.default.time())
     else:
       raise ExtendError('Extension date outside allowable date range.')
     self.put()
@@ -927,12 +930,9 @@ def calculate_return_dates(assignment_date):
   Returns:
     A ReturnDates NamedTuple of datetimes.
   """
-  loan_duration = config_model.Config.get(
-      'loan_duration')
-  max_loan_duration = config_model.Config.get(
-      'maximum_loan_duration')
-  default_date = assignment_date + datetime.timedelta(days=loan_duration)
+  default_date = assignment_date + datetime.timedelta(
+      days=config_model.Config.get('loan_duration'))
   max_loan_date = assignment_date + datetime.timedelta(
-      days=max_loan_duration)
+      days=config_model.Config.get('maximum_loan_duration'))
 
   return ReturnDates(max_loan_date, default_date)

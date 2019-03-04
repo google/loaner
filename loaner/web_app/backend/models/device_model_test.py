@@ -598,9 +598,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.assertTrue(retrieved_device.assignment_date)
     self.assertEqual(retrieved_device.mark_pending_return_date, None)
     self.assertEqual(
-        retrieved_device.due_date,
-        device_model.calculate_return_dates(
-            self.test_device.assignment_date).default)
+        retrieved_device.due_date, self.test_device.return_dates.default)
     self.assertIsNone(self.test_device.shelf)
 
     self.assertEqual(self.testbed.mock_raiseevent.call_count, 1)
@@ -1000,8 +998,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.test_device.assignment_date = now
     mock_config.get.side_effect = [3, 14]
 
-    dates = device_model.calculate_return_dates(
-        self.test_device.assignment_date)
+    dates = self.test_device.return_dates
 
     self.assertIsInstance(dates, device_model.ReturnDates)
     self.assertEqual(dates.default, now + datetime.timedelta(days=3))

@@ -26,7 +26,6 @@ import endpoints
 
 from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shelf_messages
-from loaner.web_app.backend.models import device_model
 
 _CORRUPT_KEY_MSG = 'The key provided for submission was not found.'
 _MALFORMED_PAGE_TOKEN_MSG = 'The page token provided is incorrect.'
@@ -73,8 +72,7 @@ def build_device_message_from_model(device, guest_permitted):
     message.next_reminder = build_reminder_message_from_model(
         device.next_reminder)
   if device.is_assigned:
-    message.max_extend_date = device_model.calculate_return_dates(
-        device.assignment_date).max
+    message.max_extend_date = device.return_dates.max
   if device.shelf:
     message.shelf = build_shelf_message_from_model(device.shelf.get())
   return message

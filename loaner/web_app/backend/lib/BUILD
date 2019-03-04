@@ -48,7 +48,6 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
-        "//loaner/web_app/backend/models:device_model",
         "@endpoints_archive//:endpoints",
     ],
 )

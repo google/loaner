@@ -118,8 +118,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         next_reminder=device_messages.Reminder(level=2),
         guest_permitted=True,
         guest_enabled=True,
-        max_extend_date=device_model.calculate_return_dates(
-            test_device.assignment_date).max,
+        max_extend_date=test_device.return_dates.max,
         overdue=True,
     )
     actual_message = api_utils.build_device_message_from_model(
