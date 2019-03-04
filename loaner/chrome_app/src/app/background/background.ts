@@ -463,3 +463,4 @@ function createDebugView() {
   chrome.app.window.create(
       'debug.html', {id: 'debug', minWidth: 800, minHeight: 650});
 }
+
