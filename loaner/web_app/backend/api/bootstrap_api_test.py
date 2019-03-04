@@ -72,16 +72,13 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
         ['Running a task.', 'Running another task'],
         [task.description for task in response.tasks])
 
-  @mock.patch(
-      '__main__.bootstrap_api.bootstrap.constants.BOOTSTRAP_ENABLED', True)
   @mock.patch('__main__.bootstrap_api.bootstrap.get_bootstrap_task_status')
-  @mock.patch('__main__.bootstrap_api.bootstrap.is_bootstrap_enabled')
   @mock.patch('__main__.bootstrap_api.bootstrap.is_bootstrap_started')
   @mock.patch('__main__.bootstrap_api.bootstrap.is_bootstrap_completed')
   @mock.patch('__main__.bootstrap_api.root_api.Service.check_xsrf_token')
   def test_get_status(
       self, mock_xsrf_token, mock_is_completed, mock_is_started,
-      mock_is_enabled, mock_get_task_status):
+      mock_get_task_status):
     """Tests get_status for general status and task details."""
     yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=-1)
     task1_status = {
@@ -102,34 +99,28 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     mock_is_started.return_value = True
     request = message_types.VoidMessage()
 
-    mock_is_enabled.return_value = True
     mock_is_completed.return_value = True
     response = self.service.get_status(request)
 
-    self.assertTrue(response.enabled)
     self.assertTrue(response.started)
     self.assertTrue(response.completed)
     self.assertEqual(mock_xsrf_token.call_count, 1)
 
     mock_xsrf_token.reset_mock()
 
-    # Enabled False and completed True, so no tasks in response.
-    mock_is_enabled.return_value = False
+    # Completed True, so no tasks in response.
     mock_is_completed.return_value = True
     response = self.service.get_status(request)
 
-    self.assertFalse(response.enabled)
     self.assertTrue(response.completed)
     self.assertEqual(mock_xsrf_token.call_count, 1)
 
     mock_xsrf_token.reset_mock()
 
-    # Enabled True and completed False, so yes tasks in response.
-    mock_is_enabled.return_value = True
+    # Completed False, so yes tasks in response.
     mock_is_completed.return_value = False
     response = self.service.get_status(request)
 
-    self.assertTrue(response.enabled)
     self.assertFalse(response.completed)
     self.assertEqual(mock_xsrf_token.call_count, 1)
 
@@ -142,12 +133,10 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
     mock_xsrf_token.reset_mock()
 
-    # Enabled False and completed False, so yes tasks in response.
-    mock_is_enabled.return_value = False
+    # Completed False, so yes tasks in response.
     mock_is_completed.return_value = False
     response = self.service.get_status(request)
 
-    self.assertFalse(response.enabled)
     self.assertFalse(response.completed)
     self.assertEqual(mock_xsrf_token.call_count, 1)
 

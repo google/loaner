@@ -65,12 +65,10 @@ class BootstrapStatusResponse(messages.Message):
   """Bootstrap status response ProtoRPC message.
 
   Attributes:
-    enabled: bool, Indicates if the bootstrap is enabled.
     started: bool, Indicated if the bootstrap has been started.
     completed: bool, Indicated if the bootstrap is completed.
     tasks: BootstrapTask, A list of all of the tasks to be displayed.
   """
-  enabled = messages.BooleanField(1)
   started = messages.BooleanField(2)
   completed = messages.BooleanField(3)
   tasks = messages.MessageField(BootstrapTask, 4, repeated=True)

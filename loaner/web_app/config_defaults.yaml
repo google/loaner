@@ -112,6 +112,11 @@
 # All below configurations are used by the app to keep track of state.
 # Adjusting these manually might break things.
 
+# running_version: str, the application version, (MAJOR.MINOR.PATCH[pre-release]).
+# In all cases other than new deployments this will be a non-zeroized value in Datastore indicating
+# that there is an existing deployment. This should not be adjusted manually.
+'running_version': '0.0'
+
 # bootstrap_[started|completed]: bool, Both False by default, changed to
 # True in datastore once the bootstrap process is started or completed
 # respectively.
