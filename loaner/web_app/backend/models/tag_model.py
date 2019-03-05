@@ -147,7 +147,7 @@ class Tag(base_model.BaseModel):
         'Destroying the tag with urlsafe key %r and name %r.',
         key.urlsafe(), key.get().name)
     for model in _MODELS_WITH_TAGS:
-      deferred.defer(_delete_tags, model, key)
+      deferred.defer(_delete_tags, model, key.get())
 
   @classmethod
   def list(cls, page_size=10, page_index=1, include_hidden_tags=False,
@@ -179,34 +179,37 @@ class Tag(base_model.BaseModel):
             math.ceil(query_object.count() / page_size))
 
 
-def _delete_tags(model, key, cursor=None, num_updated=0, batch_size=100):
+def _delete_tags(model, tag, cursor=None, num_updated=0, batch_size=100):
   """Cleans up any entities on the given model that reference the given key.
 
   Args:
     model: ndb.Model, a Model with a repeated TagData property.
-    key: ndb.Key, a Tag model key.
+    tag: Tag, an instance of a Tag model.
     cursor: Optional[datastore_query.Cursor], pointing to the last result.
     num_updated: int, the number of entities that were just updated.
     batch_size: int, the number of entities to include in the batch.
   """
   entities, next_cursor, more = model.query(
-      model.tags.tag_key == key).fetch_page(batch_size, start_cursor=cursor)
+      model.tags.tag == tag).fetch_page(batch_size, start_cursor=cursor)
+
   for entity in entities:
-    entity.tags = [tag for tag in entity.tags if tag.tag_key != key]
+    entity.tags = [
+        model_tag for model_tag in entity.tags if model_tag.tag != tag
+    ]
   ndb.put_multi(entities)
 
   num_updated += len(entities)
   logging.info(
       'Destroyed %d occurrence(s) of the tag with URL safe key %r',
-      len(entities), key.urlsafe())
+      len(entities), tag.key.urlsafe())
   if more:
     deferred.defer(
-        _delete_tags, model, key,
+        _delete_tags, model, tag,
         cursor=next_cursor, num_updated=num_updated, batch_size=batch_size)
   else:
     logging.info(
         'Destroyed a total of %d occurrence(s) of the tag with URL safe key %r',
-        num_updated, key.urlsafe())
+        num_updated, tag.key.urlsafe())
 
 
 class TagData(ndb.Model):
@@ -216,8 +219,8 @@ class TagData(ndb.Model):
   the property name must be 'tags'.
 
   Attributes:
-    tag_key: ndb.Key, a reference to a Tag entity.
+    tag: Tag, an instance of a Tag entity.
     more_info: str, an informational field about this particular tag reference.
   """
-  tag_key = ndb.KeyProperty(Tag)
+  tag = ndb.StructuredProperty(Tag)
   more_info = ndb.StringProperty()

@@ -73,9 +73,9 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
     self.tag5.put()
 
     self.tag1_data = tag_model.TagData(
-        tag_key=self.tag1.key, more_info='tag1_data info.')
+        tag=self.tag1, more_info='tag1_data info.')
     self.tag2_data = tag_model.TagData(
-        tag_key=self.tag2.key, more_info='tag2_data info.')
+        tag=self.tag2, more_info='tag2_data info.')
 
     self.entity1 = _ModelWithTags(
         tags=[self.tag1_data, self.tag2_data]).put().get()
@@ -147,7 +147,7 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
         name='TestTag1 Renamed')
     self.assertIn(
         tag_model.TagData(
-            tag_key=self.tag1.key, more_info=self.tag1_data.more_info),
+            tag=self.tag1, more_info=self.tag1_data.more_info),
         self.entity1.tags)
     self.assertEqual(self.tag1.name, 'TestTag1 Renamed')
 
@@ -178,16 +178,15 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
       ('TestTag2', 'tag2_data info.'),
   )
   @mock.patch.object(ndb, 'put_multi', autospec=True)
-  def test_destroy(self, tag, tag_info, mock_put_multi):
+  def test_destroy(self, tag_name, tag_info, mock_put_multi):
     """Test destroying an existing Tag using deferred tasks."""
-    tag_key = tag_model.Tag.query(tag_model.Tag.name == tag).get().key
-    tag_key.delete()
+    tag_entity = tag_model.Tag.query(tag_model.Tag.name == tag_name).get()
+    tag_entity.key.delete()
 
     tasks = self.taskqueue_stub.get_filtered_tasks()
     deferred.run(tasks[0].payload)
-
-    tag_data = tag_model.TagData(tag_key=tag_key, more_info=tag_info)
-    self.assertIsNone(tag_key.get())
+    tag_data = tag_model.TagData(tag=tag_entity, more_info=tag_info)
+    self.assertIsNone(tag_entity.key.get())
     self.assertNotIn(tag_data, self.entity1.tags)
     self.assertNotIn(tag_data, self.entity2.tags)
     self.assertNotIn(tag_data, self.entity3.tags)
@@ -197,7 +196,7 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
   def test_delete_tags(self):
     """Test destroying a Tag in small batches to test multiple defer calls."""
     tag_model._delete_tags(
-        _ModelWithTags, key=self.tag1.key, batch_size=2)
+        _ModelWithTags, tag=self.tag1, batch_size=2)
     tasks = self.taskqueue_stub.get_filtered_tasks()
     deferred.run(tasks[0].payload)
     deferred.run(tasks[0].payload)
