@@ -77,9 +77,14 @@ class ListTagRequest(messages.Message):
     page_size: int, The number of results to return.
     cursor: str, The base64-encoded cursor string specifying where to start the
       query.
+    page_index: int, A human-readable page index to navigate to that will be
+      used in the calculation of the offset.
+    include_hidden_tags: bool, Whether to include hidden tags in the results.
   """
   page_size = messages.IntegerField(1, default=10)
   cursor = messages.StringField(2)
+  page_index = messages.IntegerField(3, default=1)
+  include_hidden_tags = messages.BooleanField(4, default=False)
 
 
 class ListTagResponse(messages.Message):
@@ -95,3 +100,4 @@ class ListTagResponse(messages.Message):
   tags = messages.MessageField(Tag, 1, repeated=True)
   cursor = messages.StringField(2)
   has_additional_results = messages.BooleanField(3)
+  total_pages = messages.IntegerField(4)

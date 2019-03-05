@@ -50,11 +50,27 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
     self.tag1 = tag_model.Tag(
         name='TestTag1', hidden=False, protect=True,
         color='blue', description='Description 1.')
+    self.tag1.put()
+
     self.tag2 = tag_model.Tag(
         name='TestTag2', hidden=False, protect=False,
         color='red', description='Description 2.')
-    self.tag1.put()
     self.tag2.put()
+
+    self.tag3 = tag_model.Tag(
+        name='TestTag3', hidden=True, protect=False,
+        color='yellow', description='Description 3.')
+    self.tag3.put()
+
+    self.tag4 = tag_model.Tag(
+        name='TestTag4', hidden=True, protect=True,
+        color='green', description='Description 4.')
+    self.tag4.put()
+
+    self.tag5 = tag_model.Tag(
+        name='TestTag5', hidden=False, protect=False,
+        color='red', description='Description 5.')
+    self.tag5.put()
 
     self.tag1_data = tag_model.TagData(
         tag_key=self.tag1.key, more_info='tag1_data info.')
@@ -73,11 +89,11 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
     """Test the creation of a Tag."""
     tag_entity = tag_model.Tag.create(
         user_email=loanertest.USER_EMAIL,
-        name='TestTag4',
+        name='NewlyCreatedTag',
         hidden=False,
         protect=False,
         color='red',
-        description='Description 4.')
+        description='Description for new tag.')
     self.assertEqual(
         tag_entity, tag_model.Tag.get(
             urlsafe_key=tag_entity.key.urlsafe()))
@@ -197,33 +213,70 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
     with self.assertRaises(endpoints.BadRequestException):
       tag_model.Tag.get(urlsafe_key='fake_urlsafe_key')
 
-  def test_list_all_tags(self):
-    """Test listing all tag entities by using an unreasonbly high page_size."""
-    query_results, cursor, has_additional_results = tag_model.Tag.list(
-        page_size=1000)
-    self.assertListEqual(query_results, [self.tag1, self.tag2])
+  def test_list_tags_include_hidden(self):
+    (query_results, cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=tag_model.Tag.query().count(), include_hidden_tags=True)
+    self.assertListEqual(
+        query_results, [self.tag1, self.tag2, self.tag3, self.tag4, self.tag5])
+    self.assertEqual(total_pages, 1)
     self.assertIsInstance(cursor, datastore_query.Cursor)
     self.assertFalse(has_additional_results)
 
+  def test_list_tags_exclude_hidden(self):
+    (query_results, cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=tag_model.Tag.query().count(), include_hidden_tags=False)
+    self.assertListEqual(query_results, [self.tag1, self.tag2, self.tag5])
+    self.assertNotIn(self.tag3, query_results)
+    self.assertNotIn(self.tag4, query_results)
+    self.assertIsInstance(cursor, datastore_query.Cursor)
+    self.assertFalse(has_additional_results)
+    self.assertEqual(total_pages, 1)
+
   def test_list_tags_more(self):
-    page_one_result, first_cursor, has_additional_results = tag_model.Tag.list(
-        page_size=1, cursor=None)
+    (page_one_result, first_cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=1, cursor=None, include_hidden_tags=False)
     self.assertListEqual(page_one_result, [self.tag1])
     self.assertTrue(has_additional_results)
+    self.assertEqual(total_pages, 3)
 
-    page_two_result, next_cursor, has_additional_results = tag_model.Tag.list(
-        page_size=10000, cursor=first_cursor)
-    self.assertListEqual(page_two_result, [self.tag2])
+    (page_two_result, next_cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=tag_model.Tag.query().count(), cursor=first_cursor,
+         include_hidden_tags=False)
+    self.assertListEqual(page_two_result, [self.tag2, self.tag5])
     self.assertIsInstance(next_cursor, datastore_query.Cursor)
     self.assertFalse(has_additional_results)
+    self.assertEqual(total_pages, 1)
+
+  def test_list_tags_middle_page(self):
+    (page_result, next_cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=1, page_index=2, include_hidden_tags=False)
+    self.assertListEqual(page_result, [self.tag2])
+    self.assertIsInstance(next_cursor, datastore_query.Cursor)
+    self.assertTrue(has_additional_results)
+    self.assertEqual(total_pages, 3)
+
+  def test_list_tags_last_page(self):
+    (page_result, next_cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=2, page_index=2, include_hidden_tags=False)
+    self.assertListEqual(page_result, [self.tag5])
+    self.assertIsInstance(next_cursor, datastore_query.Cursor)
+    self.assertFalse(has_additional_results)
+    self.assertEqual(total_pages, 2)
 
   def test_list_tags_none(self):
-    self.tag1.key.delete()
-    self.tag2.key.delete()
-    query_results, cursor, has_additional_results = tag_model.Tag.list()
+    ndb.delete_multi(tag_model.Tag.query().fetch(keys_only=True))
+    (query_results, cursor,
+     has_additional_results), total_pages = tag_model.Tag.list()
     self.assertEmpty(query_results)
     self.assertIsNone(cursor)
     self.assertFalse(has_additional_results)
+    self.assertEqual(total_pages, 0)
 
 
 if __name__ == '__main__':

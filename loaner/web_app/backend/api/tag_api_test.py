@@ -51,8 +51,19 @@ class TagApiTest(loanertest.EndpointsTestCase):
         description=self.test_tag.description,
         urlsafe_key=self.test_tag.key.urlsafe())
 
+    self.default_tag = tag_model.Tag.create(
+        user_email=loanertest.USER_EMAIL, name='tag-visible-unprotected',
+        hidden=False, protect=False, color='blue')
+    self.default_tag_response = tag_messages.Tag(
+        name=self.default_tag.name,
+        hidden=self.default_tag.hidden,
+        protect=self.default_tag.protect,
+        color=self.default_tag.color,
+        description=self.default_tag.description,
+        urlsafe_key=self.default_tag.key.urlsafe())
+
     self.hidden_tag = tag_model.Tag.create(
-        user_email=loanertest.USER_EMAIL, name='tag-two',
+        user_email=loanertest.USER_EMAIL, name='tag-hidden',
         hidden=True, protect=False, color='red', description='test-description')
     self.hidden_tag_response = tag_messages.Tag(
         name=self.hidden_tag.name,
@@ -63,7 +74,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
         urlsafe_key=self.hidden_tag.key.urlsafe())
 
     self.protected_tag = tag_model.Tag.create(
-        user_email=loanertest.USER_EMAIL, name='tag-three',
+        user_email=loanertest.USER_EMAIL, name='tag-protected',
         hidden=False, protect=True, color='amber')
     self.protected_tag_response = tag_messages.Tag(
         name=self.protected_tag.name,
@@ -150,36 +161,75 @@ class TagApiTest(loanertest.EndpointsTestCase):
     with self.assertRaises(endpoints.BadRequestException):
       self.service.get(request)
 
-  def test_list_tags(self):
+  def test_list_tags_include_hidden(self):
     with mock.patch.object(
         self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
-      response = self.service.list(tag_messages.ListTagRequest(page_size=10000))
+      response = self.service.list(tag_messages.ListTagRequest(
+          page_size=tag_model.Tag.query().count(), include_hidden_tags=True))
       self.assertEqual(mock_xsrf_token.call_count, 1)
-      self.assertListEqual(
-          response.tags,
-          [self.test_tag_response,
-           self.hidden_tag_response,
-           self.protected_tag_response])
+      self.assertListEqual(response.tags, [
+          self.test_tag_response, self.default_tag_response,
+          self.hidden_tag_response, self.protected_tag_response
+      ])
+      self.assertIsNotNone(response.cursor)
+      self.assertFalse(response.has_additional_results)
+      self.assertEqual(response.total_pages, 1)
+
+  def test_list_tags_exclude_hidden(self):
+    with mock.patch.object(
+        self.service, 'check_xsrf_token', autospec=True) as mock_xsrf_token:
+      response = self.service.list(tag_messages.ListTagRequest(
+          page_size=tag_model.Tag.query().count(), include_hidden_tags=False))
+      self.assertEqual(mock_xsrf_token.call_count, 1)
+      self.assertNotIn(self.hidden_tag_response, response.tags)
+      self.assertIsNotNone(response.cursor)
+      self.assertEqual(response.total_pages, 1)
 
   def test_list_tags_additional_results(self):
     first_response = self.service.list(tag_messages.ListTagRequest(page_size=1))
     self.assertListEqual(first_response.tags, [self.test_tag_response])
     self.assertTrue(first_response.has_additional_results)
+    self.assertIsNotNone(first_response.cursor)
+    self.assertEqual(first_response.total_pages, 3)
 
     second_response = self.service.list(tag_messages.ListTagRequest(
         page_size=1, cursor=first_response.cursor))
-    self.assertEqual(second_response.tags, [self.hidden_tag_response])
+    self.assertListEqual(second_response.tags, [
+        self.default_tag_response])
     self.assertTrue(second_response.has_additional_results)
+    self.assertIsNotNone(second_response.cursor)
+    self.assertEqual(second_response.total_pages, 3)
 
     third_response = self.service.list(tag_messages.ListTagRequest(
-        page_size=10000, cursor=second_response.cursor))
-    self.assertEqual(third_response.tags, [self.protected_tag_response])
+        page_size=1, cursor=second_response.cursor))
+    self.assertListEqual(third_response.tags, [self.protected_tag_response])
     self.assertFalse(third_response.has_additional_results)
+    self.assertIsNotNone(third_response.cursor)
+    self.assertEqual(third_response.total_pages, 3)
 
-    self.assertIsNotNone(second_response.cursor)
+  def test_list_tags_first_page_index(self):
+    response = self.service.list(tag_messages.ListTagRequest(
+        page_size=1, page_index=1))
+    self.assertListEqual(response.tags, [self.test_tag_response])
+    self.assertTrue(response.has_additional_results)
+    self.assertIsNotNone(response.cursor)
+    self.assertEqual(response.total_pages, 3)
+
+  def test_list_tags_last_page_index(self):
+    response = self.service.list(tag_messages.ListTagRequest(
+        page_size=1, page_index=3))
+    self.assertListEqual(response.tags, [self.protected_tag_response])
+    self.assertFalse(response.has_additional_results)
+    self.assertIsNotNone(response.cursor)
+    self.assertEqual(response.total_pages, 3)
+
+  def test_list_tags_page_size_bad_request(self):
+    with self.assertRaises(endpoints.BadRequestException):
+      self.service.list(tag_messages.ListTagRequest(page_size=0))
 
   def test_list_tags_none(self):
     self.test_tag.key.delete()
+    self.default_tag.key.delete()
     self.hidden_tag.key.delete()
     self.protected_tag.key.delete()
 
@@ -187,6 +237,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
     self.assertEmpty(response.tags)
     self.assertFalse(response.has_additional_results)
     self.assertIsNone(response.cursor)
+    self.assertEqual(response.total_pages, 0)
 
   def test_list_tags_no_cursor(self):
     with mock.patch.object(
@@ -195,7 +246,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
       self.service.list(tag_messages.ListTagRequest())
       self.assertFalse(mock_get_datastore_cursor.called)
 
-  def test_list_tags_bad_request(self):
+  def test_list_tags_cursor_bad_request(self):
     with self.assertRaises(datastore_errors.BadValueError):
       self.service.list(tag_messages.ListTagRequest(cursor='bad_cursor_value'))
 

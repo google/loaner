@@ -106,12 +106,21 @@ class TagApi(root_api.Service):
   def list(self, request):
     """Lists tags in datastore."""
     self.check_xsrf_token(self.request_state)
+
+    if request.page_size <= 0:
+      raise endpoints.BadRequestException(
+          'The value for page size must be greater than 0.')
+
     cursor = None
     if request.cursor:
       cursor = api_utils.get_datastore_cursor(urlsafe_cursor=request.cursor)
 
-    tag_results, next_cursor, has_additional_results = tag_model.Tag.list(
-        page_size=request.page_size, cursor=cursor)
+    (tag_results, next_cursor,
+     has_additional_results), total_pages = tag_model.Tag.list(
+         page_size=request.page_size,
+         page_index=request.page_index,
+         include_hidden_tags=request.include_hidden_tags,
+         cursor=cursor)
     tags_messages = []
     for tag in tag_results:
       message = tag_messages.Tag(
@@ -123,7 +132,8 @@ class TagApi(root_api.Service):
     return tag_messages.ListTagResponse(
         tags=tags_messages,
         cursor=next_cursor.urlsafe() if next_cursor else None,
-        has_additional_results=has_additional_results)
+        has_additional_results=has_additional_results,
+        total_pages=total_pages)
 
   @auth.method(
       tag_messages.UpdateTagRequest,

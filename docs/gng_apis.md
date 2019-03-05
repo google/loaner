@@ -962,7 +962,7 @@ message_types.VoidMessage | None
 
 ##### get
 
-Destroy a tag.
+Get a tag.
 
 | Requests                       | Attributes
 | :----------------------------- | :---------
@@ -992,6 +992,34 @@ tag_messages.UpdateTagRequest | tag: tag_messages.Tag, the attributes of a Tag.
 Returns                   | Attributes
 :------------------------ | :---------
 message_types.VoidMessage | None
+
+##### list
+
+Lists tags.
+
+| Requests                       | Attributes
+| :----------------------------- | :---------
+| tag_messages.ListTagRequest    | page_size: int, the number of results to
+|                                | return.
+|                                | cursor: str, the base64-encoded cursor string
+|                                | specifying where to start the query.
+|                                | page_index: int, the page index to offset the
+|                                | results from.
+|                                | include_hidden_tags: bool, whether to include
+|                                | hidden tags in the results, defaults to
+|                                | False.
+
+
+Returns                       | Attributes
+:---------------------------- | :---------
+tag_messages.ListTagResponse  | tags: tag_messages.Tag (repeated), the list of tags
+                              | being returned.
+                              | cursor: str, the base64-encoded denoting the
+                              | position of the last result retrieved.
+                              | has_additional_results : bool, whether there are
+                              | additional results to be retrieved.
+
+
 
 ### User_api
 

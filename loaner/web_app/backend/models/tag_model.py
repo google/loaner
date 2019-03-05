@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import logging
+import math
 
 from google.appengine.api import datastore_errors
 from google.appengine.ext import deferred
@@ -149,11 +150,14 @@ class Tag(base_model.BaseModel):
       deferred.defer(_delete_tags, model, key)
 
   @classmethod
-  def list(cls, page_size=10, cursor=None):
-    """Fetches all tags entities from datastore.
+  def list(cls, page_size=10, page_index=1, include_hidden_tags=False,
+           cursor=None):
+    """Fetches tags entities from datastore.
 
     Args:
       page_size: int, The number of results to return.
+      page_index: int, The page index to offset the results from.
+      include_hidden_tags: bool, Whether to include hidden tags in the results.
       cursor: Optional[datastore_query.Cursor], pointing to the last
         result.
 
@@ -166,7 +170,13 @@ class Tag(base_model.BaseModel):
        datastore_query.Cursor instance,
        True)
     """
-    return cls.query().fetch_page(page_size=page_size, start_cursor=cursor)
+    query_object = cls.query()
+    if not include_hidden_tags:
+      query_object = query_object.filter(cls.hidden == False)  # pylint: disable=singleton-comparison,g-explicit-bool-comparison
+    return query_object.fetch_page(
+        page_size=page_size, start_cursor=cursor,
+        offset=(page_index - 1) * page_size), int(
+            math.ceil(query_object.count() / page_size))
 
 
 def _delete_tags(model, key, cursor=None, num_updated=0, batch_size=100):
