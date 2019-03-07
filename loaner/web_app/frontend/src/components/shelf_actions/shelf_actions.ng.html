@@ -31,17 +31,17 @@
         </mat-form-field>
         <mat-form-field fxFlex>
             <input matInput type="number" step="0.1" placeholder="Latitude"
-                   [ngModel]="shelf.latitude | number: '1.1'"
+                   [ngModel]="shelf.latitude | number: '1.0-9'"
                    (ngModelChange)="shelf.latitude=$event" name="latitude">
         </mat-form-field>
         <mat-form-field fxFlex>
             <input matInput type="number" step="0.1" placeholder="Longitude"
-                    [ngModel]="shelf.longitude | number: '1.1'"
+                    [ngModel]="shelf.longitude | number: '1.0-9'"
                     (ngModelChange)="shelf.longitude=$event" name="longitude">
         </mat-form-field>
         <mat-form-field fxFlex>
             <input matInput type="number" step="0.1" placeholder="Altitude"
-                    [ngModel]="shelf.altitude | number: '1.1'"
+                    [ngModel]="shelf.altitude | number: '1.0-9'"
                     (ngModelChange)="shelf.altitude=$event" name="altitude">
         </mat-form-field>
       </section>
