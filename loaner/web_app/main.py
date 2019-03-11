@@ -44,6 +44,7 @@ web_app_routes = [
     (r'/_cron/run_shelf_audit_events',
      run_shelf_audit_events.RunShelfAuditEventsHandler),
     (r'/_cron/sync_user_roles', sync_user_roles.SyncUserRolesHandler),
+    (r'/maintenance', maintenance.MaintenanceHandler),
     (r'(/.*)', frontend.FrontendHandler),
 ]
 

@@ -22,10 +22,12 @@ import httplib
 import mock
 
 from loaner.web_app import constants
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.clients import directory  # pylint: disable=unused-import
 from loaner.web_app.backend.handlers import frontend
 from loaner.web_app.backend.lib import bootstrap  # pylint: disable=unused-import
 from loaner.web_app.backend.models import config_model
+from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import handlertest
 
 
@@ -110,7 +112,18 @@ class FrontendHandlerTestIncomplete(handlertest.HandlerTestCase):
 
     super(FrontendHandlerTestIncomplete, self).setUp(*args, **kwargs)
 
-  def test_load(self):
+  @mock.patch.object(user_model, 'User')
+  def test_load_regular_user(self, mock_user_class):
+    mock_user = mock_user_class.get_user.return_value
+    mock_user.get_permissions.return_value = []
+    self.testapp.get(r'/')
+    self.mock_redirect.assert_called_once_with('/maintenance')
+
+  @mock.patch.object(user_model, 'User')
+  def test_load_admin_user(self, mock_user_class):
+    mock_user = mock_user_class.get_user.return_value
+    mock_user.get_permissions.return_value = [
+        permissions.Permissions.BOOTSTRAP]
     self.testapp.get(r'/')
     self.mock_redirect.assert_called_once_with('/bootstrap')
 
@@ -160,7 +173,11 @@ class FrontendHandlerTestChangeBootstrapStatus(handlertest.HandlerTestCase):
 
     super(FrontendHandlerTestChangeBootstrapStatus, self).setUp(*args, **kwargs)
 
-  def test_load(self):
+  @mock.patch.object(user_model, 'User')
+  def test_load(self, mock_user_class):
+    mock_user = mock_user_class.get_user.return_value
+    mock_user.get_permissions.return_value = [
+        permissions.Permissions.BOOTSTRAP]
     self.testapp.get(r'/')
     config_model.Config.set('bootstrap_completed', True)
     config_model.Config.set('bootstrap_started', True)

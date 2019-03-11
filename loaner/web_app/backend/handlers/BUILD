@@ -34,8 +34,10 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/api:permissions",
         "//loaner/web_app/backend/lib:bootstrap",
         "//loaner/web_app/backend/lib:sync_users",
+        "//loaner/web_app/backend/models:user_model",
         "@absl_archive//absl/logging",
     ],
 )
@@ -50,6 +52,7 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/lib:bootstrap",
     ],
 )
 
@@ -64,9 +67,11 @@ loaner_appengine_test(
     ],
     deps = [
         ":frontend",
+        "//loaner/web_app/backend/api:permissions",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:bootstrap",
         "//loaner/web_app/backend/models:config_model",
+        "//loaner/web_app/backend/models:user_model",
         "//loaner/web_app/backend/testing:handlertest",
         "@mock_archive//:mock",
     ],
@@ -80,6 +85,7 @@ loaner_appengine_test(
     deps = [
         ":maintenance",
         "//loaner/web_app:constants",
+        "//loaner/web_app/backend/lib:bootstrap",
         "//loaner/web_app/backend/testing:handlertest",
         "@mock_archive//:mock",
     ],

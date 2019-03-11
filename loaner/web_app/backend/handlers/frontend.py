@@ -28,8 +28,10 @@ import webapp2
 from google.appengine.api import users
 
 from loaner.web_app import constants
+from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.lib import bootstrap
 from loaner.web_app.backend.lib import sync_users
+from loaner.web_app.backend.models import user_model
 
 if os.environ.get('TEST_WORKSPACE') == 'gng':
   # The following mocks are here to stub out the npm compiled frontend since
@@ -77,7 +79,12 @@ class FrontendHandler(webapp2.RequestHandler):
       if self.bootstrap_completed:
         self.redirect(path)
       else:
-        self.redirect(BOOTSTRAP_URL)
+        datastore_user = user_model.User.get_user(user.email())
+        if (permissions.Permissions.BOOTSTRAP in
+            datastore_user.get_permissions()):
+          self.redirect(BOOTSTRAP_URL)
+        else:
+          self.redirect('/maintenance')
 
   def _serve_frontend(self):
     """Writes Angular Frontend to the response and sets the right content type.

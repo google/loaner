@@ -21,6 +21,7 @@ from __future__ import print_function
 import webapp2
 
 from loaner.web_app import constants
+from loaner.web_app.backend.lib import bootstrap
 
 
 class MaintenanceHandler(webapp2.RequestHandler):
@@ -28,7 +29,10 @@ class MaintenanceHandler(webapp2.RequestHandler):
 
   def get(self):
     """Process GET, serving a static maintenance page."""
-    self.response.headers['Content-Type'] = 'text/html'
-    self.response.body_file.write(
-        constants.JINJA.get_template('maintenance.html').render(
-            {'app_name': constants.APP_NAME}))
+    if constants.MAINTENANCE or not bootstrap.is_bootstrap_completed():
+      self.response.headers['Content-Type'] = 'text/html'
+      self.response.body_file.write(
+          constants.JINJA.get_template('maintenance.html').render(
+              {'app_name': constants.APP_NAME}))
+    else:
+      self.redirect('/user')

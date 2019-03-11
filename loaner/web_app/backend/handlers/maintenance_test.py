@@ -22,14 +22,16 @@ import jinja2
 import mock
 
 from loaner.web_app import constants
+from loaner.web_app.backend.lib import bootstrap
 constants.MAINTENANCE = True
 # constants.MAINTENANCE before import main; pylint: disable=g-import-not-at-top
 from loaner.web_app.backend.testing import handlertest
 
 
 class MaintenanceHandlerTest(handlertest.HandlerTestCase):
+  """Tests the handler when all traffic should be served to static page."""
 
-  def test_get(self):
+  def test_get_constants_maintenance_set(self):
     """Test handler for GET."""
     with mock.patch.object(
         jinja2.Environment, 'get_template') as mock_get_template:
@@ -37,6 +39,32 @@ class MaintenanceHandlerTest(handlertest.HandlerTestCase):
       self.assertEqual(response.status_int, 200)
       self.assertEqual(response.content_type, 'text/html')
       mock_get_template.assert_called_once_with('maintenance.html')
+
+
+constants.MAINTENANCE = False
+# Reimport handlertest to set constants.MAINTENANCE to false this time; pylint: disable=g-import-not-at-top, reimported
+from loaner.web_app.backend.testing import handlertest
+
+
+class MaintenanceHandlerUpdateTest(handlertest.HandlerTestCase):
+  """Tests the handler when serving traffic during application updates."""
+
+  @mock.patch.object(bootstrap, 'is_bootstrap_completed', return_value=False)
+  def test_get_during_app_updates(self, mock_is_bootstrap_started):
+    """Test handler for GET while application is being updated."""
+    with mock.patch.object(
+        jinja2.Environment, 'get_template') as mock_get_template:
+      response = self.testapp.get('/maintenance')
+      self.assertEqual(response.status_int, 200)
+      self.assertEqual(response.content_type, 'text/html')
+      mock_get_template.assert_called_once_with('maintenance.html')
+
+  @mock.patch.object(bootstrap, 'is_bootstrap_completed', return_value=True)
+  def test_get_no_app_updates(self, mock_is_bootstrap_started):
+    """Test handler for GET while application is not being being updated."""
+    response = self.testapp.get('/maintenance')
+    self.assertEqual(response.status_int, 302)
+    self.assertIn('/user', response.location)
 
 
 if __name__ == '__main__':
