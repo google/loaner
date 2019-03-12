@@ -67,8 +67,14 @@ class BootstrapStatusResponse(messages.Message):
   Attributes:
     started: bool, Indicated if the bootstrap has been started.
     completed: bool, Indicated if the bootstrap is completed.
-    tasks: BootstrapTask, A list of all of the tasks to be displayed.
+    tasks: List[BootstrapTask], A list of all of the tasks to be displayed.
+    app_version: str, The installed (deployed) version of the app.
+    running_version: str, The running (bootstrapped) version of the app.
+    is_update: bool, Whether this is an update for an existing installation.
   """
   started = messages.BooleanField(2)
   completed = messages.BooleanField(3)
   tasks = messages.MessageField(BootstrapTask, 4, repeated=True)
+  app_version = messages.StringField(5)
+  running_version = messages.StringField(6)
+  is_update = messages.BooleanField(7)

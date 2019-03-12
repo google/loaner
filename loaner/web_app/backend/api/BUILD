@@ -59,8 +59,10 @@ loaner_appengine_library(
         ":auth",
         ":permissions",
         ":root_api",
+        "//loaner/web_app:constants",
         "//loaner/web_app/backend/api/messages:bootstrap_messages",
         "//loaner/web_app/backend/lib:bootstrap",
+        "//loaner/web_app/backend/models:config_model",
     ],
 )
 
@@ -271,7 +273,9 @@ loaner_appengine_test(
     ],
     deps = [
         ":bootstrap_api",
+        ":root_api",
         "//loaner/web_app/backend/api/messages:bootstrap_messages",
+        "//loaner/web_app/backend/lib:bootstrap",
         "//loaner/web_app/backend/testing:loanertest",
     ],
 )

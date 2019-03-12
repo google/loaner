@@ -25,7 +25,9 @@ import mock
 from protorpc import message_types
 
 from loaner.web_app.backend.api import bootstrap_api
+from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import bootstrap_messages
+from loaner.web_app.backend.lib import bootstrap
 from loaner.web_app.backend.testing import loanertest
 
 
@@ -34,16 +36,27 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
 
   def setUp(self):
     super(BootstrapEndpointsTest, self).setUp()
-
     self.service = bootstrap_api.BootstrapApi()
     self.login_admin_endpoints_user()
+
+    self.task1_status = {
+        'description': 'Bootstrap foo',
+        'success': True,
+        'timestamp': datetime.datetime.utcnow(),
+        'details': 'Task failed'
+    }
+    self.task2_status = {
+        'description': 'Bootstrap bar',
+        'success': True,
+        'timestamp': datetime.datetime.utcnow(),
+        'details': ''}
 
   def tearDown(self):
     super(BootstrapEndpointsTest, self).tearDown()
     self.service = None
 
-  @mock.patch('__main__.bootstrap_api.bootstrap.run_bootstrap')
-  @mock.patch('__main__.bootstrap_api.root_api.Service.check_xsrf_token')
+  @mock.patch.object(bootstrap, 'run_bootstrap', autospec=True)
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_run(self, mock_xsrf_token, mock_runbootstrap):
     """Test bootstrap init."""
     mock_runbootstrap.return_value = {
@@ -64,7 +77,7 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
     request.requested_tasks = [task1, task2]
 
     response = self.service.run(request)
-    self.assertTrue(mock_runbootstrap.called)
+    self.assertEqual(mock_runbootstrap.call_count, 1)
     self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertCountEqual(
         ['task1', 'task2'], [task.name for task in response.tasks])
@@ -72,80 +85,34 @@ class BootstrapEndpointsTest(loanertest.EndpointsTestCase):
         ['Running a task.', 'Running another task'],
         [task.description for task in response.tasks])
 
-  @mock.patch('__main__.bootstrap_api.bootstrap.get_bootstrap_task_status')
-  @mock.patch('__main__.bootstrap_api.bootstrap.is_bootstrap_started')
-  @mock.patch('__main__.bootstrap_api.bootstrap.is_bootstrap_completed')
-  @mock.patch('__main__.bootstrap_api.root_api.Service.check_xsrf_token')
+  @mock.patch.object(bootstrap, 'get_bootstrap_task_status', autospec=True)
+  @mock.patch.object(
+      bootstrap, 'is_bootstrap_started', autospec=True, return_value=True)
+  @mock.patch.object(
+      bootstrap, 'is_bootstrap_completed', autospec=True, return_value=True)
+  @mock.patch.object(bootstrap, 'is_update', autospec=True, return_value=False)
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_get_status(
-      self, mock_xsrf_token, mock_is_completed, mock_is_started,
-      mock_get_task_status):
+      self, mock_xsrf_token, mock_is_update, mock_is_completed,
+      mock_is_started, mock_get_task_status):
     """Tests get_status for general status and task details."""
-    yesterday = datetime.datetime.utcnow() - datetime.timedelta(days=-1)
-    task1_status = {
-        'description': 'Bootstrap foo',
-        'success': False,
-        'timestamp': yesterday,
-        'details': 'Task failed'
-    }
-    task2_status = {
-        'description': 'Bootstrap bar',
-        'success': True,
-        'timestamp': yesterday,
-        'details': ''}
     mock_get_task_status.return_value = {
-        'task1': task1_status,
-        'task2': task2_status
+        'task1': self.task1_status,
+        'task2': self.task2_status
     }
-    mock_is_started.return_value = True
-    request = message_types.VoidMessage()
 
-    mock_is_completed.return_value = True
+    request = message_types.VoidMessage()
     response = self.service.get_status(request)
 
     self.assertTrue(response.started)
     self.assertTrue(response.completed)
+    self.assertFalse(response.is_update)
+    self.assertEqual(response.running_version, '0.0')
+    self.assertEqual(response.app_version, bootstrap_api.constants.APP_VERSION)
+    for task in response.tasks:
+      self.assertTrue(task.success)
     self.assertEqual(mock_xsrf_token.call_count, 1)
-
     mock_xsrf_token.reset_mock()
-
-    # Completed True, so no tasks in response.
-    mock_is_completed.return_value = True
-    response = self.service.get_status(request)
-
-    self.assertTrue(response.completed)
-    self.assertEqual(mock_xsrf_token.call_count, 1)
-
-    mock_xsrf_token.reset_mock()
-
-    # Completed False, so yes tasks in response.
-    mock_is_completed.return_value = False
-    response = self.service.get_status(request)
-
-    self.assertFalse(response.completed)
-    self.assertEqual(mock_xsrf_token.call_count, 1)
-
-    task1_success = [
-        task.success for task in response.tasks if task.name == 'task1'][0]
-    task2_success = [
-        task.success for task in response.tasks if task.name == 'task2'][0]
-    self.assertFalse(task1_success)
-    self.assertTrue(task2_success)
-
-    mock_xsrf_token.reset_mock()
-
-    # Completed False, so yes tasks in response.
-    mock_is_completed.return_value = False
-    response = self.service.get_status(request)
-
-    self.assertFalse(response.completed)
-    self.assertEqual(mock_xsrf_token.call_count, 1)
-
-    task1_success = [
-        task.success for task in response.tasks if task.name == 'task1'][0]
-    task2_success = [
-        task.success for task in response.tasks if task.name == 'task2'][0]
-    self.assertFalse(task1_success)
-    self.assertTrue(task2_success)
 
 
 if __name__ == '__main__':

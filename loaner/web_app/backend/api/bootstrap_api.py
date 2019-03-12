@@ -20,11 +20,13 @@ from __future__ import print_function
 
 from protorpc import message_types
 
+from loaner.web_app import constants
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import bootstrap_messages
 from loaner.web_app.backend.lib import bootstrap
+from loaner.web_app.backend.models import config_model
 
 
 @root_api.ROOT_API.api_class(resource_name='bootstrap', path='bootstrap')
@@ -63,11 +65,9 @@ class BootstrapApi(root_api.Service):
       http_method='GET',
       permission=permissions.Permissions.BOOTSTRAP)
   def get_status(self, request):
-    """Gets general bootstrap status, and task status if not yet completed."""
+    """Gets general bootstrap and bootstrap task status."""
     self.check_xsrf_token(self.request_state)
     response_message = bootstrap_messages.BootstrapStatusResponse()
-    response_message.started = bootstrap.is_bootstrap_started()
-    response_message.completed = bootstrap.is_bootstrap_completed()
     for name, status in bootstrap.get_bootstrap_task_status().iteritems():
       response_message.tasks.append(
           bootstrap_messages.BootstrapTask(
@@ -76,4 +76,10 @@ class BootstrapApi(root_api.Service):
               success=status.get('success'),
               timestamp=status.get('timestamp'),
               details=status.get('details')))
+    response_message.is_update = bootstrap.is_update()
+    response_message.started = bootstrap.is_bootstrap_started()
+    response_message.completed = bootstrap.is_bootstrap_completed()
+    response_message.app_version = constants.APP_VERSION
+    response_message.running_version = config_model.Config.get(
+        'running_version')
     return response_message
