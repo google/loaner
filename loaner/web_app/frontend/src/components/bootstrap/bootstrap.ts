@@ -38,8 +38,12 @@ export class Bootstrap implements OnInit, OnDestroy {
   inProgress = false;
   /** This will be populated with the bootstrap status from the backend. */
   bootstrapStatus!: bootstrap.Status;
-  /** This gets flipped on ngInit depending on whether bootstrap is enabled. */
-  bootstrapEnabled = false;
+  /** Whether or not this is an update. */
+  isUpdate = true;
+  /** The deployed application version. */
+  appVersion?: string;
+  /** The running application version. */
+  runningVersion?: string;
 
   constructor(
       private readonly bootstrapService: BootstrapService,
@@ -48,8 +52,10 @@ export class Bootstrap implements OnInit, OnDestroy {
   ngOnInit() {
     this.inProgress = true;
     this.bootstrapService.getStatus().subscribe((status: bootstrap.Status) => {
-      this.bootstrapEnabled = status.enabled;
       this.bootstrapStarted = status.started;
+      this.isUpdate = status.is_update;
+      this.appVersion = status.app_version;
+      this.runningVersion = status.running_version;
       this.inProgress = false;
     });
   }
@@ -88,10 +94,6 @@ export class Bootstrap implements OnInit, OnDestroy {
     this.router.navigate(['/devices']);
   }
 
-  get isEnabled(): boolean {
-    return this.bootstrapEnabled;
-  }
-
   get bootstrapTasksFinished(): boolean {
     return this.hasTasks &&
         this.bootstrapStatus.tasks.every(task => !!task.success);
@@ -106,11 +108,6 @@ export class Bootstrap implements OnInit, OnDestroy {
 
   get hasTasks(): boolean {
     return this.bootstrapStatus && !!this.bootstrapStatus.tasks;
-  }
-
-  get canBootstrap(): boolean {
-    return !this.bootstrapStarted && this.isEnabled && !this.inProgress &&
-        !this.bootstrapTasksFinished;
   }
 
   get canRetry(): boolean {

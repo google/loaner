@@ -124,13 +124,24 @@ export class ShelfServiceMock {
 
 export class BootstrapServiceMock {
   run() {
-    return of(
-        {'started': true, 'enabled': true, 'completed': false, 'tasks': []} as
-        bootstrap.Status);
+    return of({
+      'started': true,
+      'completed': false,
+      'is_update': true,
+      'app_version': '0.0.7-alpha',
+      'running_version': '0.0.6-alpha',
+      'tasks': []
+    } as bootstrap.Status);
   }
   getStatus() {
     return new Observable(observer => {
-      observer.next({'enabled': true, 'completed': true, 'tasks': []});
+      observer.next({
+        'completed': true,
+        'is_update': false,
+        'app_version': '0.0.7-alpha',
+        'running_version': '0.0.7-alpha',
+        'tasks': []
+      });
     });
   }
 }
@@ -429,7 +440,7 @@ export const CONFIG_RESPONSE_MOCK = [
   {boolean_value: false, name: 'use_asset_tags'},
   {name: 'unenroll_ou', string_value: '/'},
   {boolean_value: true, name: 'loan_duration_email'},
-  {name: 'img_banner_primary', 'string_value': 'images/testbanner.png'},
+  {name: 'img_banner_primary', string_value: 'images/testbanner.png'},
   {integer_value: '1000', name: 'sync_roles_user_query_size'},
   {boolean_value: true, name: 'shelf_audit'},
   {integer_value: '24', name: 'audit_interval'},

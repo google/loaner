@@ -20,8 +20,8 @@ import * as bootstrap from '../models/bootstrap';
 
 import {ApiService} from './api';
 
-@Injectable()
 /** Class to connect to the backend's Bootstrap Service API methods. */
+@Injectable()
 export class BootstrapService extends ApiService {
   /** Implements ApiService's apiEndpoint requirement. */
   apiEndpoint = 'bootstrap';
@@ -30,6 +30,14 @@ export class BootstrapService extends ApiService {
     return this.post<bootstrap.Status>('run', tasks).pipe(tap(() => {
       this.snackBar.open(`Setup requested.`);
     }));
+  }
+
+  checkValidTimestamps(tasks?: bootstrap.Task[]) {
+    return tasks && tasks.every((task) => !!task.timestamp);
+  }
+
+  checkTaskSuccess(tasks?: bootstrap.Task[]) {
+    return tasks && tasks.some((task) => !task.success);
   }
 
   /**
@@ -41,8 +49,8 @@ export class BootstrapService extends ApiService {
           if (status.completed) {
             this.snackBar.open(`Bootstrap completed successfully.`);
           } else if (
-              status.tasks && status.tasks.every((task) => !!task.timestamp) &&
-              status.tasks.some((task) => !task.success)) {
+              this.checkValidTimestamps(status.tasks) &&
+              this.checkTaskSuccess(status.tasks) && !status.is_update) {
             this.snackBar.open(`One or more tasks failed.`);
           }
         }));

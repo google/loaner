@@ -61,6 +61,30 @@ describe('BootstrapComponent', () => {
     expect(bootstrapService.run).toHaveBeenCalledTimes(1);
   });
 
+  it('renders a setup title for new deployments', () => {
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const bootstrapTitle = compiled.querySelector('.bootstrapTitle');
+    expect(bootstrapTitle.textContent).toContain('Setup');
+  });
+
+  it('renders the version numbers for an update', () => {
+    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
+      'completed': false,
+      'is_update': true,
+      'app_version': '0.0.7-alpha',
+      'running_version': '0.0.6-alpha',
+    }));
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const bootstrapTitle = compiled.querySelector('.bootstrapSubtitle');
+    expect((bootstrapTitle as HTMLElement).textContent)
+        .toContain('0.0.7-alpha');
+    expect((bootstrapTitle as HTMLElement).textContent)
+        .toContain('0.0.6-alpha');
+  });
+
   it('renders each task in an expansion panel when bootstrap begins', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
     spyOn(bootstrapService, 'run').and.returnValue(of({

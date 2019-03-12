@@ -14,9 +14,11 @@
 
 /** Interface that defines the general bootstrap status of the application. */
 export declare interface Status {
-  enabled: boolean;
   completed: boolean;
   started: boolean;
+  is_update: boolean;
+  app_version: string;
+  running_version: string;
   tasks: Task[];
 }
 

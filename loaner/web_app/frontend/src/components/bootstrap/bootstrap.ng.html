@@ -1,5 +1,5 @@
 <div fxLayout="column" fxLayoutAlign="center center">
-  <mat-card>
+  <mat-card *ngIf="!isUpdate">
     <mat-card-header>
       <mat-card-title>
         <h1>Before you bootstrap</h1>
@@ -30,10 +30,13 @@
   <mat-card>
     <mat-card-header>
       <mat-card-title>
-        <h1>Setup</h1>
+        <h1 class="bootstrapTitle">{{isUpdate ? 'Update' : 'Setup'}}</h1>
       </mat-card-title>
-      <mat-card-subtitle>
+      <mat-card-subtitle *ngIf="!isUpdate" class="bootstrapSubtitle">
           This first-time step will automate the installation process.
+      </mat-card-subtitle>
+      <mat-card-subtitle *ngIf="isUpdate" class="bootstrapSubtitle">
+          This step will update the application from version {{runningVersion}} to {{appVersion}}.
       </mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>
@@ -75,19 +78,17 @@
       </mat-accordion>
       <div class="button-row">
         <button mat-raised-button
-                *ngIf="(!bootstrapTasksFinished) && (!canRetry)"
+                *ngIf="!bootstrapTasksFinished"
                 class="beginButton"
                 color="primary"
-                [disabled]="!canBootstrap"
-                (click)="bootstrapApplication()">Begin bootstrap</button>
+                [disabled]="inProgress"
+                (click)="bootstrapApplication()">
+          {{isUpdate ? 'Begin update' : (canRetry ? 'Retry tasks' : 'Begin bootstrap')}}
+        </button>
         <button mat-raised-button
                 *ngIf="bootstrapTasksFinished"
                 color="primary"
                 (click)="redirectToApp()">Get started with {{appName}}</button>
-        <button mat-raised-button
-                *ngIf="canRetry"
-                color="primary"
-                (click)="bootstrapApplication()">Retry failed tasks</button>
       </div>
     </mat-card-content>
   </mat-card>
