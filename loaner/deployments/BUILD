@@ -27,7 +27,7 @@ py_binary(
     srcs = [
         "deploy_impl.py",
     ],
-    default_python_version = "PY3",
+    python_version = "PY3",
     srcs_version = "PY2AND3",
     deps = [
         ":deploy_impl_lib",
@@ -39,7 +39,7 @@ py_binary(
     srcs = [
         "gng_impl.py",
     ],
-    default_python_version = "PY3",
+    python_version = "PY3",
     deps = [
         ":gng_impl_lib",
     ],
