@@ -101,3 +101,14 @@ class ListTagResponse(messages.Message):
   cursor = messages.StringField(2)
   has_additional_results = messages.BooleanField(3)
   total_pages = messages.IntegerField(4)
+
+
+class TagData(messages.Message):
+  """TagData ProtoRPC message.
+
+  Attributes:
+    tag: Tag, an instance of a Tag entity.
+    more_info: str, an informational field about this particular tag reference.
+  """
+  tag = messages.MessageField(Tag, 1)
+  more_info = messages.StringField(2)

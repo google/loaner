@@ -23,6 +23,7 @@ from protorpc import messages
 
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.api.messages import tag_messages
 
 
 class Reminder(messages.Message):
@@ -30,7 +31,7 @@ class Reminder(messages.Message):
 
   Attributes:
     level: int, Indicates if a reminder is due, overdue, or massively overdue.
-    time:  datetime, The date at which the Device's borrower was reminded.
+    time:  datetime, The date at which the Device's assignee was reminded.
     count: int, Indicates the number of reminders seen.
   """
   level = messages.IntegerField(1)
@@ -93,6 +94,8 @@ class Device(messages.Message):
     query: shared_message.SearchRequest, a message containing query options to
         conduct a search on an index.
     overdue: bool, Indicates that the due date has passed.
+    tags: List[tag_model.TagData], a list of TagData objects associated with the
+        device.
   """
   serial_number = messages.StringField(1)
   asset_tag = messages.StringField(2)
@@ -124,10 +127,11 @@ class Device(messages.Message):
   given_name = messages.StringField(28)
   query = messages.MessageField(shared_messages.SearchRequest, 29)
   overdue = messages.BooleanField(30)
+  tags = messages.MessageField(tag_messages.TagData, 31, repeated=True)
 
 
 class ListDevicesResponse(messages.Message):
-  """List device response ProtoRPC message.
+  """ListDevicesResponse ProtoRPC message.
 
   Attributes:
     devices: List[Device], The list of devices being returned.
@@ -141,7 +145,7 @@ class ListDevicesResponse(messages.Message):
 
 
 class DamagedRequest(messages.Message):
-  """Damaged device ProtoRPC message.
+  """DamagedRequest ProtoRPC message.
 
   Attributes:
     device: DeviceRequest, A device to be fetched.
@@ -152,7 +156,7 @@ class DamagedRequest(messages.Message):
 
 
 class ExtendLoanRequest(messages.Message):
-  """Loan extension request ProtoRPC message.
+  """ExtendLoanRequest ProtoRPC message.
 
   Atrributes:
     device: DeviceRequest, A device to be fetched.
@@ -163,7 +167,7 @@ class ExtendLoanRequest(messages.Message):
 
 
 class ListUserDeviceResponse(messages.Message):
-  """UserDeviceResponse ProtoRPC message.
+  """ListUserDeviceResponse ProtoRPC message.
 
   Attributes:
     devices: List[Device], The list of devices assigned to the user.

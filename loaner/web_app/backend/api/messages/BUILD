@@ -52,6 +52,7 @@ loaner_appengine_library(
     deps = [
         ":shared_messages",
         ":shelf_messages",
+        ":tag_messages",
     ],
 )
 

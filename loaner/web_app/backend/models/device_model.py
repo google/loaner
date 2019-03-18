@@ -30,10 +30,12 @@ from google.appengine.ext import ndb
 from loaner.web_app import constants
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.clients import directory
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import config_model
+from loaner.web_app.backend.models import tag_model
 from loaner.web_app.backend.models import user_model
 
 
@@ -197,6 +199,7 @@ class Device(base_model.BaseModel):
     last_reminder: Reminder, Level, time, and count of the last reminder
         the device had.
     next_reminder: Reminder, Level, time, and count of the next reminder.
+    tags: List[tag_model.Tag], a list of tags associated with the device.
   """
   serial_number = ndb.StringProperty()
   asset_tag = ndb.StringProperty()
@@ -218,6 +221,7 @@ class Device(base_model.BaseModel):
   damaged_reason = ndb.StringProperty()
   last_reminder = ndb.StructuredProperty(Reminder)
   next_reminder = ndb.StructuredProperty(Reminder)
+  tags = ndb.StructuredProperty(tag_model.TagData, repeated=True)
 
   _INDEX_NAME = constants.DEVICE_INDEX_NAME
   _SEARCH_PARAMETERS = {
@@ -886,6 +890,58 @@ class Device(base_model.BaseModel):
         self.stream_to_bq(
             user_email, 'Removing device: %s from shelf: %s' % (
                 self.identifier, shelf.location))
+
+  def associate_tag(self, user_email, tag_urlsafekey, more_info=None):
+    """Associates a tag with a device.
+
+    Args:
+      user_email: str, the email of the user taking the action.
+      tag_urlsafekey: str, the urlsafe representation of the ndb.Key for a tag.
+      more_info: str, an informational field about a particular tag reference.
+    """
+    tag_data = tag_model.TagData(
+        tag=api_utils.get_ndb_key(tag_urlsafekey).get(), more_info=more_info)
+    if tag_data not in self.tags:
+      for device_tag in self.tags:
+        if tag_urlsafekey == device_tag.tag.key.urlsafe():
+          # Updates more_info field of an existing associated tag.
+          device_tag.more_info = more_info
+          self.put()
+          self.stream_to_bq(
+              user_email,
+              'Updated more_info on tag %s to %s on device %s.' %
+              (tag_data.tag.name, more_info, self.identifier))
+          return
+      self.tags.append(tag_data)
+      self.put()
+      self.stream_to_bq(
+          user_email, 'Associated tag %s with device %s' %
+          (tag_data.tag.name, self.identifier))
+
+  def disassociate_tag(self, user_email, tag_urlsafekey):
+    """Disassociates a tag from a device.
+
+    Args:
+      user_email: str, the email of the user taking the action.
+      tag_urlsafekey: str, the urlsafe key of the tag to be disassociated from
+        the device.
+
+    Raises:
+      ValueError: If the tag requested to be disassociated from the device is
+        not currently associated with the device.
+    """
+
+    for tag_reference in self.tags:
+      if tag_reference.tag.key.urlsafe() == tag_urlsafekey:
+        self.tags.remove(tag_reference)
+        self.put()
+        self.stream_to_bq(
+            user_email, 'Removed tag %s from device %s' %
+            (tag_reference.tag.name, self.identifier))
+        return
+    logging.warn(
+        'Tag with urlsafe key %s is not associated with device %s',
+        tag_urlsafekey, self.identifier)
 
 
 def _update_existing_device(device, user_email, asset_tag=None):

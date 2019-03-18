@@ -19,6 +19,7 @@ from __future__ import division
 from __future__ import print_function
 
 import datetime
+
 from absl import logging
 from absl.testing import parameterized
 import freezegun
@@ -27,12 +28,16 @@ import mock
 from google.appengine.api import datastore_errors
 from google.appengine.api import search
 from google.appengine.ext import deferred
+
+import endpoints
+
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
+from loaner.web_app.backend.models import tag_model
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -48,6 +53,19 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.shelf = shelf_model.Shelf.enroll(
         user_email=loanertest.USER_EMAIL, location='MTV', capacity=10,
         friendly_name='MTV office')
+
+    self.tag1_key = tag_model.Tag(
+        name='TestTag1', hidden=False, protect=True,
+        color='blue', description='Description 1.').put()
+    self.tag2_key = tag_model.Tag(
+        name='TestTag2', hidden=False, protect=False,
+        color='red', description='Description 2.').put()
+
+    self.tag1_data = tag_model.TagData(
+        tag=self.tag1_key.get(), more_info='tag1_data info.')
+    self.tag2_data = tag_model.TagData(
+        tag=self.tag2_key.get(), more_info='tag2_data info.')
+
     device_model.Device(
         serial_number='12321', enrolled=True,
         device_model='HP Chromebook 13 G1', current_ou='/',
@@ -57,15 +75,16 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         serial_number='67890', enrolled=True,
         device_model='Google Pixelbook', current_ou='/',
         shelf=self.shelf.key, chrome_device_id='unique_id_2',
-        damaged=False).put()
+        damaged=False, tags=[self.tag1_data]).put()
     device_model.Device(
         serial_number='VOID', enrolled=False,
         device_model='HP Chromebook 13 G1', current_ou='/',
         shelf=self.shelf.key, chrome_device_id='unique_id_8',
-        damaged=False).put()
+        damaged=False, tags=[self.tag1_data, self.tag2_data]).put()
     self.device1 = device_model.Device.get(serial_number='12321')
     self.device2 = device_model.Device.get(serial_number='67890')
     self.device3 = device_model.Device.get(serial_number='Void')
+
     datastore_user = user_model.User.get_user(loanertest.USER_EMAIL)
     datastore_user.update(superadmin=True)
 
@@ -378,7 +397,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         enrolled=False,
         serial_number='5467FD',
         chrome_device_id='unique_id_09',
-        current_ou='not_deafult').put()
+        current_ou='not_default').put()
     err_message = 'Failed to move device'
     mock_directoryclient = mock_directoryclass.return_value
     mock_directoryclient.move_chrome_device_org_unit.side_effect = (
@@ -712,9 +731,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
   @mock.patch.object(device_model.Device, 'unlock', autospec=True)
   def test_loan_return(self, mock_unlock):
-    user_email = loanertest.USER_EMAIL
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    self.test_device.assigned_user = user_email
     self.test_device.assignment_date = (
         datetime.datetime(year=2017, month=1, day=1))
     self.test_device.due_date = (
@@ -722,7 +739,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.test_device.lost = True
     self.test_device.locked = True
 
-    self.test_device._loan_return(user_email)
+    self.test_device._loan_return(loanertest.USER_EMAIL)
 
     retrieved_device = device_model.Device.get(serial_number='123456')
     self.assertIsNone(retrieved_device.assigned_user)
@@ -991,6 +1008,63 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         shelf=self.shelf, user_email=loanertest.USER_EMAIL)
     self.assertIsNone(self.test_device.shelf)
 
+  def test_associate_tag(self):
+    self.device1.associate_tag(
+        user_email=loanertest.USER_EMAIL,
+        tag_urlsafekey=self.tag2_key.urlsafe(),
+        more_info=self.tag2_data.more_info)
+    self.assertIsInstance(self.device1.tags[0], tag_model.TagData)
+    self.assertCountEqual(
+        device_model.Device.get(serial_number='12321').tags, [self.tag2_data])
+
+  def test_associate_tag__additional(self):
+    self.device2.associate_tag(
+        user_email=loanertest.USER_EMAIL,
+        tag_urlsafekey=self.tag2_key.urlsafe(),
+        more_info=self.tag2_data.more_info)
+    self.assertCountEqual(
+        device_model.Device.get(serial_number='67890').tags,
+        [self.tag1_data, self.tag2_data])
+
+  def test_associate_tag__duplicate(self):
+    self.device2.associate_tag(
+        user_email=loanertest.USER_EMAIL,
+        tag_urlsafekey=self.tag1_key.urlsafe(),
+        more_info=self.tag1_data.more_info)
+    self.assertCountEqual(
+        device_model.Device.get(serial_number='67890').tags, [self.tag1_data])
+
+  def test_associate_tag__updated_info(self):
+    self.device2.associate_tag(
+        user_email=loanertest.USER_EMAIL,
+        tag_urlsafekey=self.tag1_key.urlsafe(),
+        more_info='different_more_info')
+    retrieved_device = device_model.Device.get(serial_number='67890')
+    self.assertCountEqual(retrieved_device.tags, [self.tag1_data])
+    self.assertEqual(retrieved_device.tags[0].more_info, 'different_more_info')
+
+  def test_associate_tag__value_error(self):
+    """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
+    with self.assertRaises(endpoints.BadRequestException):
+      self.device1.associate_tag(
+          user_email=loanertest.USER_EMAIL,
+          tag_urlsafekey='corrupt_key',
+          more_info='more_info_field')
+
+  def test_disassociate_tag(self):
+    self.device3.disassociate_tag(
+        user_email=loanertest.USER_EMAIL,
+        tag_urlsafekey=self.tag2_key.urlsafe())
+    self.assertCountEqual(
+        device_model.Device.get(serial_number='Void').tags, [self.tag1_data])
+
+  def test_disassociate_tag__not_associated(self):
+    with mock.patch.object(logging, 'warn', autospec=True) as mock_logging:
+      self.device1.disassociate_tag(
+          user_email=loanertest.USER_EMAIL,
+          tag_urlsafekey=self.tag2_key.urlsafe())
+      self.assertTrue(mock_logging.called)
+
   @mock.patch.object(config_model, 'Config', autospec=True)
   def test_calculate_return_dates(self, mock_config):
     now = datetime.datetime(year=2017, month=1, day=1)
@@ -999,7 +1073,6 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     mock_config.get.side_effect = [3, 14]
 
     dates = self.test_device.return_dates
-
     self.assertIsInstance(dates, device_model.ReturnDates)
     self.assertEqual(dates.default, now + datetime.timedelta(days=3))
     self.assertEqual(dates.max, now + datetime.timedelta(days=14))
@@ -1018,8 +1091,7 @@ class DecoratorTest(loanertest.TestCase):
       def testable_method(self):
         return True
 
-    self.test_device = TestDevice()
-    self.test_device.assigned_user = loanertest.USER_EMAIL
+    self.test_device = TestDevice(assigned_user=loanertest.USER_EMAIL)
 
   @mock.patch.object(
       device_model.user_lib, 'get_user_email',
