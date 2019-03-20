@@ -51,6 +51,8 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.service = device_api.DeviceApi()
     self.login_admin_endpoints_user()
 
+    # Set bootstrap to completed so that maintenance mode will not be invoked.
+    config_model.Config.set('bootstrap_completed', True)
     self.shelf = shelf_model.Shelf.enroll(
         user_email=loanertest.USER_EMAIL,
         location='NYC',

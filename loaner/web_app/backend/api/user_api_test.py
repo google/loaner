@@ -22,6 +22,7 @@ from protorpc import message_types
 
 from loaner.web_app.backend.api import user_api
 from loaner.web_app.backend.api.messages import user_messages
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -31,6 +32,8 @@ class UserApiTest(loanertest.EndpointsTestCase):
   def setUp(self):
     super(UserApiTest, self).setUp()
     self.service = user_api.UserApi()
+    # Set bootstrap to completed so that maintenance mode will not be invoked.
+    config_model.Config.set('bootstrap_completed', True)
 
   def tearDown(self):
     super(UserApiTest, self).tearDown()

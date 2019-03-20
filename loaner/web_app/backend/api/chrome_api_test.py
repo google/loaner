@@ -47,6 +47,8 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     self.login_endpoints_user()
     self.chrome_request = chrome_messages.HeartbeatRequest(device_id=UNIQUE_ID)
     config_model.Config(id='silent_onboarding', bool_value=False).put()
+    # Set bootstrap to completed so that maintenance mode will not be invoked.
+    config_model.Config.set('bootstrap_completed', True)
 
   def tearDown(self):
     super(ChromeEndpointsTest, self).tearDown()

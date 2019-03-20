@@ -62,6 +62,7 @@ import endpoints
 
 from loaner.web_app import constants
 from loaner.web_app.backend.lib import user as user_lib
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import user_model
 
 _FORBIDDEN_MSG = (
@@ -104,12 +105,17 @@ def _check_auth(permission):
       # Only allow domain users.
       _forbid_non_domain_users(user_email)
 
+      datastore_user = user_model.User.get_user(user_email)
+      # If the user is not a superadmin, we need to check and see if the
+      # application is in maintenance mode.
+      if not datastore_user.superadmin:
+        _is_maintenance_mode()
+
       # If there are no specified permissions, continue with the function.
       if not permission:
         return function_without_auth_check(*args, **kwargs)
 
       # If there are permissions get the datastore user and compare permissions.
-      datastore_user = user_model.User.get_user(user_email)
       if datastore_user.superadmin or (
           permission in datastore_user.get_permissions()):
         return function_without_auth_check(*args, **kwargs)
@@ -135,3 +141,16 @@ def _forbid_non_domain_users(user_email):
     raise endpoints.UnauthorizedException(
         '{} is not an authorized user for one of the domains: {}'.format(
             user_email, ', '.join(constants.APP_DOMAINS)))
+
+
+def _is_maintenance_mode():
+  """Checks to see if the application is under maintenance.
+
+  Raises:
+    endpoints.InternalServerErrorException: If the application is currently
+        under maintenance.
+  """
+  if (constants.MAINTENANCE or not
+      config_model.Config.get('bootstrap_completed')):
+    raise endpoints.InternalServerErrorException(
+        'The application is currently undergoing maintenance.')

@@ -30,6 +30,7 @@ from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.lib import xsrf
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -114,7 +115,9 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
       self.call_test_as(
           api_name='api_for_superadmins_only', user=user)
 
-  def test_loaner_endpoints_auth_method__api_for_any_authenticated_user(self):
+  @mock.patch.object(config_model.Config, 'get', return_value=True)
+  def test_loaner_endpoints_auth_method__api_for_any_authenticated_user(
+      self, mock_config):
     # Test api_with_permission with a user.
     user = users.User(email=loanertest.USER_EMAIL)
     self.assertTrue(self.call_test_as('api_for_any_authenticated_user', user))
@@ -132,7 +135,8 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
     with self.assertRaises(endpoints.UnauthorizedException):
       self.call_test_as('api_for_any_authenticated_user', user)
 
-  def test_loaner_endpoints_auth_method__api_with_permission(self):
+  @mock.patch.object(config_model.Config, 'get', return_value=True)
+  def test_loaner_endpoints_auth_method__api_with_permission(self, mock_config):
     # Forbid standard users.
     user = users.User(email=loanertest.USER_EMAIL)
     with self.assertRaises(endpoints.ForbiddenException):
@@ -146,7 +150,9 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
     user = users.User(email=loanertest.SUPER_ADMIN_EMAIL)
     self.assertTrue(self.call_test_as('api_with_permission', user))
 
-  def test_loaner_endpoints_auth_method__api_for_superadmins_only(self):
+  @mock.patch.object(config_model.Config, 'get', return_value=True)
+  def test_loaner_endpoints_auth_method__api_for_superadmins_only(
+      self, mock_config):
     # Test wrong permission.
     user = users.User(email=loanertest.TECHNICAL_ADMIN_EMAIL)
     with self.assertRaises(endpoints.ForbiddenException):
@@ -155,6 +161,22 @@ class LoanerEndpointsTest(loanertest.EndpointsTestCase):
     # Test superadmin access.
     user = users.User(email=loanertest.SUPER_ADMIN_EMAIL)
     self.call_test_as('api_for_superadmins_only', user)
+
+  @mock.patch.object(config_model.Config, 'get', return_value=False)
+  def test_loaner_endpoints_auth_method__app_being_updated_regular_user(
+      self, mock_config):
+    with self.assertRaises(endpoints.InternalServerErrorException):
+      self.call_test_as(
+          'api_for_any_authenticated_user',
+          users.User(email=loanertest.USER_EMAIL))
+
+  @mock.patch.object(config_model.Config, 'get', return_value=False)
+  def test_loaner_endpoints_auth_method__app_being_updated_elevated_users(
+      self, mock_config):
+    # Should execute even though the application is being updated.
+    self.assertTrue(self.call_test_as(
+        'api_with_permission',
+        users.User(email=loanertest.SUPER_ADMIN_EMAIL)))
 
 
 if __name__ == '__main__':

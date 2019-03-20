@@ -24,6 +24,7 @@ import endpoints
 
 from loaner.web_app.backend.api import datastore_api
 from loaner.web_app.backend.api.messages import datastore_messages
+from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -34,6 +35,8 @@ class DatastoreEndpointsTest(loanertest.EndpointsTestCase):
   def setUp(self):
     super(DatastoreEndpointsTest, self).setUp()
     self.service = datastore_api.DatastoreApi()
+    # Set bootstrap to completed so that maintenance mode will not be invoked.
+    config_model.Config.set('bootstrap_completed', True)
 
   def tearDown(self):
     super(DatastoreEndpointsTest, self).tearDown()
