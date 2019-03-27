@@ -121,7 +121,7 @@ describe('AuditTableComponent', () => {
     const compiled = fixture.debugElement.nativeElement;
     const auditButton = compiled.querySelector('button.audit');
     expect(auditButton).toBeTruthy();
-    expect(auditButton.getAttribute('disabled')).toBe('true');
+    expect(auditButton.hasAttribute('disabled')).toBeTruthy();
   });
 
   it('calls shelf service with deviceId when audit button is clicked',

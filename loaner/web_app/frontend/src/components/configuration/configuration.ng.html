@@ -405,7 +405,7 @@
       </mat-card-content>
     </mat-card>
     <div class="submit-section">
-      <button mat-raised-button [disabled]="!configurationForm.dirty" type="submit">Save changes</button>
+      <button mat-raised-button [disabled]="!configurationForm.valid" type="submit">Save changes</button>
     </div>
   </form>
 </ng-container>

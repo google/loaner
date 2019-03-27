@@ -140,7 +140,7 @@ describe('ConfigurationComponent', () => {
        const submitButtonAfterChange =
            compiled.querySelector('button[type="submit"]');
        expect(submitButtonAfterChange).toBeDefined();
-       expect(submitButtonAfterChange.getAttribute('disabled')).toBe('true');
+       expect(submitButtonAfterChange.hasAttribute('disabled')).toBeFalsy();
      }));
 
   it('calls config service after updating an input and triggering submit',
