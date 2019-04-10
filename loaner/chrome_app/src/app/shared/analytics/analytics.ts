@@ -56,7 +56,8 @@ export class AnalyticsService {
     return chars.join('');
   }
 
-  retrieveUuid(): Observable<string> {
+  /** Retrieves the stored UUID or requests to generate one. */
+  retrieveUuid(): Observable<{}> {
     return this.storage.local.get('analyticsID').pipe(tap(analyticsID => {
       if (!analyticsID) {
         const generatedId = this.generateUuid();

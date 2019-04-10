@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ChangeDetectorRef, Component, Input, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {interval, merge, NEVER, Subject} from 'rxjs';
@@ -33,7 +33,7 @@ import {DeviceService} from '../../services/device';
   templateUrl: 'device_list_table.ng.html',
 
 })
-export class DeviceListTable implements OnInit {
+export class DeviceListTable implements AfterViewInit, OnDestroy, OnInit {
   /** Title of the table to be displayed. */
   @Input() cardTitle = 'Device List';
   /** If whether the action buttons taken on each row should be displayed. */

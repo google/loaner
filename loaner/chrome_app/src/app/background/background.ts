@@ -303,7 +303,7 @@ chrome.runtime.onMessage.addListener(
  */
 function checkLoanerStatus(): Observable<LoanerStorage> {
   const storage = new Storage();
-  return storage.local.getLoanerStorage(LOANER_STATUS_NAME)
+  return storage.local.get(LOANER_STATUS_NAME)
       .pipe(
           take(1),
           switchMap(status => status ? of(status) : manageValueUpdater()));

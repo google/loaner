@@ -261,9 +261,8 @@ class DeployImplTest(absltest.TestCase):
     self.assertEndsWith(test_app_engine_config.app_path, '.runfiles/gng')
     # Test that the app_engine_path ends with the bazel package name for app
     # engine.
-    self.assertEndsWith(
-        test_app_engine_config.app_engine_deps_path,
-        '.runfiles/gng/external/com_google_appengine_python')
+    self.assertEndsWith(test_app_engine_config.app_engine_deps_path,
+                        '.runfiles/gng/external/com_google_appengine_py')
     # Test that the frontend_src_path ends with the frontend package.
     self.assertEndsWith(
         test_app_engine_config.frontend_src_path,
@@ -306,7 +305,7 @@ class DeployImplTest(absltest.TestCase):
     """Test that the build web application backend executes."""
     fake_app_engine_deps_path = (
         '/this/is/a/workspace/bazel-bin/loaner/web_app/runfiles.runfiles/gng/'
-        'external/com_google_appengine_python')
+        'external/com_google_appengine_py')
     self.fs.CreateDirectory(fake_app_engine_deps_path)
     test_app_engine_config = self.CreateTestAppEngineConfig()
     test_app_engine_config._BuildWebAppBackend()

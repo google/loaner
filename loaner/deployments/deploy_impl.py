@@ -292,8 +292,7 @@ class AppEngineServerConfig(LoanerConfig):
   @property
   def app_engine_deps_path(self):
     """Retrieve the App Engine Dependencies path as a string."""
-    return os.path.join(
-        self.app_path, 'external', 'com_google_appengine_python')
+    return os.path.join(self.app_path, 'external', 'com_google_appengine_py')
 
   @property
   def frontend_src_path(self):

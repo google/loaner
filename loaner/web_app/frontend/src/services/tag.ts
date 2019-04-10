@@ -13,9 +13,10 @@
 // limitations under the License.
 
 import {Injectable} from '@angular/core';
-import {tap} from 'rxjs/operators';
+import {Observable} from 'rxjs';
+import {map, tap} from 'rxjs/operators';
 
-import {CreateTagRequest, Tag, UpdateTagRequest} from '../models/tag';
+import {CreateTagRequest, ListTagRequest, ListTagResponse, ListTagResponseApiParams, Tag, UpdateTagRequest} from '../models/tag';
 
 import {ApiService} from './api';
 
@@ -43,6 +44,19 @@ export class TagService extends ApiService {
     const params: UpdateTagRequest = {'tag': tag.toApiMessage()};
     return this.post('update', params).pipe(tap(() => {
       this.snackBar.open(`Tag: ${tag.name} has been updated.`);
+    }));
+  }
+
+  list(params: ListTagRequest): Observable<ListTagResponse> {
+    return this.post<ListTagResponseApiParams>('list', params).pipe(map(res => {
+      const tags = res.tags && res.tags.map(tag => new Tag(tag)) || [];
+      const retrievedTags: ListTagResponse = {
+        tags,
+        cursor: res.cursor,
+        has_additional_results: res.has_additional_results,
+        total_pages: res.total_pages,
+      };
+      return retrievedTags;
     }));
   }
 }

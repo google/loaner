@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, ContentChild, Input} from '@angular/core';
+import {Component, ContentChild, DoCheck, Input, OnInit} from '@angular/core';
 
 import {Device} from '../../../models/device';
 
@@ -56,7 +56,7 @@ import {GuestButton} from './guest_button';
   styleUrls: ['./loan_actions_card.scss'],
   templateUrl: './loan_actions_card.ng.html',
 })
-export class LoanActionsCardComponent {
+export class LoanActionsCardComponent implements DoCheck, OnInit {
   @Input() additionalManagementText = '';
   @Input() device!: Device;
   @ContentChild(ExtendButton) extendButton!: ExtendButton;

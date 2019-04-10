@@ -114,3 +114,34 @@ export class AnimationMenuServiceMock {
     return this.playbackRate.asObservable();
   }
 }
+
+/**
+ * Mock of the storage service to interact with the ChromeLocalStorageMock
+ * class.
+ */
+@Injectable()
+export class StorageMock {
+  private readonly chromeLocalStorageMock: ChromeLocalStorageMock;
+
+  get local() {
+    return this.chromeLocalStorageMock;
+  }
+
+  constructor() {
+    this.chromeLocalStorageMock = new ChromeLocalStorageMock();
+  }
+}
+
+/**
+ * Mocks out the ChromeLocalStorage service above since the Chrome API is not
+ * available in unit tests.
+ */
+export class ChromeLocalStorageMock {
+  get(key: string): Observable<{}> {
+    return of('Value');
+  }
+
+  set(key: string, value: {}) {
+    console.info('Setting key ', key, ' with value: ', value);
+  }
+}

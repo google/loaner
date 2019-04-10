@@ -33,7 +33,7 @@ future updates and features!
 To clone this release run the following command:
 
 ```
-git clone -b Alpha-\(0.7\) https://github.com/google/loaner.git
+git clone -b Alpha-\(0.7.1\) https://github.com/google/loaner.git
 cd loaner
 ```
 

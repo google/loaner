@@ -19,7 +19,7 @@ import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
 import {Device, ListDevicesResponse} from '../models/device';
 import {ListShelfResponse, Shelf, ShelfRequestParams} from '../models/shelf';
-import {Tag} from '../models/tag';
+import {ListTagRequest, ListTagResponse, Tag} from '../models/tag';
 import {User} from '../models/user';
 
 /* Disabling jsdocs on this file because they do not add much information   */
@@ -566,128 +566,128 @@ export class TagServiceMock {
   constructor() {
     this.tags = [
       new Tag({
-        name: 'Executive',
-        hidden: true,
+        name: '1',
+        hidden: false,
         color: 'purple',
         protect: false,
         description: 'Devices reserved for executives'
       }),
       new Tag({
-        name: 'Business Unit',
-        hidden: true,
-        color: 'Green',
+        name: '2',
+        hidden: false,
+        color: 'green',
         protect: false,
         description: 'Tag for chromebook used only for the Business Unit shelf'
       }),
       new Tag({
-        name: 'Firmware',
-        hidden: true,
-        color: 'Orange',
+        name: '3',
+        hidden: false,
+        color: 'orange',
         protect: true,
         description: 'Security vulnerability update required'
       }),
       new Tag({
-        name: 'Executive 2',
-        hidden: true,
+        name: '4',
+        hidden: false,
         color: 'purple',
         protect: false,
         description: 'Devices reserved for executives'
       }),
       new Tag({
-        name: 'Business Unit 2',
-        hidden: true,
-        color: 'Green',
+        name: '5',
+        hidden: false,
+        color: 'green',
         protect: false,
         description: 'Tag for chromebook used only for the Business Unit shelf'
       }),
       new Tag({
-        name: 'Firmware 2',
-        hidden: true,
-        color: 'Orange',
+        name: '6',
+        hidden: false,
+        color: 'orange',
         protect: true,
         description: 'Security vulnerability update required'
       }),
       new Tag({
-        name: 'Executive 3',
-        hidden: true,
+        name: '7',
+        hidden: false,
         color: 'purple',
         protect: false,
         description: 'Devices reserved for executives'
       }),
       new Tag({
-        name: 'Business Unit 3',
+        name: '8',
         hidden: true,
-        color: 'Green',
+        color: 'green',
         protect: false,
         description: 'Tag for chromebook used only for the Business Unit shelf'
       }),
       new Tag({
-        name: 'Firmware 3',
+        name: '9',
         hidden: true,
-        color: 'Orange',
+        color: 'orange',
         protect: true,
         description: 'Security vulnerability update required'
       }),
       new Tag({
-        name: 'Executive 4',
+        name: '10',
         hidden: true,
         color: 'purple',
         protect: false,
         description: 'Devices reserved for executives'
       }),
       new Tag({
-        name: 'Business Unit 4',
+        name: '11',
         hidden: true,
-        color: 'Green',
+        color: 'green',
         protect: false,
         description: 'Tag for chromebook used only for the Business Unit shelf'
       }),
       new Tag({
-        name: 'Firmware 4',
+        name: '12',
         hidden: true,
-        color: 'Orange',
+        color: 'orange',
         protect: true,
         description: 'Security vulnerability update required'
       }),
       new Tag({
-        name: 'Executive 5',
+        name: '13',
         hidden: true,
         color: 'purple',
         protect: false,
         description: 'Devices reserved for executives'
       }),
       new Tag({
-        name: 'Business Unit 5',
+        name: '14',
         hidden: true,
-        color: 'Green',
+        color: 'green',
         protect: false,
         description: 'Tag for chromebook used only for the Business Unit shelf'
       }),
       new Tag({
-        name: 'Firmware 5',
-        hidden: true,
-        color: 'Orange',
+        name: '15',
+        hidden: false,
+        color: 'orange',
         protect: true,
         description: 'Security vulnerability update required'
       }),
       new Tag({
-        name: 'Executive 6',
-        hidden: true,
+        name: '16',
+        hidden: false,
         color: 'purple',
         protect: false,
         description: 'Devices reserved for executives'
       }),
       new Tag({
-        name: 'Business Unit 6',
-        hidden: true,
-        color: 'Green',
+        name: '17',
+        hidden: false,
+        color: 'green',
         protect: false,
         description: 'Tag for chromebook used only for the Business Unit shelf'
       }),
       new Tag({
-        name: 'Firmware 6',
-        hidden: true,
-        color: 'Orange',
+        name: '18',
+        hidden: false,
+        color: 'orange',
         protect: true,
         description: 'Security vulnerability update required'
       })
@@ -738,6 +738,36 @@ export class TagServiceMock {
         observer.next(true);
       } else {
         observer.error(new Error(`No Tag found for: ${updateTag.name}`));
+      }
+      observer.complete();
+    });
+  }
+
+  list(params: ListTagRequest = {
+    page_size: 5,
+    page_index: 1,
+    include_hidden_tags: false
+  }): Observable<ListTagResponse> {
+    return Observable.create((observer: Observer<ListTagResponse>) => {
+      const response: ListTagResponse =
+          {total_pages: 0, has_additional_results: false, tags: [], cursor: ''};
+      if (params.page_size && params.page_size <= 0) {
+        observer.error(new Error(`Invalid page_size: ${params.page_size}`));
+      } else if (params.page_size && params.page_index) {
+        let filteredTags = this.tags;
+        if (params.include_hidden_tags === false) {
+          filteredTags = this.tags.filter(tag => {
+            return !tag.hidden;
+          });
+        }
+        response.total_pages =
+            Math.ceil(filteredTags.length / params.page_size);
+        const startIndex = (params.page_index - 1) * params.page_size;
+        response.tags = filteredTags.slice(
+            startIndex, params.page_size * params.page_index);
+        response.has_additional_results =
+            (response.total_pages > params.page_index) ? true : false;
+        observer.next(response);
       }
       observer.complete();
     });

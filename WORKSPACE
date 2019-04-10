@@ -278,15 +278,22 @@ http_archive(
 
 http_archive(
      name = "io_bazel_rules_appengine",
-     sha256 = "3cc3963d883c06d953181c28ce8c32ad4720779fca22a36891fc54ffb41c32d0",
-     strip_prefix = "rules_appengine-edee76dd6892c1af75ad4166c1d3f709d240daf5",
-     url = "https://github.com/bazelbuild/rules_appengine/archive/edee76dd6892c1af75ad4166c1d3f709d240daf5.tar.gz",
+     sha256 = "bebc923ff8e0c5586ec340208ada10b8899c40defe9f0766b754de45994cdcbc",
+     strip_prefix = "rules_appengine-6ef28a83a0ce3a1abc8583c2340d5c4842519a6b",
+     url = "https://github.com/bazelbuild/rules_appengine/archive/6ef28a83a0ce3a1abc8583c2340d5c4842519a6b.zip",
+)
+
+load(
+    "@io_bazel_rules_appengine//appengine:sdk.bzl",
+    "appengine_repositories",
 )
 
 load(
     "@io_bazel_rules_appengine//appengine:py_appengine.bzl",
     "py_appengine_repositories"
 )
+
+appengine_repositories()
 
 py_appengine_repositories()
 

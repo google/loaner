@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {PlatformLocation} from '@angular/common';
-import {Component, NgModule, ViewChild, ViewEncapsulation} from '@angular/core';
+import {AfterViewInit, Component, NgModule, ViewChild, ViewEncapsulation} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NavigationEnd, Router, RouterModule, Routes} from '@angular/router';
@@ -31,6 +31,7 @@ import {BottomNavModule, NavTab} from './shared/bottom_nav';
 import {StatusComponent, StatusModule} from './status';
 import {TroubleshootComponent, TroubleshootModule} from './troubleshoot';
 
+/** Represents the root management component. */
 @Component({
   encapsulation: ViewEncapsulation.None,
   preserveWhitespaces: true,
@@ -38,7 +39,7 @@ import {TroubleshootComponent, TroubleshootModule} from './troubleshoot';
   styleUrls: ['./app.scss'],
   templateUrl: './app.ng.html',
 })
-export class AppRoot {
+export class AppRoot implements AfterViewInit {
   backgroundLogo = BACKGROUND_LOGO;
   backgroundLogoEnabled = BACKGROUND_LOGO_ENABLED;
 

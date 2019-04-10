@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {ChangeDetectorRef, Component, Input, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnDestroy, ViewChild} from '@angular/core';
 import {MatSort} from '@angular/material/sort';
 import {MatTableDataSource} from '@angular/material/table';
 import {interval, merge, NEVER, Subject} from 'rxjs';
@@ -31,7 +31,7 @@ import {ShelfService} from '../../services/shelf';
   styleUrls: ['shelf_list_table.scss'],
   templateUrl: 'shelf_list_table.ng.html',
 })
-export class ShelfListTable implements OnDestroy {
+export class ShelfListTable implements AfterViewInit, OnDestroy {
   /** Title of the table to be displayed. */
   @Input() cardTitle = 'Shelf List';
 

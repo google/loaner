@@ -16,6 +16,7 @@ import * as moment from 'moment';
 
 import {SearchQuery} from './search';
 import {Shelf, ShelfApiParams} from './shelf';
+import {TagDataParams} from './tag';
 
 /**
  * Interface with fields that come from our device API.
@@ -46,6 +47,7 @@ export declare interface DeviceApiParams {
   page_token?: string;
   query?: SearchQuery;
   overdue?: boolean;
+  tags?: TagDataParams[];
 }
 
 export declare interface DeviceRequestApiParams {
@@ -125,6 +127,8 @@ export class Device {
   overdue = false;
   /** List of flags relevant to this device. */
   chips: DeviceChip[] = [];
+  /** Object with the associated tags for a given device. */
+  tags?: TagDataParams[];
 
   constructor(device: DeviceApiParams = {}) {
     this.serialNumber = device.serial_number || this.serialNumber;
@@ -150,6 +154,7 @@ export class Device {
     this.givenName = device.given_name || this.givenName;
     this.overdue = !!device.overdue || this.overdue;
     this.chips = this.makeChips();
+    this.tags = device.tags || [];
   }
 
   /**
@@ -188,6 +193,7 @@ export class Device {
       guest_permitted: this.guestAllowed,
       max_extend_date: this.maxExtendDate,
       given_name: this.givenName,
+      tags: this.tags,
     };
   }
 
