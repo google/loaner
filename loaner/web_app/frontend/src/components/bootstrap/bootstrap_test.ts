@@ -17,6 +17,7 @@ import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
+import {Status} from '../../models/bootstrap';
 import {BootstrapService} from '../../services/bootstrap';
 import {BootstrapServiceMock} from '../../testing/mocks';
 
@@ -25,6 +26,7 @@ import {Bootstrap, BootstrapModule} from './index';
 describe('BootstrapComponent', () => {
   let fixture: ComponentFixture<Bootstrap>;
   let bootstrap: Bootstrap;
+  let bootstrapRun: Status;
 
   beforeEach(fakeAsync(() => {
     TestBed
@@ -42,8 +44,20 @@ describe('BootstrapComponent', () => {
 
     flushMicrotasks();
 
+    bootstrapRun = {
+      'started': false,
+      'completed': false,
+      'is_update': true,
+      'app_version': '0.0.7-alpha',
+      'running_version': '0.0.6-alpha',
+      'tasks': [
+        {name: 'task1'},
+      ]
+    };
+
     fixture = TestBed.createComponent(Bootstrap);
     bootstrap = fixture.debugElement.componentInstance;
+
   }));
 
   it('creates the bootstrap component', () => {
@@ -70,12 +84,7 @@ describe('BootstrapComponent', () => {
 
   it('renders the version numbers for an update', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'getStatus').and.returnValue(of({
-      'completed': false,
-      'is_update': true,
-      'app_version': '0.0.7-alpha',
-      'running_version': '0.0.6-alpha',
-    }));
+    spyOn(bootstrapService, 'getStatus').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const bootstrapTitle = compiled.querySelector('.bootstrapSubtitle');
@@ -87,13 +96,12 @@ describe('BootstrapComponent', () => {
 
   it('renders each task in an expansion panel when bootstrap begins', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'run').and.returnValue(of({
-      tasks: [
-        {name: 'task1'},
-        {name: 'task2'},
-        {name: 'task3'},
-      ]
-    }));
+    bootstrapRun['tasks'] = [
+      {name: 'task1'},
+      {name: 'task2'},
+      {name: 'task3'},
+    ];
+    spyOn(bootstrapService, 'run').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const beginButton = compiled.querySelector('.beginButton');
@@ -113,13 +121,12 @@ describe('BootstrapComponent', () => {
 
   it('marks successful tasks with a checkmark icon', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'run').and.returnValue(of({
-      tasks: [
-        {name: 'task1', success: true},
-        {name: 'task2', success: false},
-        {name: 'task3'},
-      ]
-    }));
+    bootstrapRun['tasks'] = [
+      {name: 'task1', success: true},
+      {name: 'task2', success: false},
+      {name: 'task3'},
+    ];
+    spyOn(bootstrapService, 'run').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const beginButton = compiled.querySelector('.beginButton');
@@ -140,13 +147,12 @@ describe('BootstrapComponent', () => {
 
   it('marks failed tasks with an alert icon', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'run').and.returnValue(of({
-      tasks: [
-        {name: 'task1', success: true},
-        {name: 'task2', success: false, timestamp: 1},
-        {name: 'task3'},
-      ]
-    }));
+    bootstrapRun['tasks'] = [
+      {name: 'task1', success: true},
+      {name: 'task2', success: false, timestamp: 1},
+      {name: 'task3'},
+    ];
+    spyOn(bootstrapService, 'run').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const beginButton = compiled.querySelector('.beginButton');
@@ -166,13 +172,12 @@ describe('BootstrapComponent', () => {
 
   it('marks in-progress tasks with a progress spinner', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'run').and.returnValue(of({
-      tasks: [
-        {name: 'task1', success: true},
-        {name: 'task2', success: false, timestamp: 1},
-        {name: 'task3'},
-      ]
-    }));
+    bootstrapRun['tasks'] = [
+      {name: 'task1', success: true},
+      {name: 'task2', success: false, timestamp: 1},
+      {name: 'task3'},
+    ];
+    spyOn(bootstrapService, 'run').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const beginButton = compiled.querySelector('.beginButton');
@@ -192,11 +197,10 @@ describe('BootstrapComponent', () => {
   it('displays the task description instead of the task name whenever possible',
      () => {
        const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-       spyOn(bootstrapService, 'run').and.returnValue(of({
-         tasks: [
-           {name: 'task1', description: 'testing task #1'},
-         ]
-       }));
+       bootstrapRun['tasks'] = [
+         {name: 'task1', description: 'testing task #1'},
+       ];
+       spyOn(bootstrapService, 'run').and.returnValue(of(bootstrapRun));
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
        const beginButton = compiled.querySelector('.beginButton');
@@ -210,16 +214,15 @@ describe('BootstrapComponent', () => {
 
   it('displays failure information in an expansion panel', () => {
     const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
-    spyOn(bootstrapService, 'run').and.returnValue(of({
-      tasks: [
-        {
-          name: 'task1',
-          description: 'testing task #1',
-          success: false,
-          details: 'testing task #1 failed'
-        },
-      ]
-    }));
+    bootstrapRun['tasks'] = [
+      {
+        name: 'task1',
+        description: 'testing task #1',
+        success: false,
+        details: 'testing task #1 failed'
+      },
+    ];
+    spyOn(bootstrapService, 'run').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
     const beginButton = compiled.querySelector('.beginButton');

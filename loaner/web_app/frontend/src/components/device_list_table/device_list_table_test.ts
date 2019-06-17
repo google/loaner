@@ -136,6 +136,8 @@ describe('DeviceListTableComponent', () => {
          devices: [DEVICE_DAMAGED],
          totalResults: 1,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
        deviceListTable.ngAfterViewInit();
        const matChipListContent =
@@ -151,6 +153,8 @@ describe('DeviceListTableComponent', () => {
          devices: [DEVICE_LOCKED],
          totalResults: 1,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
        deviceListTable.ngAfterViewInit();
        const matChipListContent =
@@ -166,6 +170,8 @@ describe('DeviceListTableComponent', () => {
          devices: [DEVICE_LOST_AND_MORE],
          totalResults: 1,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
        deviceListTable.ngAfterViewInit();
        const matChipListContent =
@@ -182,6 +188,8 @@ describe('DeviceListTableComponent', () => {
          devices: [DEVICE_MARKED_FOR_RETURN],
          totalResults: 1,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
        deviceListTable.ngAfterViewInit();
        const matChipListContent =
@@ -197,6 +205,8 @@ describe('DeviceListTableComponent', () => {
          devices: [DEVICE_OVERDUE],
          totalResults: 1,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
        deviceListTable.ngAfterViewInit();
        const matChipListContent =
@@ -213,6 +223,8 @@ describe('DeviceListTableComponent', () => {
          devices: [DEVICE_LOST_AND_MORE],
          totalResults: 1,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
 
        deviceListTable.ngAfterViewInit();

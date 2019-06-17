@@ -278,7 +278,7 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       spyOn(deviceService, 'markAsDamaged').and.returnValue(of(true));
+       spyOn(deviceService, 'markAsDamaged').and.returnValue(of(null));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
        const actionsButton =
@@ -316,7 +316,7 @@ describe('DeviceActionsMenu', () => {
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
        const deviceService: DeviceService = TestBed.get(DeviceService);
-       spyOn(deviceService, 'unenroll').and.returnValue(of(true));
+       spyOn(deviceService, 'unenroll').and.returnValue(of(null));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
        const actionsButton =

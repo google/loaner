@@ -1,13 +1,12 @@
+<html lang="en">
+
 # Grab n Go API
-
-
-
 
 ## Getting Started with the GnG API
 
 This documentation explains how to get started with the GnG API.
 
-## API Authentication
+### API Authentication
 
 The GnG API is authenticated based on user roles and permissions. Roles are
 managed by Google groups that are synced with a Cron job.
@@ -25,12 +24,11 @@ There are two roles built into the app by default:
         experience. This role has all permissions by default and thus
         the ability to perform all of the actions within the application.
 
-Additional roles can be created by using the Roles API. Each Role can be
-given zero or more permissions and associated with a group to automatically
-add users to the given role. Some example roles you may want to create are
-a technician role that can audit shelves and other inventory-related tasks or
-a helpdesk role that can assist users with their loans.
-
+Additional roles can be created by using the Roles API. Each role can be given
+zero or more permissions and associated with a group to automatically add users
+to the given role. Some example roles you may want to create are a technician
+role that can audit shelves and other inventory-related tasks or a helpdesk role
+that can assist users with their loans.
 
 ### Authentication Decorator
 
@@ -85,8 +83,8 @@ also be synced to groups so you don't need to manually update them.
 1.  Go to the root of the source code and search for a file named
     `constants.py`.
 
-1.  Use your favorite editor to open the file and add the superadmin group
-    that you created earlier. For example:
+1.  Use your favorite editor to open the file and add the superadmin group that
+    you created earlier. For example:
 
     ```python
     # superadmins_group: str, The name of the Google Group that governs who is
@@ -96,43 +94,82 @@ also be synced to groups so you don't need to manually update them.
 
 ## API List
 
+  <!--- Used HTML for the tables because GitHub-flavored MD Markup doesn't allow for merging of rows within tables. Tables won't render properly without HTML. *-->
+
 ### Bootstrap_api
 
 The entry point for the Bootstrap methods.
 
 #### Methods
 
-##### get_status
+`get_status` Gets general bootstrap status, and task status if not yet
+completed:
 
-Gets general bootstrap status, and task status if not yet completed:
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Requests                  | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>GetStatusResponse: Bootstrap status response ProtoRPC</td>
+         <td>enabled: bool, indicates if the bootstrap is enabled.</td>
+      <tr>
+         <td></td>
+         <td>started: bool, indicated if the bootstrap has been started.</td>
+      <tr>
+         <td></td>
+         <td>completed: bool, indicated if the bootstrap is completed.</td>
+      <tr>
+         <td></td>
+         <td> tasks: BootstrapTask, A list of all of the tasks to be displayed.</td>
+   </tbody>
+</table>
 
-| Returns                             | Attributes                             |
-| :---------------------------------- | :------------------------------------- |
-| GetStatusResponse: Bootstrap status | enabled: bool, indicates if the        |
-| response ProtoRPC                   | bootstrap is enabled.                  |
-|                                     | started: bool, indicated if the        |
-|                                     | bootstrap has been started.            |
-|                                     | completed: bool, indicated if the      |
-|                                     | bootstrap is completed.                |
-|                                     | tasks: BootstrapTask, A list of all of |
-|                                     | the tasks to be displayed.             |
+<br>
 
-##### run
+`run` Runs request for the Bootstrap API:
 
-Runs request for the Bootstrap API:
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>RunRequest: Bootstrap request ProtoRPC message</td>
+         <td>requested_tasks: BootstrapTask, A list of the requested tasks.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                      | Attributes                                |
-| :---------------------------- | :---------------------------------------- |
-| RunRequest: Bootstrap request | requested_tasks: BootstrapTask, A list of |
-| ProtoRPC message              | the requested tasks.                      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
 ### Chrome_api
 
@@ -140,21 +177,38 @@ The entry point for the GnG Loaners Chrome App.
 
 #### Methods
 
-##### heartbeat
+`heartbeat`Heartbeat check-in for Chrome devices:
 
-Heartbeat check-in for Chrome devices:
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>HeartbeatRequest: Heartbeat Request ProtoRPC message.</td>
+         <td>device_id: str, The unique Chrome device ID of the Chrome device.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                            | Attributes                        |
-| :---------------------------------- | :-------------------------------- |
-| HeartbeatRequest: Heartbeat Request | device_id: str, The unique Chrome |
-| ProtoRPC message.                   | device ID of the Chrome device.   |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>HeartbeatResponse: Heartbeat Response ProtoRPC message.</td>
+         <td>is_enrolled: bool, Determine if the device is enrolled.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>start_assignment: bool, Determine if assignment workflow should be started.</td>
+   </tbody>
+</table>
 
-| Returns                      | Attributes                                    |
-| :--------------------------- | :-------------------------------------------- |
-| HeartbeatResponse: Heartbeat | is_enrolled: bool, Determine if the device is |
-| Response ProtoRPC message.   | enrolled.                                     |
-|                              | start_assignment: bool, Determine if          |
-|                              | assignment workflow should be started.        |
+<br>
 
 ### Configuration_api
 
@@ -162,68 +216,126 @@ Lists the given setting's value.
 
 #### Methods
 
-##### get
+`get` Lists the given setting's value:
 
-Lists the given setting's value:
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>GetConfigurationRequest request for ProtoRPC message.</td>
+         <td>setting: str, The name of the setting being requested.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>configuration_type: ConfigurationType, the type of configuration to request for.</td>
+   </tbody>
+</table>
 
-| Requests                            | Attributes                             |
-| :---------------------------------- | :------------------------------------- |
-| GetConfigurationRequest request for | setting: str, The name of the setting  |
-| ProtoRPC message.                   | being requested.                       |
-|                                     | configuration_type: ConfigurationType, |
-|                                     | The type of configuration to request   |
-|                                     | for.                                   |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ConfigurationResponse response for ProtoRPC message. </td>
+         <td>setting: str, The name of the setting being returned.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>string_value: str, The string value of the setting.</td>
+      <tr>
+         <td></td>
+         <td>integer_value: int, The integer value of the setting.</td>
+      <tr>
+         <td></td>
+         <td>boolean_value: bool, The boolean value of the setting.</td>
+      <tr>
+         <td></td>
+         <td>list_value: list, The list value of the setting.</td>
+   </tbody>
+</table>
 
-| Returns                            | Attributes                              |
-| :--------------------------------- | :-------------------------------------- |
-| ConfigurationResponse response for | setting: str, The name of the setting   |
-| ProtoRPC message.                  | being returned.                         |
-|                                    | string_value: str, The string value of  |
-|                                    | the setting.                            |
-|                                    | integer_value: int, The integer value   |
-|                                    | of the setting.                         |
-|                                    | boolean_value: bool, The boolean value  |
-|                                    | of the setting.                         |
-|                                    | list_value: list, The list value of the |
-|                                    | setting.                                |
+<br>
 
-##### list
+`list` Get a list of all configuration values.
 
-Get a list of all configuration values.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Requests                  | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ListConfigurationsResponse response for ProtoRPC message.</td>
+         <td>settings: ConfigurationResponse, The setting and corresponding value being returned.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Returns                             | Attributes                            |
-| :---------------------------------- | :------------------------------------ |
-| ListConfigurationsResponse response | settings: ConfigurationResponse, The  |
-| for ProtoRPC message.               | setting and corresponding value being |
-|                                     | returned.                             |
+<br>
 
-##### update
+`update` Updates a given settings value.
 
-Updates a given settings value.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>UpdateConfigurationRequest request for ProtoRPC message.</td>
+         <td>setting: str, The name of the setting being requested.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>configuration_type: ConfigurationType, The type of configuration to request for.</td>
+      <tr>
+         <td></td>
+         <td>string_value: str, The string value of the setting being updated.</td>
+      <tr>
+         <td></td>
+         <td>integer_value: int, The integer value ff the setting being updated.</td>
+      <tr>
+         <td></td>
+         <td>boolean_value: bool, The boolean value of the setting being updated.</td>
+      <tr>
+         <td></td>
+         <td>list_value: list, The list value of the setting being updated.</td>
 
-| Requests                           | Attributes                              |
-| :--------------------------------- | :-------------------------------------- |
-| UpdateConfigurationRequest request | setting: str, The name of the setting   |
-| for ProtoRPC message.              | being requested.                        |
-|                                    | configuration_type: ConfigurationType,  |
-|                                    | The type of configuration to request    |
-|                                    | for.                                    |
-|                                    | string_value: str, The string value of  |
-|                                    | the setting being updated.              |
-|                                    | integer_value: int, The integer value   |
-|                                    | of the setting being updated.           |
-|                                    | boolean_value: bool, The boolean value  |
-|                                    | of the setting being updated.           |
-|                                    | list_value: list, The list value of the |
-|                                    | setting being updated.                  |
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
+
+<br>
 
 ### Datastore_api
 
@@ -231,18 +343,35 @@ The entry point for the Datastore methods.
 
 #### Methods
 
-##### import
+`import` Datastore import request for the Datastore API.
 
-Datastore import request for the Datastore API.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Datastore YAML Import Request ProtoRPC message.</td>
+         <td>yaml: str, The name of the YAML being imported.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                      | Attributes                            |
-| :---------------------------- | :------------------------------------ |
-| Datastore YAML Import Request | yaml: str, The name of the YAML being |
-| ProtoRPC message.             | imported.                             |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage.</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
 ### Device_api
 
@@ -250,293 +379,572 @@ API endpoint that handles requests related to Devices.
 
 #### Methods
 
-##### auditable
+`auditable` If a device is able to be audited for shelf audits. Returns an error
+if the device cannot be moved to the shelf for any reason.
 
-If a device is able to be audited for shelf audits. Returns an error if the
-device cannot be moved to the shelf for any reason.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
-##### enable_guest_mode
+`enable_guest_mode` Enables Guest Mode for a given device.
 
-Enables Guest Mode for a given device.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>RunRequest: Bootstrap request ProtoRPC message</td>
+         <td>requested_tasks: BootstrapTask, A list of the requested tasks.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### enroll
+<br>
 
-Enrolls a device in the program
+`enroll` Enrolls a device in the program
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### extend_loan
+<br>
 
-Extend the current loan for a given Chrome device.
+`extend_loan` Extend the current loan for a given Chrome device.
 
-| Requests                        | Attributes                                |
-| :------------------------------ | :---------------------------------------- |
-| Loan extension request ProtoRPC | device: DeviceRequest, A device to be     |
-| message.                        | fetched.                                  |
-|                                 | extend_date: datetime, The date to extend |
-|                                 | the loan for.                             |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Loan extension request ProtoRPC message.</td>
+         <td>device: DeviceRequest, A device to be fetched.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>extend_date: datetime, The date to extend the loan for.</tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### get
+<br>
 
-Gets a device using any identifier in device_message.DeviceRequest.
+`get` Gets a device using any identifier in device_message.DeviceRequest.
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### list
+<br>
 
-Lists all devices based on any device attribute.
+`list` Lists all devices based on any device attribute.
 
-| Requests                 | Attributes                                        |
-| :----------------------- | :------------------------------------------------ |
-| Device ProtoRPC message. | serial_number: str, The serial number of the      |
-|                          | Chrome device.                                    |
-|                          | asset_tag: str, The asset tag of the Chrome       |
-|                          | device.                                           |
-|                          | enrolled: bool, Indicates the enrollment status   |
-|                          | of the device.                                    |
-|                          | device_model: int, Identifies the model name of   |
-|                          | the device.                                       |
-|                          | due_date: datetime, The date that device is due   |
-|                          | for return.                                       |
-|                          | last_know_healthy: datetime, The date to indicate |
-|                          | the last known healthy status.                    |
-|                          | shelf: shelf_messages.Shelf, The shelf the device |
-|                          | is placed on.                                     |
-|                          | assigned_user: str, The email of the user who is  |
-|                          | assigned to the device.                           |
-|                          | assignment_date: datetime, The date the device    |
-|                          | was assigned to a user.                           |
-|                          | current_ou: str, The current organizational unit  |
-|                          | the device belongs to.                            |
-|                          | ou_change_date: datetime, The date the            |
-|                          | organizational unit was changed.                  |
-|                          | locked: bool, Indicates whether or not the device |
-|                          | is locked.                                        |
-|                          | lost: bool, Indicates whether or not the device   |
-|                          | is lost.                                          |
-|                          | mark_pending_return_date: datetime, The date a    |
-|                          | user marked device returned.                      |
-|                          | chrome_device_id: str, A unique device ID.        |
-|                          | last_heartbeat: datetime, The date of the last    |
-|                          | time the device checked in.                       |
-|                          | damaged: bool, Indicates the if the device is     |
-|                          | damaged.                                          |
-|                          | damaged_reason: str, A string denoting the reason |
-|                          | for being reported as damaged.                    |
-|                          | last_reminder: Reminder, Level, time, and count   |
-|                          | of the last reminder the device had.              |
-|                          | next_reminder: Reminder, Level, time, and count   |
-|                          | of the next reminder.                             |
-|                          | page_size: int, The number of results to query    |
-|                          | for and display.                                  |
-|                          | page_token: str, A page token to query next page  |
-|                          | results.                                          |
-|                          | max_extend_date: datetime, Indicates maximum      |
-|                          | extend date a device can have.                    |
-|                          | guest_enabled: bool, Indicates if guest mode has  |
-|                          | been already enabled.                             |
-|                          | guest_permitted: bool, Indicates if guest mode has|
-|                          | been allowed.                                     |
-|                          | give_name: str, The given name of the user.       |
-|                          | query: shared_message.SearchRequest, a message    |
-|                          | containing query options to conduct a search on an|
-|                          | index.                                            |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Device ProtoRPC message.</td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+       <tr>
+         <td>enrolled: bool, Indicates the enrollment status of the device.</td>
+          <td></td>
+       <tr>
+         <td></td>
+          <td>device_model: int, Identifies the model name of the device.</td>
+       <tr>
+         <td></td>
+         <td>due_date: datetime, The date that device is due for return.</td>
+       <tr>
+         <td></td>
+         <td>last_know_healthy: datetime, The date to indicate the last known healthy status.</td>
+       <tr>
+         <td></td>
+         <td>shelf: shelf_messages. Shelf, The shelf the device is placed on.</td>
+       <tr>
+          <td></td>
+          <td>assigned_user: str, The email of the user who is assigned to the device.</td>
+       <tr>
+          <td></td>
+          <td>assignment_date: datetime, The date the device was assigned to a user.</td>
+       <tr>
+          <td></td>
+          <td>current_ou: str, The current organizational unit the device belongs to.</td>
+       <tr>
+          <td></td>
+          <td>ou_change_date: datetime, The date the organizational unit was changed.</td>
+       <tr>
+          <td></td>
+          <td>locked: bool, Indicates whether or not the device is locked.</td>
+       <tr>
+          <td></td>
+          <td>lost: bool, Indicates whether or not the device is lost.</td>
+       <tr>
+          <td></td>
+          <td>mark_pending_return_date: datetime, The date a user marked device returned.</td>
+       <tr>
+          <td></td>
+          <td>chrome_device_id: str, A unique device ID.</td>
+       <tr>
+          <td></td>
+          <td>last_heartbeat: datetime, The date of the last time the device checked in.</td>
+       <tr>
+          <td></td>
+          <td>damaged: bool, Indicates the if the device is damaged.</td>
+       <tr>
+          <td></td>
+          <td>damaged_reason: str, A string denoting the reason for being reported as damaged.</td>
+       <tr>
+          <td></td>
+          <td>last_reminder: Reminder, Level, time, and count of the last reminder the device had.</td>
+       <tr>
+          <td></td>
+          <td>next_reminder: Reminder, Level, time, and count of the next reminder.</td>
+       <tr>
+          <td></td>
+          <td>page_size: int, The number of results to query for and display.</td>
+       <tr>
+          <td></td>
+          <td>page_token: str, A page token to query next page results.</td>
+       <tr>
+          <td></td>
+          <td>max_extend_date: datetime, Indicates maximum extend date a device can have.</td>
+       <tr>
+          <td></td>
+          <td>guest_enabled: bool, Indicates if guest mode has been already enabled.</td>
+       <tr>
+          <td></td>
+          <td>guest_permitted: bool, Indicates if guest mode has been allowed.</td>
+       <tr>
+          <td></td>
+          <td>give_name: str, The given name of the user.</td>
+       <tr>
+          <td></td>
+          <td>query: shared_message.SearchRequest, a message containing query options to conduct a search on an index.</td>
+   </tbody>
+</table>
 
-| Returns                       | Attributes                                  |
-| :---------------------------- | :------------------------------------------ |
-| List device response ProtoRPC | devices: Device, A device to display.       |
-| message.                      |                                             |
-|                               | has_additional_results: bool, If there are  |
-|                               | more results to be displayed.               |
-|                               | page_token: str, A page token that will     |
-|                               | allow be used to query for additional       |
-|                               | results.                                    |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>List device response ProtoRPC message.</td>
+         <td>devices: Device, A device to display.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>has_additional_results: bool, If there are more results to be displayed.</td>
+      <tr>
+         <td></td>
+         <td>page_token: str, A page token that will allow be used to query for additional results.</td>
+   </tbody>
+</table>
 
-##### mark_damaged
+<br>
 
-Mark that a device is damaged.
+`mark_damaged` Mark that a device is damaged.
 
-| Requests                         | Attributes                            |
-| :------------------------------- | :------------------------------------ |
-| Damaged device ProtoRPC message. | device: DeviceRequest, A device to be |
-|                                  | fetched.                              |
-|                                  | damaged_reason: str, The reason the   |
-|                                  | device is being reported as damaged.  |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Damaged device ProtoRPC message.</td>
+         <td>device: DeviceRequest, A device to be fetched.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>damaged_reason: str, The reason the device is being reported as damaged.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### mark_lost
+<br>
 
-Mark that a device is lost.
+`mark_lost` Mark that a device is lost.
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-|                                   | chrome_device_id: str, The Chrome device |
-|                                   | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### mark_pending_return
+<br>
 
-Mark that a device is pending return.
+`mark_pending_return` Mark that a device is pending return.
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### resume_loan
+<br>
 
-Manually resume a loan that was paused because the device was marked
-pending_return.
+`resume_loan` Manually resume a loan that was paused because the device was
+marked pending_return.
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### unenroll
+<br>
 
-Unenrolls a device from the program.
+`unenroll` Unenrolls a device from the program.
 
-| Requests                          | Attributes                               |
-| :-------------------------------- | :--------------------------------------- |
-| General Device request ProtoRPC   | asset_tag: str, The asset tag of the     |
-| message with several identifiers. | Chrome device.                           |
-| Only one identifier needs to be   | chrome_device_id: str, The Chrome device |
-| provided.                         | id of the Chrome device.                 |
-|                                   | serial_number: str, The serial number of |
-|                                   | the Chrome device.                       |
-|                                   | urlkey: str, The URL-safe key of a       |
-|                                   | device.                                  |
-|                                   | unknown_identifier: str, Either an asset |
-|                                   | tag or serial number of the device.      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>General Device request ProtoRPC message with several identifiers. Only one identifier needs to be provided.</td>
+         <td>asset_tag: str, The asset tag of the Chrome device.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>chrome_device_id: str, The Chrome device id of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>serial_number: str, The serial number of the Chrome device.</td>
+      <tr>
+         <td></td>
+         <td>urlkey: str, The URL-safe key of a device.</td>
+      <tr>
+         <td></td>
+         <td>unknown_identifier: str, Either an asset tag or serial number of the device.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### user_devices
+<br>
 
-Lists the devices assigned to the currently logged in user.
+`user_devices` Lists the devices assigned to the currently logged in user.
 
-Requests                  | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-| Returns                       | Attributes                                  |
-| :---------------------------- | :------------------------------------------ |
-| List device response ProtoRPC | devices: Device, A device to display.       |
-| message.                      |                                             |
-|                               | has_additional_results: bool, If there are  |
-|                               | more results to be displayed.               |
-|                               | page_token: str, A page token that will     |
-|                               | allow be used to query for additional       |
-|                               | results.                                    |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>List device response ProtoRPC message.</td>
+         <td>devices: Device, A device to display.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>has_additional_results: bool, If there are more results to be displayed.</td>
+      <tr>
+         <td></td>
+         <td>page_token: str, A page token that will allow be used to query for additional results.</td>
+   </tbody>
+</table>
+
+<br>
 
 ### Roles_api
 
@@ -544,54 +952,115 @@ API endpoint that handles requests related to user roles.
 
 #### Methods
 
-##### create
+`create` Create a new role.
 
-Create a new role.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>user_messages.Role</td>
+         <td>name: str, the name of the role.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>permissions: list of str, zero or more permissions to add to the role.</td>
+      <tr>
+         <td></td>
+         <td>associated_group: str, optional group to associate to the role for automatic sync.</td>
+   </tbody>
+</table>
 
-| Requests                      | Attributes
-| :---------------------------- | :---------
-| user_messages.Role            | name: str, the name of the role.
-|                               | permissions: list of str, zero or more
-|                               | permissions to add to the role.
-|                               | associated_group: str, optional group to
-|                               | associate to the role for automatic sync.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-| Returns                        | Attributes                                  |
-| :----------------------------- | :------------------------------------------ |
-| message_types.VoidMessage      | None                                        |
+<br>
 
-##### get
+`get` Get a specific role by name.
 
-Get a specific role by name.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>user_messages.GetRoleRequest</td>
+         <td>name: str, the name of the role.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                      | Attributes
-| :---------------------------- | :---------
-| user_messages.GetRoleRequest  | name: str, the name of the role.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>user_messages.Role</td>
+         <td>name: str, the name of the role.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>permissions: list of str, zero or more permissions associated with the role.</td>
+      <tr>
+         <td></td>
+         <td>associated_group: str, optional group associated to the role for automatic sync.</td>
 
-| Returns                       | Attributes
-| :---------------------------- | :---------
-| user_messages.Role            | name: str, the name of the role.
-|                               | permissions: list of str, zero or more
-|                               | permissions associated with the role.
-|                               | associated_group: str, optional group
-|                               | associated to the role for automatic sync.
+   </tbody>
+</table>
 
-##### update
+<br>
 
-Updates a role's permissions or associated group. Role names cannot be changed
-once set.
+`update` Updates a role's permissions or associated group. Role names cannot be
+changed once set.
 
-| Requests                      | Attributes
-| :---------------------------- | :---------
-| user_messages.Role            | name: str, the name of the role.
-|                               | permissions: list of str, zero or more
-|                               | permissions to add to the role.
-|                               | associated_group: str, optional group to
-|                               | associate to the role for automatic sync.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>user_messages.Role</td>
+         <td>name: str, the name of the role.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>permissions: list of str, zero or more permissions to add to the role.</td>
+      <tr>
+         <td></td>
+         <td>associated_group: str, optional group to associate to the role for automatic sync.</td>
+   </tbody>
+</table>
 
-| Returns                        | Attributes                                  |
-| :----------------------------- | :------------------------------------------ |
-| message_types.VoidMessage      | None                                        |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
+
+<br>
 
 ### Search_api
 
@@ -599,31 +1068,65 @@ API endpoint that handles requests related to search.
 
 #### Methods
 
-##### clear
+`clear` Clear the index for a given model (Device or Shelf).
 
-Clear the index for a given model (Device or Shelf).
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>search_messages.SearchMessage</td>
+         <td>model: enum, the model to clear the index of (Device or Shelf).</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                      | Attributes
-| :---------------------------- | :---------
-| search_messages.SearchMessage | model: enum, the model to clear the index of
-|                               | (Device or Shelf).
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-| Returns                        | Attributes                                  |
-| :----------------------------- | :------------------------------------------ |
-| message_types.VoidMessage      | None                                        |
+<br>
 
-##### reindex
+`reindex` Reindex the entities for a given model (Device or Shelf).
 
-Reindex the entities for a given model (Device or Shelf).
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>search_messages.SearchMessage</td>
+         <td>model: enum, the model to clear the index of (Device or Shelf).</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                      | Attributes
-| :---------------------------- | :---------
-| search_messages.SearchMessage | model: enum, the model to reindex (Device or
-|                               | Shelf).
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-| Returns                        | Attributes                                  |
-| :----------------------------- | :------------------------------------------ |
-| message_types.VoidMessage      | None                                        |
+<br>
 
 ### Shelf_api
 
@@ -631,176 +1134,325 @@ The entry point for the Shelf methods.
 
 #### Methods
 
-##### audit
+`audit` Performs an audit on a shelf based on location.
 
-Performs an audit on a shelf based on location.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ShelfAuditRequest ProtoRPC message.</td>
+         <td>shelf_request: ShelfRequest, A message containing the unique identifiers to be used when retrieving a shelf.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>device_identifiers: list, A list of device serial numbers to perform a device audit on.</td>
+   </tbody>
+</table>
 
-| Requests                            | Attributes                             |
-| :---------------------------------- | :------------------------------------- |
-| ShelfAuditRequest ProtoRPC message. | shelf_request: ShelfRequest, A message |
-|                                     | containing the unique identifiers to   |
-|                                     | be used when retrieving a shelf.       |
-|                                     | device_identifiers: list, A list of    |
-|                                     | device serial numbers to perform a     |
-|                                     | device audit on.                       |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
-##### disable
+`disable` Disable a shelf by its location.
 
-Disable a shelf by its location.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ShelfRequest</td>
+         <td>location: str, The location of the shelf.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>urlsafe_key: str, The urlsafe representation of a ndb.Key.</td>
+   </tbody>
+</table>
 
-| Requests                     | Attributes                                    |
-| :--------------------------- | :----------------------------------------     |
-| ShelfRequest                 | location: str, The location of the shelf.     |
-|                              | urlsafe_key: str, The urlsafe representation  |
-|                              | of a ndb.Key.                                 |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
-##### enroll
+`enroll` Enroll request for the Shelf API.
 
-Enroll request for the Shelf API.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>EnrollShelfRequest ProtoRPC message.</td>
+         <td>friendly_name: str, The friendly name of the shelf.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>location: str, The location of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>latitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>latitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>longitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>altitude: float, Indicates the floor.</td>
+      <tr>
+         <td></td>
+         <td>capacity: int, The amount of devices a shelf can hold.</td>
+      <tr>
+         <td></td>
+         <td>audit_notification_enabled: bool, Indicates if an audit is enabled for the shelf.</td>
+      <tr>
+         <td></td>
+         <td>responsible_for_audit: str, The party responsible for audits.</td>
+   </tbody>
+</table>
 
-| Requests                             | Attributes                            |
-| :----------------------------------- | :------------------------------------ |
-| EnrollShelfRequest ProtoRPC message. | friendly_name: str, The friendly name |
-|                                      | of the shelf.                         |
-|                                      | location: str, The location of the    |
-|                                      | shelf.                                |
-|                                      | latitude: float, A geographical point |
-|                                      | represented by floating-point.        |
-|                                      | longitude: float, A geographical      |
-|                                      | point represented by floating-point.  |
-|                                      | altitude: float, Indicates the floor. |
-|                                      | capacity: int, The amount of devices  |
-|                                      | a shelf can hold.                     |
-|                                      | audit_notification_enabled: bool,     |
-|                                      | Indicates if an audit is enabled for  |
-|                                      | the shelf.                            |
-|                                      | responsible_for_audit: str, The party |
-|                                      | responsible for audits.               |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
-##### get
+`get` Get a shelf based on location.
 
-Get a shelf based on location.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ShelfRequest</td>
+         <td>location: str, The location of the shelf.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>urlsafe_key: str, The urlsafe representation of a ndb.Key.</td>
+   </tbody>
+</table>
 
-| Requests                     | Attributes                                    |
-| :--------------------------- | :----------------------------------------     |
-| ShelfRequest                 | location: str, The location of the shelf.     |
-|                              | urlsafe_key: str, The urlsafe representation  |
-|                              | of a ndb.Key.                                 |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Shelf ProtoRPC message</td>
+         <td>enabled: bool, Indicates if the shelf is enabled or not.</td>
+      </tr>
+         <td></td>
+         <td>friendly_name: str, The friendly name of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>location: str, The location of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>latitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>longitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>altitude: float, Indicates the floor.</td>
+      <tr>
+         <td></td>
+         <td>capacity: int, The amount of devices a shelf can hold.</td>
+      <tr>
+         <td></td>
+         <td>audit_notification_enabled: bool, Indicates if an audit is enabled for the shelf.</td>
+      <tr>
+         <td></td>
+         <td>audit_requested: bool, Indicates if an audit has been requested.</td>
+      <tr>
+         <td></td>
+         <td>responsible_for_audit: str, The party responsible for audits.</td>
+      <tr>
+         <td></td>
+         <td>last_audit_time: datetime, Indicates the last audit time.</td>
+      <tr>
+         <td></td>
+         <td>last_audit_by: str, Indicates the last user to audit the shelf.</td>
+      <tr>
+         <td></td>
+         <td>page_token: str, A page token to query next page results.</td>
+      <tr>
+         <td></td>
+         <td>page_size: int, The number of results to query for and display.</td>
+      <tr>
+         <td></td>
+         <td>shelf_request: ShelfRequest, A message containing the unique identifiers to be used when retrieving a shelf.</td>
+   </tbody>
+</table>
 
-| Returns                 | Attributes                                         |
-| :---------------------- | :------------------------------------------------- |
-| Shelf ProtoRPC message. | enabled: bool, Indicates if the shelf is enabled   |
-|                         | or not.                                            |
-|                         | friendly_name: str, The friendly name of the       |
-|                         | shelf.                                             |
-|                         | location: str, The location of the shelf.          |
-|                         | latitude: float, A geographical point represented  |
-|                         | by floating-point.                                 |
-|                         | longitude: float, A geographical point represented |
-|                         | by floating-point.                                 |
-|                         | altitude: float, Indicates the floor.              |
-|                         | capacity: int, The amount of devices a shelf can   |
-|                         | hold.                                              |
-|                         | audit_notification_enabled: bool, Indicates if an  |
-|                         | audit is enabled for the shelf.                    |
-|                         | audit_requested: bool, Indicates if an audit has   |
-|                         | been requested.                                    |
-|                         | responsible_for_audit: str, The party responsible  |
-|                         | for audits.                                        |
-|                         | last_audit_time: datetime, Indicates the last      |
-|                         | audit time.                                        |
-|                         | last_audit_by: str, Indicates the last user to     |
-|                         | audit the shelf.                                   |
-|                         | page_token: str, A page token to query next page   |
-|                         | results.                                           |
-|                         | page_size: int, The number of results to query for |
-|                         | and display.                                       |
-|                         | shelf_request: ShelfRequest, A message containing  |
-|                         | the unique identifiers to be used when retrieving a|
-|                         | shelf.                                             |
+<br>
 
-##### list
+`list` List enabled or all shelves based on any shelf attribute.
 
-List enabled or all shelves based on any shelf attribute.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Shelf ProtoRPC message</td>
+         <td>enabled: bool, Indicates if the shelf is enabled or not.</td>
+      </tr>
+         <td></td>
+         <td>friendly_name: str, The friendly name of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>location: str, The location of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>latitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>longitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>altitude: float, Indicates the floor.</td>
+      <tr>
+         <td></td>
+         <td>capacity: int, The amount of devices a shelf can hold.</td>
+      <tr>
+         <td></td>
+         <td>audit_notification_enabled: bool, Indicates if an audit is enabled for the shelf.</td>
+      <tr>
+         <td></td>
+         <td>audit_requested: bool, Indicates if an audit has been requested.</td>
+      <tr>
+         <td></td>
+         <td>responsible_for_audit: str, The party responsible for audits.</td>
+      <tr>
+         <td></td>
+         <td>last_audit_time: datetime, Indicates the last audit time.</td>
+      <tr>
+         <td></td>
+         <td>last_audit_by: str, Indicates the last user to audit the shelf.</td>
+      <tr>
+         <td></td>
+         <td>page_token: str, A page token to query next page results.</td>
+      <tr>
+         <td></td>
+         <td>page_size: int, The number of results to query for and display.</td>
+      <tr>
+         <td></td>
+         <td>shelf_request: ShelfRequest, A message containing the unique identifiers to be used when retrieving a shelf.</td>
+      <tr>
+         <td></td>
+         <td>query: shared_message.SearchRequest, a message containing query options to conduct a search on an index.</td>
+   </tbody>
+</table>
 
-| Requests                | Attributes                                         |
-| :---------------------- | :------------------------------------------------- |
-| Shelf ProtoRPC message. | enabled: bool, Indicates if the shelf is enabled   |
-|                         | or not.                                            |
-|                         | friendly_name: str, The friendly name of the       |
-|                         | shelf.                                             |
-|                         | location: str, The location of the shelf.          |
-|                         | latitude: float, A geographical point represented  |
-|                         | by floating-point.                                 |
-|                         | longitude: float, A geographical point represented |
-|                         | by floating-point.                                 |
-|                         | altitude: float, Indicates the floor.              |
-|                         | capacity: int, The amount of devices a shelf can   |
-|                         | hold.                                              |
-|                         | audit_notification_enabled: bool, Indicates if an  |
-|                         | audit is enabled for the shelf.                    |
-|                         | audit_requested: bool, Indicates if an audit has   |
-|                         | been requested.                                    |
-|                         | responsible_for_audit: str, The party responsible  |
-|                         | for audits.                                        |
-|                         | last_audit_time: datetime, Indicates the last      |
-|                         | audit time.                                        |
-|                         | last_audit_by: str, Indicates the last user to     |
-|                         | audit the shelf.                                   |
-|                         | page_size: int, The number of results to query for |
-|                         | and display.                                       |
-|                         | page_token: str, A page token to query next page   |
-|                         | results.                                           |
-|                         | shelf_request: ShelfRequest, A message containing  |
-|                         | the unique identifier to be used to retrieve the   |
-|                         | shelf.                                             |
-|                         | query: shared_message.SearchRequest, a message     |
-|                         | containing query options to conduct a search on an |
-|                         | index.                                             |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>List Shelf Response ProtoRPC message.</td>
+         <td>shelves: Shelf, The list of shelves being returned.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>has_additional_results: bool, If there are more results to be displayed.</td>
+      <tr>
+         <td></td>
+         <td>page_token: str, A page token that will allow be used to query for additional results.</td>
+   </tbody>
+</table>
 
-| Returns                      | Attributes                                    |
-| :--------------------------- | :-------------------------------------------- |
-| List Shelf Response ProtoRPC | shelves: Shelf, The list of shelves being     |
-| message.                     | returned.                                     |
-|                              | has_additional_results: bool, If there are    |
-|                              | more results to be displayed.                 |
-|                              | page_token: str, A page token that will allow |
-|                              | be used to query for additional results.      |
+<br>
 
-##### update
+`update` Get a shelf using location to update its properties.
 
-Get a shelf using location to update its properties.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>UpdateShelfRequest ProtoRPC message.</td>
+         <td>shelf_request: ShelfRequest, A message containing the unique identifiers to be used when retrieving a shelf.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>friendly_name: str, The friendly name of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>location: str, The location of the shelf.</td>
+      <tr>
+         <td></td>
+         <td>latitude: float, A geographical point represented by floating-point.</td>
+      <tr>
+         <td></td>
+         <td>longitude: float, A geographical point represented by floating-point. </td>
+      <tr>
+         <td></td>
+         <td>altitude: float, Indicates the floor.</td>
 
-| Requests                             | Attributes                            |
-| :----------------------------------- | :------------------------------------ |
-| UpdateShelfRequest ProtoRPC message. | shelf_request: ShelfRequest, A message|
-|                                      | containing the unique identifiers to  |
-|                                      | be used when retrieving a shelf.      |
-|                                      | friendly_name: str, The friendly name |
-|                                      | of the shelf.                         |
-|                                      | location: str, The location of the    |
-|                                      | shelf.                                |
-|                                      | latitude: float, A geographical point |
-|                                      | represented by floating-point.        |
-|                                      | longitude: float, A geographical      |
-|                                      | point represented by floating-point.  |
-|                                      | altitude: float, Indicates the floor. |
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
+
+<br>
 
 ### Survey_api
 
@@ -808,126 +1460,225 @@ The entry point for the Survey methods.
 
 #### Methods
 
-##### create
+`create` Create a new survey and insert instance into datastore.
 
-Create a new survey and insert instance into datastore.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Survey ProtoRPC Message to encapsulate the survey_model.Survey.</td>
+         <td>survey_type: survey_model.SurveyType, The type of survey this is.</td>
+      <tr>
+         <td></td>
+         <td>question: str, The text displayed as the question for this survey.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>enabled: bool, Whether or not this survey should be enabled.</td>
+      <tr>
+         <td></td>
+         <td>rand_weight: int, The weight to be applied to this survey when using the get method survey with random.</td>
+      <tr>
+         <td></td>
+         <td>answers: List of Answer, The list of answers possible for this survey.</td>
+      <tr>
+         <td></td>
+         <td>survey_urlsafe_key: str, The ndb.Key.urlsafe() for the survey.</td>
+   </tbody>
+</table>
 
-| Requests                             | Attributes                            |
-| :----------------------------------- | :------------------------------------ |
-| Survey ProtoRPC Message to           | survey_type: survey_model.SurveyType, |
-| encapsulate the survey_model.Survey. | The type of survey this is.           |
-|                                      | question: str, The text displayed as  |
-|                                      | the question for this survey.         |
-|                                      | enabled: bool, Whether or not this    |
-|                                      | survey should be enabled.             |
-|                                      | rand_weight: int, The weight to be    |
-|                                      | applied to this survey when using the |
-|                                      | get method survey with random.        |
-|                                      | answers: List of Answer, The list of  |
-|                                      | answers possible for this survey.     |
-|                                      | survey_urlsafe_key: str, The          |
-|                                      | ndb.Key.urlsafe() for the survey.     |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<br>
 
-##### list
+`list` List surveys.
 
-List surveys.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ListSurveyRequest ProtoRPC Message.</td>
+         <td>survey_type: survey_model.SurveyType, The type of survey to list.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>enabled: bool, True for only enabled surveys, False to view disabled surveys.</td>
+     <tr>
+        <td></td>
+        <td>page_size: int, The size of the page to return.</td>
+     <tr>
+        <td></td>
+        <td>page_token: str, The urlsafe representation of the page token. </td>
+   </tbody>
+</table>
 
-| Requests                            | Attributes                            |
-| :---------------------------------- | :------------------------------------ |
-| ListSurveyRequest ProtoRPC Message. | survey_type: survey_model.SurveyType, |
-|                                     | The type of survey to list.           |
-|                                     | enabled: bool, True for only          |
-|                                     | enabled surveys, False to view        |
-|                                     | disabled surveys.                     |
-|                                     | page_size: int, The size of the       |
-|                                     | page to return.                       |
-|                                     | page_token: str, The urlsafe          |
-|                                     | representation of the page token.     |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>SurveyList ProtoRPC Message.</td>
+         <td>surveys: List of Survey, The list of surveys to return.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>page_token: str, The urlsafe representation of the page token.</td>
+      <tr>
+         <td></td>
+         <td>more: bool, Whether or not there are more results to be queried.</td>
+   </tbody>
+</table>
 
-| Returns                      | Attributes                                   |
-| :--------------------------- | :------------------------------------------- |
-| SurveyList ProtoRPC Message. | surveys: List of Survey, The list of surveys |
-|                              | to return.                                   |
-|                              | page_token: str, The urlsafe                 |
-|                              | representation of the page token.            |
-|                              | more: bool, Whether or not there are more    |
-|                              | results to be queried.                       |
+<br>
 
-##### patch
+`patch` Patch a given survey.
 
-Patch a given survey.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>PatchSurveyRequest ProtoRPC Message.</td>
+         <td>survey_urlsafe_key: str, The ndb.Key.urlsafe() for the survey.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>answers: List of Answer, The list of answers possible for this survey.</td>
+      <tr>
+         <td></td>
+         <td>answer_keys_to_remove: List of str, The list of answer_urlsafe_key to remove from this survey.</td>
+      <tr>
+         <td></td>
+         <td>survey_type: survey_model.SurveyType, The type of survey this is. </td>
+      <tr>
+         <td></td>
+         <td>question: str, The text displayed as the question for this survey.</td>
+      <tr>
+         <td></td>
+         <td>enabled: bool, Whether or not this survey should be enabled.</td>
+      <tr>
+         <td></td>
+         <td>rand_weight: int, The weight to be applied to this survey when using the get method survey with random.</td>
 
-| Requests                             | Attributes                            |
-| :----------------------------------- | :------------------------------------ |
-| PatchSurveyRequest ProtoRPC Message. | survey_urlsafe_key: str, The          |
-|                                      | ndb.Key.urlsafe() for the survey.     |
-|                                      | answers: List of Answer, The list of  |
-|                                      | answers possible for this survey.     |
-|                                      | answer_keys_to_remove: List of str,   |
-|                                      | The list of answer_urlsafe_key to     |
-|                                      | remove from this survey.              |
-|                                      | survey_type: survey_model.SurveyType, |
-|                                      | The type of survey this is.           |
-|                                      | question: str, The text displayed as  |
-|                                      | the question for this survey.         |
-|                                      | enabled: bool, Whether or not this    |
-|                                      | survey should be enabled.             |
-|                                      | rand_weight: int, The weight to be    |
-|                                      | applied to this survey when using the |
-|                                      | get method survey with random.        |
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-##### request
+<br>
 
-Request a survey by type and present that survey to a Chrome App user.
+`request`Request a survey by type and present that survey to a Chrome App user.
 
-| Requests                        | Attributes                                |
-| :------------------------------ | :---------------------------------------- |
-| SurveyRequest ProtoRPC Message. | survey_type: survey_model.SurveyType, The |
-|                                 | type of survey being requested.           |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>ListSurveyRequest ProtoRPC Message.</td>
+         <td>survey_type: survey_model.SurveyType, The type of survey to list.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Returns                              | Attributes                            |
-| :----------------------------------- | :------------------------------------ |
-| Survey ProtoRPC Message to           | survey_type: survey_model.SurveyType, |
-| encapsulate the survey_model.Survey. | The type of survey this is.           |
-|                                      | question: str, The text displayed as  |
-|                                      | the question for this survey.         |
-|                                      | enabled: bool, Whether or not this    |
-|                                      | survey should be enabled.             |
-|                                      | rand_weight: int, The weight to be    |
-|                                      | applied to this survey when using the |
-|                                      | get method survey with random.        |
-|                                      | answers: List of Answer, The list of  |
-|                                      | answers possible for this survey.     |
-|                                      | survey_urlsafe_key: str, The          |
-|                                      | ndb.Key.urlsafe() for the survey.     |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>Survey ProtoRPC Message to encapsulate the survey_model.Survey</td>
+         <td>survey_type: survey_model.SurveyType, The type of survey this is.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>question: str, The text displayed as the question for this survey.</td>
+      <tr>
+         <td></td>
+         <td>enabled: bool, Whether or not this survey should be enabled.</td>
+      <tr>
+         <td></td>
+         <td>rand_weight: int, The weight to be applied to this survey when using the get method survey with random.</td>
+      <tr>
+         <td></td>
+         <td>answers: List of Answer, The list of answers possible for this survey.</td>
+      <tr>
+         <td></td>
+         <td>survey_urlsafe_key: str, The ndb.Key.urlsafe() for the survey. </td>
+   </tbody>
+</table>
 
-##### submit
+<br>
 
-Submit a response to a survey acquired via a request.
+`submit` Submit a response to a survey acquired via a request.
 
-| Requests                           | Attributes                              |
-| :--------------------------------- | :-------------------------------------- |
-| SurveySubmission ProtoRPC Message. | survey_urlsafe_key: str, The urlsafe    |
-|                                    | ndb.Key for a survey_model.Survey       |
-|                                    | instance.                               |
-|                                    | answer_urlsafe_key: str, The urlsafe    |
-|                                    | ndb.Key for a survey_model.Answer       |
-|                                    | instance.                               |
-|                                    | more_info: str, the extra info          |
-|                                    | optionally provided for the given       |
-|                                    | Survey and Answer.                      |
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>SurveySubmission ProtoRPC Message.</td>
+         <td>survey_urlsafe_key: str, The urlsafe ndb.Key for a survey_model.Survey instance.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>answer_urlsafe_key: str, The urlsafe ndb.Key for a survey_model.Answer instance.</td>
+      <tr>
+         <td></td>
+         <td>more_info: str, the extra info optionally provided for the given Survey and Answer.</td>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
+
+<br>
 
 ### Tag_api
 
@@ -935,91 +1686,178 @@ API endpoint that handles requests related to tags.
 
 #### Methods
 
-##### create
+`create` Create a new tag.
 
-Create a new tag.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.CreateTagRequest</td>
+         <td>tag: tag_messages.Tag, the attributes of a Tag.</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                      | Attributes
-| :---------------------------- | :---------
-| tag_messages.CreateTagRequest | tag: tag_messages.Tag, the attributes of a Tag.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+`destroy` Destroy a tag.
 
-##### destroy
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.TagRequest</td>
+         <td>urlsafe_key: str, the urlsafe representation of the ndb.Key for the tag being requested.</td>
+      </tr>
+   </tbody>
+</table>
 
-Destroy a tag.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                       | Attributes
-| :----------------------------- | :---------
-| tag_messages.TagRequest        | urlsafe_key: str, the urlsafe representation
-|                                | of the ndb.Key for the tag being requested.
+`get` Get a tag.
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.TagRequest</td>
+         <td>urlsafe_key: str, the urlsafe representation of the ndb.Key for the tag being requested.</td>
+      </tr>
+   </tbody>
+</table>
 
-##### get
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.Tag</td>
+         <td>name: str, the unique name of the tag.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>hidden: bool, whether the tag is hidden in the frontend, defaults to False.</td>
+      <tr>
+         <td></td>
+         <td>color: str, the color of the tag, one of the material design palette.</td>
+      <tr>
+         <td></td>
+         <td>protect: bool, whether the tag is protected from user manipulation; this field will only be included in response messages.</td>
+      <tr>
+         <td></td>
+         <td>description: str, the description for the tag.</td>
+   </tbody>
+</table>
 
-Get a tag.
+<br>
 
-| Requests                       | Attributes
-| :----------------------------- | :---------
-| tag_messages.TagRequest        | urlsafe_key: str, the urlsafe representation
-|                                | of the ndb.Key for the tag being requested.
+`update` Updates a tag.
 
-Returns           | Attributes
-:---------------- | :---------
-tag_messages.Tag  | name: str, the unique name of the tag.
-                  | hidden: bool, whether the tag is hidden in the frontend,
-                  | defaults to False.
-                  | color: str, the color of the tag, one of the material
-                  | design palette.
-                  | protect: bool, whether the tag is protected from user
-                  | manipulation; this field will only be included in response
-                  | messages.
-                  | description: str, the description for the tag.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.UpdateTagRequest</td>
+         <td>tag: tag_messages.Tag, the attributes of a Tag.</td>
+      </tr>
+   </tbody>
+</table>
 
-##### update
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-Updates a tag.
+<br>
 
-Requests                      | Attributes
-:---------------------------- | :----------------------------------------------
-tag_messages.UpdateTagRequest | tag: tag_messages.Tag, the attributes of a Tag.
+`list` Lists tags.
 
-Returns                   | Attributes
-:------------------------ | :---------
-message_types.VoidMessage | None
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Requests</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.ListTagRequest</td>
+         <td>page_size: int, the number of results to return.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>cursor: str, the base64-encoded cursor string specifying where to start the query.</td>
+      <tr>
+         <td></td>
+         <td>page_index: int, the page index to offset the results from.</td>
+      <tr>
+         <td></td>
+         <td>include_hidden_tags: bool, whether to include hidden tags in the results, defaults to False.</td>
+   </tbody>
+</table>
 
-##### list
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>tag_messages.ListTagResponse</td>
+         <td>tags: tag_messages.Tag (repeated), the list of tags being returned.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>cursor: str, the base64-encoded denoting the position of the last result retrieved. additional results to be retrieved.</td>
+      <tr>
+         <td></td>
+         <td>
+   </tbody>
+</table>
 
-Lists tags.
-
-| Requests                       | Attributes
-| :----------------------------- | :---------
-| tag_messages.ListTagRequest    | page_size: int, the number of results to
-|                                | return.
-|                                | cursor: str, the base64-encoded cursor string
-|                                | specifying where to start the query.
-|                                | page_index: int, the page index to offset the
-|                                | results from.
-|                                | include_hidden_tags: bool, whether to include
-|                                | hidden tags in the results, defaults to
-|                                | False.
-
-
-Returns                       | Attributes
-:---------------------------- | :---------
-tag_messages.ListTagResponse  | tags: tag_messages.Tag (repeated), the list of tags
-                              | being returned.
-                              | cursor: str, the base64-encoded denoting the
-                              | position of the last result retrieved.
-                              | has_additional_results : bool, whether there are
-                              | additional results to be retrieved.
-
-
+<br>
 
 ### User_api
 
@@ -1027,19 +1865,39 @@ API endpoint that handles requests related to users.
 
 #### Methods
 
-##### get
+`get` Get a user object using the logged in user's credential.
 
-Get a user object using the logged in user's credential.
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>message_types.VoidMessage</td>
+         <td>None</td>
+      </tr>
+   </tbody>
+</table>
 
-| Requests                  | Attributes
-| :------------------------ | :---------
-| message_types.VoidMessage | None
-
-| Returns                        | Attributes                                  |
-| :----------------------------- | :------------------------------------------ |
-| UserResponse response for      | email: str, The user email to be displayed. |
-| ProtoRPC message.              | roles: list of str, The roles of the user to|
-|                                | be displayed.                               |
-|                                | permissions: list of str, The permissions   |
-|                                | the user has.                               |
-|                                | superadmin: bool, if the user is superadmin.|
+<table>
+   <tbody>
+      <tr>
+         <th align="center">Returns</th>
+         <th align="center">Attributes</th>
+      </tr>
+      <tr>
+         <td>UserResponse response for ProtoRPC message.</td>
+         <td>email: str, The user email to be displayed.</td>
+      </tr>
+      <tr>
+         <td></td>
+         <td>roles: list of str, The roles of the user to be displayed.</td>
+      <tr>
+         <td></td>
+         <td>permissions: list of str, The permissions the user has.</td>
+      <tr>
+         <td></td>
+         <td>superadmin: bool, if the user is superadmin.</td>
+   </tbody>
+</table>

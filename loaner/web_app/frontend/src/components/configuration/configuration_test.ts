@@ -148,7 +148,7 @@ describe('ConfigurationComponent', () => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
        const configService: ConfigService = TestBed.get(ConfigService);
-       spyOn(configService, 'updateAll').and.returnValue(of());
+       spyOn(configService, 'updateAll').and.returnValue(null);
        const supportContactInput =
            compiled.querySelector('input[name="support_contact_string"]');
        expect(supportContactInput).toBeDefined();

@@ -41,3 +41,4 @@ declare interface LoanerStorage {
   enrolled?: boolean;
   onboardingComplete?: boolean;
 }
+

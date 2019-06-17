@@ -26,6 +26,9 @@ import endpoints
 
 from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.api.messages import tag_messages
+from loaner.web_app.backend.api.messages import user_messages
+from loaner.web_app.backend.models import tag_model
 
 _CORRUPT_KEY_MSG = 'The key provided for submission was not found.'
 _MALFORMED_PAGE_TOKEN_MSG = 'The page token provided is incorrect.'
@@ -75,6 +78,17 @@ def build_device_message_from_model(device, guest_permitted):
     message.max_extend_date = device.return_dates.max
   if device.shelf:
     message.shelf = build_shelf_message_from_model(device.shelf.get())
+  for tag_data in device.tags:
+    tag_data_message = tag_messages.TagData()
+    urlsafe_key = tag_model.Tag.get(tag_data.tag.name).key.urlsafe()
+    tag_data_message.tag = tag_messages.Tag(
+        name=tag_data.tag.name, hidden=tag_data.tag.hidden,
+        color=tag_data.tag.color, protect=tag_data.tag.protect,
+        description=tag_data.tag.description,
+        urlsafe_key=urlsafe_key)
+    tag_data_message.more_info = tag_data.more_info
+    message.tags.append(tag_data_message)
+
   return message
 
 
@@ -91,6 +105,21 @@ def build_reminder_message_from_model(reminder):
       level=reminder.level,
       time=reminder.time,
       count=reminder.count)
+
+
+def build_role_message_from_model(role):
+  """Builds a role ProtoRPC message.
+
+  Args:
+    role: user_model.Role, the role for a user.
+
+  Returns:
+    A role_messages.Role message with the respective properties.
+  """
+  return user_messages.Role(
+      name=role.name,
+      permissions=role.permissions,
+      associated_group=role.associated_group)
 
 
 def build_shelf_message_from_model(shelf):

@@ -81,6 +81,22 @@ class RoleModelTest(loanertest.TestCase):
     self.assertRaises(
         user_model.UpdateRoleError, retrieved_role.update, name='test')
 
+  def test_list_all_roles(self):
+    user_model.Role.create(self.role_name, self.permissions,
+                           self.associated_group)
+
+    retrieved_role = user_model.Role.list_all_roles()
+
+    self.assertEqual(len(retrieved_role), 1)
+
+  def test_destroy(self):
+    created_role = user_model.Role.create(self.role_name, self.permissions,
+                                          self.associated_group)
+
+    created_role.destroy()
+
+    self.assertIsNone(user_model.Role.get_by_name(self.role_name))
+
 
 class UserModelTest(loanertest.TestCase):
 

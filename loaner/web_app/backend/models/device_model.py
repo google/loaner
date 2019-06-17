@@ -30,7 +30,6 @@ from google.appengine.ext import ndb
 from loaner.web_app import constants
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.clients import directory
-from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import events
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import base_model
@@ -891,19 +890,19 @@ class Device(base_model.BaseModel):
             user_email, 'Removing device: %s from shelf: %s' % (
                 self.identifier, shelf.location))
 
-  def associate_tag(self, user_email, tag_urlsafekey, more_info=None):
+  def associate_tag(self, user_email, tag_name, more_info=None):
     """Associates a tag with a device.
 
     Args:
       user_email: str, the email of the user taking the action.
-      tag_urlsafekey: str, the urlsafe representation of the ndb.Key for a tag.
+      tag_name: str, the name of the tag to be associated.
       more_info: str, an informational field about a particular tag reference.
     """
     tag_data = tag_model.TagData(
-        tag=api_utils.get_ndb_key(tag_urlsafekey).get(), more_info=more_info)
+        tag=tag_model.Tag.get(tag_name), more_info=more_info)
     if tag_data not in self.tags:
       for device_tag in self.tags:
-        if tag_urlsafekey == device_tag.tag.key.urlsafe():
+        if tag_name == device_tag.tag.name:
           # Updates more_info field of an existing associated tag.
           device_tag.more_info = more_info
           self.put()
@@ -918,13 +917,12 @@ class Device(base_model.BaseModel):
           user_email, 'Associated tag %s with device %s' %
           (tag_data.tag.name, self.identifier))
 
-  def disassociate_tag(self, user_email, tag_urlsafekey):
+  def disassociate_tag(self, user_email, tag_name):
     """Disassociates a tag from a device.
 
     Args:
       user_email: str, the email of the user taking the action.
-      tag_urlsafekey: str, the urlsafe key of the tag to be disassociated from
-        the device.
+      tag_name: str, the name of the tag to be disassociated.
 
     Raises:
       ValueError: If the tag requested to be disassociated from the device is
@@ -932,7 +930,7 @@ class Device(base_model.BaseModel):
     """
 
     for tag_reference in self.tags:
-      if tag_reference.tag.key.urlsafe() == tag_urlsafekey:
+      if tag_reference.tag.name == tag_name:
         self.tags.remove(tag_reference)
         self.put()
         self.stream_to_bq(
@@ -940,8 +938,8 @@ class Device(base_model.BaseModel):
             (tag_reference.tag.name, self.identifier))
         return
     logging.warn(
-        'Tag with urlsafe key %s is not associated with device %s',
-        tag_urlsafekey, self.identifier)
+        'Tag with name %s is not associated with device %s',
+        tag_name, self.identifier)
 
 
 def _update_existing_device(device, user_email, asset_tag=None):

@@ -240,6 +240,7 @@ loaner_appengine_library(
         ":permissions",
         ":root_api",
         "//loaner/web_app/backend/api/messages:user_messages",
+        "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:user_model",
     ],
@@ -443,6 +444,7 @@ loaner_appengine_test(
     deps = [
         ":user_api",
         "//loaner/web_app/backend/api/messages:user_messages",
+        "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/models:config_model",
         "//loaner/web_app/backend/models:user_model",
         "//loaner/web_app/backend/testing:loanertest",

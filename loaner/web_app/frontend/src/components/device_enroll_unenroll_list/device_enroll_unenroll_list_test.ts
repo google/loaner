@@ -90,7 +90,7 @@ describe('DeviceEnrollUnenrollList', () => {
   it('renders enrolled device', () => {
     deviceEnrollUnenrollList.currentAction = 'enroll';
     const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'enroll').and.returnValue(of(['success']));
+    spyOn(deviceService, 'enroll').and.returnValue(of(null));
     deviceEnrollUnenrollList.deviceAction(DEVICE_1);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -107,8 +107,8 @@ describe('DeviceEnrollUnenrollList', () => {
   it('renders unenrolled device', () => {
     deviceEnrollUnenrollList.currentAction = 'unenroll';
     const deviceService: DeviceService = TestBed.get(DeviceService);
-    spyOn(deviceService, 'enroll').and.returnValue(of(['success']));
-    spyOn(deviceService, 'unenroll').and.returnValue(of(['success']));
+    spyOn(deviceService, 'enroll').and.returnValue(of(null));
+    spyOn(deviceService, 'unenroll').and.returnValue(of(null));
     deviceEnrollUnenrollList.deviceAction(DEVICE_2);
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;

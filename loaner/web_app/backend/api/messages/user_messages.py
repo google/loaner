@@ -57,3 +57,21 @@ class GetRoleRequest(messages.Message):
     name: str, The role's name.
   """
   name = messages.StringField(1, required=True)
+
+
+class ListRoleResponse(messages.Message):
+  """Returns all roles.
+
+  Attributes:
+    roles: a list of Roles.
+  """
+  roles = messages.MessageField(Role, 1, repeated=True)
+
+
+class DeleteRoleRequest(messages.Message):
+  """Deletes a role by name.
+
+  Attributes:
+    name: str, The role's name.
+  """
+  name = messages.StringField(1, required=True)

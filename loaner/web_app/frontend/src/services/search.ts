@@ -15,7 +15,7 @@
 import {HttpClient} from '@angular/common/http';
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-
+import {tap} from 'rxjs/operators';
 import {SearchIndexType} from '../models/config';
 
 import {ApiService} from './api';
@@ -59,9 +59,9 @@ export class SearchService extends ApiService {
    */
   reindex(searchType: SearchIndexType) {
     const request = this.getRequestType(searchType);
-    return this.get('reindex', request).subscribe(() => {
+    return this.get('reindex', request).pipe(tap(() => {
       this.snackBar.open(`Reindexing ${searchType} search.`);
-    });
+    }));
   }
 
   /**
@@ -70,8 +70,8 @@ export class SearchService extends ApiService {
    */
   clearIndex(searchType: SearchIndexType) {
     const request = this.getRequestType(searchType);
-    return this.get('clear', request).subscribe(() => {
+    return this.get('clear', request).pipe(tap(() => {
       this.snackBar.open(`Clearing index for ${searchType} search.`);
-    });
+    }));
   }
 }

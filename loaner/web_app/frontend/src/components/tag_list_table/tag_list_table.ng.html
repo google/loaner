@@ -1,0 +1,38 @@
+<mat-card>
+  <mat-card-title>
+    Tags
+  </mat-card-title>
+  <mat-card-subtitle>
+    <span>Create and edit tags</span>
+    <span class="card-spacer"></span>
+    <button class="card-button" mat-stroked-button type="button">
+      <mat-icon>add</mat-icon>
+      New Tag
+    </button>
+  </mat-card-subtitle>
+  <div class="table-container">
+    <mat-table>
+      <!-- Protected Column -->
+      <ng-container cdkColumnDef="protected" sticky>
+        <mat-header-cell *cdkHeaderCellDef>Status</mat-header-cell>
+      </ng-container>
+      <!-- Name Column -->
+      <ng-container cdkColumnDef="name" sticky>
+        <mat-header-cell *cdkHeaderCellDef>Name</mat-header-cell>
+      </ng-container>
+      <!-- Description Column -->
+      <ng-container cdkColumnDef="description">
+        <mat-header-cell *cdkHeaderCellDef>Description</mat-header-cell>
+      </ng-container>
+      <!-- Color Column -->
+      <ng-container cdkColumnDef="color">
+        <mat-header-cell *cdkHeaderCellDef>Color</mat-header-cell>
+      </ng-container>
+      <!-- Edit Column -->
+      <ng-container cdkColumnDef="edit" stickyEnd>
+        <mat-header-cell *cdkHeaderCellDef>Actions</mat-header-cell>
+      </ng-container>
+      <mat-header-row *cdkHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
+    </mat-table>
+  </div>
+</mat-card>

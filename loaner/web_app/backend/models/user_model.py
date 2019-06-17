@@ -100,12 +100,25 @@ class Role(ndb.Model):
     """
     return ndb.Key(cls, name).get()
 
+  @classmethod
+  def list_all_roles(cls):
+    """Returns all roles in datastore.
+
+    Returns:
+      List of Roles.
+    """
+    return cls.query().fetch()
+
   def update(self, **kwargs):
     """Updates a role's permissions or associated group."""
     if kwargs.get('name'):
       raise UpdateRoleError(_UPDATE_ROLE_NAME_ERROR)
     self.populate(**kwargs)
     self.put()
+
+  def destroy(self):
+    """Destroys a role."""
+    self.key.delete()
 
 
 class User(ndb.Model):

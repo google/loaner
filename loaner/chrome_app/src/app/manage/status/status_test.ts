@@ -106,11 +106,24 @@ describe('StatusComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.setLoanInfo();
     fixture.detectChanges();
-    expect(app.device.dueDate).toEqual(testDeviceInfo.due_date);
-    expect(app.device.maxExtendDate).toEqual(testDeviceInfo.max_extend_date);
-    expect(app.device.givenName).toEqual(testDeviceInfo.given_name);
-    expect(app.device.guestAllowed).toEqual(testDeviceInfo.guest_permitted);
-    expect(app.device.guestEnabled).toEqual(testDeviceInfo.guest_enabled);
+    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
+    expect(app.device.dueDate)
+        .toEqual((testDeviceInfo.due_date) as AnyDuringJasmineTypesMigration);
+    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
+    expect(app.device.maxExtendDate)
+        .toEqual(
+            (testDeviceInfo.max_extend_date) as AnyDuringJasmineTypesMigration);
+    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
+    expect(app.device.givenName)
+        .toEqual((testDeviceInfo.given_name) as AnyDuringJasmineTypesMigration);
+    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
+    expect(app.device.guestAllowed)
+        .toEqual(
+            (testDeviceInfo.guest_permitted) as AnyDuringJasmineTypesMigration);
+    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
+    expect(app.device.guestEnabled)
+        .toEqual(
+            (testDeviceInfo.guest_enabled) as AnyDuringJasmineTypesMigration);
   });
 
   it('renders content on the page', () => {

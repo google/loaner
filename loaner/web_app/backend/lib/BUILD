@@ -48,6 +48,9 @@ loaner_appengine_library(
     deps = [
         "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/api/messages:tag_messages",
+        "//loaner/web_app/backend/api/messages:user_messages",
+        "//loaner/web_app/backend/models:tag_model",
         "@endpoints_archive//:endpoints",
     ],
 )
@@ -198,8 +201,12 @@ loaner_appengine_test(
         "//loaner/web_app:constants",
         "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/api/messages:tag_messages",
+        "//loaner/web_app/backend/api/messages:user_messages",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
+        "//loaner/web_app/backend/models:tag_model",
+        "//loaner/web_app/backend/models:user_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:parameterized",
         "@endpoints_archive//:endpoints",

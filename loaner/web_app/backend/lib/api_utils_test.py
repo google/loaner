@@ -29,9 +29,13 @@ import endpoints
 from loaner.web_app import constants
 from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.api.messages import tag_messages
+from loaner.web_app.backend.api.messages import user_messages
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import shelf_model
+from loaner.web_app.backend.models import tag_model
+from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
 
 
@@ -39,6 +43,11 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
 
   def setUp(self):
     super(ApiUtilsTest, self).setUp()
+    self.test_tag = tag_model.Tag(
+        name='test',
+        hidden=False,
+        protect=False,
+        color='red').put().get()
     self.test_shelf_model = shelf_model.Shelf(
         enabled=True,
         friendly_name='test_friendly_name',
@@ -94,6 +103,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         last_reminder=device_model.Reminder(level=1),
         next_reminder=device_model.Reminder(level=2),
     ).put().get()
+    test_device.associate_tag('test', self.test_tag.name)
     expected_message = device_messages.Device(
         serial_number='test_serial_value',
         asset_tag='test_asset_tag_value',
@@ -121,6 +131,15 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         max_extend_date=test_device.return_dates.max,
         overdue=True,
     )
+    expected_tag = tag_messages.Tag(
+        name=self.test_tag.name,
+        hidden=self.test_tag.hidden,
+        protect=self.test_tag.protect,
+        color=self.test_tag.color,
+        urlsafe_key=self.test_tag.key.urlsafe())
+    expected_tag_data = tag_messages.TagData(tag=expected_tag)
+    expected_message.tags.append(expected_tag_data)
+
     actual_message = api_utils.build_device_message_from_model(
         test_device, True)
     self.assertEqual(actual_message, expected_message)
@@ -146,6 +165,22 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
     actual_message = api_utils.build_shelf_message_from_model(
         self.test_shelf_model)
     self.assertEqual(actual_message, self.expected_shelf_message)
+
+  def test_build_role_message_from_model(self):
+    """Test the construction of a role message from a role entity."""
+    test_role = user_model.Role(
+        key=ndb.Key(user_model.Role, 'test_role'),
+        permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL).put().get()
+
+    expected_message = user_messages.Role(
+        name='test_role',
+        permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    actual_message = api_utils.build_role_message_from_model(test_role)
+
+    self.assertEqual(actual_message, expected_message)
 
   @parameterized.named_parameters(
       {'testcase_name': 'with_lat_long', 'message': shelf_messages.Shelf(

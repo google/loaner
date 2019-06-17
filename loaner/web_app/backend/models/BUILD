@@ -137,7 +137,6 @@ loaner_appengine_library(
     ],
     deps = [
         ":base_model",
-        "//loaner/web_app/backend/lib:api_utils",
     ],
 )
 
@@ -236,7 +235,6 @@ loaner_appengine_test(
         "//loaner/web_app/backend/lib:events",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:parameterized",
-        "@endpoints_archive//:endpoints",
         "@freezegun_archive//:freezegun",
         "@mock_archive//:mock",
     ],
@@ -295,7 +293,6 @@ loaner_appengine_test(
         ":tag_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:parameterized",
-        "@endpoints_archive//:endpoints",
         "@mock_archive//:mock",
     ],
 )

@@ -97,7 +97,9 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    expect(app.device.dueDate).toEqual(testDeviceInfo.due_date);
+    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
+    expect(app.device.dueDate)
+        .toEqual((testDeviceInfo.due_date) as AnyDuringJasmineTypesMigration);
   });
 
   it('fails to retrieve the loan information and provides a helpful card',

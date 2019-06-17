@@ -410,7 +410,7 @@ export class DeviceServiceMock {
   }
 
   markAsDamaged(id: string) {
-    return;
+    return of();
   }
 
   markAsLost(id: string) {
@@ -418,15 +418,15 @@ export class DeviceServiceMock {
   }
 
   enableGuestMode(id: string) {
-    return of(true);
+    return of();
   }
 
   enroll(newDevice: Device) {
-    return;
+    return of();
   }
 
   unenroll(deviceToBeUnenrolled: Device) {
-    return of(true);
+    return of();
   }
 }
 

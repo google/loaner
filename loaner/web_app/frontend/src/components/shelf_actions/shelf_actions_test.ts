@@ -208,7 +208,7 @@ describe('ShelfActionsComponent', () => {
   it('calls shelf api update and get new value when updating a shelf.', () => {
     const shelfService: ShelfService = TestBed.get(ShelfService);
     spyOn(shelfService, 'update').and.returnValue(of([TEST_SHELF]));
-    spyOn(shelfService, 'getShelf').and.returnValue(of([TEST_SHELF]));
+    spyOn(shelfService, 'getShelf').and.returnValue(of(TEST_SHELF));
 
     componentInstance.shelf = TEST_SHELF;
     componentInstance.editing = true;

@@ -24,6 +24,7 @@ from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import user_messages
+from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import user_model
 
@@ -98,4 +99,35 @@ class RoleApi(root_api.Service):
     role.update(
         permissions=request.permissions,
         associated_group=request.associated_group)
+    return message_types.VoidMessage()
+
+  @auth.method(
+      message_types.VoidMessage,
+      user_messages.ListRoleResponse,
+      name='list',
+      path='list',
+      http_method='POST',
+      permission=permissions.Permissions.READ_ROLES)
+  def list(self, request):
+    """List roles in datastore."""
+    self.check_xsrf_token(self.request_state)
+    response = user_messages.ListRoleResponse()
+    all_roles = user_model.Role.list_all_roles()
+    response.roles = [
+        api_utils.build_role_message_from_model(role) for role in all_roles
+    ]
+    return response
+
+  @auth.method(
+      user_messages.DeleteRoleRequest,
+      message_types.VoidMessage,
+      name='delete',
+      path='delete',
+      http_method='POST',
+      permission=permissions.Permissions.MODIFY_ROLE)
+  def delete(self, request):
+    """Delete a role from the datastore."""
+    self.check_xsrf_token(self.request_state)
+    role = user_model.Role.get_by_name(request.name)
+    role.destroy()
     return message_types.VoidMessage()

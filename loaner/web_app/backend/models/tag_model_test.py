@@ -27,8 +27,6 @@ from google.appengine.datastore import datastore_query
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
-import endpoints
-
 from loaner.web_app.backend.models import base_model
 from loaner.web_app.backend.models import tag_model
 from loaner.web_app.backend.testing import loanertest
@@ -95,8 +93,7 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
         color='red',
         description='Description for new tag.')
     self.assertEqual(
-        tag_entity, tag_model.Tag.get(
-            urlsafe_key=tag_entity.key.urlsafe()))
+        tag_entity, tag_model.Tag.get('NewlyCreatedTag'))
     self.assertEqual(mock_stream_to_bq.call_count, 1)
 
   def test_create_existing(self):
@@ -206,11 +203,10 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
 
   def test_get_tag(self):
     self.assertEqual(
-        tag_model.Tag.get(urlsafe_key=self.tag1.key.urlsafe()), self.tag1)
+        tag_model.Tag.get(self.tag1.name), self.tag1)
 
-  def test_get_tag_bad_request(self):
-    with self.assertRaises(endpoints.BadRequestException):
-      tag_model.Tag.get(urlsafe_key='fake_urlsafe_key')
+  def test_get_tag_get_none(self):
+    self.assertIsNone(tag_model.Tag.get('nothing'))
 
   def test_list_tags_include_hidden(self):
     (query_results, cursor,

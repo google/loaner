@@ -88,7 +88,7 @@ class TagApi(root_api.Service):
   def get(self, request):
     """Gets a tag by its urlsafe key."""
     self.check_xsrf_token(self.request_state)
-    tag = tag_model.Tag.get(request.urlsafe_key)
+    tag = api_utils.get_ndb_key(request.urlsafe_key).get()
     return tag_messages.Tag(
         name=tag.name,
         hidden=tag.hidden,

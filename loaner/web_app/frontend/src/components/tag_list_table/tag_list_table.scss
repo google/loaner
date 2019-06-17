@@ -1,0 +1,38 @@
+mat-card-subtitle {
+  display: flex;
+}
+
+.table-container {
+  height: 400px;
+  overflow: auto;
+}
+
+.cdk-column-protected {
+  max-width: 5%;
+  min-width: 25px;
+  padding-right: 8px;
+}
+
+.cdk-column-name {
+  max-width: 20%;
+  padding-right: 8px;
+}
+
+.cdk-column-description {
+  max-width: 57%;
+  padding-right: 8px;
+}
+
+.cdk-column-color {
+  max-width: 5%;
+  padding-right: 8px;
+}
+
+.cdk-column-edit {
+  max-width: 13%;
+  padding-right: 8px;
+}
+
+.card-spacer {
+  flex: 1 1 auto;
+}

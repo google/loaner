@@ -29,8 +29,6 @@ from google.appengine.api import datastore_errors
 from google.appengine.api import search
 from google.appengine.ext import deferred
 
-import endpoints
-
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import events
@@ -1011,7 +1009,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_associate_tag(self):
     self.device1.associate_tag(
         user_email=loanertest.USER_EMAIL,
-        tag_urlsafekey=self.tag2_key.urlsafe(),
+        tag_name=self.tag2_data.tag.name,
         more_info=self.tag2_data.more_info)
     self.assertIsInstance(self.device1.tags[0], tag_model.TagData)
     self.assertCountEqual(
@@ -1020,7 +1018,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_associate_tag__additional(self):
     self.device2.associate_tag(
         user_email=loanertest.USER_EMAIL,
-        tag_urlsafekey=self.tag2_key.urlsafe(),
+        tag_name=self.tag2_data.tag.name,
         more_info=self.tag2_data.more_info)
     self.assertCountEqual(
         device_model.Device.get(serial_number='67890').tags,
@@ -1029,7 +1027,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_associate_tag__duplicate(self):
     self.device2.associate_tag(
         user_email=loanertest.USER_EMAIL,
-        tag_urlsafekey=self.tag1_key.urlsafe(),
+        tag_name=self.tag1_data.tag.name,
         more_info=self.tag1_data.more_info)
     self.assertCountEqual(
         device_model.Device.get(serial_number='67890').tags, [self.tag1_data])
@@ -1037,24 +1035,16 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_associate_tag__updated_info(self):
     self.device2.associate_tag(
         user_email=loanertest.USER_EMAIL,
-        tag_urlsafekey=self.tag1_key.urlsafe(),
+        tag_name=self.tag1_data.tag.name,
         more_info='different_more_info')
     retrieved_device = device_model.Device.get(serial_number='67890')
     self.assertCountEqual(retrieved_device.tags, [self.tag1_data])
     self.assertEqual(retrieved_device.tags[0].more_info, 'different_more_info')
 
-  def test_associate_tag__value_error(self):
-    """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
-    with self.assertRaises(endpoints.BadRequestException):
-      self.device1.associate_tag(
-          user_email=loanertest.USER_EMAIL,
-          tag_urlsafekey='corrupt_key',
-          more_info='more_info_field')
-
   def test_disassociate_tag(self):
     self.device3.disassociate_tag(
         user_email=loanertest.USER_EMAIL,
-        tag_urlsafekey=self.tag2_key.urlsafe())
+        tag_name=self.tag2_data.tag.name)
     self.assertCountEqual(
         device_model.Device.get(serial_number='Void').tags, [self.tag1_data])
 
@@ -1062,7 +1052,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     with mock.patch.object(logging, 'warn', autospec=True) as mock_logging:
       self.device1.disassociate_tag(
           user_email=loanertest.USER_EMAIL,
-          tag_urlsafekey=self.tag2_key.urlsafe())
+          tag_name=self.tag2_data.tag.name)
       self.assertTrue(mock_logging.called)
 
   @mock.patch.object(config_model, 'Config', autospec=True)

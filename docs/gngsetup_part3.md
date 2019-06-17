@@ -1,4 +1,4 @@
-# Deploy the Grab n Go Chrome App
+# Grab n Go Setup Part 3: Deploy the Grab n Go Chrome app
 
 
 
@@ -77,10 +77,10 @@ initialize it. Below are the steps you will need to complete.
 1.  Zip the `dist` folder and save it somewhere you can easily access. It must
     be a zip file (other archive formats are not recognized).
 
-1.  Go to the [Chrome Web Store Developer
-    Dashboard](https://chrome.google.com/webstore/developer/dashboard). You may
-    see a warning that you have to pay an access fee ($5 at the time of this
-    writing), but you can safely disregard this message.
+1.  Go to the
+    [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard).
+    You may see a warning that you have to pay an access fee ($5 at the time of
+    this writing), but you can safely disregard this message.
 
 1.  Click **Add New Item**.
 
@@ -116,9 +116,9 @@ initialize it. Below are the steps you will need to complete.
 
 ## Step 3: Keying the Chrome App
 
-1.  Return to the [Chrome Web Store Developer
-    Dashboard](https://chrome.google.com/webstore/developer/dashboard) and click
-    **More Info on your application**.
+1.  Return to the
+    [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard)
+    and click **More Info on your application**.
 
 1.  Copy the contents below the "BEGIN PUBLIC KEY" and above the "END PUBLIC
     KEY" comments.
@@ -211,24 +211,26 @@ To define the OAuth client:
     `False` will prevent unexpected bootstraps in the future (a bootstrap will
     cause data loss).
 
-**NOTE:** You will need to migrate all of your traffic in the [App
-Engine>Versions](https://console.cloud.google.com/appengine/versions) menu to
-the newest version every time you re-deploy the app. You can do so by selecting
-the new version's checkbox, and clicking **Migrate Traffic** for each service
-(i.e. default, action system, chrome, endpoints). Once you are certain the new
-version is working properly, you can delete the old one(s) to save resources.
+**NOTE:** You will need to migrate all of your traffic in the
+[App Engine>Versions](https://console.cloud.google.com/appengine/versions) menu
+to the newest version every time you re-deploy the app. You can do so by
+selecting the new version's checkbox, and clicking **Migrate Traffic** for each
+service (i.e. default, action system, chrome, endpoints). Once you are certain
+the new version is working properly, you can delete the old one(s) to save
+resources.
 
 Your Chrome App can now use OAuth to communicate with the API.
 
 ## Step 5: Whitelist the API to Bypass OAuth Prompts
 
-To avoid prompting users to grant access to their email addresses, whitelist
-the API client and the scopes. It is important to do this for your domain
-because if the Chrome App cannot collect email addresses automatically, it will
-not be able to assign devices.
+To avoid prompting users to grant access to their email addresses, whitelist the
+API client and the scopes. It is important to do this for your domain because if
+the Chrome App cannot collect email addresses automatically, it will not be able
+to assign devices.
 
-1.  Open the [Manage API client
-    access](https://admin.google.com/ManageOauthClients) menu in Google Admin.
+1.  Open the
+    [Manage API client access](https://admin.google.com/ManageOauthClients) menu
+    in Google Admin.
 1.  Paste the Client ID you generated in the previous section as the Client
     Name.
 1.  For scope, use:
@@ -245,8 +247,8 @@ We'll now update the API URL to allow the Chrome App to communicate with the
 backend. Additionally, we will set the troubleshooting information for the
 Chrome App.
 
-**View of the default troubleshooting page for the Chrome App:** ![Chrome App's
-troubleshooting page](images/ca_troubleshoot.png)
+**View of the default troubleshooting page for the Chrome App:**
+![Chrome App's troubleshooting page](images/ca_troubleshoot.png)
 
 Edit the configuration file:
 
@@ -278,15 +280,15 @@ Edit the configuration file:
 The Chrome App's management view allows for FAQ to be displayed in the FAQ tab.
 The Chrome App will use the standard markdown format to display these FAQs.
 
-**View of the default FAQ page for the Chrome App:** ![Chrome App's FAQ
-page](images/ca_faq.png)
+**View of the default FAQ page for the Chrome App:**
+![Chrome App's FAQ page](images/ca_faq.png)
 
 To add content to the FAQ section:
 
 1.  You can edit the contents of our provided `chrome_app/src/app/assets/faq.md`
-    file using [the markdown
-    format](https://guides.github.com/features/mastering-markdown/) to what you
-    want to see in your FAQ tab in the Chrome App.
+    file using
+    [the markdown format](https://guides.github.com/features/mastering-markdown/)
+    to what you want to see in your FAQ tab in the Chrome App.
 
     *   If you want some examples of how the FAQ works on the Chrome App, you
         can visit the included `chrome_app/src/app/assets/faq.md` file and look
@@ -315,20 +317,19 @@ To deploy the Chrome App:
     Chrome Web Store Developer Dashboard. For example, if the current Chrome Web
     Store version is 0.0.1, the new version would be 0.0.2.
 
-1.  When the app is finished building, open the app on the [Web Store Developer
-    Dashboard](https://chrome.google.com/webstore/developer/dashboard) and click
-    **Edit**, then click **Upload Updated Package** to upload the zip folder
-    (loaner_chrome_app.zip) that was just created in the root of the workspace.
-    Once the file has uploaded, click **Publish changes** all the way at the
-    bottom right in the edit page. Whenever you deploy a Chrome App, you need to
-    promote it to the current version on the Chrome Web Store Developer
+1.  When the app is finished building, open the app on the
+    [Web Store Developer Dashboard](https://chrome.google.com/webstore/developer/dashboard)
+    and click **Edit**, then click **Upload Updated Package** to upload the zip
+    folder (loaner_chrome_app.zip) that was just created in the root of the
+    workspace. Once the file has uploaded, click **Publish changes** all the way
+    at the bottom right in the edit page. Whenever you deploy a Chrome App, you
+    need to promote it to the current version on the Chrome Web Store Developer
     Dashboard.
 
 **NOTE**: When publishing Chrome Apps, allow at least 30 minutes for the new
 version to become available. In addition, it can take up to 24 hours for the
 Chrome App to be updated on your Chrome OS fleet.
 
-## Step 9: Deploy Chrome App
+## Next up:
 
-In order to deploy the Chrome App to your Chrome OS fleet, continue to follow
-the instructions at: [Configure the G Suite Environment](gsuite_config.md).
+### [GnG Setup Part 4: Configure the G Suite Environment](docs/gngsetup_part4.md)

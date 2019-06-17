@@ -24,6 +24,11 @@ export declare interface GetRoleRequestApiParams {
   name?: string;
 }
 
+/** Interfaces with fields for our list response. */
+export declare interface ListRolesResponse {
+  roles: RoleApiParams[];
+}
+
 /** A role model with all properties and methods.  */
 export class Role {
   /** Name of the Role. */

@@ -52,7 +52,7 @@ def import_yaml(yaml_data, user_email, wipe=False, randomize_shelving=False):
     randomize_shelving: bool, whether to assign Devices to Shelves randomly,
         which may be useful in app testing.
   """
-  yaml_data = yaml.load(yaml_data)
+  yaml_data = yaml.safe_load(yaml_data)
 
   if wipe:
     logging.info(

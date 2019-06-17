@@ -52,7 +52,7 @@ export function get<T>(url: string, headers?: HeaderInitTs26) {
  * @param body The data to be send over the POST HTTP request
  * @param headers Any other http header request information.
  */
-export function post<T>(url: string, body: string, headers?: HeaderInitTs26) {
+export function post<T>(url: string, body: {}, headers?: HeaderInitTs26) {
   return makeRequest<T>('post', url, body, headers);
 }
 
@@ -64,7 +64,7 @@ export function post<T>(url: string, body: string, headers?: HeaderInitTs26) {
  * @param headers Any other http header request information.
  */
 function makeRequest<T>(
-    method: string, url: string, body?: string, headers?: HeaderInitTs26) {
+    method: string, url: string, body?: {}, headers?: HeaderInitTs26) {
   return new Promise<T>((resolve, reject) => {
     chrome.identity.getAuthToken(
         {interactive: false}, (newAccessToken: string) => {
@@ -99,7 +99,7 @@ function makeRequest<T>(
             };
 
             if (method !== 'head' && method !== 'get') {
-              options.body = body || '';
+              options.body = JSON.stringify(body);
             }
 
             fetch(`${url}`, options)

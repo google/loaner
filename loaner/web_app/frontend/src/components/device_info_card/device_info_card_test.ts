@@ -173,6 +173,8 @@ describe('DeviceInfoCardComponent', () => {
          devices: [],
          totalResults: 0,
          totalPages: 1,
+         has_additional_results: false,
+         page_token: ''
        }));
        spyOn(router, 'navigate');
        mockParams.next({id: ''});
@@ -187,6 +189,8 @@ describe('DeviceInfoCardComponent', () => {
       devices: [DEVICE_ASSIGNED],
       totalResults: 0,
       totalPages: 1,
+      has_additional_results: false,
+      page_token: ''
     }));
     mockParams.next({id: ''});
     mockQueryParams.next({user: 'test_user'});
@@ -211,6 +215,8 @@ describe('DeviceInfoCardComponent', () => {
       devices: [DEVICE_ASSIGNED],
       totalResults: 0,
       totalPages: 1,
+      has_additional_results: false,
+      page_token: ''
     }));
     deviceInfoCard.onLost(DEVICE_1);
     expect(deviceService.list).toHaveBeenCalled();

@@ -12,32 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+import {MatButtonModule} from '@angular/material/button';
 import {BrowserModule} from '@angular/platform-browser';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {MaterialModule} from '../../core/material_module';
-import {TagListTableModule} from '../tag_list_table';
 
-import {Configuration} from './configuration';
+import {TagListTable} from './tag_list_table';
 
-export * from './configuration';
+export * from './tag_list_table';
 
 @NgModule({
   declarations: [
-    Configuration,
+    TagListTable,
   ],
   exports: [
-    Configuration,
+    TagListTable,
   ],
   imports: [
-    BrowserModule,
-    CommonModule,
     FormsModule,
+    BrowserModule,
     MaterialModule,
-    TagListTableModule,
+    MatButtonModule,
+    BrowserAnimationsModule,
   ],
 })
-export class ConfigurationModule {
+export class TagListTableModule {
 }

@@ -120,6 +120,27 @@ class RoleApiTest(loanertest.EndpointsTestCase):
     self.assertEqual(
         created_role.associated_group, retrieved_role.associated_group)
 
+  def test_list(self):
+    created_role = user_model.Role.create(
+        name='test',
+        role_permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    retrieved_role = self.service.list(message_types.VoidMessage())
+
+    self.assertEqual(created_role.name, retrieved_role.roles[0].name)
+    self.assertEqual(len(retrieved_role.roles), 1)
+
+  def test_delete(self):
+    user_model.Role.create(
+        name='test',
+        role_permissions=['get', 'put'],
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
+
+    response = self.service.delete(user_messages.DeleteRoleRequest(name='test'))
+
+    self.assertIsInstance(response, message_types.VoidMessage)
+
 
 if __name__ == '__main__':
   loanertest.main()

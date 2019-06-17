@@ -137,16 +137,16 @@ export class DeviceListTable implements AfterViewInit, OnDestroy, OnInit {
     const sortDirection = this.sort.direction || 'asc';
 
     this.deviceService.list(this.filters, sort, sortDirection)
-        .subscribe(listReponse => {
+        .subscribe(listResponse => {
           if (this.gettingMoreData) {
             this.dataSource.data =
-                this.dataSource.data.concat(listReponse.devices);
+                this.dataSource.data.concat(listResponse.devices);
           } else {
-            this.dataSource.data = listReponse.devices;
+            this.dataSource.data = listResponse.devices;
           }
           this.gettingMoreData = false;
-          this.hasMoreResults = listReponse.has_additional_results;
-          this.pageToken = listReponse.page_token;
+          this.hasMoreResults = listResponse.has_additional_results;
+          this.pageToken = listResponse.page_token;
           // We need to manually call change detection here because of
           // https://github.com/angular/angular/issues/14748
           this.changeDetector.detectChanges();

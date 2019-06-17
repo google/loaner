@@ -192,6 +192,11 @@ class ActionTestCase(TestCase):
     self.action = (
         actions['sync'].get(self.testing_action) or
         actions['async'].get(self.testing_action))
+    self.addCleanup(self.reset_cached_actions)
+
+  def reset_cached_actions(self):
+    """Resets the cached actions object, possibly filtered by another test."""
+    action_loader._CACHED_ACTIONS = None
 
 
 def main():

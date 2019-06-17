@@ -1,4 +1,4 @@
-# Grab n Go Setup
+# Grab n Go Setup Part 2: Set up the GnG web app
 
 
 
@@ -9,148 +9,6 @@ The Grab n Go (GnG) web app makes it easy to manage a fleet of loaner Chromebook
 devices. Using GnG, users can self-checkout a loaner Chromebook and begin using
 it right away, thereby decreasing the workload on IT support while keeping users
 productive.
-
-## Prerequisites
-
-Before you start configuring the GnG web app itself, you need to setup and
-configure a Google Cloud Platform project:
-
-1.  **Get [G Suite](https://gsuite.google.com/intl/en_in/setup-hub/) with
-    [Chrome for
-    Enterprise](https://enterprise.google.com/chrome/chrome-enterprise/)**
-
-    To log in to an assigned loaner Chromebook, borrowers must use a Google G
-    Suite account (GnG will not work with standard Gmail accounts).
-
-1.  **Setup an App Engine project in Google Cloud**
-
-    1.  GnG runs on Google App Engine, an automatically scaling, sandboxed
-        computing environment that runs on Google Cloud. [Create a Google Cloud
-        Platform
-        Project](https://cloud.google.com/resource-manager/docs/creating-managing-projects).
-        Name the project something you will remember, such as *loaner*.
-
-    1.  [Create a billing
-        account](https://cloud.google.com/billing/docs/how-to/manage-billing-account)
-        and then [enable billing for the
-        project](https://cloud.google.com/billing/docs/how-to/modify-project)
-        that you created.
-
-    1.  For secure authentication, the GnG application uses OAuth2. This
-        requires that you [create an OAuth2 Client ID within your App Engine
-        Project](https://cloud.google.com/endpoints/docs/frameworks/python/creating-client-ids#Creating_OAuth_20_client_IDs).
-        When prompted, make sure to select **Web App**. For the Authorized
-        JavaScript Origins URL, your App Engine project URL will be your GCP
-        project ID followed by appspot.com. For example, if your GCP project ID
-        is "example-123456" then the default URL will be
-        https://example-123456.appspot.com. You can also [configure App Engine
-        to use your own custom
-        domain](https://cloud.google.com/appengine/docs/standard/python/mapping-custom-domains).
-
-        **NOTE**: Make sure to add your App Engine project URL to Authorized
-        JavaScript Origins. Otherwise, the app will fail to authenticate.
-        Changing this setting has a propagation delay, so if you are getting
-        origin errors you will need to set this and then wait a few minutes.
-
-    1.  Visit the OAuth consent screen tab and ensure that the Application type
-        is listed as "Public".
-
-        **WARNING:**  The Chrome App will be unable to generate any
-        OAuth tokens if the Application type isn't listed as Public.
-
-    1.  The GnG application requires a service account on your G Suite Domain
-        configured with **G Suite Domain-Wide Delegated Authority** in order to
-        access the G Suite APIs to move devices to and from organizational
-        units, maintain permissions based on Google Groups, etc.
-
-        [Create the service account and its
-        credentials](https://developers.google.com/admin-sdk/directory/v1/guides/delegation).
-
-        **NOTE**: During service account creation you do not need to select a
-        Role.
-
-        This will produce a newly furnished private key in the form of a JSON
-        file containing the client secrets for the service account.
-
-        **WARNING:** Do not lose or share this private key file, as it allows
-        access to your G Suite domain user data through the service account.
-
-        Once you have created a service account and downloaded its JSON-encoded
-        private key, you can move on to the next step.
-
-    1.  [Delegate domain-wide authority to the service account you
-        created](https://developers.google.com/admin-sdk/directory/v1/guides/delegation).
-
-        In the **One or More API Scopes** field copy and paste the following
-        list of scopes required by GnG:
-
-        ```
-        https://www.googleapis.com/auth/admin.directory.device.chromeos,
-        https://www.googleapis.com/auth/admin.directory.group.member.readonly,
-        https://www.googleapis.com/auth/admin.directory.orgunit,
-        https://www.googleapis.com/auth/admin.directory.user.readonly
-        ```
-
-    1.  GnG requires the Directory API to manage devices in your G Suite Domain.
-        To access the Directory API you will need to enable the Admin SDK API
-        through [Google Cloud
-        Console](https://console.developers.google.com/apis/api/admin.googleapis.com/overview)
-
-1.  **Set up a G Suite role account**
-
-    In order to give the app domain privileges you must also set up a G Suite
-    role account for the app to use. This account won't require an additional G
-    Suite license, it will act only as a proxy for the application.
-
-    1.  Visit [Google Admin](https://admin.google.com) and create a new user.
-        Name it something such as loaner-role@example.com. Set the password to
-        something highly complex, as a human should never log into this account.
-        It is highly recommended that you also use 2FA on this account to reduce
-        risk.
-
-    1.  Give the account the following Admin roles:
-
-        +   Directory Admin
-        +   Services Admin
-        +   User Management Admin
-
-    **Note**: It is recommended that you put this account in an OU that has all
-    G Suite and additional services disabled.
-
-1.  **[Enterprise
-    enroll](https://support.google.com/chrome/a/answer/1360534?hl=en) your
-    [Chromebooks](https://www.google.com/chromebook/)**
-
-1.  **Set up your permissions groups**
-
-    By default users only have permission to view and manage their own loans. To
-    give users elevated permissions to manage devices and shelves you must
-    assign them roles. User's roles are managed using Google Groups. You must
-    provide at least one group for superadmins - users that have all permissions
-    by default. Additional roles can be created by calling the role API with
-    a custom set of permissions depending on what access you'd like to give. You
-    can provide different Google Groups to manage the users in these roles and
-    they will sync automatically. You can also manually add users to roles if
-    you do not provide a group. You can [add the appropriate users to each
-    group.](https://support.google.com/groups/answer/2465464?hl=en&ref_topic=2458761)
-
-    Note: Make sure to add yourself in the superadmins group in order to
-    get the highest elevated permissions for the application. You will not be
-    able to set up the application without those permissions.
-
-1.  **Set up a development computer**
-
-    You’ll modify the code and build and upload GnG from this device.
-
-    +   Note: This deployment has only been tested on Linux and macOS.
-
-    +   Install the following software:
-
-        +   [Install Git](https://git-scm.com/downloads)
-        +   [Install
-            Bazel](https://docs.bazel.build/versions/master/install.html)
-        +   [Install the Google Cloud SDK](https://cloud.google.com/sdk/)
-        +   [Install NPM](https://www.npmjs.com/get-npm)
 
 While the following skills are not explicitly required, you should be
 comfortable referencing the documentation for each of these to troubleshoot
@@ -163,8 +21,8 @@ deployments of GnG:
     To modify the GnG frontend and Chrome App, you will use Angular with
     Typescript.
 
-+   **[Learn the Basics of Google App
-    Engine](https://cloud.google.com/appengine/docs/standard/python/).** \
++   **[Learn the Basics of Google App Engine](https://cloud.google.com/appengine/docs/standard/python/).**
+    \
     Although GnG is mostly set up, it is helpful to know the App Engine
     environment should you want to customize it.
 
@@ -191,17 +49,17 @@ these are optional.
 
 ### Customize the BUILD Rule for Deployment
 
-The source code includes a `WORKSPACE` file to make it a [Bazel
-workspace](https://docs.bazel.build/versions/master/build-ref.html#workspaces).
+The source code includes a `WORKSPACE` file to make it a
+[Bazel workspace](https://docs.bazel.build/versions/master/build-ref.html#workspaces).
 
 The client secret file for the service account you created earlier must be moved
 into your local copy of the GnG app inside the `loaner/web_app` directory. If
 you are using Cloud Shell or a remote computer, you can simply copy and paste
 the contents of the file. A friendly name is suggested e.g.
 `client-secret.json`. Once the file has been relocated to this directory, the
-BUILD rule in `loaner/web_app/BUILD` named "loaner" must have a [data
-dependency](https://docs.bazel.build/versions/master/build-ref.html#data) that
-references the `client-secret.json` file.
+BUILD rule in `loaner/web_app/BUILD` named "loaner" must have a
+[data dependency](https://docs.bazel.build/versions/master/build-ref.html#data)
+that references the `client-secret.json` file.
 
 ```
     loaner_appengine_library(
@@ -246,19 +104,18 @@ Before you deploy GnG, the following constants must be configured:
 +   **`SEND_EMAIL_AS`** is the email address within the G Suite Domain that GnG
     app email notifications will be sent from.
 
-+   **`SUPERADMINS_GROUP`**: The Google Groups email address that contains
-    at least one Superadmin in charge of configuring the app.
++   **`SUPERADMINS_GROUP`**: The Google Groups email address that contains at
+    least one Superadmin in charge of configuring the app.
 
 Within the `if ON_PROD` block are the required constants to be configured on the
 Google Cloud Project you will be using to host the production version of GnG:
 
-+   **`CHROME_CLIENT_ID`** the Chrome App will use this to authenticate to
-    the production version of GnG. **Leave this blank for now, you'll generate
-    this ID later.**
++   **`CHROME_CLIENT_ID`** the Chrome App will use this to authenticate to the
+    production version of GnG. **Leave this blank for now, you'll generate this
+    ID later.**
 
-+   **`WEB_CLIENT_ID`** is the OAuth2 Client ID you created previously that
-    the Web App frontend will use to authenticate to the production version of
-    GnG.
++   **`WEB_CLIENT_ID`** is the OAuth2 Client ID you created previously that the
+    Web App frontend will use to authenticate to the production version of GnG.
 
 +   **`SECRETS_FILE`** is the location of the Directory APIs service account
     secret json file relative to the Bazel WORKSPACE. If using the example above
@@ -288,11 +145,11 @@ versions to test deployments before promoting them to the production version.
     'prod-app-engine-project' with the ID of your project. This is the same ID
     used for ON_PROD in loaner/web_app/constants.py.
 
-+   **`WEB_CLIENT_IDS`** is the OAuth2 Client ID you created previously that
-    the Web App frontend will use to authenticate to the backend. This is the
-    same ID that was used for the WEB_CLIENT_ID in
-    loaner/web_app/constants.py. If you are deploying a single instance of the
-    application, fill in the PROD value with the Client ID.
++   **`WEB_CLIENT_IDS`** is the OAuth2 Client ID you created previously that the
+    Web App frontend will use to authenticate to the backend. This is the same
+    ID that was used for the WEB_CLIENT_ID in loaner/web_app/constants.py. If
+    you are deploying a single instance of the application, fill in the PROD
+    value with the Client ID.
 
 +   **`STANDARD_ENDPOINTS`** is the Google Endpoints URL the frontend uses to
     access your backend API. If necessary, update the `prod`, `qa` and `dev`
@@ -352,13 +209,13 @@ settings without deploying a new version of GnG:
 
 ### (Optional) Customize Images for Button and Banner in Emails
 
-You can upload custom banner and button images to [Google Cloud
-Storage](https://cloud.google.com/storage/) to use in the emails sent by the
-GnG.
+You can upload custom banner and button images to
+[Google Cloud Storage](https://cloud.google.com/storage/) to use in the emails
+sent by the GnG.
 
 To do this, upload your custom images to Google Cloud Storage via the console by
-following [these
-instructions](https://cloud.google.com/storage/docs/cloud-console).
+following
+[these instructions](https://cloud.google.com/storage/docs/cloud-console).
 
 Name your bucket and object something descriptive, e.g.
 `https://storage.cloud.google.com/[BUCKET_NAME]/[OBJECT_NAME]`.
@@ -389,9 +246,9 @@ the `loaner/web_app/backend/actions` directory.
 Specifically, each event can be configured in the datastore to call zero or more
 actions and these actions are defined by the modules contained in the
 `loaner/web_app/backend/actions` directory. Each of these actions will be run as
-an [App Engine
-Task](https://cloud.google.com/appengine/docs/standard/python/taskqueue/), which
-allows them to run asynchronously and not block the processing of GnG.
+an
+[App Engine Task](https://cloud.google.com/appengine/docs/standard/python/taskqueue/),
+which allows them to run asynchronously and not block the processing of GnG.
 
 While GnG contains several pre-coded actions, you can also add your own. For
 example, you can add an action as a module in the
@@ -509,15 +366,16 @@ accidentally overwrite your configuration.
 #### Create an Authorized Email Sender
 
 You need to configure an authorized email sender that GnG emails will be sent
-from, e.g. loaner@example.com. To do that, add an [Email API Authorized
-Senders](https://console.cloud.google.com/appengine/settings) in the GCP
-Console.
+from, e.g. loaner@example.com. To do that, add an
+[Email API Authorized Senders](https://console.cloud.google.com/appengine/settings)
+in the GCP Console.
 
 #### Deploy the Chrome App
+
 After bootstrapping is complete, you will need to set up the GnG Chrome App.
 This app helps configure the Chromebooks you will be using as loaners and
-provides the bulk of the user-facing experience. Continue on to [deploying the
-chrome app](deploy_chrome_app.md).
+provides the bulk of the user-facing experience. Continue on to
+[deploying the chrome app](gngsetup_part3.md).
 
 #### Multi-domain Support (Optional).
 
@@ -526,25 +384,24 @@ any bugs using GitHub's issue tracker.
 
 If you want to support more than one managed domain on loaner devices please
 follow the steps below. Please note, the domains you want to support must be
-part of the same G Suite account and added to admin.google.com via
-Account > Domains > Add/Remove Domains. Different domains managed by different
-G Suite accounts and public Gmail addresses are not supported.
+part of the same G Suite account and added to admin.google.com via Account >
+Domains > Add/Remove Domains. Different domains managed by different G Suite
+accounts and public Gmail addresses are not supported.
 
-+  The domains you want to support must be added to the App Engine project from
-   console.cloud.google.com via App Engine > Settings > Custom Domains.
-+  In App Engine > Settings > Application settings "Referrers" must be set to
-   Google Accounts API.
-   WARNING: Setting this allows any Google managed account to try and sign into
-   the app. Make sure you have the latest version of the code deployed or you
-   could be exposing the app publicly.
-+  In the application's code in web_app/constants.py the variable APP_DOMAINS
-   should be a list of all the domains you plan on supporting.
-+  Go to admin.google.com and in Devices > Chrome Management > Device Settings
-   find the Grab n Go parent OU and set Sign-in Restriction to the list of
-   domains you're supporting. Optionally, you may also want to switch off the
-   Autocomplete Domain option as it may cause some confusion (it's not very
-   intuitive that you can override the sign-in screen by typing your full email
-   address).
++   The domains you want to support must be added to the App Engine project from
+    console.cloud.google.com via App Engine > Settings > Custom Domains.
++   In App Engine > Settings > Application settings "Referrers" must be set to
+    Google Accounts API. WARNING: Setting this allows any Google managed account
+    to try and sign into the app. Make sure you have the latest version of the
+    code deployed or you could be exposing the app publicly.
++   In the application's code in web_app/constants.py the variable APP_DOMAINS
+    should be a list of all the domains you plan on supporting.
++   Go to admin.google.com and in Devices > Chrome Management > Device Settings
+    find the Grab n Go parent OU and set Sign-in Restriction to the list of
+    domains you're supporting. Optionally, you may also want to switch off the
+    Autocomplete Domain option as it may cause some confusion (it's not very
+    intuitive that you can override the sign-in screen by typing your full email
+    address).
 
 #### Datastore backups (Optional, but Recommended).
 
@@ -562,12 +419,15 @@ Requirements:
 +   [Configure access permissions](https://cloud.google.com/datastore/docs/schedule-export#setting_up_scheduled_exports)
     for the default service account and the Cloud Storage bucket created above.
 +   Enter the name of the bucket in the configuration page of the application.
-+   Toggle datastore backups to on in the configuration page of the
-    application.
++   Toggle datastore backups to on in the configuration page of the application.
 
 NOTE: Please review the
 [Object Lifecycle Management](https://cloud.google.com/storage/docs/lifecycle)
 feature of Cloud Storage buckets in order to get familiar with retention
 policies. For example, policies can be set on GCS buckets such that objects can
-be deleted after a specified interval. This is to avoid additional
-costs associated with Cloud Storage.
+be deleted after a specified interval. This is to avoid additional costs
+associated with Cloud Storage.
+
+## Next up:
+
+### [Grab n Go Setup Part 3: Deploy the Grab n Go Chrome app](docs/gngsetup_part3.md)

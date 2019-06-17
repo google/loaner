@@ -25,7 +25,6 @@ from google.appengine.api import datastore_errors
 from google.appengine.ext import deferred
 from google.appengine.ext import ndb
 
-from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.models import base_model
 
 
@@ -86,16 +85,16 @@ class Tag(base_model.BaseModel):
     return tag
 
   @classmethod
-  def get(cls, urlsafe_key):
-    """Gets a Tag by its urlsafe key.
+  def get(cls, name):
+    """Gets a Tag by its name.
 
     Args:
-      urlsafe_key: str, the urlsafe encoding of the requested tag's ndb.Key.
+      name: str, the name of the tag.
 
     Returns:
       A Tag model entity.
     """
-    return api_utils.get_ndb_key(urlsafe_key).get()
+    return cls.query(cls.name == name).get()
 
   def update(self, user_email, **kwargs):
     """Updates an existing tag.

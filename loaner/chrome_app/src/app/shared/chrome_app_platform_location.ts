@@ -42,6 +42,22 @@ export class ChromeAppPlatformLocation extends PlatformLocation {
     this.appLocation.pathname = newPath;
   }
 
+  getState(): unknown {
+    return null;
+  }
+  get href(): string {
+    return '';
+  }
+  get protocol(): string {
+    return '';
+  }
+  get hostname(): string {
+    return '';
+  }
+  get port(): string {
+    return '';
+  }
+
   getBaseHrefFromDOM() {
     return '/';
   }

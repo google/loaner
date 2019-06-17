@@ -267,7 +267,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
       self.assertEqual(mock_xsrf_token.call_count, 1)
     self.assertIsInstance(response, message_types.VoidMessage)
     # Ensure that the new tag was updated.
-    tag = tag_model.Tag.get(self.test_tag.key.urlsafe())
+    tag = tag_model.Tag.get(self.test_tag.name)
     self.assertEqual(tag.name, self.test_tag.name)
     self.assertEqual(tag.hidden, self.test_tag.hidden)
     self.assertEqual(tag.protect, self.test_tag.protect)
@@ -287,7 +287,7 @@ class TagApiTest(loanertest.EndpointsTestCase):
             description=self.test_tag.description))
     response = self.service.update(request)
     self.assertIsInstance(response, message_types.VoidMessage)
-    tag = tag_model.Tag.get(self.test_tag.key.urlsafe())
+    tag = tag_model.Tag.get(self.test_tag.name)
     self.assertEqual(tag.name, new_name)
     self.assertEqual(tag.hidden, self.test_tag.hidden)
     self.assertEqual(tag.protect, self.test_tag.protect)

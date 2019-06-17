@@ -12,26 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/** Interface that defines the general bootstrap status of the application. */
-export declare interface Status {
-  completed: boolean;
-  started: boolean;
-  is_update: boolean;
-  app_version: string;
-  running_version: string;
-  tasks: Task[];
-}
+import {Component} from '@angular/core';
+import {TagService} from '../../services/tag';
 
-/** Interface that defines the properties of a particular bootstrap task. */
-export declare interface Task {
-  name: string;
-  success?: boolean;
-  timestamp?: number;
-  details?: string;
-  description?: string;
-}
 
-/** Interface that defines which (if any) bootstrap tasks should be (re)run. */
-export declare interface TaskRequest {
-  requested_tasks: string[];
+/**
+ * Component that renders the Tags list and action, using a mat-table.
+ */
+@Component({
+  selector: 'loaner-tag-list-table',
+  styleUrls: ['tag_list_table.scss'],
+  templateUrl: 'tag_list_table.ng.html',
+})
+export class TagListTable {
+  /** Columns that should be rendered on the frontend table */
+  displayedColumns: string[];
+
+  constructor(readonly tagService: TagService) {
+    this.displayedColumns =
+        ['protected', 'name', 'description', 'color', 'edit'];
+  }
 }

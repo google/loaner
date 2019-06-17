@@ -37,7 +37,8 @@ git clone -b Alpha-\(0.7.1\) https://github.com/google/loaner.git
 cd loaner
 ```
 
-* To discuss this project send an email to loaner@googlegroups.com.
+* To discuss this project send an email to loaner@googlegroups.com. Please note
+  that this group is public (anyone can view/post).
 * Read more about releases in our [release notes](docs/release_notes.md).
 * Please file bugs using the GitHub issue tracker.
 
@@ -66,12 +67,11 @@ cd loaner
 To deploy and configure the Grab n Go (GnG) Loaner project, follow the steps
 below.
 
-1.  [Setup the Web
-    Application](docs/setup_guide.md)
-1.  [Deploy the Grab n Go Chrome
-    App](docs/deploy_chrome_app.md)
-1.  [Configure your G Suite
-    Environment](docs/gsuite_config.md)
++  [Part 1: Create necessary accounts and computer environments](docs/gngsetup_part1.md)
++ [Part 2: Set up the GnG web app](docs/gngsetup_part2.md)
++ [Part 3: Deploy the Grab n Go Chrome app](docs/gngsetup_part3.md)
++ [Part 4: Configure the G Suite Environment](docs/gngsetup_part4.md)
+
 
 #### Reference Documentation
 

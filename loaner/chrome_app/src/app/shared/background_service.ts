@@ -62,6 +62,7 @@ export class Background {
   setAlwaysOnTop(id: string, value: boolean) {
     chrome.app.window.get(id).setAlwaysOnTop(value);
   }
+
 }
 
 /**
@@ -85,4 +86,5 @@ export class BackgroundMock implements Background {
   setAlwaysOnTop(id: string, value: boolean) {
     console.info(`Set value of alwaysOnTop for the view: ${id} to ${value}`);
   }
+
 }

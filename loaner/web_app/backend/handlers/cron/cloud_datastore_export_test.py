@@ -44,6 +44,10 @@ class DatastoreExportTest(parameterized.TestCase, handlertest.HandlerTestCase):
     super(DatastoreExportTest, self).setUp()
     self.testbed.init_app_identity_stub()
     self.testbed.init_urlfetch_stub()
+    self.test_application_id = 'test_application_id'
+    # Adding `s~` here because os.environ.get returns the application id with
+    # a partition followed by the tilde character.
+    constants.APPLICATION_ID = 's~' + self.test_application_id
 
   @mock.patch.object(logging, 'info')
   @mock.patch.object(
@@ -52,24 +56,20 @@ class DatastoreExportTest(parameterized.TestCase, handlertest.HandlerTestCase):
   @mock.patch.object(config_model.Config, 'get')
   def test_get(
       self, mock_config, mock_urlfetch, mock_app_identity, mock_logging):
-    test_application_id = 'test_application_id'
     test_destination_url = cloud_datastore_export._DESTINATION_URL
     test_bucket_name = 'gcp_bucket_name'
-    # Adding `s~` here because os.environ.get returns the application id with
-    # a partition followed by the tilde character.
-    constants.APPLICATION_ID = 's~' + test_application_id
     mock_config.side_effect = [test_bucket_name, True]
     expected_url = (
-        cloud_datastore_export._DATASTORE_API_URL % test_application_id)
+        cloud_datastore_export._DATASTORE_API_URL % self.test_application_id)
     mock_urlfetch.return_value.status_code = httplib.OK
     now = datetime.datetime(
-        year=2017, month=1, day=1, hour=01, minute=01, second=15)
+        year=2017, month=1, day=1, hour=1, minute=1, second=15)
     with freezegun.freeze_time(now):
       self.testapp.get(self._CRON_URL)
       mock_urlfetch.assert_called_once_with(
           url=expected_url,
           payload=json.dumps({
-              'project_id': test_application_id,
+              'project_id': self.test_application_id,
               'output_url_prefix': test_destination_url.format(
                   test_bucket_name, now.strftime('%Y_%m_%d-%H%M%S'))
           }),
@@ -115,7 +115,7 @@ class DatastoreExportTest(parameterized.TestCase, handlertest.HandlerTestCase):
   )
   def test_format_full_path(self, mock_bucket):
     now = datetime.datetime(
-        year=2017, month=1, day=1, hour=01, minute=01, second=15)
+        year=2017, month=1, day=1, hour=1, minute=1, second=15)
     with freezegun.freeze_time(now):
       self.assertEqual(
           cloud_datastore_export._format_full_path(mock_bucket),
