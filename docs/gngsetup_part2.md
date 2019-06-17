@@ -17,9 +17,9 @@ deployments of GnG:
 +   **[Know some Python](https://www.python.org/).** \
     To customize the GnG backend, you’ll use Python 2.7.
 
-+   **[Know some Angular and Typescript](https://angular.io/).** \
++   **[Know some Angular and TypeScript](https://angular.io/).** \
     To modify the GnG frontend and Chrome App, you will use Angular with
-    Typescript.
+    TypeScript.
 
 +   **[Learn the Basics of Google App Engine](https://cloud.google.com/appengine/docs/standard/python/).**
     \
@@ -430,4 +430,4 @@ associated with Cloud Storage.
 
 ## Next up:
 
-### [Grab n Go Setup Part 3: Deploy the Grab n Go Chrome app](docs/gngsetup_part3.md)
+### [Grab n Go Setup Part 3: Deploy the Grab n Go Chrome app](gngsetup_part3.md)

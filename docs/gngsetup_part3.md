@@ -332,4 +332,4 @@ Chrome App to be updated on your Chrome OS fleet.
 
 ## Next up:
 
-### [GnG Setup Part 4: Configure the G Suite Environment](docs/gngsetup_part4.md)
+### [GnG Setup Part 4: Configure the G Suite Environment](gngsetup_part4.md)

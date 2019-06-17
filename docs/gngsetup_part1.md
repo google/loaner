@@ -137,4 +137,4 @@ Install the following software:
 
 ## Next up:
 
-### [GnG Setup Part 2: Set up the GnG web app](docs/gngsetup_part2.md)
+### [GnG Setup Part 2: Set up the GnG web app](gngsetup_part2.md)
