@@ -38,7 +38,7 @@ export class DeviceActionsView implements OnInit {
    * device_enroll_unenroll_list component.
    */
   device = new Device();
-  @ViewChild('deviceEnrollUnenroll')
+  @ViewChild('deviceEnrollUnenroll', {static: true})
   deviceEnrollUnenroll!: DeviceEnrollUnenrollList;
 
   constructor(

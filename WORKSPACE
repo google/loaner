@@ -278,9 +278,9 @@ http_archive(
 
 http_archive(
      name = "io_bazel_rules_appengine",
-     sha256 = "bebc923ff8e0c5586ec340208ada10b8899c40defe9f0766b754de45994cdcbc",
-     strip_prefix = "rules_appengine-6ef28a83a0ce3a1abc8583c2340d5c4842519a6b",
-     url = "https://github.com/bazelbuild/rules_appengine/archive/6ef28a83a0ce3a1abc8583c2340d5c4842519a6b.zip",
+     sha256 = "b5b3c964e7dba92ab2a80857519ef3a8c599c4fc3e84094ea112ec34cfe4b2e2",
+     url = "https://github.com/bazelbuild/rules_appengine/archive/0.0.9.tar.gz",
+     strip_prefix = "rules_appengine-0.0.9",
 )
 
 load(
@@ -288,20 +288,20 @@ load(
     "appengine_repositories",
 )
 
+appengine_repositories()
+
+
 load(
     "@io_bazel_rules_appengine//appengine:py_appengine.bzl",
     "py_appengine_repositories"
 )
-
-appengine_repositories()
-
 py_appengine_repositories()
 
 http_archive(
     name = "io_bazel_rules_python",
-    sha256 = "8b32d2dbb0b0dca02e0410da81499eef8ff051dad167d6931a92579e3b2a1d48",
-    strip_prefix = "rules_python-8b5d0683a7d878b28fffe464779c8a53659fc645",
-    url = "https://github.com/bazelbuild/rules_python/archive/8b5d0683a7d878b28fffe464779c8a53659fc645.tar.gz",
+    sha256 = "9a3d71e348da504a9c4c5e8abd4cb822f7afb32c613dc6ee8b8535333a81a938",
+    strip_prefix = "rules_python-fdbb17a4118a1728d19e638a5291b4c4266ea5b8",
+    url = "https://github.com/bazelbuild/rules_python/archive/fdbb17a4118a1728d19e638a5291b4c4266ea5b8.tar.gz",
 )
 
 load("@io_bazel_rules_python//python:pip.bzl", "pip_repositories", "pip_import")

@@ -59,7 +59,7 @@ export class DeviceListTable implements AfterViewInit, OnDestroy, OnInit {
   /* When true, pauseLoading will prevent auto refresh on the table. */
   pauseLoading = false;
 
-  @ViewChild(MatSort) sort!: MatSort;
+  @ViewChild(MatSort, {static: true}) sort!: MatSort;
   /** Token needed on backend in order to return more results. */
   pageToken?: string;
   /** Backend response if there is more results to be retrieved. */

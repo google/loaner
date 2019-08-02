@@ -44,6 +44,7 @@ export abstract class DeviceActionsDialogService {
   close() {}
 }
 
+@Injectable()
 export class DamagedMock extends DeviceActionsDialogService {
   get onDamaged(): Observable<string> {
     return of('damagedReason');
@@ -53,12 +54,14 @@ export class DamagedMock extends DeviceActionsDialogService {
   }
 }
 
+@Injectable()
 export class ExtendMock extends DeviceActionsDialogService {
   get onExtended(): Observable<string> {
     return of('newDate');
   }
 }
 
+@Injectable()
 export class GuestModeMock extends DeviceActionsDialogService {
   get onGuestModeEnabled(): Observable<boolean> {
     return of(true);
@@ -71,12 +74,14 @@ export class ResumeLoanMock extends DeviceActionsDialogService {
   }
 }
 
+@Injectable()
 export class LostMock extends DeviceActionsDialogService {
   get onLost(): Observable<boolean> {
     return of(true);
   }
 }
 
+@Injectable()
 export class UnenrollMock extends DeviceActionsDialogService {
   get onUnenroll(): Observable<boolean> {
     return of(true);

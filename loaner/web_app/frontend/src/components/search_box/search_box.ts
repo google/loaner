@@ -64,8 +64,8 @@ export class SearchBox implements OnInit {
   ];
   searchType: SearchType[] = [];
   searchText = '';
-  @ViewChild('searchBox') searchInputElement!: ElementRef;
-  @ViewChild(MatAutocompleteTrigger)
+  @ViewChild('searchBox', {static: true}) searchInputElement!: ElementRef;
+  @ViewChild(MatAutocompleteTrigger, {static: true})
   autocompleteTrigger!: MatAutocompleteTrigger;
 
 
@@ -78,7 +78,9 @@ export class SearchBox implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.searchService.searchText.subscribe(query => this.searchText = query);
+    this.searchService.searchText.subscribe(query => {
+      this.searchText = query;
+    });
     this.userService.whenUserLoaded().subscribe(user => {
       if (user.hasPermission(CONFIG.appPermissions.ADMINISTRATE_LOAN)) {
         this.searchType = this.privilegedSearchType;

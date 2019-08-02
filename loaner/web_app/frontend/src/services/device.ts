@@ -67,9 +67,8 @@ export class DeviceService extends ApiService {
    */
   getDevice(id: string) {
     const request: DeviceRequestApiParams = {'identifier': id};
-    return this.post('user/get', request)
-        .pipe(map(
-            (retrievedDevice: DeviceApiParams) => new Device(retrievedDevice)));
+    return this.post<DeviceApiParams>('user/get', request)
+        .pipe(map(retrievedDevice => new Device(retrievedDevice)));
   }
 
   /**

@@ -97,7 +97,6 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    // For info about AnyDuringJasmineTypesMigration, see go/jasmine-dts
     expect(app.device.dueDate)
         .toEqual((testDeviceInfo.due_date) as AnyDuringJasmineTypesMigration);
   });

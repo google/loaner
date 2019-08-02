@@ -40,7 +40,7 @@ export class ShelfActionsCard implements OnInit {
   /** List of possible teams that are responsible for a shelf. */
   responsiblesForAuditList: string[] = [];
   /** Access properties in the form. */
-  @ViewChild('shelfActionsForm') shelfActionsForm!: NgForm;
+  @ViewChild('shelfActionsForm', {static: true}) shelfActionsForm!: NgForm;
 
   constructor(
       private readonly configService: ConfigService,

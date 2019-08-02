@@ -144,6 +144,7 @@ def build_shelf_message_from_model(shelf):
       capacity=shelf.capacity,
       audit_notification_enabled=shelf.audit_notification_enabled,
       audit_requested=shelf.audit_requested,
+      audit_enabled=shelf.audit_enabled,
       responsible_for_audit=shelf.responsible_for_audit,
       last_audit_time=shelf.last_audit_time,
       last_audit_by=shelf.last_audit_by,

@@ -84,22 +84,24 @@ export class AppRoot implements AfterViewInit, OnInit {
   currentStep = 0;
   maxStep = 0;
   readonly steps = STEPS;
-  @ViewChild(LoanerFlowSequence) flowSequence!: LoanerFlowSequence;
-  @ViewChild(LoanerFlowSequenceButtons)
+  @ViewChild(LoanerFlowSequence, {static: true})
+  flowSequence!: LoanerFlowSequence;
+  @ViewChild(LoanerFlowSequenceButtons, {static: true})
   flowSequenceButtons!: LoanerFlowSequenceButtons;
 
   surveyAnswer!: SurveyAnswer;
   surveySent = false;
 
   // Flow components to be manipulated.
-  @ViewChild(WelcomeComponent) welcomeComponent!: WelcomeComponent;
-  @ViewChild(SurveyComponent) surveyComponent!: SurveyComponent;
-  @ViewChild(ReturnComponent) returnComponent!: ReturnComponent;
-  @ViewChild(LoanerReturnInstructions)
+  @ViewChild(WelcomeComponent, {static: true})
+  welcomeComponent!: WelcomeComponent;
+  @ViewChild(SurveyComponent, {static: true}) surveyComponent!: SurveyComponent;
+  @ViewChild(ReturnComponent, {static: true}) returnComponent!: ReturnComponent;
+  @ViewChild(LoanerReturnInstructions, {static: true})
   returnInstructions!: LoanerReturnInstructions;
 
   // Represents the analytics image in the body.
-  @ViewChild('analytics') analyticsImg!: HTMLImageElement|null;
+  @ViewChild('analytics', {static: true}) analyticsImg!: HTMLImageElement|null;
 
   constructor(
       private readonly analyticsService: AnalyticsService,
@@ -166,8 +168,9 @@ export class AppRoot implements AfterViewInit, OnInit {
     });
 
     // If there is no network connection, disable the flow buttons.
-    this.networkService.internetStatus.subscribe(
-        status => this.flowSequenceButtons.allowButtonClick = status);
+    this.networkService.internetStatus.subscribe(status => {
+      this.flowSequenceButtons.allowButtonClick = status;
+    });
 
     // Subscribe to flow state
     this.flowSequence.flowState.subscribe(state => {
@@ -281,7 +284,9 @@ ensure we have an appropriate amount of loaners.`;
    * Handle changes from survey related items including the SurveyComponent.
    */
   surveyListener() {
-    this.survey.answer.subscribe(val => this.surveyAnswer = val);
+    this.survey.answer.subscribe(val => {
+      this.surveyAnswer = val;
+    });
     this.surveyComponent.surveyError.subscribe(val => {
       const message = `We are unable to retrieve the survey at the moment,
 continue using the app as normal.`;

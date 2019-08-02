@@ -127,6 +127,13 @@ class BigQueryRow(base_model.BaseModel):
       logging.error('Unable to stream rows.')
       return
     _set_streamed(rows)
+    for row in rows:
+      row.delete()
+
+  def delete(self):
+    """Deletes streamed row from datastore."""
+    if self.streamed:
+      self.key.delete()
 
 
 def _set_streamed(rows):
