@@ -163,7 +163,7 @@ class DirectoryClientTest(parameterized.TestCase, loanertest.TestCase):
 
     self.mock_client.chromeosdevices.side_effect = KeyError
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         directory.DeviceDoesNotExistError,
         directory._NO_DEVICE_MSG % self.serial_number):
       directory_client = directory.DirectoryApiClient(

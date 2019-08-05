@@ -18,6 +18,7 @@ import {CONFIG} from '../app.config';
 import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
 import {Device, ListDevicesResponse} from '../models/device';
+import {Role} from '../models/role';
 import {ListShelfResponse, Shelf, ShelfRequestParams} from '../models/shelf';
 import {ListTagRequest, ListTagResponse, Tag} from '../models/tag';
 import {User} from '../models/user';
@@ -699,7 +700,7 @@ export class TagServiceMock {
   }
 
   create(createTag: Tag) {
-    return Observable.create((observer: Observer<boolean>) => {
+    return new Observable<boolean>((observer: Observer<boolean>) => {
       if (createTag.name === '') {
         observer.error(false);
         observer.complete();
@@ -715,7 +716,7 @@ export class TagServiceMock {
   }
 
   destroy(destroyTag: Tag) {
-    return Observable.create((observer: Observer<boolean>) => {
+    return new Observable<boolean>((observer: Observer<boolean>) => {
       const deleteIndex = this.tags.findIndex(
           (tag) => tag.urlSafeKey === destroyTag.urlSafeKey);
       if (deleteIndex > -1) {
@@ -730,7 +731,7 @@ export class TagServiceMock {
   }
 
   update(updateTag: Tag) {
-    return Observable.create((observer: Observer<boolean>) => {
+    return new Observable<boolean>((observer: Observer<boolean>) => {
       const updateIndex =
           this.tags.findIndex((tag) => tag.urlSafeKey === updateTag.urlSafeKey);
       if (updateIndex > -1) {
@@ -748,7 +749,8 @@ export class TagServiceMock {
     page_index: 1,
     include_hidden_tags: false
   }): Observable<ListTagResponse> {
-    return Observable.create((observer: Observer<ListTagResponse>) => {
+    return new Observable<
+        ListTagResponse>((observer: Observer<ListTagResponse>) => {
       const response: ListTagResponse =
           {total_pages: 0, has_additional_results: false, tags: [], cursor: ''};
       if (params.page_size && params.page_size <= 0) {
@@ -808,6 +810,46 @@ export class SearchServiceMock {
   }
 
   clearIndex(searchType: string) {
+    return of();
+  }
+}
+
+export class RoleServiceMock {
+  dataChange = new BehaviorSubject<Role[]>([
+    new Role({
+      name: 'Role 1',
+      associated_group: 'Role Group 1',
+      permissions: ['permission1', 'permissions2', 'permissions3'],
+    }),
+    new Role({
+      name: 'Role 2',
+      associated_group: 'Role Group 2',
+      permissions: ['permission1', 'permissions2', 'permissions3'],
+    }),
+    new Role({
+      name: 'Role 3',
+      associated_group: 'Role Group 3',
+      permissions: ['permission1', 'permissions2', 'permissions3'],
+    }),
+  ]);
+
+  create(role: Role) {
+    return of();
+  }
+
+  getRole(role: Role) {
+    return this.dataChange.value;
+  }
+
+  update(role: Role) {
+    return of();
+  }
+
+  list() {
+    return of(this.dataChange);
+  }
+
+  deleteRole(role: Role) {
     return of();
   }
 }

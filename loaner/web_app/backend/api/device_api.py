@@ -127,7 +127,8 @@ class DeviceApi(root_api.Service):
       device.device_audit_check()
     except (
         device_model.DeviceNotEnrolledError,
-        device_model.UnableToMoveToShelfError) as err:
+        device_model.UnableToMoveToShelfError,
+        device_model.DeviceAuditEventError) as err:
       raise endpoints.BadRequestException(str(err))
     return message_types.VoidMessage()
 

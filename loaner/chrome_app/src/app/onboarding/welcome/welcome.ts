@@ -26,7 +26,7 @@ import {AnimationMenuService} from '../../../../../shared/services/animation_men
   templateUrl: './welcome.ng.html',
 })
 export class WelcomeComponent implements OnInit {
-  @ViewChild('welcomeAnimation') animationElement!: ElementRef;
+  @ViewChild('welcomeAnimation', {static: false}) animationElement!: ElementRef;
 
   playbackRate!: number;
   programName: string = PROGRAM_NAME;

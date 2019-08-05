@@ -127,6 +127,10 @@ class DeviceReturnError(Error):
   """Raised when a device failed to be returned."""
 
 
+class DeviceAuditEventError(Error):
+  """Raised when the app fails to audit a device."""
+
+
 ReturnDates = collections.namedtuple('ReturnDates', ['max', 'default'])
 
 
@@ -844,11 +848,20 @@ class Device(base_model.BaseModel):
     Raises:
       DeviceNotEnrolledError: when a device is not enrolled in the application.
       UnableToMoveToShelfError: when a deivce can not be checked into a shelf.
+      DeviceAuditError:when a device encounters an error during auditing
     """
     if not self.enrolled:
       raise DeviceNotEnrolledError(DEVICE_NOT_ENROLLED_MSG % self.identifier)
     if self.damaged:
       raise UnableToMoveToShelfError(_DEVICE_DAMAGED_MSG % self.identifier)
+    try:
+      events.raise_event('device_audit', device=self)
+    except events.EventActionsError as err:
+      # For any action that is implemented for device_audit that is
+      # required for the rest of the logic an error should be raised.
+      # If all actions are not required, eg sending a notification email only,
+      # the error should only be logged.
+      raise DeviceAuditEventError(err)
 
   def move_to_shelf(self, shelf, user_email):
     """Checks a device into a shelf.

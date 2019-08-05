@@ -31,7 +31,7 @@ export enum FlowsEnum {
   templateUrl: './return_instructions.ng.html',
 })
 export class LoanerReturnInstructions implements OnInit {
-  @ViewChild('returnAnimation') animationElement!: ElementRef;
+  @ViewChild('returnAnimation', {static: false}) animationElement!: ElementRef;
 
   flows = FlowsEnum;
 

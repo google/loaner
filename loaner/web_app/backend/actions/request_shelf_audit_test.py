@@ -35,7 +35,7 @@ class RequestShelfAuditTest(parameterized.TestCase, loanertest.ActionTestCase):
     super(RequestShelfAuditTest, self).setUp()
 
   def test_run_no_shelf(self):
-    self.assertRaisesRegexp(  # Raises generic because imported != loaded.
+    self.assertRaisesRegexpp(  # Raises generic because imported != loaded.
         Exception, '.*did not receive a shelf.*', self.action.run)
 
   @parameterized.named_parameters(

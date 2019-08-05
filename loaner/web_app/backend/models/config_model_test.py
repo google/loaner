@@ -130,7 +130,7 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
     self.assertEqual(config_datastore, 'both_required')
 
   def test_get_nonexistent(self):
-    with self.assertRaisesRegexp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
+    with self.assertRaisesRegexpp(KeyError, config_model._CONFIG_NOT_FOUND_MSG):
       config_model.Config.get('does_not_exist')
 
   @parameterized.parameters(_create_config_parameters())
@@ -143,7 +143,7 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
     self.assertEqual(config, test_config[1])
 
   def test_set_nonexistent(self):
-    with self.assertRaisesRegexp(KeyError,
+    with self.assertRaisesRegexpp(KeyError,
                                  config_model._CONFIG_NOT_FOUND_MSG % 'fake'):
       config_model.Config.set('fake', 'does_not_exist')
 

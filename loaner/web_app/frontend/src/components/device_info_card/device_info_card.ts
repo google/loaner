@@ -91,7 +91,9 @@ export class DeviceInfoCard implements OnInit {
   private getDevices() {
     this.userService.whenUserLoaded()
         .pipe(
-            tap(user => this.user = user),
+            tap(user => {
+              this.user = user;
+            }),
             switchMap(() => this.route.queryParams),
             map(params => params['user']),
             switchMap(

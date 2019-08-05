@@ -1,0 +1,23 @@
+<mat-card>
+ <mat-card-title>Role Editor</mat-card-title>
+  <mat-card-subtitle>
+    View, add, edit, or delete existing roles
+  </mat-card-subtitle>
+  <mat-table #table [dataSource]="dataSource">
+    <ng-container cdkColumnDef="name">
+      <mat-header-cell *cdkHeaderCellDef>Name</mat-header-cell>
+      <mat-cell *cdkCellDef="let role">{{role.name}}</mat-cell>
+    </ng-container>
+    <ng-container cdkColumnDef="associated_group">
+      <mat-header-cell *cdkHeaderCellDef>Associated Group</mat-header-cell>
+      <mat-cell *cdkCellDef="let role">{{role.associated_group}}</mat-cell>
+    </ng-container>
+    <ng-container cdkColumnDef="permissions">
+      <mat-header-cell *cdkHeaderCellDef>Permissions</mat-header-cell>
+      <mat-cell *cdkCellDef="let role">{{role.permissions}}</mat-cell>
+    </ng-container>
+
+    <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *cdkRowDef="let role; columns: displayedColumns"></mat-row>
+  </mat-table>
+</mat-card>

@@ -201,7 +201,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
     ou = constants.ORG_UNIT_DICT.get('DEFAULT')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.DeviceCreationError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
             '123456', ou, err_message)):
@@ -401,7 +401,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
     ou = constants.ORG_UNIT_DICT['DEFAULT']
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.DeviceCreationError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
             '5467FD', ou, err_message)):
@@ -415,7 +415,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     mock_directoryclient.get_chrome_device_by_serial.side_effect = (
         directory.DeviceDoesNotExistError(
             directory._NO_DEVICE_MSG % serial_number))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.DeviceCreationError,
         directory._NO_DEVICE_MSG % serial_number):
       device_model.Device.enroll(
@@ -428,7 +428,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
     unenroll_ou = config_model.Config.get('unenroll_ou')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.FailedToUnenrollError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
             self.test_device.identifier, unenroll_ou, err_message)):
@@ -515,7 +515,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     mock_directoryclient.get_chrome_device.return_value = {
         directory.SERIAL_NUMBER: ''}
 
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.DeviceCreationError,
         device_model._DIRECTORY_INFO_INCOMPLETE_MSG):
       device_model.Device.create_unenrolled(
@@ -939,7 +939,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.mock_directoryclient.reset_mock()
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.UnableToMoveToDefaultOUError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
             self.test_device.identifier, constants.ORG_UNIT_DICT['DEFAULT'],
@@ -955,7 +955,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_device_audit_check_device_not_active(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.enrolled = False
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.DeviceNotEnrolledError,
         device_model.DEVICE_NOT_ENROLLED_MSG % (
             self.test_device.identifier)):
@@ -964,17 +964,23 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_device_audit_check_device_is_damaged(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.damaged = True
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         device_model.UnableToMoveToShelfError,
         device_model._DEVICE_DAMAGED_MSG % (
             self.test_device.identifier)):
+      self.test_device.device_audit_check()
+
+  def test_device_audit_check_audit_error(self):
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.testbed.mock_raiseevent.side_effect = events.EventActionsError
+    with self.assertRaises(device_model.DeviceAuditEventError):
       self.test_device.device_audit_check()
 
   def test_place_device_on_shelf_is_not_active(self):
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.shelf.enabled = False
     self.shelf.put()
-    self.assertRaisesRegexp(
+    self.assertRaisesRegexpp(
         device_model.UnableToMoveToShelfError, 'Unable to check device',
         self.test_device.move_to_shelf, self.shelf, loanertest.USER_EMAIL)
 

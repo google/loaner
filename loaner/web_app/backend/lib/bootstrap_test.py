@@ -116,7 +116,7 @@ class BootstrapTest(loanertest.TestCase):
   def test_manage_task_handles_exception(self, mock_importyaml):
     """Tests that the manage_task decorator kandles an exception."""
     mock_importyaml.side_effect = KeyError('task-exception')
-    self.assertRaisesRegexp(
+    self.assertRaisesRegexpp(
         deferred.PermanentTaskFailure,
         'bootstrap_datastore_yaml.*task-exception',
         bootstrap.bootstrap_datastore_yaml, user_email='foo')

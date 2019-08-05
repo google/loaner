@@ -67,7 +67,7 @@ class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = config_messages.GetConfigRequest(
         name='Not Valid',
         config_type=config_messages.ConfigType.STRING)
-    self.assertRaisesRegexp(
+    self.assertRaisesRegexpp(
         config_api.endpoints.BadRequestException,
         'No such name',
         self.service.get_config,
@@ -134,7 +134,7 @@ class ConfigApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
             name='Does not exist!',
             config_type=config_messages.ConfigType.BOOLEAN,
             boolean_value=False)])
-    self.assertRaisesRegexp(
+    self.assertRaisesRegexpp(
         config_api.endpoints.BadRequestException,
         'No such name',
         self.service.update_config,

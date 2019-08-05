@@ -21,10 +21,12 @@ export class NetworkService {
   internetStatus = new BehaviorSubject<boolean>(true);
 
   constructor(private readonly snackBar: MatSnackBar) {
-    fromEvent(window, 'online')
-        .subscribe(() => this.internetStatusUpdater(true));
-    fromEvent(window, 'offline')
-        .subscribe(() => this.internetStatusUpdater(false));
+    fromEvent(window, 'online').subscribe(() => {
+      this.internetStatusUpdater(true);
+    });
+    fromEvent(window, 'offline').subscribe(() => {
+      this.internetStatusUpdater(false);
+    });
   }
 
   /**

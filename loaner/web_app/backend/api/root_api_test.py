@@ -54,7 +54,7 @@ class RootServiceTest(loanertest.EndpointsTestCase):
       self.assertTrue(mock_validate_request.called)
 
       mock_validate_request.return_value = False
-      self.assertRaisesRegexp(
+      self.assertRaisesRegexpp(
           endpoints.ForbiddenException, 'XSRF',
           self.service.do_something, request)
 

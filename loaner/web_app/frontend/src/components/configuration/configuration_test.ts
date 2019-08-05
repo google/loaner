@@ -19,8 +19,9 @@ import {RouterTestingModule} from '@angular/router/testing';
 import {of} from 'rxjs';
 
 import {ConfigService} from '../../services/config';
+import {RoleService} from '../../services/role';
 import {SearchService} from '../../services/search';
-import {ConfigServiceMock, SearchServiceMock} from '../../testing/mocks';
+import {ConfigServiceMock, RoleServiceMock, SearchServiceMock} from '../../testing/mocks';
 
 import {Configuration, ConfigurationModule} from './index';
 
@@ -40,6 +41,7 @@ describe('ConfigurationComponent', () => {
           providers: [
             {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: SearchService, useClass: SearchServiceMock},
+            {provide: RoleService, useClass: RoleServiceMock},
           ],
         })
         .compileComponents();
@@ -75,7 +77,7 @@ describe('ConfigurationComponent', () => {
         fixture.debugElement.nativeElement.querySelector(
             'input[name="responsible_for_audit_list"]');
     expect(groupResponsibleForAuditInput).toBeDefined();
-    expect(groupResponsibleForAuditInput.type).toBe('email');
+    expect(groupResponsibleForAuditInput.type).toBe('text');
   });
 
   it('renders a known string config', () => {

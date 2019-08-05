@@ -210,7 +210,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   @mock.patch('__main__.device_model.Device.device_audit_check')
   def test_device_audit_check(self, mock_device_audit_check):
     request = device_messages.DeviceRequest(identifier='6765')
-    self.assertRaisesRegexp(
+    self.assertRaisesRegexpp(
         device_api.endpoints.NotFoundException,
         device_api._NO_DEVICE_MSG % '6765',
         self.service.device_audit_check, request)
@@ -238,6 +238,13 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = device_messages.DeviceRequest(
         identifier=self.device.serial_number)
     self.device.damaged = True
+    with self.assertRaises(device_api.endpoints.BadRequestException):
+      self.service.device_audit_check(request)
+
+  def test_device_audit_check_audit_error(self):
+    request = device_messages.DeviceRequest(
+        identifier=self.device.serial_number)
+    self.testbed.mock_raiseevent.side_effect = device_model.DeviceAuditEventError
     with self.assertRaises(device_api.endpoints.BadRequestException):
       self.service.device_audit_check(request)
 
@@ -490,7 +497,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     config_model.Config.set('allow_guest_mode', True)
     self.device.assigned_user = None
     self.device.put()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.UnauthorizedException,
         device_model._UNASSIGNED_DEVICE % self.device.identifier):
       self.service.enable_guest_mode(
@@ -532,7 +539,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_extend_loan_unassigned(self):
     self.device.assigned_user = None
     self.device.put()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.UnauthorizedException,
         device_model._UNASSIGNED_DEVICE % self.device.identifier):
       self.service.extend_loan(
@@ -623,7 +630,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_mark_pending_return_unassigned(self):
     self.device.assigned_user = None
     self.device.put()
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.UnauthorizedException,
         device_model._UNASSIGNED_DEVICE % self.device.identifier):
       self.service.mark_pending_return(

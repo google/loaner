@@ -36,18 +36,18 @@ class SendReminderTest(loanertest.ActionTestCase, parameterized.TestCase):
     super(SendReminderTest, self).setUp()
 
   def test_run_no_device(self):
-    self.assertRaisesRegexp(  # Raises generic because imported != loaded.
+    self.assertRaisesRegexpp(  # Raises generic because imported != loaded.
         Exception, '.*did not receive a device.*', self.action.run)
 
   def test_run_no_next_reminder(self):
     device = device_model.Device(serial_number='123456', chrome_device_id='123')
-    self.assertRaisesRegexp(  # Raises generic because imported != loaded.
+    self.assertRaisesRegexpp(  # Raises generic because imported != loaded.
         Exception, '.*without next_reminder.*', self.action.run, device=device)
 
   def test_run_no_event(self):
     device = device_model.Device(  # Raises generic because imported != loaded.
         serial_number='123456', next_reminder=device_model.Reminder(level=0))
-    self.assertRaisesRegexp(
+    self.assertRaisesRegexpp(
         Exception, '.*no ReminderEvent.*', self.action.run, device=device)
 
   @parameterized.named_parameters(

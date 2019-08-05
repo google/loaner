@@ -123,7 +123,8 @@ class BigQueryRowModelTest(loanertest.TestCase, parameterized.TestCase):
       ('time', '_time_threshold_reached'),
       ('rows', '_row_threshold_reached'))
   @mock.patch.object(ndb, 'put_multi', autospec=True)
-  def test_stream_rows(self, threshold_function, mock_put_multi):
+  @mock.patch.object(bigquery_row_model.BigQueryRow, 'delete')
+  def test_stream_rows(self, threshold_function, mock_delete, mock_put_multi):
     test_row_dict_1 = self.test_row_1.to_json_dict()
     test_row_dict_2 = self.test_row_2.to_json_dict()
     test_row_1 = (test_row_dict_1['ndb_key'], test_row_dict_1['timestamp'],
@@ -150,6 +151,7 @@ class BigQueryRowModelTest(loanertest.TestCase, parameterized.TestCase):
     self.assertTrue(self.test_row_1.streamed)
     self.assertTrue(self.test_row_2.streamed)
     self.assertEqual(mock_put_multi.call_count, 1)
+    self.assertEqual(mock_delete.call_count, 2)
 
   def test_stream_rows_insert_error(self):
     self.mock_bigquery_client.stream_table.side_effect = bigquery.InsertError
@@ -159,5 +161,20 @@ class BigQueryRowModelTest(loanertest.TestCase, parameterized.TestCase):
       with self.assertRaises(bigquery.InsertError):
         bigquery_row_model.BigQueryRow.stream_rows()
 
+  def test_delete(self):
+    self.test_row_1.streamed = True
+
+    self.test_row_1.delete()
+
+    self.assertLen(bigquery_row_model.BigQueryRow._fetch_unstreamed_rows(), 1)
+
+  def test_deleted_fail(self):
+    self.test_row_1.streamed = False
+
+    self.test_row_1.delete()
+
+    self.assertLen(bigquery_row_model.BigQueryRow._fetch_unstreamed_rows(), 2)
+
 if __name__ == '__main__':
   loanertest.main()
+

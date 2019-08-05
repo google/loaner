@@ -12,34 +12,28 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
-
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from '../../core/material_module';
-import {RoleEditorTableModule} from '../role_editor_table';
-import {TagListTableModule} from '../tag_list_table';
+import {RoleEditorTable} from './role_editor_table';
 
-import {Configuration} from './configuration';
-
-export * from './configuration';
+export * from './role_editor_table';
 
 @NgModule({
   declarations: [
-    Configuration,
+    RoleEditorTable,
   ],
   exports: [
-    Configuration,
+    RoleEditorTable,
   ],
   imports: [
-    BrowserModule,
-    CommonModule,
     FormsModule,
+    BrowserModule,
     MaterialModule,
-    TagListTableModule,
-    RoleEditorTableModule,
+    BrowserAnimationsModule,
   ],
 })
-export class ConfigurationModule {
+export class RoleEditorTableModule {
 }

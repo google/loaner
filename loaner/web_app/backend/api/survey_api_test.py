@@ -138,7 +138,7 @@ class QuestionEndpointsTest(
     request = survey_messages.Question(
         question_type=survey_models.QuestionType.ASSIGNMENT,
         question_text='How are you today?')
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.BadRequestException,
         survey_api._NOT_ENOUGH_ANSWERS_MSG):
       self.service.create(request)
@@ -162,14 +162,14 @@ class QuestionEndpointsTest(
         enabled=True)
 
     # Test that more info without place holder text raises an exception.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.BadRequestException,
         survey_models._MORE_INFO_MSG):
       request.answers = [malformed_answer_message_1]
       self.service.create(request)
 
     # Test that place holder text without more info raises an exception.
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.BadRequestException,
         survey_models._MORE_INFO_MSG):
       request.answers = [malformed_answer_message_2]
@@ -192,7 +192,7 @@ class QuestionEndpointsTest(
     """Test request method when no survey exists, raises NotFoundException."""
     request = survey_messages.QuestionRequest(
         question_type=survey_models.QuestionType.ASSIGNMENT)
-    with self.assertRaisesRegexp(
+    with self.assertRaisesRegexpp(
         endpoints.NotFoundException,
         survey_api._NO_QUESTION_FOR_TYPE_MSG % request.question_type):
       self.service.request(request)
