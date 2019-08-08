@@ -30,7 +30,7 @@ from loaner.web_app.backend.models import template_model
 # The application version (MAJOR.MINOR.PATCH-[pre-release]).
 # This should be iterated on all official releases or for any bootstrap
 # affecting changes.
-APP_VERSION = '0.7.1-alpha'
+APP_VERSION = '0.7.2-alpha'
 
 # The application id for this project otherwise known as the Google Cloud
 # Project ID.

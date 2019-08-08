@@ -26,6 +26,7 @@ loaner_appengine_library(
         ":config_model",
         ":device_model",
         ":event_models",
+        ":fleet_model",
         ":shelf_model",
         ":survey_models",
         ":tag_model",
@@ -101,6 +102,17 @@ loaner_appengine_library(
     ],
     deps = [
         "@absl_archive//absl/logging",
+    ],
+)
+
+loaner_appengine_library(
+    name = "fleet_model",
+    srcs = [
+        "fleet_model.py",
+    ],
+    deps = [
+        ":base_model",
+        "//loaner/web_app/backend/lib:utils",
     ],
 )
 
@@ -256,6 +268,17 @@ loaner_appengine_test(
 )
 
 loaner_appengine_test(
+    name = "fleet_model_test",
+    srcs = [
+        "fleet_model_test.py",
+    ],
+    deps = [
+        ":fleet_model",
+        "//loaner/web_app/backend/testing:loanertest",
+    ],
+)
+
+loaner_appengine_test(
     name = "shelf_model_test",
     srcs = [
         "shelf_model_test.py",
@@ -330,6 +353,7 @@ test_suite(
         ":config_model_test",
         ":device_model_test",
         ":event_models_test",
+        ":fleet_model_test",
         ":shelf_model_test",
         ":survey_models_test",
         ":tag_model_test",
