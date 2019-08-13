@@ -560,6 +560,32 @@ export const TEST_SHELF = new Shelf({
   shelf_request: TEST_SHELF_REQUEST,
 });
 
+export const TEST_SHELF_SYSTEM_AUDIT_ENABLED = new Shelf({
+  friendly_name: 'SYSTEM AUDIT SHELF',
+  location: 'FAKE LOCATION',
+  capacity: 5,
+  responsible_for_audit: 'me',
+  audit_enabled: true,
+  audit_notification_enabled: true,
+});
+
+export const TEST_SHELF_SYSTEM_AUDIT_DISABLED = new Shelf({
+  friendly_name: 'SHELF AUDIT SHELF',
+  location: 'FAKE LOCATION',
+  capacity: 5,
+  responsible_for_audit: 'me',
+  audit_enabled: false,
+  audit_notification_enabled: true,
+});
+
+export const TEST_SHELF_AUDIT_DISABLED = new Shelf({
+  friendly_name: 'SYSTEM AUDIT SHELF',
+  location: 'FAKE LOCATION',
+  capacity: 5,
+  responsible_for_audit: 'me',
+  audit_enabled: true,
+  audit_notification_enabled: false,
+});
 /** A class which mocks TagService calls without making any HTTP calls. */
 export class TagServiceMock {
   tags: Tag[];

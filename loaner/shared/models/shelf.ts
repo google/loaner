@@ -42,6 +42,7 @@ export declare interface ShelfApiParams {
   page_token?: string;
   page_size?: number;
   query?: SearchQuery;
+  audit_enabled?: boolean;
 }
 
 /** Interface of listShelfResponseApiParams. */
@@ -84,6 +85,8 @@ export class Shelf {
   shelfRequest!: ShelfRequestParams;
   /** Enable audit notifications. */
   auditNotificationEnabled = true;
+  /** Combined status for shelf and system auditing. */
+  auditEnabled = false;
 
   /**
    * Property for the shelf name, which is preferred to be it's friendly
@@ -110,6 +113,7 @@ export class Shelf {
         shelf.audit_notification_enabled === undefined ?
         this.auditNotificationEnabled :
         shelf.audit_notification_enabled;
+    this.auditEnabled = shelf.audit_enabled || this.auditEnabled;
   }
 
   /** Translates the Shelf model object to the API message. */
@@ -127,6 +131,7 @@ export class Shelf {
       capacity: this.capacity,
       shelf_request: this.shelfRequest,
       audit_notification_enabled: this.auditNotificationEnabled,
+      audit_enabled: this.auditEnabled,
     };
   }
 }

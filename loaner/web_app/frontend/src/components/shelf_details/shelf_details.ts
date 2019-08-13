@@ -17,7 +17,6 @@ import {Component, Input, OnInit} from '@angular/core';
 import {Router} from '@angular/router';
 
 import {APPLICATION_PERMISSIONS} from '../../app.config';
-
 import {Shelf} from '../../models/shelf';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
@@ -91,5 +90,19 @@ export class ShelfDetails implements OnInit {
   /** Navigates to the previous expected page. */
   back() {
     this.location.back();
+  }
+
+  /** Displays string of audit status within the shelf details. */
+  auditStatus(): string {
+    if (this.shelf) {
+      if (!this.shelf.auditNotificationEnabled) {
+        return 'disabled on shelf';
+      } else if (!this.shelf.auditEnabled) {
+        return 'disabled by system';
+      } else if (this.shelf.auditEnabled) {
+        return 'enabled';
+      }
+    }
+    return 'unknown';
   }
 }

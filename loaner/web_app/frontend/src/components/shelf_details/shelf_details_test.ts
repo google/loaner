@@ -26,7 +26,7 @@ import {MatIconRegistry} from '../../core/material_module';
 import {Dialog} from '../../services/dialog';
 import {ShelfService} from '../../services/shelf';
 import {UserService} from '../../services/user';
-import {ShelfServiceMock, TEST_SHELF, TEST_USER, UserServiceMock} from '../../testing/mocks';
+import {ShelfServiceMock, TEST_SHELF, TEST_SHELF_AUDIT_DISABLED, TEST_SHELF_SYSTEM_AUDIT_DISABLED, TEST_SHELF_SYSTEM_AUDIT_ENABLED, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
 import {ShelfDetails, ShelfDetailsModule} from './index';
 
@@ -153,12 +153,37 @@ describe('ShelfDetailsComponent', () => {
      () => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
-       expect(
-           compiled
-               .querySelector('loaner-viewonly-label.auditNotificationEnabled')
-               .textContent)
+       expect(compiled.querySelector('loaner-viewonly-label.audit-status')
+                  .textContent)
            .toContain('Audit notification');
      });
+
+  it('should render the shelf as audits enabled by system and shelf', () => {
+    shelfDetails.shelf = TEST_SHELF_SYSTEM_AUDIT_ENABLED;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('loaner-viewonly-label.audit-status')
+               .textContent)
+        .toContain('Audit notifications are enabled');
+  });
+
+  it('should render the shelf as audits disabled by system', () => {
+    shelfDetails.shelf = TEST_SHELF_SYSTEM_AUDIT_DISABLED;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('loaner-viewonly-label.audit-status')
+               .textContent)
+        .toContain('Audit notifications are disabled by system');
+  });
+
+  it('should render the shelf as audits disabled by shelf', () => {
+    shelfDetails.shelf = TEST_SHELF_AUDIT_DISABLED;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('loaner-viewonly-label.audit-status')
+               .textContent)
+        .toContain('Audit notifications are disabled on shelf');
+  });
 
   it('should call openDialog when button is clicked.',
      () => {
