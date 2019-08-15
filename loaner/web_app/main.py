@@ -32,7 +32,6 @@ from loaner.web_app.backend.handlers.task import process_action
 from loaner.web_app.backend.handlers.task import process_emails
 from loaner.web_app.backend.handlers.task import stream_to_bigquery
 
-
 web_app_routes = [
     (r'/_ah/queue/process-action', process_action.ProcessActionHandler),
     (r'/_ah/queue/send-email', process_emails.EmailTaskHandler),
