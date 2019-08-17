@@ -23,7 +23,7 @@ import {Survey, SurveyAnswer, SurveyResponse, SurveyResponseAnswer, SurveyType} 
 @Component({
   host: {'class': 'mat-typography'},
   selector: 'survey',
-  styleUrls: ['./survey_component.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './survey_component.ng.html',
 })
 export class SurveyComponent extends LoaderView implements OnInit {

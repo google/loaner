@@ -19,7 +19,7 @@ import {Lost} from '../../lost';
 
 @Component({
   selector: 'loan-button[lostButton]',
-  styleUrls: ['./loan_actions_card.scss'],
+  styleUrls: ['./style.css'],
   template: `
   <button mat-raised-button class="action-button" color="warn"
           (click)="openDialog()"

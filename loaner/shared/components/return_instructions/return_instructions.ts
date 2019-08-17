@@ -27,7 +27,7 @@ export enum FlowsEnum {
 @Component({
   host: {'class': 'mat-typography'},
   selector: 'loaner-return-instructions',
-  styleUrls: ['./return_instructions.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './return_instructions.ng.html',
 })
 export class LoanerReturnInstructions implements OnInit {
@@ -43,6 +43,7 @@ export class LoanerReturnInstructions implements OnInit {
   @Input() flow: FlowsEnum = FlowsEnum.NONE;
   @Input() chromeApp = false;
   returnPlaying = true;
+  returnAnimationAltText = 'Return instructions';
 
   constructor(
       private animationService: AnimationMenuService,

@@ -26,7 +26,7 @@ import {AuthService} from '../../services/auth';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-authorization',
-  styleUrls: ['authorization.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'authorization.ng.html',
 })
 export class Authorization extends LoaderView implements OnInit {

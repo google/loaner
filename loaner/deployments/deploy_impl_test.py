@@ -106,7 +106,6 @@ class DeployImplTest(absltest.TestCase):
     self.stubs.SmartSet(deploy_impl, 'os', self.os)
     self.stubs.SmartSet(deploy_impl, 'shutil', self.shutil)
     # Populate the fake file system with the expected directories and files.
-    self.fs.CreateDirectory('/this/is/a/workspace/loaner/web_app/frontend/dist')
     self.fs.CreateDirectory('/this/is/a/workspace/loaner/chrome_app/dist')
     self.fs.CreateFile('/this/is/a/workspace/loaner/web_app/app.yaml')
     self.fs.CreateFile('/this/is/a/workspace/loaner/web_app/endpoints.yaml')
@@ -288,65 +287,17 @@ class DeployImplTest(absltest.TestCase):
     with self.assertRaises(app.UsageError):
       self.CreateTestAppEngineConfig(deployment_type='not_real_server')
 
-  def testMoveWebAppFrontendBundle(self):
-    """Test that frontend is moved correctly."""
-    fake_frontend_path = (
-        '/this/is/a/workspace/bazel-bin/loaner/web_app/runfiles.runfiles/gng/'
-        'loaner/web_app/frontend/src')
-    self.fs.CreateDirectory(fake_frontend_path)
-    test_app_engine_config = self.CreateTestAppEngineConfig()
-    test_app_engine_config._MoveWebAppFrontendBundle()
-    assert self.os.path.isdir(fake_frontend_path)
-    assert not self.os.path.isdir(
-        '/this/is/a/workspace/loaner/web_app/frontend/dist')
-
   @mock.patch.object(deploy_impl, '_ExecuteCommand', autospec=True)
-  def testBuildWebAppBackend(self, mock_execute):
+  def testBuildWebApp(self, mock_execute):
     """Test that the build web application backend executes."""
     fake_app_engine_deps_path = (
         '/this/is/a/workspace/bazel-bin/loaner/web_app/runfiles.runfiles/gng/'
         'external/com_google_appengine_py')
     self.fs.CreateDirectory(fake_app_engine_deps_path)
     test_app_engine_config = self.CreateTestAppEngineConfig()
-    test_app_engine_config._BuildWebAppBackend()
+    test_app_engine_config._BuildWebApp()
     assert mock_execute.call_count == 1
     self.assertFalse(self.os.path.isdir(fake_app_engine_deps_path))
-
-  @mock.patch.object(deploy_impl.AppEngineServerConfig, '_DeleteNodeModulesDir')
-  @mock.patch.object(deploy_impl, '_ExecuteCommand', autospec=True)
-  def testBuildWebAppFrontend(self, mock_execute, mock_del):
-    """Test that the build web application frontend executes."""
-    test_app_engine_config = self.CreateTestAppEngineConfig()
-    test_app_engine_config._BuildWebAppFrontend()
-    assert mock_execute.call_count == 2
-    mock_del.assert_not_called()
-    assert self.os.path.isdir(
-        '/this/is/a/workspace/loaner/web_app/frontend/dist')
-
-  @mock.patch.object(deploy_impl, '_ExecuteCommand', autospec=True)
-  def testBuildWebAppFrontendGoogleCloudShell(self, mock_execute):
-    """Test that the build web application frontend executes on GCS."""
-    self.fs.CreateDirectory('/this/is/a/workspace/loaner/node_modules')
-    test_app_engine_config = self.CreateTestAppEngineConfig()
-    self.os.environ['CLOUD_SHELL'] = 'true'
-    test_app_engine_config._BuildWebAppFrontend()
-    assert not self.os.path.isdir(test_app_engine_config.node_modules_path)
-    assert mock_execute.call_count == 2
-    self.os.environ['CLOUD_SHELL'] = 'false'
-
-  @mock.patch.object(
-      deploy_impl.AppEngineServerConfig, '_BuildWebAppFrontend', autospec=True)
-  @mock.patch.object(
-      deploy_impl.AppEngineServerConfig, '_BuildWebAppBackend', autospec=True)
-  @mock.patch.object(
-      deploy_impl.AppEngineServerConfig, '_MoveWebAppFrontendBundle')
-  def testBundleWebApp(self, mock_frontend, mock_backend, mock_move):
-    """Test that the bundle web application executes both web app builds."""
-    test_app_engine_config = self.CreateTestAppEngineConfig()
-    test_app_engine_config._BundleWebApp()
-    assert mock_backend.call_count == 1
-    assert mock_frontend.call_count == 1
-    assert mock_move.call_count == 1
 
   def testGetYamlFile(self):
     """Test that the get yaml file returns the full path for a yaml file."""
@@ -359,7 +310,7 @@ class DeployImplTest(absltest.TestCase):
   @mock.patch.object(
       deploy_impl.AppEngineServerConfig, '_GetYamlFile', autospec=True)
   @mock.patch.object(
-      deploy_impl.AppEngineServerConfig, '_BundleWebApp', autospec=True)
+      deploy_impl.AppEngineServerConfig, '_BuildWebApp', autospec=True)
   def testDeployWebApp(self, mock_bundle, mock_get_yaml, mock_execute):
     """Test that the web application deployment bundles the app and deploys."""
     self.os.environ['CLOUD_SHELL'] = 'true'

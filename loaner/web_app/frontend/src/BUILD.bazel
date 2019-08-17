@@ -1,0 +1,234 @@
+package(default_visibility = ["//loaner:__subpackages__"])
+
+load("@io_bazel_rules_sass//:defs.bzl", "sass_binary", "sass_library")
+load("@npm_bazel_typescript//:defs.bzl", "ts_library")
+load("@npm_angular_bazel//:index.bzl", "ng_module")
+load("@build_bazel_rules_nodejs//:defs.bzl", "rollup_bundle")
+load("@npm_bazel_typescript//:index.bzl", "ts_devserver")
+
+sass_library(
+    name = "app_lib",
+    srcs = ["app.scss"],
+    deps = [
+        "//loaner/shared/themes:standard",
+    ],
+)
+
+sass_binary(
+    name = "style",
+    src = "app.scss",
+    output_name = "style.css",
+    deps = [
+        ":app_lib",
+    ],
+)
+
+ts_library(
+    name = "app_config",
+    srcs = [
+        "app.config.ts",
+    ],
+    deps = [
+        "//loaner/shared:config",
+    ],
+)
+
+# We don't import from these, but the generated ngfactory code will.
+NG_FACTORY_ADDED_IMPORTS = [
+    "@npm//@angular/animations",
+    "@npm//@angular/cdk",
+    "@npm//@angular/material",
+    "@npm//@angular/forms",
+]
+
+# Needed for tests, yet to be figured out after the frontend compiles and runs.
+# ts_library(
+#     name = "initialize_testbed",
+#     testonly = 1,
+#     srcs = [
+#         "initialize_testbed.ts",
+#     ],
+#     deps = [
+#         "@npm//@angular/core",
+#         "@npm//@angular/platform-browser-dynamic",
+#         "@npm//@types",
+#     ],
+# )
+
+ng_module(
+    name = "src",
+    srcs = [
+        "main.aot.ts",
+    ],
+    tsconfig = "//:tsconfig.json",
+    deps = NG_FACTORY_ADDED_IMPORTS + [
+        ":app",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/router",
+    ],
+)
+
+filegroup(
+    name = "rxjs_umd_modules",
+    srcs = [
+        ":rxjs_shims.js",
+        "@npm//:node_modules/rxjs/bundles/rxjs.umd.js",
+    ],
+)
+
+# We always strip these paths off the front of any assets we serve.
+_ROOT_DIRS = [
+    "npm/node_modules/zone.js/dist",
+    "npm/node_modules/@angular/material/prebuilt-themes",
+    "npm/node_modules/@ngrx/store/bundles",
+    "npm/node_modules/moment/min",
+    "npm/node_modules/marked",
+]
+
+# Files that we serve in both development and production.
+_ASSETS = [
+    # This label references an output of the "styles" sass_binary above.
+    ":style.css",
+
+    # Directly reference a file that came from @angular/material npm package.
+    "@npm//:node_modules/@angular/material/prebuilt-themes/deeppurple-amber.css",
+
+    # We load zone.js outside the bundle. That's because it's a "pollyfill"
+    # which speculates that such features might be available in a browser.
+    # Also it's tricky to configure dead code elimination to understand that
+    # zone.js is used, given that we don't have any import statement that
+    # imports from it.
+    "@npm//:node_modules/zone.js/dist/zone.min.js",
+]
+
+# This devserver is written in Go and is super-fast.
+# It doesn't run any bundler or code splitter. Instead, it concatenates
+# named UMD and named AMD JavaScript code on-the-fly in-memory.
+# This scales really well for massive codebases.
+ts_devserver(
+    name = "devserver",
+    # serve these files rooted at /.
+    additional_root_paths = _ROOT_DIRS,
+    # Start from the development version of the main.
+    entry_module = "gng/loaner/web_app/frontend/src/main.aot",
+    # <script> and <link> tags will be automatically injected into this index
+    # file.
+    index_html = "index.html",
+    # These scripts will be included in the JS bundle after require.js
+    # They should have only named UMD modules, or require.js will throw.
+    scripts = [
+        "@npm//:node_modules/tslib/tslib.js",
+        ":rxjs_umd_modules",
+        "@npm//marked:marked__umd",
+    ],
+    serving_path = "/application.js",
+    # Serve these files in addition to the JavaScript bundle
+    # The corresponding <script> or <link> tags will be injected into the
+    # index_html.
+    static_files = _ASSETS,
+    # Tell Bazel to build the sources first.
+    deps = [":src"],
+)
+
+rollup_bundle(
+    name = "application_compiled",
+    # These Angular routes may be lazy-loaded at runtime.
+    # So we tell Rollup that it can put them in separate JS chunks
+    # (code-splitting) for faster application startup.
+    # In the future, we could automatically gather these from statically
+    # analyzing the Angular sources.
+    entry_point = ":main.aot.ts",
+    deps = [
+        ":src",
+        "@npm//@angular/common",
+        "@npm//@angular/core",
+        "@npm//@angular/material",
+        "@npm//@angular/platform-browser",
+        "@npm//@angular/router",
+        "@npm//rxjs",
+        "@npm//zone.js",
+    ],
+)
+
+genrule(
+    name = "application",
+    srcs = [
+        "@npm//:node_modules/zone.js/dist/zone.min.js",
+        "@npm//:node_modules/moment/min/moment.min.js",
+        "@npm//:node_modules/marked/marked.min.js",
+        # Hammerjs is giving `Uncaught SyntaxError: Unexpected token }` if
+        # enabled in the rollup_bundle.
+        # "@npm//:node_modules/hammerjs/hammer.min.js",
+        "application_compiled.min.js",
+    ],
+    outs = ["application.js"],
+    cmd = "cat $(SRCS) > $@",
+)
+
+filegroup(
+    name = "production_files",
+    srcs = [
+        "index.html",
+        ":application",
+        ":style.css",
+    ],
+)
+
+ng_module(
+    name = "app",
+    srcs = [
+        "app.module.ts",
+        "app.routing.ts",
+        "app.ts",
+    ],
+    assets = [
+        ":style",
+        "app.ng.html",
+        "index.html",
+    ],
+    deps = NG_FACTORY_ADDED_IMPORTS + [
+        ":app_config",
+        "//loaner/shared:config",
+        "//loaner/shared/components/loader",
+        "//loaner/web_app/frontend/src/components/authorization",
+        "//loaner/web_app/frontend/src/components/search_box",
+        "//loaner/web_app/frontend/src/core",
+        "//loaner/web_app/frontend/src/models",
+        "//loaner/web_app/frontend/src/services",
+        "//loaner/web_app/frontend/src/views/audit_view",
+        "//loaner/web_app/frontend/src/views/bootstrap_view",
+        "//loaner/web_app/frontend/src/views/configuration_view",
+        "//loaner/web_app/frontend/src/views/device_actions_view",
+        "//loaner/web_app/frontend/src/views/device_detail_view",
+        "//loaner/web_app/frontend/src/views/device_list_view",
+        "//loaner/web_app/frontend/src/views/search_view",
+        "//loaner/web_app/frontend/src/views/shelf_actions_view",
+        "//loaner/web_app/frontend/src/views/shelf_detail_view",
+        "//loaner/web_app/frontend/src/views/shelf_list_view",
+        "//loaner/web_app/frontend/src/views/user_view",
+        "@npm//@angular/common",
+        "@npm//@angular/core",
+        "@npm//@angular/platform-browser-dynamic",
+        "@npm//@angular/router",
+        "@npm//@types/hammerjs",
+    ],
+)
+
+# Tried adding this web_package rules to runfiles' data but it doesn't even
+# compile (it doesn't show up on bazel-out or bazel-bin).
+# The official Angular example uses this web_package to inject the same scripts
+# (zone and the application minified) into index.html and serve from an HTML.
+# web_package(
+#     name = "production_files",
+#     assets = [
+#         # do not sort
+#         "@npm//:node_modules/zone.js/dist/zone.min.js",
+#         ":application.min.js",
+#         ":style.css",
+#     ],
+#     data = [
+#         "//loaner/web_app/frontend/src/assets",
+#     ],
+#     index_html = "index.html",
+# )

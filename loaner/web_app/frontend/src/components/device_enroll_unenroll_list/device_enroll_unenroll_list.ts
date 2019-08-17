@@ -23,7 +23,7 @@ import {Dialog} from '../../services/dialog';
 
 @Component({
   selector: 'loaner-device-enroll-unenroll-list',
-  styleUrls: ['device_enroll_unenroll_list.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'device_enroll_unenroll_list.ng.html',
 })
 export class DeviceEnrollUnenrollList {

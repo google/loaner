@@ -19,7 +19,7 @@ import {CONFIG} from '../../app.config';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-shelf-list-view',
-  styleUrls: ['shelf_list_view.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'shelf_list_view.ng.html',
 
 })

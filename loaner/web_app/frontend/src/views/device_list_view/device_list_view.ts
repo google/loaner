@@ -19,7 +19,7 @@ import {CONFIG} from '../../app.config';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-device-list-view',
-  styleUrls: ['device_list_view.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'device_list_view.ng.html',
 
 })

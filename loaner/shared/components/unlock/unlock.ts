@@ -57,7 +57,7 @@ export class Unlock {
     'class': 'mat-typography',
   },
   selector: 'unlock',
-  styleUrls: ['./unlock.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './unlock.ng.html',
 })
 export class UnlockDialogComponent extends LoaderView {

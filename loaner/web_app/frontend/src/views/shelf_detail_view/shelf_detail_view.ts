@@ -24,7 +24,7 @@ import {ShelfService} from '../../services/shelf';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-shelf-detail-view',
-  styleUrls: ['shelf_detail_view.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'shelf_detail_view.ng.html',
 
 })

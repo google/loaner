@@ -53,7 +53,7 @@ export class GuestMode {
     'class': 'mat-typography',
   },
   selector: 'guest',
-  styleUrls: ['./guest.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './guest.ng.html',
 })
 export class GuestComponentDialog extends LoaderView {

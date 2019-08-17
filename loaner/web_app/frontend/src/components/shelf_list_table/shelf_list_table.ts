@@ -28,7 +28,7 @@ import {ShelfService} from '../../services/shelf';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-shelf-list-table',
-  styleUrls: ['shelf_list_table.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'shelf_list_table.ng.html',
 })
 export class ShelfListTable implements AfterViewInit, OnDestroy {

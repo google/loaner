@@ -21,7 +21,7 @@ import {Component, Input} from '@angular/core';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-viewonly-label',
-  styleUrls: ['viewonly_label.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'viewonly_label.ng.html',
 })
 export class ViewonlyLabel {

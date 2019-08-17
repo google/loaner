@@ -28,7 +28,7 @@ import {UserService} from '../../services/user';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-shelf-details',
-  styleUrls: ['shelf_details.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'shelf_details.ng.html',
 })
 export class ShelfDetails implements OnInit {

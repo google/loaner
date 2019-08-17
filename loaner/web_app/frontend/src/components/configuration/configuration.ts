@@ -26,7 +26,7 @@ import {SearchService} from '../../services/search';
  */
 @Component({
   selector: 'loaner-configuration',
-  styleUrls: ['configuration.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'configuration.ng.html',
 })
 export class Configuration implements OnInit {
@@ -37,9 +37,10 @@ export class Configuration implements OnInit {
   shelfAuditEmailToList = '';
 
   constructor(
-      readonly router: Router, private readonly configService: ConfigService,
-      // tslint:disable-next-line:no-unused-variable used on template.
-      private readonly searchService: SearchService) {}
+      readonly router: Router,
+      readonly searchService: SearchService,
+      private readonly configService: ConfigService,
+  ) {}
 
   ngOnInit() {
     this.configService.list().subscribe(config => {

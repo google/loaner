@@ -57,7 +57,7 @@ export class Unenroll {
     'class': 'mat-typography',
   },
   selector: 'unenroll',
-  styleUrls: ['./unenroll.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './unenroll.ng.html',
 })
 export class UnenrollDialogComponent extends LoaderView {

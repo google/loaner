@@ -22,7 +22,7 @@ import {Component, Input} from '@angular/core';
 @Component({
   host: {'class': 'mat-typography'},
   selector: 'loaner-text-card',
-  styleUrls: ['./info_card.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './info_card.ng.html',
 })
 export class LoanerTextCard {

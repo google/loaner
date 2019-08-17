@@ -98,7 +98,7 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   preserveWhitespaces: true,
   encapsulation: ViewEncapsulation.None,
   selector: 'app-root',
-  styleUrls: ['app.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'app.ng.html',
 })
 export class AppComponent extends LoaderView {

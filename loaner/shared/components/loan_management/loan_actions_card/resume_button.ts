@@ -19,7 +19,7 @@ import {ResumeLoan} from '../../resume_loan';
 
 @Component({
   selector: 'loan-button[resumeButton]',
-  styleUrls: ['./loan_actions_card.scss'],
+  styleUrls: ['./style.css'],
   template: `
     <button mat-raised-button class="action-button"
             color="primary"

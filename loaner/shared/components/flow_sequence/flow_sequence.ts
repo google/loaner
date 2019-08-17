@@ -38,7 +38,7 @@ export class LoanerFlowSequenceChild {
   encapsulation: ViewEncapsulation.None,
   host: {'class': 'mat-typography'},
   selector: 'loaner-flow-sequence',
-  styleUrls: ['./flow_sequence.scss'],
+  styleUrls: ['./style.css'],
   template: '<ng-content></ng-content>',
 })
 export class LoanerFlowSequence implements OnInit, AfterViewInit {

@@ -29,7 +29,7 @@ import {DeviceService} from '../../services/device';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-device-list-table',
-  styleUrls: ['device_list_table.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'device_list_table.ng.html',
 
 })
@@ -126,7 +126,7 @@ export class DeviceListTable implements AfterViewInit, OnDestroy, OnInit {
     this.pageSize += 25;
   }
 
-  private getDeviceList() {
+  getDeviceList() {
     if (this.gettingMoreData) {
       this.filters = this.setupShelfFilters({page_token: this.pageToken});
     } else {

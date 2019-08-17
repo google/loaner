@@ -22,7 +22,7 @@ import {Component, Input} from '@angular/core';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-loader',
-  styleUrls: ['loader.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'loader.html'
 })
 export class Loader {

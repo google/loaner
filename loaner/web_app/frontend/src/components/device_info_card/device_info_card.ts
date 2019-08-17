@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import * as moment from 'moment';
@@ -36,7 +34,7 @@ import {UserService} from '../../services/user';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-device-info-card',
-  styleUrls: ['device_info_card.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'device_info_card.ng.html',
 })
 export class DeviceInfoCard implements OnInit {

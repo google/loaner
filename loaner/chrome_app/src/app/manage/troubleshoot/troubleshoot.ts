@@ -22,7 +22,7 @@ import {Background} from '../../shared/background_service';
   },
   selector: 'troubleshoot',
   templateUrl: './troubleshoot.ng.html',
-  styleUrls: ['./troubleshoot.scss'],
+  styleUrls: ['./style.css'],
 })
 export class TroubleshootComponent {
   contactEmail?: string;

@@ -23,7 +23,7 @@ import {ShelfActionsCard} from '../../components/shelf_actions';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-shelf-actions-view',
-  styleUrls: ['shelf_actions_view.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'shelf_actions_view.ng.html',
 
 })

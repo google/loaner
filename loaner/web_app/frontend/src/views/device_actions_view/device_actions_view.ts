@@ -23,7 +23,7 @@ import {Actions, Device} from '../../models/device';
 
 @Component({
   selector: 'loaner-device-actions-view',
-  styleUrls: ['device_actions_view.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'device_actions_view.ng.html',
 
 })

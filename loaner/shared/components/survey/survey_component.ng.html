@@ -12,7 +12,7 @@
       {{ surveyDescription }}
     </p>
     <mat-radio-group [(ngModel)]="surveyAnswer"
-                     (ngModelChange)="onChange()"
+                     (ngModelChange)="onChange($event)"
                      class="mat-subheading-1 question">
       <div *ngFor="let question of surveyData.answers">
         <ng-template [ngIf]="!question.more_info_enabled">

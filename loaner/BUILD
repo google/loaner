@@ -13,3 +13,7 @@ package(
         ":__subpackages__",
     ],
 )
+
+exports_files([
+    "tsconfig.json",
+])

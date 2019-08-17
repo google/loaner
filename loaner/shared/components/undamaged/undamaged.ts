@@ -57,7 +57,7 @@ export class Undamaged {
     'class': 'mat-typography',
   },
   selector: 'undamaged',
-  styleUrls: ['./undamaged.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './undamaged.ng.html',
 })
 export class UndamagedDialogComponent extends LoaderView {

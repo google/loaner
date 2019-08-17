@@ -19,7 +19,7 @@ import {CONFIG} from '../../app.config';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-audit-view',
-  styleUrls: ['audit_view.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'audit_view.ng.html',
 
 })

@@ -19,7 +19,7 @@ import {Component, Input} from '@angular/core';
  */
 @Component({
   selector: 'loaner-device-header',
-  styleUrls: ['device_header.scss'],
+  styleUrls: ['style.css'],
   templateUrl: 'device_header.ng.html',
 
 })

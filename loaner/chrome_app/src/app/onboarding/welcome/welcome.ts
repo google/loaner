@@ -22,7 +22,7 @@ import {AnimationMenuService} from '../../../../../shared/services/animation_men
 @Component({
   host: {'class': 'mat-typography'},
   selector: 'welcome',
-  styleUrls: ['./welcome.scss'],
+  styleUrls: ['./style.css'],
   templateUrl: './welcome.ng.html',
 })
 export class WelcomeComponent implements OnInit {
