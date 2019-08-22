@@ -17,14 +17,11 @@
  * Note: Not a standard angular module.
  */
 
-import {HeaderInit} from 'node-fetch';
 import {ConfigService} from '../../../../shared/config';
 
 let accessToken: string;
 const CONFIG = new ConfigService();
 const MAX_RETRIES = 5;
-
-export type HeaderInitTs26 = HeaderInit&string[][];
 
 /**
  * Headers to be used in the request with oauth information
@@ -42,7 +39,7 @@ function HEADERS() {
  * @param headers Any other http header request information.
  */
 
-export function get<T>(url: string, headers?: HeaderInitTs26) {
+export function get<T>(url: string, headers?: HeadersInit) {
   return makeRequest<T>('get', url, undefined, headers);
 }
 
@@ -52,7 +49,7 @@ export function get<T>(url: string, headers?: HeaderInitTs26) {
  * @param body The data to be send over the POST HTTP request
  * @param headers Any other http header request information.
  */
-export function post<T>(url: string, body: {}, headers?: HeaderInitTs26) {
+export function post<T>(url: string, body: {}, headers?: HeadersInit) {
   return makeRequest<T>('post', url, body, headers);
 }
 
@@ -64,7 +61,7 @@ export function post<T>(url: string, body: {}, headers?: HeaderInitTs26) {
  * @param headers Any other http header request information.
  */
 function makeRequest<T>(
-    method: string, url: string, body?: {}, headers?: HeaderInitTs26) {
+    method: string, url: string, body?: {}, headers?: HeadersInit) {
   return new Promise<T>((resolve, reject) => {
     chrome.identity.getAuthToken(
         {interactive: false}, (newAccessToken: string) => {
