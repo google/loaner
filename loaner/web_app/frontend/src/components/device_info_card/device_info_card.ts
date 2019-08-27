@@ -13,8 +13,10 @@
 // limitations under the License.
 
 import {Component, OnInit} from '@angular/core';
+import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
 import * as moment from 'moment';
+import {of} from 'rxjs';
 import {map, switchMap, tap} from 'rxjs/operators';
 
 import {Damaged} from '../../../../../shared/components/damaged';
@@ -27,6 +29,7 @@ import {Device} from '../../models/device';
 import {User} from '../../models/user';
 import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
+import {ReturnDialog} from '../return_dialog/return_dialog';
 
 /**
  * Component that renders the device info card template.
@@ -69,6 +72,7 @@ export class DeviceInfoCard implements OnInit {
   constructor(
       private readonly damagedService: Damaged,
       private readonly deviceService: DeviceService,
+      private readonly dialog: MatDialog,
       private readonly extendService: Extend,
       private readonly guestModeService: GuestMode,
       private readonly lostService: Lost,
@@ -168,16 +172,30 @@ export class DeviceInfoCard implements OnInit {
   }
 
   /**
-   * Calls the deviceService to return a device.
+   * Opens a dialog to confirm that the user wants to return the device. If they
+   * do, it calls the deviceService to return a device.
    *
    * @param device The device to take action on.
    */
   onReturned(device: Device) {
-    this.deviceService.returnDevice(device).subscribe(() => {
-      device.pendingReturn = true;
-      this.loanedDevices =
-          this.loanedDevices.filter(device => !device.pendingReturn);
+    const dialogRef = this.dialog.open(ReturnDialog, {
+      ariaDescribedBy: 'content',
+      ariaLabelledBy: 'title',
     });
+
+    let shouldReturn: boolean;
+    dialogRef.afterClosed()
+        .pipe(switchMap(value => {
+          shouldReturn = value;
+          return value ? this.deviceService.returnDevice(device) : of(null);
+        }))
+        .subscribe(() => {
+          if (shouldReturn) {
+            device.pendingReturn = true;
+            this.loanedDevices =
+                this.loanedDevices.filter(device => !device.pendingReturn);
+          }
+        });
   }
 
   /**

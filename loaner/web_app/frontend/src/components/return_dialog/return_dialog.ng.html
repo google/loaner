@@ -1,0 +1,19 @@
+<h1 mat-dialog-title id="title">
+  Are you sure you want to return this loaner?
+</h1>
+
+<mat-dialog-content id="content">
+  Clicking the return button below will mark this loaner as returned. Please make sure to return
+  it to your nearest Grab n Go shelf as soon as possible.
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-button (click)="returnDevice()" class="action-button"
+          matTooltip="Mark this device as returned.">
+    Return
+  </button>
+  <button mat-button (click)="closeDialog()" class="action-button"
+          matTooltip="This will close the dialog.">
+    Close
+  </button>
+</mat-dialog-actions>

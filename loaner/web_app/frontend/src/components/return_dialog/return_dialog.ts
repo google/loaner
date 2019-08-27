@@ -12,29 +12,29 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import {Component, Input, Output} from '@angular/core';
-import {Subject} from 'rxjs';
+import {Component} from '@angular/core';
+import {MatDialogRef} from '@angular/material/dialog';
 
+/**
+ * Dialog that appears when you click the return button on the user view of the
+ * web app.
+ */
 @Component({
-  selector: 'loan-button[returnButton]',
+  host: {
+    'class': 'mat-typography',
+  },
+  selector: 'loaner-return-dialog',
   styleUrls: ['./style.css'],
-  template: `
-    <button mat-raised-button class="action-button"
-            color="primary"
-            (click)="returnDevice()"
-            [disabled]="disabled"
-            id="return"
-            aria-label="Click to start the return process for this device.
-            This will close the current window and open the return window.">
-      Return
-    </button>`,
+  templateUrl: 'return_dialog.ng.html',
 })
-export class ReturnButton {
-  @Output() done = new Subject<void>();
-  @Input() disabled = false;
+export class ReturnDialog {
+  constructor(private readonly dialogRef: MatDialogRef<ReturnDialog>) {}
 
-  /** Opens the return dialog. */
   returnDevice() {
-    this.done.next();
+    this.closeDialog(true);
+  }
+
+  closeDialog(shouldReturn = false) {
+    this.dialogRef.close(shouldReturn);
   }
 }

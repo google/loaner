@@ -14,6 +14,7 @@
 
 import {Component} from '@angular/core';
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
+import {MatDialog} from '@angular/material/dialog';
 import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {ActivatedRoute, Params, Router} from '@angular/router';
@@ -27,7 +28,7 @@ import {Lost} from '../../../../../shared/components/lost';
 import {DamagedMock, ExtendMock, GuestModeMock, LostMock} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
-import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, ReturnDialogMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
 import {DeviceInfoCard, DeviceInfoCardModule} from './index';
 
@@ -43,6 +44,9 @@ describe('DeviceInfoCardComponent', () => {
   let testComponent: DummyComponent;
   let deviceInfoCard: DeviceInfoCard;
   let router: Router;
+  let dialog: ReturnDialogMock;
+  let deviceService: DeviceService;
+
   const mockParams = new BehaviorSubject<Params>({
     id: DEVICE_2.serialNumber,
   });
@@ -81,6 +85,7 @@ describe('DeviceInfoCardComponent', () => {
             {provide: GuestMode, useClass: GuestModeMock},
             {provide: Lost, useClass: LostMock},
             {provide: UserService, useClass: UserServiceMock},
+            {provide: MatDialog, useClass: ReturnDialogMock},
           ],
         })
         .compileComponents();
@@ -90,6 +95,8 @@ describe('DeviceInfoCardComponent', () => {
     fixture = TestBed.createComponent(DummyComponent);
     testComponent = fixture.debugElement.componentInstance;
     router = TestBed.get(Router);
+    dialog = TestBed.get(MatDialog);
+    deviceService = TestBed.get(DeviceService);
 
     deviceInfoCard = fixture.debugElement.query(By.directive(DeviceInfoCard))
                          .componentInstance;
@@ -117,7 +124,6 @@ describe('DeviceInfoCardComponent', () => {
   });
 
   it('shows a due date if the device is not marked for return', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices')
         .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
     fixture.detectChanges();
@@ -134,7 +140,6 @@ describe('DeviceInfoCardComponent', () => {
   });
 
   it('hides "...buttons below" text when no devices are assigned', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices').and.returnValue(of([]));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -144,14 +149,13 @@ describe('DeviceInfoCardComponent', () => {
   });
 
   it('selects the correct tab when route is provided', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'listUserDevices').and.returnValue(of([
       DEVICE_1,
       DEVICE_2,
     ]));
     mockParams.next({id: DEVICE_2.assetTag});
     fixture.detectChanges();
-    let compiled = fixture.debugElement.nativeElement;
+    const compiled = fixture.debugElement.nativeElement;
     let selectedTab =
         compiled.querySelector('.mat-tab-label[aria-selected=true]')
             .textContent;
@@ -160,7 +164,6 @@ describe('DeviceInfoCardComponent', () => {
     mockParams.next({id: DEVICE_1.assetTag});
     deviceInfoCard.ngOnInit();
     fixture.detectChanges();
-    compiled = fixture.debugElement.nativeElement;
     selectedTab = compiled.querySelector('.mat-tab-label[aria-selected=true]')
                       .textContent;
     expect(selectedTab).toContain(DEVICE_1.assetTag);
@@ -168,7 +171,6 @@ describe('DeviceInfoCardComponent', () => {
 
   it('goes to the search results page for user magic with no devices assigned',
      () => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [],
          totalResults: 0,
@@ -184,7 +186,6 @@ describe('DeviceInfoCardComponent', () => {
      });
 
   it('shows the user search for test_user with an assigned device', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'list').and.returnValue(of({
       devices: [DEVICE_ASSIGNED],
       totalResults: 0,
@@ -207,7 +208,6 @@ describe('DeviceInfoCardComponent', () => {
   });
 
   it('updates list of devices after marking a device as lost', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
     spyOn(deviceService, 'markAsLost').and.returnValue(of([
       DEVICE_1,
     ]));
@@ -220,5 +220,45 @@ describe('DeviceInfoCardComponent', () => {
     }));
     deviceInfoCard.onLost(DEVICE_1);
     expect(deviceService.list).toHaveBeenCalled();
+  });
+
+  it('opens the return dialog when the Return button is pressed', () => {
+    spyOn(dialog, 'open').and.callThrough();
+    spyOn(deviceService, 'listUserDevices')
+        .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const returnButton: HTMLElement = compiled.querySelector('#return');
+    returnButton.click();
+
+    expect(dialog.open).toHaveBeenCalled();
+  });
+
+  it('does not return the device when the dialog is closed without action',
+     () => {
+       spyOn(dialog, 'open').and.callThrough();
+       spyOn(deviceService, 'listUserDevices')
+           .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
+       spyOn(deviceService, 'returnDevice');
+       fixture.detectChanges();
+       const compiled = fixture.debugElement.nativeElement;
+       const returnButton: HTMLElement = compiled.querySelector('#return');
+       returnButton.click();
+
+       expect(deviceService.returnDevice).not.toHaveBeenCalled();
+     });
+
+  it('returns the device when the dialog is closed with a return', () => {
+    spyOn(dialog, 'open').and.callThrough();
+    spyOn(deviceService, 'listUserDevices')
+        .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
+    spyOn(deviceService, 'returnDevice');
+    dialog.afterClosedValue = true;
+    fixture.detectChanges();
+    const compiled = fixture.debugElement.nativeElement;
+    const returnButton: HTMLElement = compiled.querySelector('#return');
+    returnButton.click();
+
+    expect(deviceService.returnDevice).toHaveBeenCalled();
   });
 });

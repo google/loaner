@@ -879,3 +879,17 @@ export class RoleServiceMock {
     return of();
   }
 }
+
+/**
+ * Mock dialog to allow for testing the behavior around opening/closing the
+ * material dialog.
+ */
+export class ReturnDialogMock {
+  afterClosedValue = false;
+
+  open() {
+    return {
+      afterClosed: () => of(this.afterClosedValue),
+    };
+  }
+}

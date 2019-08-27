@@ -24,6 +24,7 @@ import {LoanActionsCardModule} from '../../../../../shared/components/loan_manag
 import {LostModule} from '../../../../../shared/components/lost';
 import {ResumeLoanModule} from '../../../../../shared/components/resume_loan';
 import {MaterialModule} from '../../core/material_module';
+import {ReturnDialogModule} from '../return_dialog';
 
 import {DeviceInfoCard} from './device_info_card';
 
@@ -47,6 +48,7 @@ export * from './device_info_card';
     LostModule,
     MaterialModule,
     ResumeLoanModule,
+    ReturnDialogModule,
   ],
 })
 export class DeviceInfoCardModule {
