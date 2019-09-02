@@ -13,11 +13,13 @@
 // limitations under the License.
 
 import {LocationChangeListener, PlatformLocation} from '@angular/common';
+import {Injectable} from '@angular/core';
 
 /**
  * A platform location implementation for a Chrome OS app to prevent calls
  * to history.
  */
+@Injectable()
 export class ChromeAppPlatformLocation extends PlatformLocation {
   private appLocation: Location;
 
