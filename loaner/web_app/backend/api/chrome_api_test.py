@@ -74,7 +74,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
   def test_heartbeat_no_device_id(self):
     """Tests heartbeat without a request.device_id."""
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         endpoints.BadRequestException,
         chrome_api._NO_DEVICE_ID_MSG):
       self.service.heartbeat(chrome_messages.HeartbeatRequest())
@@ -150,7 +150,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     """Tests heartbeat processing for a nonexistent (in directory) device."""
     self.mock_directoryclient.get_chrome_device.return_value = None
 
-    self.assertRaisesRegexpp(
+    self.assertRaisesRegexp(
         endpoints.NotFoundException,
         device_model._DEVICE_ID_NOT_FOUND % UNIQUE_ID,
         self.service.heartbeat, self.chrome_request)

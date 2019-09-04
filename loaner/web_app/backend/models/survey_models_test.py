@@ -65,12 +65,12 @@ class QuestionTest(loanertest.TestCase):
 
   def test_answer_validation(self):
     """Tests that more_info_enabled validation works."""
-    self.assertRaisesRegexpp(
+    self.assertRaisesRegexp(
         survey_models.Answer.create,
         survey_models._MORE_INFO_MSG,
         text='Answer text',
         more_info_enabled=True)
-    self.assertRaisesRegexpp(
+    self.assertRaisesRegexp(
         survey_models.Answer.create,
         survey_models._MORE_INFO_MSG,
         text='Answer text',

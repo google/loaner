@@ -203,7 +203,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
 
   def test_get_ndb_key_not_found(self):
     """Test the get of an ndb.Key, raises endpoints.BadRequestException."""
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         endpoints.BadRequestException,
         api_utils._CORRUPT_KEY_MSG):
       api_utils.get_ndb_key('corruptKey')
@@ -211,7 +211,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
   def test_get_datastore_cursor_not_found(self):
     """Test the get of a datastore.Cursor, raises endpoints.BadRequestException.
     """
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         endpoints.BadRequestException,
         api_utils._MALFORMED_PAGE_TOKEN_MSG):
       api_utils.get_datastore_cursor('malformedPageToken')

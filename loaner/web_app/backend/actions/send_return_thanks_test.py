@@ -33,7 +33,7 @@ class SendReturnThanksTest(loanertest.ActionTestCase):
     super(SendReturnThanksTest, self).setUp()
 
   def test_run__no_device(self):
-    self.assertRaisesRegexpp(  # Raises generic because imported != loaded.
+    self.assertRaisesRegexp(  # Raises generic because imported != loaded.
         Exception, '.*did not receive a device.*', self.action.run)
 
   @mock.patch('__main__.send_email.send_user_email')

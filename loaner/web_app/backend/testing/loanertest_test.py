@@ -60,7 +60,7 @@ class ActionTestCaseTestNoTestingAction(loanertest.ActionTestCase):
     pass
 
   def test_fail(self):
-    self.assertRaisesRegexpp(
+    self.assertRaisesRegexp(
         EnvironmentError, '.*Create a TestCase setUp .* variable named.*',
         super(ActionTestCaseTestNoTestingAction, self).setUp)
 
@@ -75,7 +75,7 @@ class ActionTestCaseTestNoActions(loanertest.ActionTestCase):
   def test_fail(self, mock_importactions):
     self.testing_action = 'action_sample'
     mock_importactions.return_value = {}
-    self.assertRaisesRegexpp(
+    self.assertRaisesRegexp(
         EnvironmentError, '.*must import at least one.*',
         super(ActionTestCaseTestNoActions, self).setUp)
 

@@ -122,13 +122,13 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
 
   def test_enroll_bad_request(self):
     request = shelf_messages.EnrollShelfRequest(capacity=10)
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         shelf_api.endpoints.BadRequestException,
         'Entity has uninitialized properties'):
       self.service.enroll(request)
     request = shelf_messages.EnrollShelfRequest(
         location='nyc', capacity=10, latitude=12.5)
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         shelf_api.endpoints.BadRequestException,
         shelf_model._LAT_LONG_MSG):
       self.service.enroll(request)
@@ -226,7 +226,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     request = shelf_messages.ShelfAuditRequest(
         shelf_request=shelf_messages.ShelfRequest(location='NYC'),
         device_identifiers=['Invalid'])
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         endpoints.NotFoundException,
         shelf_api._DEVICE_DOES_NOT_EXIST_MSG % 'Invalid'):
       self.service.audit(request)
@@ -272,7 +272,7 @@ class ShelfApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   def test_get_shelf_using_location_error(self):
     """Test getting a shelf with an invalid location."""
     request = shelf_messages.ShelfRequest(location='Not_Valid')
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         endpoints.NotFoundException,
         shelf_api._SHELF_DOES_NOT_EXIST_MSG % request.location):
       shelf_api.get_shelf(request)

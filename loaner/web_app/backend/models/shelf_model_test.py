@@ -190,7 +190,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
 
   def test_enroll_latitude_no_longitude(self):
     """Test that enroll requires both lat and long, raises EnrollmentError."""
-    with self.assertRaisesRegexpp(
+    with self.assertRaisesRegexp(
         shelf_model.EnrollmentError,
         shelf_model._LAT_LONG_MSG):
       shelf_model.Shelf.enroll(
