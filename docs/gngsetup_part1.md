@@ -74,6 +74,11 @@ environment that runs on Google Cloud.
     GnG requires the Directory API to manage devices in your G Suite Domain. To
     access the Directory API you need to enable the Admin SDK API.
 
+1.  **Optional:** Follow these instructions (Step 2) again to create Google
+    Cloup App Engine projects for DEV and QA instances. It's useful to have
+    separate development and QA apps for testing. For steps 2.2 and 2.4, use the
+    same accounts that you set up for Prod.
+
 ## Step 3: Set up a G Suite role account
 
 In order to give the GnG app domain privileges, you must set up a G Suite role
@@ -120,20 +125,6 @@ group. Just
 You must
 [enterprise enroll](https://support.google.com/chrome/a/answer/1360534?hl=en)
 each of your Chromebook loaners.
-
-## Step 6: Set up a development computer
-
-This computer will be the device that you'll modify the code, and build and
-upload GnG from.
-
-**Note:** This deployment has only been tested on Linux and macOS.
-
-Install the following software:
-
-+   [Git](https://git-scm.com/downloads)
-+   [Bazel](https://docs.bazel.build/versions/master/install.html)
-+   [Google Cloud SDK](https://cloud.google.com/sdk/)
-+   [NPM](https://www.npmjs.com/get-npm)
 
 ## Next up:
 
