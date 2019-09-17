@@ -70,8 +70,9 @@ describe('ReturnComponent', () => {
         })
         .compileComponents();
 
-    loan = TestBed.get(Loan);
-    returnService = TestBed.get(ReturnDateService);
+    loan = TestBed.get(Loan) as AnyDuringTestBedInjectMigration;
+    returnService =
+        TestBed.get(ReturnDateService) as AnyDuringTestBedInjectMigration;
     fixture = TestBed.createComponent(ReturnComponent);
     app = fixture.debugElement.componentInstance;
 

@@ -51,7 +51,7 @@ describe('AuditTableComponent', () => {
 
     fixture = TestBed.createComponent(AuditTable);
     auditTable = fixture.debugElement.componentInstance;
-    router = TestBed.get(Router);
+    router = TestBed.get(Router) as AnyDuringTestBedInjectMigration;
   }));
 
   it('creates the AuditTable', () => {
@@ -138,7 +138,8 @@ describe('AuditTableComponent', () => {
        const compiled = fixture.debugElement.nativeElement;
        const auditButton = compiled.querySelector('button.audit');
 
-       const shelfService = TestBed.get(ShelfService);
+       const shelfService =
+           TestBed.get(ShelfService) as AnyDuringTestBedInjectMigration;
        spyOn(shelfService, 'audit').and.callThrough();
        spyOn(router, 'navigate');
        auditButton.click();
@@ -171,7 +172,8 @@ describe('AuditTableComponent', () => {
        const compiled = fixture.debugElement.nativeElement;
        const auditButton = compiled.querySelector('button.audit');
 
-       const shelfService = TestBed.get(ShelfService);
+       const shelfService =
+           TestBed.get(ShelfService) as AnyDuringTestBedInjectMigration;
        spyOn(shelfService, 'audit').and.callThrough();
        spyOn(router, 'navigate');
        auditButton.click();
@@ -189,10 +191,11 @@ describe('AuditTableComponent', () => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
        const auditButton = compiled.querySelector('button.audit');
-       const shelfService = TestBed.get(ShelfService);
+       const shelfService =
+           TestBed.get(ShelfService) as AnyDuringTestBedInjectMigration;
        spyOn(shelfService, 'audit').and.callThrough();
 
-       const dialog: Dialog = TestBed.get(Dialog);
+       const dialog = TestBed.get(Dialog);
        spyOn(dialog, 'confirm').and.returnValue(of(true));
        spyOn(router, 'navigate');
        auditButton.click();
@@ -208,10 +211,11 @@ describe('AuditTableComponent', () => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
        const auditButton = compiled.querySelector('button.audit');
-       const shelfService = TestBed.get(ShelfService);
+       const shelfService =
+           TestBed.get(ShelfService) as AnyDuringTestBedInjectMigration;
        spyOn(shelfService, 'audit').and.callThrough();
 
-       const dialog: Dialog = TestBed.get(Dialog);
+       const dialog = TestBed.get(Dialog);
        spyOn(dialog, 'confirm').and.returnValue(of(false));
        auditButton.click();
        flushMicrotasks();
