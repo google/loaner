@@ -23,7 +23,7 @@ describe('ConfigService', () => {
     TestBed.configureTestingModule({
       providers: [ConfigService],
     });
-    config = TestBed.get(ConfigService);
+    config = TestBed.get(ConfigService) as AnyDuringTestBedInjectMigration;
   });
 
   it('provides the correct link for chrome/endpoints apis if on prod', () => {

@@ -103,7 +103,7 @@ describe('Onboarding AppRoot', () => {
 
   it('should send survey and update surveySent value', () => {
     expect(app.surveySent).toBeFalsy();
-    const surveyService: Survey = TestBed.get(Survey);
+    const surveyService = TestBed.get(Survey);
     spyOn(surveyService, 'submitSurvey').and.callThrough();
     const fakeSurveyData = {
       more_info_text: 'Yes, this is more info.',
@@ -124,7 +124,7 @@ describe('Onboarding AppRoot', () => {
   it('should open the manage view and NOT send the survey', () => {
     expect(app.surveySent).toBeFalsy();
     expect(app.surveyAnswer).toBeFalsy();
-    const bg: Background = TestBed.get(Background);
+    const bg = TestBed.get(Background);
     spyOn(bg, 'openView');
     app.launchManageView();
     fixture.detectChanges();

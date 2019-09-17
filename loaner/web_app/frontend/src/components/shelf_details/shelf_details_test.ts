@@ -63,8 +63,10 @@ describe('ShelfDetailsComponent', () => {
 
     flushMicrotasks();
 
-    const iconRegistry = TestBed.get(MatIconRegistry);
-    const sanitizer = TestBed.get(DomSanitizer);
+    const iconRegistry =
+        TestBed.get(MatIconRegistry) as AnyDuringTestBedInjectMigration;
+    const sanitizer =
+        TestBed.get(DomSanitizer) as AnyDuringTestBedInjectMigration;
     iconRegistry.addSvgIcon(
         'checkin',
         // Note: The bypassSecurity here can't be refactored: the code
@@ -190,9 +192,9 @@ describe('ShelfDetailsComponent', () => {
      });
 
   it('should call disable when delete a shelf.', () => {
-    const shelfService: ShelfService = TestBed.get(ShelfService);
+    const shelfService = TestBed.get(ShelfService);
     spyOn(shelfService, 'disable');
-    const dialog: Dialog = TestBed.get(Dialog);
+    const dialog = TestBed.get(Dialog);
     spyOn(dialog, 'confirm').and.returnValue(of(true));
     shelfDetails.openDisableDialog();
 
@@ -202,7 +204,7 @@ describe('ShelfDetailsComponent', () => {
   });
 
   it('shows the quick audit button to auditors', fakeAsync(() => {
-       const userService: UserService = TestBed.get(UserService);
+       const userService = TestBed.get(UserService);
        const testUser = TEST_USER;
        testUser.permissions.push(APPLICATION_PERMISSIONS.AUDIT_SHELF);
        spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
@@ -214,7 +216,7 @@ describe('ShelfDetailsComponent', () => {
      }));
 
   it('hides the quick audit button for non-auditors', fakeAsync(() => {
-       const userService: UserService = TestBed.get(UserService);
+       const userService = TestBed.get(UserService);
        const testUser = TEST_USER;
        testUser.permissions = testUser.permissions.filter(permission => {
          return permission !== APPLICATION_PERMISSIONS.AUDIT_SHELF;
@@ -228,7 +230,7 @@ describe('ShelfDetailsComponent', () => {
      }));
 
   it('shows the advanced options to superadmins', fakeAsync(() => {
-       const userService: UserService = TestBed.get(UserService);
+       const userService = TestBed.get(UserService);
        const testUser = TEST_USER;
        testUser.superadmin = true;
        spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
@@ -241,7 +243,7 @@ describe('ShelfDetailsComponent', () => {
      }));
 
   it('hides the advanced options for non-superadmins', fakeAsync(() => {
-       const userService: UserService = TestBed.get(UserService);
+       const userService = TestBed.get(UserService);
        const testUser = TEST_USER;
        testUser.superadmin = false;
        spyOn(userService, 'whenUserLoaded').and.returnValue(of(testUser));
@@ -253,7 +255,7 @@ describe('ShelfDetailsComponent', () => {
      }));
 
   it('hides quick audit button when user is superadmin', fakeAsync(() => {
-       const userService: UserService = TestBed.get(UserService);
+       const userService = TestBed.get(UserService);
        const testUser = TEST_USER;
        testUser.superadmin = true;
        testUser.permissions.push(APPLICATION_PERMISSIONS.AUDIT_SHELF);

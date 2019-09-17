@@ -71,7 +71,8 @@ describe('DeviceActionBox', () => {
     actionBox = fixture.debugElement.query(By.directive(DeviceActionBox))
                     .componentInstance;
 
-    configService = TestBed.get(ConfigService);
+    configService =
+        TestBed.get(ConfigService) as AnyDuringTestBedInjectMigration;
     configServiceSpy = spyOn(configService, 'getStringConfig');
     configServiceSpy.and.returnValue(
         of(DeviceIdentifierModeType.SERIAL_NUMBER));

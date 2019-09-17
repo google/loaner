@@ -38,7 +38,8 @@ describe('FaqComponent', () => {
   });
 
   it('should render markdown as HTML', () => {
-    const httpService = TestBed.get(HttpClient);
+    const httpService =
+        TestBed.get(HttpClient) as AnyDuringTestBedInjectMigration;
     const faqMock = `
 # Heading 1
 ## Heading 2

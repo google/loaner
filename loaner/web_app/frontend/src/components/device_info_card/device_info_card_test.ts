@@ -94,9 +94,10 @@ describe('DeviceInfoCardComponent', () => {
 
     fixture = TestBed.createComponent(DummyComponent);
     testComponent = fixture.debugElement.componentInstance;
-    router = TestBed.get(Router);
-    dialog = TestBed.get(MatDialog);
-    deviceService = TestBed.get(DeviceService);
+    router = TestBed.get(Router) as AnyDuringTestBedInjectMigration;
+    dialog = TestBed.get(MatDialog) as AnyDuringTestBedInjectMigration;
+    deviceService =
+        TestBed.get(DeviceService) as AnyDuringTestBedInjectMigration;
 
     deviceInfoCard = fixture.debugElement.query(By.directive(DeviceInfoCard))
                          .componentInstance;

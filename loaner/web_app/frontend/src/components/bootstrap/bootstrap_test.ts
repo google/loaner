@@ -65,7 +65,7 @@ describe('BootstrapComponent', () => {
   });
 
   it('calls bootstrap service when the begin button is clicked', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     spyOn(bootstrapService, 'run');
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -83,7 +83,7 @@ describe('BootstrapComponent', () => {
   });
 
   it('renders the version numbers for an update', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     spyOn(bootstrapService, 'getStatus').and.returnValue(of(bootstrapRun));
     fixture.detectChanges();
     const compiled = fixture.debugElement.nativeElement;
@@ -95,7 +95,7 @@ describe('BootstrapComponent', () => {
   });
 
   it('renders each task in an expansion panel when bootstrap begins', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     bootstrapRun['tasks'] = [
       {name: 'task1'},
       {name: 'task2'},
@@ -120,7 +120,7 @@ describe('BootstrapComponent', () => {
   });
 
   it('marks successful tasks with a checkmark icon', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     bootstrapRun['tasks'] = [
       {name: 'task1', success: true},
       {name: 'task2', success: false},
@@ -146,7 +146,7 @@ describe('BootstrapComponent', () => {
   });
 
   it('marks failed tasks with an alert icon', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     bootstrapRun['tasks'] = [
       {name: 'task1', success: true},
       {name: 'task2', success: false, timestamp: 1},
@@ -171,7 +171,7 @@ describe('BootstrapComponent', () => {
   });
 
   it('marks in-progress tasks with a progress spinner', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     bootstrapRun['tasks'] = [
       {name: 'task1', success: true},
       {name: 'task2', success: false, timestamp: 1},
@@ -196,7 +196,7 @@ describe('BootstrapComponent', () => {
 
   it('displays the task description instead of the task name whenever possible',
      () => {
-       const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+       const bootstrapService = TestBed.get(BootstrapService);
        bootstrapRun['tasks'] = [
          {name: 'task1', description: 'testing task #1'},
        ];
@@ -213,7 +213,7 @@ describe('BootstrapComponent', () => {
      });
 
   it('displays failure information in an expansion panel', () => {
-    const bootstrapService: BootstrapService = TestBed.get(BootstrapService);
+    const bootstrapService = TestBed.get(BootstrapService);
     bootstrapRun['tasks'] = [
       {
         name: 'task1',

@@ -38,8 +38,9 @@ describe('Survey Service', () => {
       ]
     });
 
-    survey = TestBed.get(Survey);
-    httpMock = TestBed.get(HttpTestingController);
+    survey = TestBed.get(Survey) as AnyDuringTestBedInjectMigration;
+    httpMock = TestBed.get(HttpTestingController) as
+        AnyDuringTestBedInjectMigration;
   });
 
   afterEach(() => {

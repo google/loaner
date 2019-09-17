@@ -96,7 +96,7 @@ describe('Offboarding AppRoot', () => {
   });
 
   it('sends survey upon request to close the application', () => {
-    const surveyService: Survey = TestBed.get(Survey);
+    const surveyService = TestBed.get(Survey);
     spyOn(surveyService, 'submitSurvey').and.callThrough();
     const fakeSurveyData = {
       more_info_text: 'Yes, this is more info.',
@@ -117,7 +117,7 @@ describe('Offboarding AppRoot', () => {
   it('should close the offboarding view and NOT send the survey', () => {
     expect(app.surveySent).toBeFalsy();
     expect(app.surveyAnswer).toBeFalsy();
-    const bg: Background = TestBed.get(Background);
+    const bg = TestBed.get(Background);
     spyOn(bg, 'closeView');
     app.closeApplication();
     fixture.detectChanges();

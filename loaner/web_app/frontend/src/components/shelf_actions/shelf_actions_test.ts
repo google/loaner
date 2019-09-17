@@ -174,7 +174,7 @@ describe('ShelfActionsComponent', () => {
      });
 
   it('calls the shelf api when creating a shelf', () => {
-    const shelfService: ShelfService = TestBed.get(ShelfService);
+    const shelfService = TestBed.get(ShelfService);
     spyOn(shelfService, 'create').and.callThrough();
 
     fixture.detectChanges();
@@ -206,7 +206,7 @@ describe('ShelfActionsComponent', () => {
   });
 
   it('calls shelf api update and get new value when updating a shelf.', () => {
-    const shelfService: ShelfService = TestBed.get(ShelfService);
+    const shelfService = TestBed.get(ShelfService);
     spyOn(shelfService, 'update').and.returnValue(of([TEST_SHELF]));
     spyOn(shelfService, 'getShelf').and.returnValue(of(TEST_SHELF));
 

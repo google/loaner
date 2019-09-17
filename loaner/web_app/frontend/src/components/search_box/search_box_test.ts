@@ -62,10 +62,12 @@ describe('SearchBox', () => {
 
     fixture = TestBed.createComponent(SearchBox);
     searchBox = fixture.debugElement.componentInstance;
-    router = TestBed.get(Router);
-    searchService = TestBed.get(SearchService);
+    router = TestBed.get(Router) as AnyDuringTestBedInjectMigration;
+    searchService =
+        TestBed.get(SearchService) as AnyDuringTestBedInjectMigration;
     overlayContainerElement =
-        TestBed.get(OverlayContainer).getContainerElement();
+        (TestBed.get(OverlayContainer) as AnyDuringTestBedInjectMigration)
+            .getContainerElement();
   }));
 
   it('should create the SearchBox', () => {
@@ -290,7 +292,7 @@ describe('SearchBox', () => {
      }));
 
   it('does not allow an unprivileged user to see the user option', async(() => {
-       const userService: UserService = TestBed.get(UserService);
+       const userService = TestBed.get(UserService);
        spyOn(userService, 'whenUserLoaded')
            .and.returnValue(of(TEST_USER_WITHOUT_ADMINISTRATE_LOAN));
        searchBox.ngOnInit();

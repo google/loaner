@@ -60,7 +60,7 @@ describe('TroubleshootComponent', () => {
   });
 
   it('opens the debug view when the button is clicked', () => {
-    const bg: Background = TestBed.get(Background);
+    const bg = TestBed.get(Background);
     spyOn(bg, 'openView');
     const debugButton =
         fixture.debugElement.nativeElement.querySelector('#debug');

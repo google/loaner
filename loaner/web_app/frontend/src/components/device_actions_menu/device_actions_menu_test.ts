@@ -72,7 +72,8 @@ describe('DeviceActionsMenu', () => {
             .componentInstance;
     compiled = fixture.debugElement.nativeElement;
     overlayContainerElement =
-        TestBed.get(OverlayContainer).getContainerElement();
+        (TestBed.get(OverlayContainer) as AnyDuringTestBedInjectMigration)
+            .getContainerElement();
   }));
 
   // Fake the jasmine clock to allow for extension.
@@ -220,7 +221,7 @@ describe('DeviceActionsMenu', () => {
   it('calls extend when extend button is clicked and emits refresh event.',
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'extend').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
@@ -239,7 +240,7 @@ describe('DeviceActionsMenu', () => {
   it('calls returnDevice when Return is clicked and emits refresh event.',
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'returnDevice').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
@@ -258,7 +259,7 @@ describe('DeviceActionsMenu', () => {
   it('calls enableGuest when guest button is clicked and emits refresh event.',
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'enableGuestMode').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
@@ -277,7 +278,7 @@ describe('DeviceActionsMenu', () => {
   it('calls onDamaged when Mark as damaged is clicked and emits refresh event.',
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'markAsDamaged').and.returnValue(of(null));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
@@ -296,7 +297,7 @@ describe('DeviceActionsMenu', () => {
   it('calls onLost when Mark as lost is clicked and emits refresh event.',
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'markAsLost').and.returnValue(of(true));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();
@@ -315,7 +316,7 @@ describe('DeviceActionsMenu', () => {
   it('calls onUnenroll when Unenroll is clicked and emits refresh event.',
      () => {
        dummyComponent.testDevice = DEVICE_ASSIGNED;
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'unenroll').and.returnValue(of(null));
        spyOn(deviceActionsMenu.refreshDevice, 'emit');
        fixture.detectChanges();

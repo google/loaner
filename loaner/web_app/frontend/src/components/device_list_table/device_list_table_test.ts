@@ -120,7 +120,7 @@ describe('DeviceListTableComponent', () => {
   });
 
   it('calls DeviceService with shelf filter when shelf is present.', () => {
-    const deviceService: DeviceService = TestBed.get(DeviceService);
+    const deviceService = TestBed.get(DeviceService);
     const deviceServiceSpy = spyOn(deviceService, 'list').and.callThrough();
     const shelfRequest = {shelf_request: TEST_SHELF_REQUEST};
     deviceListTable.shelf = TEST_SHELF;
@@ -131,7 +131,7 @@ describe('DeviceListTableComponent', () => {
   });
 
   it('shows the damaged chip when device is damaged', fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [DEVICE_DAMAGED],
          totalResults: 1,
@@ -148,7 +148,7 @@ describe('DeviceListTableComponent', () => {
      }));
 
   it('shows the locked chip when device is locked', fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [DEVICE_LOCKED],
          totalResults: 1,
@@ -165,7 +165,7 @@ describe('DeviceListTableComponent', () => {
      }));
 
   it('shows the lost chip when device is lost', fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [DEVICE_LOST_AND_MORE],
          totalResults: 1,
@@ -183,7 +183,7 @@ describe('DeviceListTableComponent', () => {
 
   it('shows the pending return chip when device is pending return',
      fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [DEVICE_MARKED_FOR_RETURN],
          totalResults: 1,
@@ -200,7 +200,7 @@ describe('DeviceListTableComponent', () => {
      }));
 
   it('shows the overdue chip when device is overdue', fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [DEVICE_OVERDUE],
          totalResults: 1,
@@ -218,7 +218,7 @@ describe('DeviceListTableComponent', () => {
 
   it('does not show the return and damaged chips if device is lost',
      fakeAsync(() => {
-       const deviceService: DeviceService = TestBed.get(DeviceService);
+       const deviceService = TestBed.get(DeviceService);
        spyOn(deviceService, 'list').and.returnValue(of({
          devices: [DEVICE_LOST_AND_MORE],
          totalResults: 1,

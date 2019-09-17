@@ -57,7 +57,7 @@ describe('ConfigurationComponent', () => {
   });
 
   it('calls config service to get config', fakeAsync(() => {
-       const configService: ConfigService = TestBed.get(ConfigService);
+       const configService = TestBed.get(ConfigService);
        spyOn(configService, 'list').and.callThrough();
        fixture.detectChanges();
        expect(configService.list).toHaveBeenCalledTimes(1);
@@ -149,7 +149,7 @@ describe('ConfigurationComponent', () => {
      fakeAsync(() => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
-       const configService: ConfigService = TestBed.get(ConfigService);
+       const configService = TestBed.get(ConfigService);
        spyOn(configService, 'updateAll').and.returnValue(null);
        const supportContactInput =
            compiled.querySelector('input[name="support_contact_string"]');
@@ -166,7 +166,7 @@ describe('ConfigurationComponent', () => {
   it('calls reindex service when a reindex button is clicked', fakeAsync(() => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
-       const searchService: SearchService = TestBed.get(SearchService);
+       const searchService = TestBed.get(SearchService);
        spyOn(searchService, 'reindex').and.returnValue(of());
        const reindexDevices =
            compiled.querySelector('button[name="reindex-devices"]');
@@ -192,7 +192,7 @@ describe('ConfigurationComponent', () => {
      fakeAsync(() => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
-       const searchService: SearchService = TestBed.get(SearchService);
+       const searchService = TestBed.get(SearchService);
        spyOn(searchService, 'clearIndex').and.returnValue(of());
        const clearIndexDevices =
            compiled.querySelector('button[name="clear-index-devices"]');

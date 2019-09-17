@@ -47,8 +47,10 @@ describe('ShelfListTableComponent', () => {
 
     tick();
 
-    const iconRegistry = TestBed.get(MatIconRegistry);
-    const sanitizer = TestBed.get(DomSanitizer);
+    const iconRegistry =
+        TestBed.get(MatIconRegistry) as AnyDuringTestBedInjectMigration;
+    const sanitizer =
+        TestBed.get(DomSanitizer) as AnyDuringTestBedInjectMigration;
     iconRegistry.addSvgIcon(
         'checkin',
         // Note: The bypassSecurity here can't be refactored: the code

@@ -61,8 +61,9 @@ describe('AuthGuard service', () => {
         })
         .compileComponents();
 
-    authGuard = TestBed.get(AuthGuard);
-    userService = TestBed.get(UserService);
+    authGuard = TestBed.get(AuthGuard) as AnyDuringTestBedInjectMigration;
+    userService =
+        TestBed.get(UserService) as AnyDuringTestBedInjectMigration;
   });
 
   it('returns true with all permissions are passed.', async(() => {

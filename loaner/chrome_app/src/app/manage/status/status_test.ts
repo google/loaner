@@ -89,7 +89,7 @@ describe('StatusComponent', () => {
   });
 
   beforeEach(() => {
-    loan = TestBed.get(Loan);
+    loan = TestBed.get(Loan) as AnyDuringTestBedInjectMigration;
     fixture = TestBed.createComponent(StatusComponent);
     app = fixture.debugElement.componentInstance;
     app.ready();
