@@ -163,54 +163,62 @@ describe('ConfigurationComponent', () => {
        expect(configService.updateAll).toHaveBeenCalledTimes(1);
      }));
 
-  it('calls reindex service when a reindex button is clicked', fakeAsync(() => {
+  it('calls reindex method when a reindex button is clicked', fakeAsync(() => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
        const searchService = TestBed.get(SearchService);
        spyOn(searchService, 'reindex').and.returnValue(of());
+       spyOn(configuration, 'reindex').and.callThrough();
        const reindexDevices =
            compiled.querySelector('button[name="reindex-devices"]');
        reindexDevices.click();
        expect(searchService.reindex)
            .toHaveBeenCalledWith(configuration.searchIndexType.Device);
+       expect(configuration.reindex).toHaveBeenCalledTimes(1);
        expect(searchService.reindex).toHaveBeenCalledTimes(1);
        const reindexShelves =
            compiled.querySelector('button[name="reindex-shelves"]');
        reindexShelves.click();
        expect(searchService.reindex)
            .toHaveBeenCalledWith(configuration.searchIndexType.Shelf);
+       expect(configuration.reindex).toHaveBeenCalledTimes(2);
        expect(searchService.reindex).toHaveBeenCalledTimes(2);
        const reindexUsers =
            compiled.querySelector('button[name="reindex-users"]');
        reindexUsers.click();
        expect(searchService.reindex)
            .toHaveBeenCalledWith(configuration.searchIndexType.User);
+       expect(configuration.reindex).toHaveBeenCalledTimes(3);
        expect(searchService.reindex).toHaveBeenCalledTimes(3);
      }));
 
-  it('calls clearIndex service when a clear index button is clicked',
+  it('calls clearIndex method when a clear index button is clicked',
      fakeAsync(() => {
        fixture.detectChanges();
        const compiled = fixture.debugElement.nativeElement;
        const searchService = TestBed.get(SearchService);
        spyOn(searchService, 'clearIndex').and.returnValue(of());
+       spyOn(configuration, 'clearIndex').and.callThrough();
        const clearIndexDevices =
            compiled.querySelector('button[name="clear-index-devices"]');
        clearIndexDevices.click();
        expect(searchService.clearIndex)
            .toHaveBeenCalledWith(configuration.searchIndexType.Device);
+       expect(configuration.clearIndex).toHaveBeenCalledTimes(1);
        expect(searchService.clearIndex).toHaveBeenCalledTimes(1);
        const clearIndexShelves =
            compiled.querySelector('button[name="clear-index-shelves"]');
        clearIndexShelves.click();
        expect(searchService.clearIndex)
            .toHaveBeenCalledWith(configuration.searchIndexType.Shelf);
+       expect(configuration.clearIndex).toHaveBeenCalledTimes(2);
        expect(searchService.clearIndex).toHaveBeenCalledTimes(2);
        const clearIndexUsers =
            compiled.querySelector('button[name="clear-index-users"]');
        clearIndexUsers.click();
        expect(searchService.clearIndex)
            .toHaveBeenCalledWith(configuration.searchIndexType.User);
+       expect(configuration.clearIndex).toHaveBeenCalledTimes(3);
        expect(searchService.clearIndex).toHaveBeenCalledTimes(3);
      }));
 });

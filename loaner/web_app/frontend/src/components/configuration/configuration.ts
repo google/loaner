@@ -114,4 +114,14 @@ export class Configuration implements OnInit {
     }
     this.configService.updateAll(updates);
   }
+
+  /** Reindexes a given device or shelf. */
+  reindex(type: SearchIndexType) {
+    if (type) this.searchService.reindex(type).subscribe();
+  }
+
+  /** Clears the index for a given device or shelf. */
+  clearIndex(type: SearchIndexType) {
+    if (type) this.searchService.clearIndex(type).subscribe();
+  }
 }
