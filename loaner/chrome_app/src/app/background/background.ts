@@ -93,9 +93,7 @@ function prepareToOnboardUser() {
   // First attempt occurs regardless of sign in.
   onboardUser();
   // Second attempt only occurs if the sign in changes.
-  chrome.identity.onSignInChanged.addListener(() => {
-    onboardUser();
-  });
+  chrome.identity.onSignInChanged.addListener(() => onboardUser());
 }
 
 /**

@@ -283,18 +283,6 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
         self.test_shelf, loanertest.USER_EMAIL,
         shelf_model._ENABLE_MSG % self.test_shelf.identifier)
 
-  @parameterized.parameters(
-      (True, True, True), (True, False, False), (False, False, False))
-  @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
-  @mock.patch.object(shelf_model, 'logging', autospec=True)
-  def test_audit_enabled(
-      self, system_value, shelf_value, final_value, mock_logging, mock_stream):
-    """Testing the audit_enabled property with different configurations."""
-    config_model.Config.set('shelf_audit', system_value)
-    self.test_shelf.audit_notification_enabled = shelf_value
-    # Ensure the shelf audit notification status is equal to the expected value.
-    self.assertEqual(self.test_shelf.audit_enabled, final_value)
-
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
   def test_disable(self, mock_logging, mock_stream):

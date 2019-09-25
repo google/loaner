@@ -123,11 +123,6 @@ class Shelf(base_model.BaseModel):
     return self.lat_long.lon
 
   @property
-  def audit_enabled(self):
-    return self.audit_notification_enabled and config_model.Config.get(
-        'shelf_audit')
-
-  @property
   def audited(self):
     """If the shelf has been audited.
 

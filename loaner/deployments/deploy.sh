@@ -148,8 +148,8 @@ found here: https://docs.bazel.build/versions/master/install.html"
           | cut -d ' ' -f3 \
           | sed -E 's/(^0*|\.)//g');;
     esac
-    [[ "${BAZEL_VERSION}" -ge "280" ]] || error_message "The bazel version \
-installed is lower than the minimum required version (0.28.0), please update \
+    [[ "${BAZEL_VERSION}" -ge "90" ]] || error_message "The bazel vesrion \
+installed is lower than the minimum required version (0.9.0), please update \
 bazel."
     success_message "bazel was found on PATH and is at or above the minimum \
 version."
@@ -244,7 +244,7 @@ auth login"
   info_message "Initiating the build of the python deployment script..."
   bazel build //loaner/deployments:deploy_impl
 
-  ../bazel-out/k8-fastbuild/bin/loaner/deployments/deploy_impl \
+  ../bazel-out/k8-py3-fastbuild/bin/loaner/deployments/deploy_impl \
     --loaner_path "$(pwd -P)" \
     --app_servers "${APP_SERVERS}" \
     --build_target "${BUILD_TARGET}" \

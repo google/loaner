@@ -56,7 +56,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         altitude=1.1,
         capacity=10,
         audit_interval_override=12,
-        audit_notification_enabled=True,
+        audit_notification_enabled=False,
         audit_requested=True,
         responsible_for_audit='test_group',
         last_audit_time=datetime.datetime(year=2018, month=1, day=1),
@@ -73,9 +73,8 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         longitude=20.20,
         altitude=1.1,
         capacity=10,
-        audit_notification_enabled=True,
+        audit_notification_enabled=False,
         audit_requested=True,
-        audit_enabled=True,
         responsible_for_audit='test_group',
         last_audit_time=datetime.datetime(year=2018, month=1, day=1),
         last_audit_by='test_auditer')
@@ -103,7 +102,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         damaged_reason='Not damaged',
         last_reminder=device_model.Reminder(level=1),
         next_reminder=device_model.Reminder(level=2),
-        ).put().get()
+    ).put().get()
     test_device.associate_tag('test', self.test_tag.name)
     expected_message = device_messages.Device(
         serial_number='test_serial_value',

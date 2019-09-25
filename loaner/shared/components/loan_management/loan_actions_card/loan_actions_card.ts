@@ -59,8 +59,8 @@ import {GuestButton} from './guest_button';
 export class LoanActionsCardComponent implements DoCheck, OnInit {
   @Input() additionalManagementText = '';
   @Input() device!: Device;
-  @ContentChild(ExtendButton, {static: true}) extendButton!: ExtendButton;
-  @ContentChild(GuestButton, {static: true}) guestButton!: GuestButton;
+  @ContentChild(ExtendButton) extendButton!: ExtendButton;
+  @ContentChild(GuestButton) guestButton!: GuestButton;
 
   ngOnInit() {
     if (!this.device) {

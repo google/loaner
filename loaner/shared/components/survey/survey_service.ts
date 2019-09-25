@@ -77,9 +77,7 @@ export class Survey {
     const surveyEndpoint = `${this.apiBaseUrl}/loaner/v1/survey/submit`;
     return new Observable((observer) => {
       this.http.post(surveyEndpoint, answer)
-          .pipe(retry(2), tap(() => {
-                  this.surveySent.next(true);
-                }))
+          .pipe(retry(2), tap(() => this.surveySent.next(true)))
           .subscribe(
               () => {
                 observer.next(true);
@@ -99,9 +97,7 @@ export class Survey {
     const surveyEndpoint =
         `${this.apiBaseUrl}/loaner/v1/survey/request?question_type=${type}`;
     return this.http.get<SurveyResponse>(surveyEndpoint)
-        .pipe(retry(2), tap((survey) => {
-                this.retrievedSurvey = survey;
-              }));
+        .pipe(retry(2), tap((survey) => this.retrievedSurvey = survey));
   }
 }
 

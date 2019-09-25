@@ -176,7 +176,7 @@
           </div>
           <div class="control">
             <mat-form-field class="email-value">
-              <input matInput name="responsible_for_audit_list" type="text" [(ngModel)]="config.responsibleForAudit">
+              <input matInput name="responsible_for_audit_list" email type="email" [(ngModel)]="config.responsibleForAudit">
             </mat-form-field>
           </div>
         </section>
@@ -404,7 +404,6 @@
         </section>
       </mat-card-content>
     </mat-card>
-
     <div class="submit-section">
       <button mat-raised-button [disabled]="!configurationForm.valid" type="submit">Save changes</button>
     </div>

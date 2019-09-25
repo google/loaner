@@ -50,7 +50,7 @@ export class ShelfListTable implements AfterViewInit, OnDestroy {
   /** Total number of shelves returned from the back end */
   totalResults = 0;
   /** Sort object */
-  @ViewChild(MatSort, {static: true}) sort!: MatSort;
+  @ViewChild(MatSort) sort!: MatSort;
   /** Token needed on backend in order to return more results. */
   pageToken?: string;
   /** Backend response if there is more results to be retrieved. */

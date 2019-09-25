@@ -70,10 +70,10 @@ export class DeviceActionBox implements OnInit, AfterViewInit {
         this.deviceIdentifierMode === DeviceIdentifierModeType.BOTH_REQUIRED;
   }
 
-  @ViewChild('mainIdentifier', {static: true}) mainIdentifier!: ElementRef;
-  @ViewChild('serialNumber', {static: true}) serialNumber?: ElementRef;
-  @ViewChild('assetTag', {static: true}) assetTag?: ElementRef;
-  @ViewChild('actionForm', {static: true}) actionForm!: NgForm;
+  @ViewChild('mainIdentifier') mainIdentifier!: ElementRef;
+  @ViewChild('serialNumber') serialNumber?: ElementRef;
+  @ViewChild('assetTag') assetTag?: ElementRef;
+  @ViewChild('actionForm') actionForm!: NgForm;
 
   /** Emits a device when an action is ready to be taken. */
   @Output() takeAction = new EventEmitter<Device>();

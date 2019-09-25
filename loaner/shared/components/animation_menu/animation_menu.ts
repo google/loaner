@@ -35,9 +35,8 @@ export class AnimationMenuComponent {
   constructor(
       private animationService: AnimationMenuService,
       public dialogRef: MatDialogRef<AnimationMenuComponent>) {
-    this.animationService.getAnimationSpeed().subscribe(speed => {
-      this.playbackRate = speed;
-    });
+    this.animationService.getAnimationSpeed().subscribe(
+        speed => this.playbackRate = speed);
   }
 
   closeDialog() {

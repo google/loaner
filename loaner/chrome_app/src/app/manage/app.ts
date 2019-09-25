@@ -44,7 +44,7 @@ export class AppRoot implements AfterViewInit {
   backgroundLogoEnabled = BACKGROUND_LOGO_ENABLED;
 
   // Represents the analytics image in the body.
-  @ViewChild('analytics', {static: true}) analyticsImg!: HTMLImageElement|null;
+  @ViewChild('analytics') analyticsImg!: HTMLImageElement|null;
 
   navBarTabs: NavTab[] = [
     {

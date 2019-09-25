@@ -81,7 +81,6 @@ class Shelf(messages.Message):
   shelf_request = messages.MessageField(ShelfRequest, 16)
   query = messages.MessageField(shared_messages.SearchRequest, 17)
   audit_interval_override = messages.IntegerField(18)
-  audit_enabled = messages.BooleanField(19)
 
 
 class EnrollShelfRequest(messages.Message):

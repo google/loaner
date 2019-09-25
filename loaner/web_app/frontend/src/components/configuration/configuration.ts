@@ -30,7 +30,7 @@ import {SearchService} from '../../services/search';
   templateUrl: 'configuration.ng.html',
 })
 export class Configuration implements OnInit {
-  config!: Config;
+  config: Config = this.config;
   searchIndexType = SearchIndexType;
   deviceIdentifierModeType = DeviceIdentifierModeType;
 
