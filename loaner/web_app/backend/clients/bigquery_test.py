@@ -125,6 +125,18 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
     self.table.insert_data.assert_called_once_with(
         self.test_table, row_ids=[row_id])
 
+  def test_get_device_info(self):
+    test_serial = 'ABC1234'
+    expected_results = [('ABC1234', 'test@', '0000')]
+    mock_query_job = mock.Mock()
+    mock_query_job.fetch_data.return_value = expected_results
+    self.client._client.run_sync_query.return_value = mock_query_job
+
+    results = self.client.get_device_info(test_serial)
+
+    self.assertEqual(results, expected_results)
+    self.assertTrue(mock_query_job.run.called)
+
   def test_stream_row_no_table(self):
     self.table.exists.return_value = False
     self.assertRaises(

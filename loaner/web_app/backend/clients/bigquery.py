@@ -41,6 +41,11 @@ NDB_TO_BIGQUERY_TYPE = {
     'GeoPtProperty': 'STRING',
 }
 
+SQL_QUERY = (""" SELECT *
+           FROM [loaner.Device]
+           WHERE entity.serial_number = "{}"
+           LIMIT 100 """)
+
 
 class Error(Exception):
   """Base error class for this module."""
@@ -85,15 +90,15 @@ class BigQueryClient(object):
     try:
       self._dataset.create()
     except cloud.exceptions.Conflict:
-      logging.warning(
-          'Dataset %s already exists, not creating.', self._dataset.name)
+      logging.warning('Dataset %s already exists, not creating.',
+                      self._dataset.name)
     else:
       logging.info('Dataset %s successfully created.', self._dataset.name)
 
     self._create_table(constants.BIGQUERY_DEVICE_TABLE, device_model.Device())
     self._create_table(constants.BIGQUERY_SHELF_TABLE, shelf_model.Shelf())
-    self._create_table(
-        constants.BIGQUERY_SURVEY_TABLE, survey_models.Question())
+    self._create_table(constants.BIGQUERY_SURVEY_TABLE,
+                       survey_models.Question())
 
     logging.info('BigQuery successfully initialized.')
 
@@ -111,8 +116,8 @@ class BigQueryClient(object):
     try:
       table.create()
     except cloud.exceptions.Conflict:
-      logging.info(
-          'Table %s already exists, attempting to update it.', table_name)
+      logging.info('Table %s already exists, attempting to update it.',
+                   table_name)
       table.reload()
       merged_schema = _merge_schemas(table.schema, table_schema)
       table.patch(schema=merged_schema)
@@ -156,6 +161,19 @@ class BigQueryClient(object):
       logging.error(errors)
       raise InsertError('BigQuery insert generated errors {}.'.format(errors))
 
+  def get_device_info(self, serial):
+    """Return historical data of a device by quering serial number.
+
+    Args:
+      serial: str, input used to query the data. An attribute of a device.
+
+    Returns:
+      Iterator of tuples with historical data.
+    """
+    query_job = self._client.run_sync_query(SQL_QUERY.format(serial))
+    query_job.run()
+    return query_job.fetch_data()
+
 
 def _generate_entity_schema(entity):
   """Converts an ndb.Model to a BigQuery schema.
@@ -187,12 +205,13 @@ def _generate_entity_schema(entity):
         try:
           nested_entity = ndb_property._modelclass()  # pylint: disable=protected-access
         except TypeError:
-          logging.warning(
-              'Could not create instance of %s, skipping.', property_name)
+          logging.warning('Could not create instance of %s, skipping.',
+                          property_name)
           continue
         generated_schema = _generate_entity_schema(nested_entity)
-        schema.append(bigquery.SchemaField(
-            property_name, 'RECORD', field_type, fields=generated_schema))
+        schema.append(
+            bigquery.SchemaField(
+                property_name, 'RECORD', field_type, fields=generated_schema))
     else:
       bigquery_type = NDB_TO_BIGQUERY_TYPE.get(ndb_type)
       if not bigquery_type:
@@ -212,7 +231,7 @@ def _generate_schema(entity_fields=None):
 
   Args:
     entity_fields: list of bigquery.SchemaField objects, the fields to include
-    in the entity record.
+      in the entity record.
 
   Returns:
     A list of bigquery.SchemaField objects.
@@ -298,10 +317,11 @@ def _merge_schemas(current_fields, new_fields):
     elif current_field.fields:
       merged_fields = _merge_schemas(current_field.fields, new_field.fields)
       current_fields.remove(current_field)
-      current_fields.append(bigquery.SchemaField(
-          current_field.name,
-          'RECORD',
-          current_field.mode,
-          fields=merged_fields))
+      current_fields.append(
+          bigquery.SchemaField(
+              current_field.name,
+              'RECORD',
+              current_field.mode,
+              fields=merged_fields))
 
   return current_fields
