@@ -49,8 +49,8 @@ export class DeviceActionsView implements OnInit {
     this.route.params.subscribe(params => {
       this.currentAction = '';
       for (const key in Actions) {
-        if (params['action'] === Actions[key]) {
-          this.currentAction = Actions[key];
+        if (params['action'] === Actions[key as keyof typeof Actions]) {
+          this.currentAction = Actions[key as keyof typeof Actions];
         }
       }
     });
