@@ -65,7 +65,7 @@ export class SurveyComponent extends LoaderView implements OnInit {
       const answer: SurveyAnswer = {
         question_urlsafe_key: this.surveyData.question_urlsafe_key,
         selected_answer: this.surveyAnswer,
-        more_info_text: e,
+        more_info_text: (typeof e === 'string') ? e : undefined
       };
       this.survey.answer.next(answer);
     }
