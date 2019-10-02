@@ -16,7 +16,7 @@ import {Component, Input} from '@angular/core';
 
 @Component({
   selector: 'loaner-progress',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./progress.scss'],
   templateUrl: './progress.ng.html',
 })
 export class ProgressComponent {

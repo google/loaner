@@ -19,7 +19,7 @@ import {Component, Input} from '@angular/core';
     'class': 'mat-typography',
   },
   selector: 'loaner-greetings-card',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./greetings_card.scss'],
   templateUrl: './greetings_card.ng.html',
 })
 export class GreetingsCardComponent {

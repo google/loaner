@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import {Injectable} from '@angular/core';
-import {Observable} from 'rxjs';
 import {map, tap} from 'rxjs/operators';
 
 import {GetRoleRequestApiParams, ListRolesResponse, Role, RoleApiParams} from '../models/role';
@@ -28,31 +27,31 @@ export class RoleService extends ApiService {
 
   create(role: Role) {
     const params: RoleApiParams = role.toApiMessage();
-    this.post<void>('create', params).pipe(tap(() => {
+    return this.post<void>('create', params).pipe(tap(() => {
       this.snackBar.open(`Role ${role.name} created.`);
     }));
   }
 
   update(role: Role) {
     const params: RoleApiParams = role.toApiMessage();
-    this.post<void>('update', params).pipe(tap(() => {
+    return this.post<void>('update', params).pipe(tap(() => {
       this.snackBar.open(`Role ${role.name} has been updated.`);
     }));
   }
 
   getRole(role: Role) {
     const request: GetRoleRequestApiParams = {name: role.name};
-    this.get<RoleApiParams>('get', request)
+    return this.get<RoleApiParams>('get', request)
         .pipe(map((retrievedRole: RoleApiParams) => new Role(retrievedRole)));
   }
 
-  list(): Observable<ListRolesResponse> {
+  list() {
     return this.post<ListRolesResponse>('list');
   }
 
   delete(role: Role) {
     const params: RoleApiParams = role.toApiMessage();
-    this.post<void>('delete', params).pipe(tap(() => {
+    return this.post<void>('delete', params).pipe(tap(() => {
       this.snackBar.open(`Role ${role.name} has been destroyed.`);
     }));
   }

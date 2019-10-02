@@ -25,7 +25,7 @@ import {ShelfService} from '../../services/shelf';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-audit-table',
-  styleUrls: ['style.css'],
+  styleUrls: ['audit_table.scss'],
   templateUrl: 'audit_table.ng.html',
 
 })

@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'core-js/es6/reflect';
+import 'core-js/es7/reflect';
+import 'zone.js/dist/zone';
+
 import {enableProdMode} from '@angular/core';
 import {platformBrowser} from '@angular/platform-browser';
 import {AppModuleNgFactory} from './app.module.ngfactory';

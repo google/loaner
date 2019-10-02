@@ -19,7 +19,7 @@ import {Extend} from '../../extend';
 
 @Component({
   selector: 'loan-button[extendButton]',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./loan_actions_card.scss'],
   template: `
   <button *ngIf="canExtend"
           mat-raised-button class="action-button"

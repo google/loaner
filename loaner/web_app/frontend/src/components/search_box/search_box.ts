@@ -38,7 +38,7 @@ export declare interface SearchType {
  */
 @Component({
   selector: 'loaner-search-box',
-  styleUrls: ['style.css'],
+  styleUrls: ['search_box.scss'],
   templateUrl: 'search_box.ng.html',
 })
 export class SearchBox implements OnInit {
@@ -145,7 +145,7 @@ export class SearchBox implements OnInit {
  */
 @Component({
   selector: 'loaner-search-helper',
-  styleUrls: ['style.css'],
+  styleUrls: ['search_box.scss'],
   templateUrl: 'search_box_helper.ng.html',
 })
 export class SearchHelper implements OnInit {

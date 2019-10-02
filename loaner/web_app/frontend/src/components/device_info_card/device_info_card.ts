@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+
 import {Component, OnInit} from '@angular/core';
 import {MatDialog} from '@angular/material/dialog';
 import {ActivatedRoute, Router} from '@angular/router';
@@ -37,7 +39,7 @@ import {ReturnDialog} from '../return_dialog/return_dialog';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-device-info-card',
-  styleUrls: ['style.css'],
+  styleUrls: ['device_info_card.scss'],
   templateUrl: 'device_info_card.ng.html',
 })
 export class DeviceInfoCard implements OnInit {

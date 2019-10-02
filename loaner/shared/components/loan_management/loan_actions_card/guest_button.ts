@@ -19,7 +19,7 @@ import {GuestMode} from '../../guest';
 
 @Component({
   selector: 'loan-button[guestButton]',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./loan_actions_card.scss'],
   template: `
   <button *ngIf="guestAllowed && !guestEnabled"
           mat-raised-button class="action-button"

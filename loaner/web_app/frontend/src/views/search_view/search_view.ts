@@ -23,7 +23,7 @@ import {CONFIG} from '../../app.config';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-search-view',
-  styleUrls: ['style.css'],
+  styleUrls: ['search_view.scss'],
   templateUrl: 'search_view.ng.html',
 })
 export class SearchView implements OnInit {

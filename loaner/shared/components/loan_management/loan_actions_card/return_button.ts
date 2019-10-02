@@ -17,7 +17,7 @@ import {Subject} from 'rxjs';
 
 @Component({
   selector: 'loan-button[returnButton]',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./loan_actions_card.scss'],
   template: `
     <button mat-raised-button class="action-button"
             color="primary"

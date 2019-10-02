@@ -63,6 +63,7 @@
                                 (blur)="pauseLoading=false;"
                                 (click)="$event.stopPropagation(); pauseLoading=true;"
                                 [device]="device"
+                                (loading)="loading=$event"
                                 (refreshDevice)="getDeviceList()">
     </loaner-device-actions-menu>
           </mat-cell>

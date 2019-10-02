@@ -318,20 +318,45 @@ class AppEngineServerConfig(LoanerConfig):
           'Google Cloud Shell.')
       shutil.rmtree(self.node_modules_path)
 
+  def _MoveWebAppFrontendBundle(self):
+    """Prepare frontend bundle destination and move the build there."""
+    if os.path.isdir(self.frontend_bundle_path):
+      logging.info(
+          'The bundled frontend exists, we are replacing it with a new build.')
+      shutil.rmtree(self.frontend_bundle_path)
+    logging.debug('Moving the frontend bundle into the web app bundle.')
+    shutil.move(
+        os.path.join(self.frontend_src_path, 'dist'), self.frontend_bundle_path)
+
   def _CleanWebAppBackend(self):
     """Run bazel clean --expunge in order to reduce filesystem utilziation."""
     logging.info('Running bazel clean --expunge_async because we are building '
                  'on Google Cloud Shell')
     _ExecuteCommand(['bazel', 'clean', '--expunge_async'])
 
-  def _BuildWebApp(self):
-    """Build the Web Application's services."""
-    logging.debug('Building the WebApp using Bazel...')
+  def _BuildWebAppBackend(self):
+    """Build the Web Application's backend services."""
+    logging.debug('Building the backend using Bazel...')
     _ExecuteCommand([
         'bazel', 'build', '//{}:{}'.format(
             self._web_app_dir, self._build_target)])
     if not self.on_local:
       self._DeleteAppEngExtDepDir()
+
+  def _BuildWebAppFrontend(self):
+    """Build the Web Application's frontend services."""
+    logging.debug('Building the frontend using npm...')
+    os.chdir(self.npm_path)
+    _ExecuteCommand(['npm', 'install'])
+    _ExecuteCommand(['npm', 'run', 'build:frontend'])
+    if self.on_google_cloud_shell:
+      self._DeleteNodeModulesDir()
+
+  def _BundleWebApp(self):
+    """Bundle the web application using bazel and npm."""
+    self._BuildWebAppFrontend()
+    self._BuildWebAppBackend()
+    self._MoveWebAppFrontendBundle()
 
   def _GetYamlFile(self, yaml_filename):
     """Returns the full path for a given yaml file in the bundle.
@@ -346,7 +371,7 @@ class AppEngineServerConfig(LoanerConfig):
 
   def DeployWebApp(self):
     """Bundle then deploy (or run locally) the web application."""
-    self._BuildWebApp()
+    self._BundleWebApp()
 
     if self.on_local:
       print('Run locally...')

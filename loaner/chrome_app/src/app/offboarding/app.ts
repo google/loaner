@@ -63,7 +63,7 @@ const STEPS: Step[] = [
   encapsulation: ViewEncapsulation.None,
   preserveWhitespaces: true,
   selector: 'app-root',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./app.scss'],
   templateUrl: './app.ng.html',
 })
 export class AppRoot implements AfterViewInit, OnInit {

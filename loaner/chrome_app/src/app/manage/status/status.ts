@@ -35,7 +35,7 @@ be sure to check out our Troubleshoot and FAQ buttons below.`;
     'class': 'mat-typography',
   },
   selector: 'status',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./status.scss'],
   templateUrl: './status.ng.html',
 })
 export class StatusComponent extends LoaderView implements OnInit {

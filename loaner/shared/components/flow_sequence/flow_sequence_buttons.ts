@@ -24,7 +24,7 @@ import {FlowState, NavigationLabels, Step} from './index';
  */
 @Component({
   selector: 'loaner-flow-sequence-buttons',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./flow_sequence.scss'],
   templateUrl: './flow_sequence_buttons.ng.html',
 })
 export class LoanerFlowSequenceButtons implements OnInit {

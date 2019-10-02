@@ -64,7 +64,7 @@ export class Damaged {
     'class': 'mat-typography',
   },
   selector: 'damaged',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./damaged.scss'],
   templateUrl: './damaged.ng.html',
 })
 export class DamagedDialogComponent extends LoaderView {

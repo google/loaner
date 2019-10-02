@@ -23,7 +23,7 @@ import {RoleService} from '../../services/role';
  */
 @Component({
   selector: 'loaner-role-editor-table',
-  styleUrls: ['style.css'],
+  styleUrls: ['role_editor_table.scss'],
   templateUrl: 'role_editor_table.ng.html',
 })
 export class RoleEditorTable implements OnInit {

@@ -19,7 +19,7 @@ import {CONFIG} from '../../app.config';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-bootstrap-view',
-  styleUrls: ['style.css'],
+  styleUrls: ['bootstrap_view.scss'],
   templateUrl: 'bootstrap_view.ng.html',
 
 })

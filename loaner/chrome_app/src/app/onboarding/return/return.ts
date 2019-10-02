@@ -25,7 +25,7 @@ import {ReturnDateService} from '../../shared/return_date_service';
 @Component({
   host: {'class': 'mat-typography'},
   selector: 'return',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./return.scss'],
   templateUrl: './return.ng.html',
 })
 export class ReturnComponent extends LoaderView implements OnInit {

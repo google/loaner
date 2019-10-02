@@ -1,32 +1,26 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "baseUrl": "./",
+    "target": "es5",
     "sourceMap": true,
     "declaration": false,
-    "downlevelIteration": true,
-    "experimentalDecorators": true,
-    "module": "esnext",
     "moduleResolution": "node",
-    "target": "es2015",
+    "module": "commonjs",
+    "emitDecoratorMetadata": true,
+    "noImplicitAny": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "experimentalDecorators": true,
     "typeRoots": [
       "node_modules/@types",
       "node_modules/@types/chrome"
     ],
-    "lib": [
-      "es2018",
-      "dom"
-    ]
+    "lib": ["es2015", "es2016", "dom"]
   },
-  "angularCompilerOptions": {
-    "fullTemplateTypeCheck": true,
-    "strictInjectionParameters": true
-  },
-  "include": [
-    "**/*.ts"
-  ],
   "exclude": [
-    "node_modules",
-    "**/*_test.ts"
-  ]
+    "node_modules"
+  ],
+  "angularCompilerOptions": {
+    "genDir": ".",
+    "skipMetadataEmit" : true
+  }
 }

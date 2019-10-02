@@ -59,7 +59,7 @@ export class Extend {
     'class': 'mat-typography',
   },
   selector: 'extend',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./extend.scss'],
   templateUrl: './extend.ng.html',
 })
 export class ExtendDialogComponent extends LoaderView implements OnInit {

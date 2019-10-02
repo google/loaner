@@ -21,7 +21,7 @@ import {TagService} from '../../services/tag';
  */
 @Component({
   selector: 'loaner-tag-list-table',
-  styleUrls: ['style.css'],
+  styleUrls: ['tag_list_table.scss'],
   templateUrl: 'tag_list_table.ng.html',
 })
 export class TagListTable {

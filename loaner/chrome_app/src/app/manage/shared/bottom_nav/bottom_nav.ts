@@ -23,7 +23,7 @@ export interface NavTab {
 
 @Component({
   selector: 'bottom-nav',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./bottom_nav.scss'],
   templateUrl: './bottom_nav.ng.html',
 })
 export class BottomNavComponent {

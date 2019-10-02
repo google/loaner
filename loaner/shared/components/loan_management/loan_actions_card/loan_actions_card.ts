@@ -53,7 +53,7 @@ import {GuestButton} from './guest_button';
     'class': 'mat-typography',
   },
   selector: 'loaner-loan-actions-card',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./loan_actions_card.scss'],
   templateUrl: './loan_actions_card.ng.html',
 })
 export class LoanActionsCardComponent implements DoCheck, OnInit {

@@ -50,7 +50,7 @@ export class ResumeLoan {
     'class': 'mat-typography',
   },
   selector: 'resume-loan',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./resume_loan.scss'],
   templateUrl: './resume_loan.ng.html',
 })
 export class ResumeLoanDialog extends LoaderView {

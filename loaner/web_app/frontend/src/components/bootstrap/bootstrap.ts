@@ -27,7 +27,7 @@ import {BootstrapService} from '../../services/bootstrap';
  */
 @Component({
   selector: 'loaner-bootstrap',
-  styleUrls: ['style.css'],
+  styleUrls: ['bootstrap.scss'],
   templateUrl: 'bootstrap.ng.html',
 })
 export class Bootstrap implements OnInit, OnDestroy {

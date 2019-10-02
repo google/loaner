@@ -14,7 +14,7 @@
 
 import {Injectable} from '@angular/core';
 import {ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot} from '@angular/router';
-import {Observable, of} from 'rxjs';
+import {of} from 'rxjs';
 import {catchError, map} from 'rxjs/operators';
 
 import {LoanerSnackBar} from './snackbar';
@@ -31,8 +31,7 @@ export class AuthGuard implements CanActivate {
       private userService: UserService,
   ) {}
 
-  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot):
-      Observable<boolean> {
+  canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
     const destinationUrl = state.url;
     return this.userService.loadUser().pipe(
         map(user => {

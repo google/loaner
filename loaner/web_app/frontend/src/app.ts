@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import {Location} from '@angular/common';
-import {Component, NgZone, ViewEncapsulation} from '@angular/core';
+import {Component, NgZone, OnInit, ViewEncapsulation} from '@angular/core';
 import {Title} from '@angular/platform-browser';
 import {NavigationEnd, Router} from '@angular/router';
 
@@ -98,10 +98,10 @@ export const NAVIGATION_ITEMS: NavigationItem[] = [
   preserveWhitespaces: true,
   encapsulation: ViewEncapsulation.None,
   selector: 'app-root',
-  styleUrls: ['style.css'],
+  styleUrls: ['app.scss'],
   templateUrl: 'app.ng.html',
 })
-export class AppComponent extends LoaderView {
+export class AppComponent extends LoaderView implements OnInit {
   readonly title = `${CONFIG.appName} Application`;
   readonly navigationItems: NavigationItem[] = NAVIGATION_ITEMS;
   user = new User();

@@ -19,7 +19,7 @@ import {Damaged} from '../../damaged';
 
 @Component({
   selector: 'loan-button[damagedButton]',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./loan_actions_card.scss'],
   template: `<button mat-raised-button class="action-button" color="warn"
              (click)="openDialog()"
              aria-label="Click to report this device as damaged.">

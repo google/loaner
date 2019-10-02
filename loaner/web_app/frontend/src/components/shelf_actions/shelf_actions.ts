@@ -29,7 +29,7 @@ import {ShelfService} from '../../services/shelf';
 @Component({
   preserveWhitespaces: true,
   selector: 'loaner-shelf-actions',
-  styleUrls: ['style.css'],
+  styleUrls: ['shelf_actions.scss'],
   templateUrl: 'shelf_actions.ng.html',
 })
 export class ShelfActionsCard implements OnInit {

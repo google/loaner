@@ -62,7 +62,7 @@ export class Lost {
     'class': 'mat-typography',
   },
   selector: 'lost',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./lost.scss'],
   templateUrl: './lost.ng.html',
 })
 export class LostDialogComponent extends LoaderView {

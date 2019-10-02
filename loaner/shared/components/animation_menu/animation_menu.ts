@@ -26,7 +26,7 @@ import {AnimationMenuService} from '../../services/animation_menu_service';
     'class': 'mat-typography',
   },
   selector: 'animation-menu',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./animation_menu.scss'],
   templateUrl: './animation_menu.ng.html',
 })
 export class AnimationMenuComponent {
