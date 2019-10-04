@@ -74,11 +74,25 @@ export function setHeartbeatAlarmListener() {
  */
 function createHeartbeatListener(alarm: chrome.alarms.Alarm) {
   if (alarm.name === HEARTBEAT.name && navigator.onLine) {
-    sendHeartbeat().subscribe();
-    if (CONFIG.LOGGING) {
-      console.info(`Heartbeat sent`);
-    }
+    sendHeartbeatIfUnlocked();
   }
+}
+
+/**
+ * Checks if the loaner is active (used in the last 5 minutes) or idle. If it is
+ * locked, it will not send a heartbeat as this will potentially reassign a
+ * previously returned device that the previous user did not log out of.
+ */
+function sendHeartbeatIfUnlocked() {
+  const durationToQuery = 5 * 60;  // 5 minutes worth of time for active state.
+  chrome.idle.queryState(durationToQuery, state => {
+    if (state !== 'locked') {
+      sendHeartbeat().subscribe();
+      if (CONFIG.LOGGING) {
+        console.info(`Heartbeat sent`);
+      }
+    }
+  });
 }
 
 /** Destroys the heartbeat listener. */
