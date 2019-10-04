@@ -173,8 +173,7 @@ describe('AppComponent', () => {
          ]
        });
 
-       const loaderService =
-           TestBed.get(LoaderService) as AnyDuringTestBedInjectMigration;
+       const loaderService = TestBed.get(LoaderService);
        loaderService.pending.next(true);
        fixture.detectChanges();
 

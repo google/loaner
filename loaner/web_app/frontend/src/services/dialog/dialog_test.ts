@@ -45,9 +45,8 @@ describe('DialogComponent', () => {
 
     flushMicrotasks();
 
-    dialog = TestBed.get(Dialog) as AnyDuringTestBedInjectMigration;
-    matDialogMock =
-        TestBed.get(MatDialog) as AnyDuringTestBedInjectMigration;
+    dialog = TestBed.get(Dialog);
+    matDialogMock = TestBed.get(MatDialog);
   }));
 
   it('should inject the Dialog', () => {

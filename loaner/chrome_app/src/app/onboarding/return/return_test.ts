@@ -70,9 +70,8 @@ describe('ReturnComponent', () => {
         })
         .compileComponents();
 
-    loan = TestBed.get(Loan) as AnyDuringTestBedInjectMigration;
-    returnService =
-        TestBed.get(ReturnDateService) as AnyDuringTestBedInjectMigration;
+    loan = TestBed.get(Loan);
+    returnService = TestBed.get(ReturnDateService);
     fixture = TestBed.createComponent(ReturnComponent);
     app = fixture.debugElement.componentInstance;
 
@@ -98,8 +97,7 @@ describe('ReturnComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.ready();
     fixture.detectChanges();
-    expect(app.device.dueDate)
-        .toEqual((testDeviceInfo.due_date) as AnyDuringJasmineTypesMigration);
+    expect(app.device.dueDate).toEqual((testDeviceInfo.due_date!));
   });
 
   it('fails to retrieve the loan information and provides a helpful card',

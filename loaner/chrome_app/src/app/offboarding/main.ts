@@ -12,16 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import 'core-js/es6';
-import 'core-js/es6/array';
-import 'core-js/es6/function';
-import 'core-js/es6/map';
-import 'core-js/es6/number';
-import 'core-js/es6/object';
-import 'core-js/es6/reflect';
-import 'core-js/es6/string';
-import 'core-js/es6/symbol';
-import 'core-js/es7/reflect';
+import 'core-js/es/array';
+import 'core-js/es/function';
+import 'core-js/es/map';
+import 'core-js/es/number';
+import 'core-js/es/object';
+import 'core-js/es/string';
+import 'core-js/es/symbol';
+import 'core-js/proposals/reflect-metadata';
 import 'zone.js/dist/zone';
 import 'rxjs';
 

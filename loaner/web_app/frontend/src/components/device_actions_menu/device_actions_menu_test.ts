@@ -72,8 +72,7 @@ describe('DeviceActionsMenu', () => {
             .componentInstance;
     compiled = fixture.debugElement.nativeElement;
     overlayContainerElement =
-        (TestBed.get(OverlayContainer) as AnyDuringTestBedInjectMigration)
-            .getContainerElement();
+        (TestBed.get(OverlayContainer)).getContainerElement();
   }));
 
   // Fake the jasmine clock to allow for extension.

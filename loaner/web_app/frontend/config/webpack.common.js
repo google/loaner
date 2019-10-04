@@ -15,7 +15,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpack = require('html-webpack-plugin');
-const {CommonsChunkPlugin} = require('webpack').optimize;
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const rootDir = path.join(process.cwd());

@@ -24,7 +24,7 @@ import {MatDialogRef} from '@angular/material/dialog';
     'class': 'mat-typography',
   },
   selector: 'loaner-return-dialog',
-  styleUrls: ['./style.css'],
+  styleUrls: ['./return_dialog.scss'],
   templateUrl: 'return_dialog.ng.html',
 })
 export class ReturnDialog {

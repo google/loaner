@@ -26,7 +26,6 @@ import {ConfigServiceMock, DeviceServiceMock, ShelfServiceMock, UserServiceMock}
 
 import {ShelfDetailView, ShelfDetailViewModule} from './index';
 
-
 describe('ShelfDetailView', () => {
   let fixture: ComponentFixture<ShelfDetailView>;
   let shelfDetailView: ShelfDetailView;
@@ -50,10 +49,8 @@ describe('ShelfDetailView', () => {
 
     flushMicrotasks();
 
-    const iconRegistry =
-        TestBed.get(MatIconRegistry) as AnyDuringTestBedInjectMigration;
-    const sanitizer =
-        TestBed.get(DomSanitizer) as AnyDuringTestBedInjectMigration;
+    const iconRegistry = TestBed.get(MatIconRegistry);
+    const sanitizer = TestBed.get(DomSanitizer);
     iconRegistry.addSvgIcon(
         'checkin',
         // Note: The bypassSecurity here can't be refactored: the code

@@ -24,17 +24,24 @@ module.exports = (config) => {
     autoWatch: true,
     browsers: ['ChromeHeadless'],
     browserDisconnectTolerance: 3,
-    browserDisconnectTimeout : 210000,
-    browserNoActivityTimeout : 210000,
+    browserDisconnectTimeout: 210000,
+    browserNoActivityTimeout: 210000,
     captureTimeout: 210000,
     frameworks: ['jasmine'],
+    reporters: ['spec', 'progress'],
     plugins: [
       'karma-jasmine',
       'karma-chrome-launcher',
+      'karma-spec-reporter',
       'karma-webpack',
     ],
     files: ['./karma.entry.js'],
     preprocessors: {'./karma.entry.js': ['webpack']},
     singleRun: false,
+    client: {
+      jasmine: {
+        random: false,
+      }
+    },
   });
 };

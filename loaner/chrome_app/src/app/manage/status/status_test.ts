@@ -89,7 +89,7 @@ describe('StatusComponent', () => {
   });
 
   beforeEach(() => {
-    loan = TestBed.get(Loan) as AnyDuringTestBedInjectMigration;
+    loan = TestBed.get(Loan);
     fixture = TestBed.createComponent(StatusComponent);
     app = fixture.debugElement.componentInstance;
     app.ready();
@@ -106,19 +106,11 @@ describe('StatusComponent', () => {
     spyOn(loan, 'getDevice').and.returnValue(of(new Device(testDeviceInfo)));
     app.setLoanInfo();
     fixture.detectChanges();
-    expect(app.device.dueDate)
-        .toEqual((testDeviceInfo.due_date) as AnyDuringJasmineTypesMigration);
-    expect(app.device.maxExtendDate)
-        .toEqual(
-            (testDeviceInfo.max_extend_date) as AnyDuringJasmineTypesMigration);
-    expect(app.device.givenName)
-        .toEqual((testDeviceInfo.given_name) as AnyDuringJasmineTypesMigration);
-    expect(app.device.guestAllowed)
-        .toEqual(
-            (testDeviceInfo.guest_permitted) as AnyDuringJasmineTypesMigration);
-    expect(app.device.guestEnabled)
-        .toEqual(
-            (testDeviceInfo.guest_enabled) as AnyDuringJasmineTypesMigration);
+    expect(app.device.dueDate).toEqual((testDeviceInfo.due_date!));
+    expect(app.device.maxExtendDate).toEqual((testDeviceInfo.max_extend_date!));
+    expect(app.device.givenName).toEqual((testDeviceInfo.given_name!));
+    expect(app.device.guestAllowed).toEqual((testDeviceInfo.guest_permitted!));
+    expect(app.device.guestEnabled).toEqual((testDeviceInfo.guest_enabled!));
   });
 
   it('renders content on the page', () => {

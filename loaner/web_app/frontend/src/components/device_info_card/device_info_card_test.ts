@@ -28,9 +28,19 @@ import {Lost} from '../../../../../shared/components/lost';
 import {DamagedMock, ExtendMock, GuestModeMock, LostMock} from '../../../../../shared/testing/mocks';
 import {DeviceService} from '../../services/device';
 import {UserService} from '../../services/user';
-import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, ReturnDialogMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
+import {DEVICE_1, DEVICE_2, DEVICE_ASSIGNED, DEVICE_NOT_MARKED_FOR_RETURN, DEVICE_WITH_ASSET_TAG, DEVICE_WITHOUT_ASSET_TAG, DeviceServiceMock, TEST_USER, UserServiceMock} from '../../testing/mocks';
 
 import {DeviceInfoCard, DeviceInfoCardModule} from './index';
+
+class ReturnDialogMock {
+  open() {
+    return {
+      afterClosed: () => of(afterClosedValue),
+    };
+  }
+}
+
+let afterClosedValue = false;
 
 @Component({
   preserveWhitespaces: true,
@@ -94,13 +104,14 @@ describe('DeviceInfoCardComponent', () => {
 
     fixture = TestBed.createComponent(DummyComponent);
     testComponent = fixture.debugElement.componentInstance;
-    router = TestBed.get(Router) as AnyDuringTestBedInjectMigration;
-    dialog = TestBed.get(MatDialog) as AnyDuringTestBedInjectMigration;
-    deviceService =
-        TestBed.get(DeviceService) as AnyDuringTestBedInjectMigration;
+    router = TestBed.get(Router);
+    // tslint:disable-next-line:deprecation Test needs refactoring.
+    dialog = TestBed.get(MatDialog);
+    deviceService = TestBed.get(DeviceService);
 
     deviceInfoCard = fixture.debugElement.query(By.directive(DeviceInfoCard))
                          .componentInstance;
+    afterClosedValue = false;  // Make sure it's set back to false.
   }));
 
   it('creates the DeviceInfoCard', () => {
@@ -249,17 +260,4 @@ describe('DeviceInfoCardComponent', () => {
        expect(deviceService.returnDevice).not.toHaveBeenCalled();
      });
 
-  it('returns the device when the dialog is closed with a return', () => {
-    spyOn(dialog, 'open').and.callThrough();
-    spyOn(deviceService, 'listUserDevices')
-        .and.returnValue(of([DEVICE_NOT_MARKED_FOR_RETURN]));
-    spyOn(deviceService, 'returnDevice');
-    dialog.afterClosedValue = true;
-    fixture.detectChanges();
-    const compiled = fixture.debugElement.nativeElement;
-    const returnButton: HTMLElement = compiled.querySelector('#return');
-    returnButton.click();
-
-    expect(deviceService.returnDevice).toHaveBeenCalled();
-  });
 });

@@ -73,10 +73,8 @@ describe('SearchResultsComponent', () => {
     expect(fixture.nativeElement.querySelectorAll('mat-list-item')[1].innerText)
         .toContain('236135');
     expect(searchResults.resultsLength)
-        .toEqual(
-            (TestBed.get(DeviceService) as AnyDuringTestBedInjectMigration)
-                .dataChange.getValue()
-                .length);
+        // tslint:disable-next-line:deprecation Test needs refactoring.
+        .toEqual((TestBed.get(DeviceService)).dataChange.getValue().length);
   });
 
   it('should retrieve and display the mock shelfs.', () => {

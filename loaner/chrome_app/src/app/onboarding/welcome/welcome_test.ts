@@ -61,8 +61,7 @@ describe('WelcomeComponent', () => {
   beforeEach(() => {
     fixture = TestBed.createComponent(WelcomeComponent);
     component = fixture.debugElement.componentInstance;
-    animationService =
-        TestBed.get(AnimationMenuService) as AnyDuringTestBedInjectMigration;
+    animationService = TestBed.get(AnimationMenuService);
     fixture.detectChanges();
   });
 

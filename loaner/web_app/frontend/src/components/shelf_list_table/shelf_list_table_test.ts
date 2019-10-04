@@ -24,7 +24,6 @@ import {ShelfServiceMock} from '../../testing/mocks';
 
 import {ShelfListTable, ShelfListTableModule} from './index';
 
-
 describe('ShelfListTableComponent', () => {
   let fixture: ComponentFixture<ShelfListTable>;
   let shelfListTable: ShelfListTable;
@@ -47,10 +46,8 @@ describe('ShelfListTableComponent', () => {
 
     tick();
 
-    const iconRegistry =
-        TestBed.get(MatIconRegistry) as AnyDuringTestBedInjectMigration;
-    const sanitizer =
-        TestBed.get(DomSanitizer) as AnyDuringTestBedInjectMigration;
+    const iconRegistry = TestBed.get(MatIconRegistry);
+    const sanitizer = TestBed.get(DomSanitizer);
     iconRegistry.addSvgIcon(
         'checkin',
         // Note: The bypassSecurity here can't be refactored: the code

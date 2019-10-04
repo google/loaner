@@ -62,12 +62,10 @@ describe('SearchBox', () => {
 
     fixture = TestBed.createComponent(SearchBox);
     searchBox = fixture.debugElement.componentInstance;
-    router = TestBed.get(Router) as AnyDuringTestBedInjectMigration;
-    searchService =
-        TestBed.get(SearchService) as AnyDuringTestBedInjectMigration;
+    router = TestBed.get(Router);
+    searchService = TestBed.get(SearchService);
     overlayContainerElement =
-        (TestBed.get(OverlayContainer) as AnyDuringTestBedInjectMigration)
-            .getContainerElement();
+        (TestBed.get(OverlayContainer)).getContainerElement();
   }));
 
   it('should create the SearchBox', () => {

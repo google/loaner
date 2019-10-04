@@ -63,10 +63,8 @@ describe('ShelfDetailsComponent', () => {
 
     flushMicrotasks();
 
-    const iconRegistry =
-        TestBed.get(MatIconRegistry) as AnyDuringTestBedInjectMigration;
-    const sanitizer =
-        TestBed.get(DomSanitizer) as AnyDuringTestBedInjectMigration;
+    const iconRegistry = TestBed.get(MatIconRegistry);
+    const sanitizer = TestBed.get(DomSanitizer);
     iconRegistry.addSvgIcon(
         'checkin',
         // Note: The bypassSecurity here can't be refactored: the code

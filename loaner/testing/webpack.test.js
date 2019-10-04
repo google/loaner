@@ -16,34 +16,20 @@ const webpack = require('webpack');
 const helpers = require('./helpers');
 
 module.exports = {
-  resolve: {
-      extensions: ['.ts', '.js'],
-      modules: ['node_modules']
-  },
+  mode: 'development',
+  resolve: {extensions: ['.ts', '.js'], modules: ['node_modules']},
   module: {
     rules: [
       {
         test: /\.ts$/,
-        loaders: [
-          'awesome-typescript-loader',
-          'angular2-template-loader'
-        ]
+        loaders: ['awesome-typescript-loader', 'angular2-template-loader']
       },
-      {
-        test: /\.html$/,
-        loader: 'html-loader'
-      },
-      {
-        test: /\.scss$/,
-        use: ["raw-loader", "sass-loader"]
-      }
+      {test: /\.html$/, loader: 'html-loader'},
+      {test: /\.scss$/, use: ['to-string-loader', 'raw-loader', 'sass-loader']}
     ],
   },
   plugins: [
     new webpack.ContextReplacementPlugin(
-      /angular(\\|\/)core(\\|\/)@angular/,
-      helpers.root('../'),
-      {}
-    ),
+        /angular(\\|\/)core(\\|\/)@angular/, helpers.root('../'), {}),
   ]
 };

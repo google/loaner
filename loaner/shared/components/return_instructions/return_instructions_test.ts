@@ -58,8 +58,7 @@ describe('LoanerReturnInstructions', () => {
   beforeEach(async(() => {
     fixture = TestBed.createComponent(LoanerReturnInstructions);
     app = fixture.debugElement.componentInstance;
-    animationService =
-        TestBed.get(AnimationMenuService) as AnyDuringTestBedInjectMigration;
+    animationService = TestBed.get(AnimationMenuService);
     app.flow = FlowsEnum.ONBOARDING;
     fixture.detectChanges();
   }));
