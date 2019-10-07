@@ -61,6 +61,7 @@ function update() {
   document.getElementById('network').textContent = navigator.onLine ?
       'There is a network connection.' :
       'There is NO network connection. Please connect to a WiFi network.';
+
 }
 
 /** Updates the content when the refresh button is clicked. */
