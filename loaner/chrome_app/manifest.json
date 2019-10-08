@@ -8,6 +8,7 @@
     "alarms",
     "enterprise.deviceAttributes",
     "identity",
+    "idle",
     "notifications",
     "storage",
     "webview",
