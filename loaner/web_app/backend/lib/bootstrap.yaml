@@ -16,6 +16,10 @@
 
 core_events:
 
+- name: device_audit
+  description: Event raised when a device is audited.
+  enabled: True
+
 - name: device_loan_assign
   description: Event run when a device is assigned.
   enabled: True
