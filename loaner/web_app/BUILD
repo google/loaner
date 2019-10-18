@@ -1,16 +1,16 @@
 # Description:
 #   BUILD file for //loaner/web_app.
 
-package(
-    default_visibility = [
-        "//loaner:__subpackages__",
-    ],
-)
-
 load(
     "//loaner:builddefs.bzl",
     "loaner_appengine_library",
     "py_appengine_binary",
+)
+
+package(
+    default_visibility = [
+        "//loaner:__subpackages__",
+    ],
 )
 
 # ==============================================================================

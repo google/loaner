@@ -1,16 +1,16 @@
 # Description:
 #   BUILD file for //loaner/web_app/backend/handlers.
 
-package(
-    default_visibility = [
-        "//loaner:__subpackages__",
-    ],
-)
-
 load(
     "//loaner:builddefs.bzl",
     "loaner_appengine_library",
     "loaner_appengine_test",
+)
+
+package(
+    default_visibility = [
+        "//loaner:__subpackages__",
+    ],
 )
 
 # ==============================================================================
