@@ -58,9 +58,22 @@ describe('RoleEditorTable', () => {
         .toContain('View, add, edit, or delete existing roles');
   });
 
-  it('renders the table header', () => {
+  it('renders the title field "Name" inside .mat-header-row', () => {
     const compiled = fixture.debugElement.nativeElement;
-    expect(compiled.querySelector('.mat-header-cell').innerText)
+    expect(compiled.querySelector('.mat-header-row').innerText)
         .toContain('Name');
+  });
+
+  it('renders the title field "Associated Group" inside .mat-header-row',
+     () => {
+       const compiled = fixture.debugElement.nativeElement;
+       expect(compiled.querySelector('.mat-header-row').innerText)
+           .toContain('Associated Group');
+     });
+
+  it('renders the title field "Permissions" inside .mat-header-row', () => {
+    const compiled = fixture.debugElement.nativeElement;
+    expect(compiled.querySelector('.mat-header-row').innerText)
+        .toContain('Permissions');
   });
 });
