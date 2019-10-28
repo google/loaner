@@ -65,6 +65,11 @@ handlers:
   login: required
   secure: always
 
+- url: /shared/assets
+  static_dir: loaner/shared/assets/
+  login: required
+  secure: always
+
 - url: /style.css
   static_files: loaner/web_app/frontend/src/style.css
   upload: loaner/web_app/frontend/src/style\.css

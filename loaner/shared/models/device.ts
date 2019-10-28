@@ -167,6 +167,20 @@ export class Device {
   }
 
   /**
+   * Property to determine if loan status of the device is almost overdue.
+   */
+  get isAlmostOverdue(): boolean {
+    return ((moment().diff(this.dueDate, 'days') >= -1) && !this.overdue);
+  }
+
+  /**
+   * Property to determine if loan status of the device is healthy.
+   */
+  get isLoanHealthy(): boolean {
+    return !this.pendingReturn && !this.isAlmostOverdue && !this.overdue;
+  }
+
+  /**
    * Property to calculate amount of time (in ms) until the device is due.
    * A negative value indicates that the device is overdue.
    */

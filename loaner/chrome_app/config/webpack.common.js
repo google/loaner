@@ -72,6 +72,8 @@ module.exports = {
       {from: './chrome_app/src/app/assets/preload.css', to: './assets/'},
       // Chrome App icons
       {from: './chrome_app/src/app/assets/icons/', to: './assets/icons/'},
+      // Chrome App shared assets
+      {from: './shared/assets/', to: './shared/assets/'},
       // FAQ markdown file
       {from: './chrome_app/src/app/assets/faq.md', to: './assets/faq.md'},
       // Animations

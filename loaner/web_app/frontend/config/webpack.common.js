@@ -51,6 +51,10 @@ module.exports = {
     new CopyWebpackPlugin([{
       from: 'web_app/frontend/src/assets',
       to: 'assets',
+    },
+    {
+      from: 'shared/assets',
+      to: 'shared/assets',
     }])
   ],
   devServer: {

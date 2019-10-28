@@ -118,6 +118,7 @@ describe('StatusComponent', () => {
     app.device.assetTag = 'asset tag';
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent)
-        .toContain('Please return this device by:');
+        .toContain(
+            'Please return your loaner on time for your fellow colleague');
   });
 });
