@@ -83,6 +83,9 @@ export class AnalyticsService {
       responseType: 'blob' as 'json',
     };
     const structuredView = `chrome_app/${flow}${pageView}`;
+    const appVersion = chrome.runtime.getManifest().version ?
+        chrome.runtime.getManifest().version :
+        'unknown';
     if (this.config.analyticsEnabled) {
       // Confirm that cid is defined, otherwise skip it until it is defined.
       return this.retrieveUuid().pipe(
@@ -91,7 +94,8 @@ export class AnalyticsService {
               cid => this.http.get<Blob>(
                   `https://www.google-analytics.com/collect?payload_data&cid=${
                       cid}&dp=${structuredView}&t=pageview&tid=${
-                      this.config.analyticsId}&v=1`,
+                      this.config.analyticsId}&v=1&an=chrome_app&av=${
+                      appVersion}`,
                   httpOptions)));
     }
     return new Observable<Blob>();
