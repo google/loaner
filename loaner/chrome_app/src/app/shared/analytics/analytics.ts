@@ -86,7 +86,7 @@ export class AnalyticsService {
     const appVersion = chrome.runtime.getManifest().version ?
         chrome.runtime.getManifest().version :
         'unknown';
-    if (this.config.analyticsEnabled) {
+    if (this.config.analyticsEnabled && this.config.isAnalyticsIdValid()) {
       // Confirm that cid is defined, otherwise skip it until it is defined.
       return this.retrieveUuid().pipe(
           skipWhile(cid => cid === undefined),

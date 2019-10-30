@@ -87,6 +87,16 @@ export const CHROME_PUBLIC_KEYS: EnvironmentsVariable = {
   dev: '{DEV_CHROME_KEY}',
 };
 
+/**
+ * Represents the various analytics IDs for the various release tracks an app
+ * may have.
+ */
+export const ANALYTICS_IDS: EnvironmentsVariable = {
+  prod: '',
+  qa: '',
+  dev: '',
+};
+
 /** ######################################################################## */
 
 /**
@@ -147,7 +157,6 @@ export class ConfigService {
 
   // Shared variables
   analyticsEnabled = false;
-  analyticsId = '';
   apiPath = '/_ah/api';
   devTrack!: boolean;
   private standardEndpoint!: string;
@@ -211,6 +220,21 @@ export class ConfigService {
   /** Add's the proper suffix to the Endpoints URL and returns the URL. */
   get endpointsApiUrl(): string {
     return `${this.standardEndpoint}${this.apiPath}`;
+  }
+
+  /** Grabs the appropriate analytics ID depending on the environment. */
+  get analyticsId(): string {
+    if (this.appMode === ENVIRONMENTS.PROD) {
+      return ANALYTICS_IDS.prod;
+    } else if (this.appMode === ENVIRONMENTS.QA) {
+      return ANALYTICS_IDS.qa;
+    }
+    return ANALYTICS_IDS.dev;
+  }
+
+  /** Check if the analytics ID for the given track is properly defined. */
+  isAnalyticsIdValid(): boolean {
+    return Boolean(this.analyticsId && this.analyticsId !== '');
   }
 }
 

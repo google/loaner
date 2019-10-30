@@ -133,8 +133,7 @@ export class AppComponent extends LoaderView implements OnInit {
     });
 
     // Handles the content pushes to Google Analytics if enabled.
-    if (this.config.analyticsEnabled &&
-        this.config.appMode === ENVIRONMENTS.PROD) {
+    if (this.config.analyticsEnabled && this.config.isAnalyticsIdValid()) {
       this.router.events.subscribe(event => {
         if (event instanceof NavigationEnd) {
           // tslint:disable:no-any DefinitelyTyped does not yet support gtag so

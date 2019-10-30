@@ -139,8 +139,7 @@ device to your nearest shelf as soon as possible.`,
    * @param view represents the current page/view.
    */
   private updateAnalytics(view: string) {
-    if (this.config.analyticsEnabled &&
-        this.config.chromeMode === CHROME_MODE.PROD) {
+    if (this.config.analyticsEnabled && this.config.isAnalyticsIdValid()) {
       this.analyticsService.sendView('offboarding', view).subscribe(url => {
         if (this.analyticsImg) {
           this.analyticsImg.src = window.URL.createObjectURL(url);

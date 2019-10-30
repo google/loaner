@@ -127,4 +127,62 @@ describe('ConfigService', () => {
            .toBe(
                'https://endpoints-dot-qa-app-engine-project.appspot.com/_ah/api');
      });
+
+  it('provides the correct ID for analytics when on prod web app', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = false;
+    config.ON_PROD = true;
+    config.IS_FRONTEND = true;
+    expect(config.analyticsId).toBe('');
+  });
+
+  it('provides the correct ID for analytics when on the qa web app', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = true;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = true;
+    expect(config.analyticsId).toBe('');
+  });
+
+  it('provides the correct ID for analytics when on the dev web app', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = true;
+    config.ON_QA = false;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = true;
+    expect(config.analyticsId).toBe('');
+  });
+
+  it('provides the correct ID for analytics when on prod chrome app', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = false;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = false;
+    spyOnProperty(config, 'chromeMode', 'get')
+        .and.returnValue(CHROME_MODE.PROD);
+    expect(config.analyticsId).toBe('');
+  });
+
+  it('provides the correct ID for analytics when on the qa chrome app', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = false;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = false;
+    spyOnProperty(config, 'chromeMode', 'get').and.returnValue(CHROME_MODE.QA);
+    expect(config.analyticsId).toBe('');
+  });
+
+  it('provides the correct ID for analytics when on the dev chrome app', () => {
+    config.ON_LOCAL = false;
+    config.ON_DEV = false;
+    config.ON_QA = false;
+    config.ON_PROD = false;
+    config.IS_FRONTEND = false;
+    spyOnProperty(config, 'chromeMode', 'get').and.returnValue(CHROME_MODE.DEV);
+    expect(config.analyticsId).toBe('');
+  });
 });

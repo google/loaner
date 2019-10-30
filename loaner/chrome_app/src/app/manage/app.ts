@@ -74,8 +74,7 @@ export class AppRoot implements AfterViewInit {
   ) {}
 
   ngAfterViewInit() {
-    if (this.config.analyticsEnabled &&
-        this.config.chromeMode === CHROME_MODE.PROD) {
+    if (this.config.analyticsEnabled && this.config.isAnalyticsIdValid()) {
       this.router.events.subscribe(route => {
         if (route instanceof NavigationEnd) {
           this.analyticsService
