@@ -54,10 +54,13 @@ class ChromeApi(root_api.Service):
       if device.enrolled:
         is_enrolled = True
         if device.assigned_user == user_email:
-          device.loan_resumes_if_late(user_email)
+          if device.onboarded:
+            device.loan_resumes_if_late(user_email)
+          else:
+            start_assignment = True
         else:
-          start_assignment = True
           device.loan_assign(user_email)
+          start_assignment = True
 
     else:
       try:

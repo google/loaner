@@ -636,6 +636,16 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
       self.service.mark_pending_return(
           device_messages.DeviceRequest(urlkey=self.device.key.urlsafe()))
 
+  @mock.patch.object(device_model.Device, 'complete_onboard')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
+  def test_complete_onboard(self, mock_xsrf_token, mock_completeonboard):
+    self.login_endpoints_user()
+    self.service.complete_onboard(
+        device_messages.DeviceRequest(urlkey=self.device.key.urlsafe()))
+    mock_completeonboard.assert_called_once_with(
+        user_email=loanertest.USER_EMAIL)
+    self.assertEqual(mock_xsrf_token.call_count, 1)
+
   @mock.patch('__main__.device_model.Device.resume_loan')
   @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
   def test_resume_loan(self, mock_xsrf_token, mock_resume_loan):

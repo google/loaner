@@ -203,6 +203,7 @@ class Device(base_model.BaseModel):
         the device had.
     next_reminder: Reminder, Level, time, and count of the next reminder.
     tags: List[tag_model.Tag], a list of tags associated with the device.
+    onboarded: bool, indicates the onboarding status of the device.
   """
   serial_number = ndb.StringProperty()
   asset_tag = ndb.StringProperty()
@@ -225,6 +226,7 @@ class Device(base_model.BaseModel):
   last_reminder = ndb.StructuredProperty(Reminder)
   next_reminder = ndb.StructuredProperty(Reminder)
   tags = ndb.StructuredProperty(tag_model.TagData, repeated=True)
+  onboarded = ndb.BooleanProperty(default=True)
 
   _INDEX_NAME = constants.DEVICE_INDEX_NAME
   _SEARCH_PARAMETERS = {
@@ -660,6 +662,7 @@ class Device(base_model.BaseModel):
     self.move_to_default_ou(user_email=user_email)
     self.last_reminder = None
     self.next_reminder = None
+    self.onboarded = True
     self.put()
     self.stream_to_bq(
         user_email, 'Marking device %s as returned.' % self.identifier)
@@ -766,6 +769,17 @@ class Device(base_model.BaseModel):
     self.lock(user_email)
     self.stream_to_bq(
         user_email, 'Marking device %s lost and locking it.' % self.identifier)
+
+  def complete_onboard(self, user_email):
+    """Complete device onboarding.
+
+    Args:
+      user_email: str, The email of the acting user.
+    """
+    self.onboarded = True
+    self.put()
+    self.stream_to_bq(
+        user_email, 'Completing onboard of device %s.' % self.identifier)
 
   @validate_assignee_or_admin
   def enable_guest_mode(self, user_email):

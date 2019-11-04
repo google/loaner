@@ -361,6 +361,23 @@ class DeviceApi(root_api.Service):
       raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
+  @auth.method(
+      device_messages.DeviceRequest,
+      message_types.VoidMessage,
+      name='complete_onboard',
+      path='user/complete_onboard',
+      http_method='POST')
+  def complete_onboard(self, request):
+    """complete onboard of a device."""
+    self.check_xsrf_token(self.request_state)
+    device = _get_device(request)
+    user_email = user_lib.get_user_email()
+    try:
+      device.complete_onboard(user_email=user_email)
+    except device_model.UnauthorizedError as err:
+      raise endpoints.UnauthorizedException(str(err))
+    return message_types.VoidMessage()
+
 
 def _get_identifier_from_request(device_request):
   """Parses the DeviceMessage for an identifier to use to get a Device entity.

@@ -54,7 +54,8 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
     super(ChromeEndpointsTest, self).tearDown()
     self.service = None
 
-  def create_device(self, enrolled=True, assigned_user=None, asset_tag=None):
+  def create_device(self, enrolled=True, assigned_user=None, asset_tag=None,
+                    onboarded=None):
     loan_resumes_if_late_patcher = mock.patch.object(
         device_model.Device, 'loan_resumes_if_late')
     loan_resumes_if_late_patcher.start()
@@ -64,7 +65,8 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
         enrolled=enrolled,
         device_model='HP Chromebook 13 G1',
         current_ou='/',
-        chrome_device_id=UNIQUE_ID)
+        chrome_device_id=UNIQUE_ID,
+        onboarded=onboarded)
     self.device.put()
 
     self.mock_loan_resumes_if_late = self.device.loan_resumes_if_late
@@ -107,7 +109,7 @@ class ChromeEndpointsTest(loanertest.EndpointsTestCase):
 
   def test_heartbeat_assignment_unchanged(self):
     """Tests heartbeat processing for an unchanged assignment."""
-    self.create_device(assigned_user=loanertest.USER_EMAIL)
+    self.create_device(assigned_user=loanertest.USER_EMAIL, onboarded=True)
 
     response = self.service.heartbeat(self.chrome_request)
     self.assertIsInstance(response, chrome_messages.HeartbeatResponse)
