@@ -12,19 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python2, python3
 """Tests for deployments.gng_impl."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
-# Prefer Python 2 and fall back on Python 3.
-# pylint:disable=g-statement-before-imports,g-import-not-at-top
-try:
-  import __builtin__ as builtins
-except ImportError:
-  import builtins
-# pylint:enable=g-statement-before-imports,g-import-not-at-top
 
 import datetime
 import getpass
@@ -33,24 +26,29 @@ import sys
 from absl import logging
 from absl.testing import flagsaver
 from absl.testing import parameterized
-
 from pyfakefs import fake_filesystem
-from pyfakefs import mox3_stubout
-
 import freezegun
 import mock
-
 from six.moves import StringIO
 
 from google.auth import credentials
-
-from absl.testing import absltest
 from loaner.deployments import gng_impl
 from loaner.deployments.lib import app_constants
 from loaner.deployments.lib import auth
 from loaner.deployments.lib import common
 from loaner.deployments.lib import storage
 from loaner.deployments.lib import utils
+from absl.testing import absltest
+
+# Prefer Python 2 and fall back on Python 3.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  import six.moves.builtins as builtins
+except ImportError:
+  import builtins
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
+
+from pyfakefs import mox3_stubout
 
 # The following constants are YAML file contents that are written to the fake
 # file system.

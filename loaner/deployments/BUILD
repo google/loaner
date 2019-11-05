@@ -40,8 +40,10 @@ py_binary(
         "gng_impl.py",
     ],
     python_version = "PY3",
+    srcs_version = "PY2AND3",
     deps = [
         ":gng_impl_lib",
+        "@six_archive//:six",
     ],
 )
 

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python2, python3
 """The Grab n Go management script.
 
 Usage: gng_impl [FLAGS]
@@ -278,7 +279,7 @@ class _Manager(object):
           utils.write('Action: {!r}\nDescription: {}\n'.format(
               opt.name, opt.description))
         action = utils.prompt_enum(
-            '', accepted_values=self._options.keys(),
+            '', accepted_values=list(self._options.keys()),
             case_sensitive=False).strip().lower()
         callback = self._options[action].callback
         if callback is None:
