@@ -157,11 +157,10 @@ http_archive(
 http_archive(
     name = "gcloud_bigquery_archive",
     build_file = "//third_party:gcloud_bigquery.BUILD",
-    sha256 = "6e8cc6914701bbfd8845cc0e0b19c5e2123649fc6ddc49aa945d83629499f4ec",
-    strip_prefix = "google-cloud-bigquery-0.25.0",
+    sha256 = "b38d5669235583ee4334d468b3719ea4a381da4b2abbedbf13cb926d893a11ab",
+    strip_prefix = "google-cloud-bigquery-1.21.0",
     urls = [
-        "https://mirror.bazel.build/pypi.python.org/packages/4a/f1/05631b0a29b1f763794404195d161edb24d7463029c987e0a32fc521e2a6/google-cloud-bigquery-0.25.0.tar.gz",
-        "https://pypi.python.org/packages/4a/f1/05631b0a29b1f763794404195d161edb24d7463029c987e0a32fc521e2a6/google-cloud-bigquery-0.25.0.tar.gz",
+        "https://files.pythonhosted.org/packages/57/5f/444f25bb2cd4c162bb91a5c43efbe0a1bc9bbf05f9fdab12c6ba538b4348/google-cloud-bigquery-1.21.0.tar.gz",
     ],
 )
 

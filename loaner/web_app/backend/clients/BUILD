@@ -32,7 +32,7 @@ loaner_appengine_library(
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/models:shelf_model",
         "//loaner/web_app/backend/models:survey_models",
-        "//third_party/py/google/cloud/bigquery",
+        "@gcloud_bigquery_archive//:gcloud_bigquery",
     ],
 )
 
@@ -66,8 +66,8 @@ loaner_appengine_test(
         "//loaner/web_app/backend/models:bigquery_row_model",
         "//loaner/web_app/backend/models:device_model",
         "//loaner/web_app/backend/testing:loanertest",
-        "//third_party/py/google/cloud/bigquery",
         "@absl_archive//absl/testing:parameterized",
+        "@gcloud_bigquery_archive//:gcloud_bigquery",
         "@mock_archive//:mock",
     ],
 )

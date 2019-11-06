@@ -78,7 +78,8 @@ class BigQueryClient(object):
     if constants.ON_LOCAL:
       return
     self._client = bigquery.Client()
-    self._dataset = self._client.dataset(constants.BIGQUERY_DATASET_NAME)
+    self._dataset_ref = bigquery.DatasetReference(
+        self._client.project, constants.BIGQUERY_DATASET_NAME)
 
   def initialize_tables(self):
     """Performs first-time setup by creating dataset/tables."""
@@ -87,13 +88,14 @@ class BigQueryClient(object):
       return
 
     logging.info('Beginning BigQuery initialization.')
+    dataset = bigquery.Dataset(self._dataset_ref)
     try:
-      self._dataset.create()
+      dataset = self._client.create_dataset(dataset)
     except cloud.exceptions.Conflict:
       logging.warning('Dataset %s already exists, not creating.',
-                      self._dataset.name)
+                      dataset.dataset_id)
     else:
-      logging.info('Dataset %s successfully created.', self._dataset.name)
+      logging.info('Dataset %s successfully created.', dataset.dataset_id)
 
     self._create_table(constants.BIGQUERY_DEVICE_TABLE, device_model.Device())
     self._create_table(constants.BIGQUERY_SHELF_TABLE, shelf_model.Shelf())
@@ -109,23 +111,23 @@ class BigQueryClient(object):
       table_name: str, name of the table to be created or updated.
       entity_instance: an ndb.Model entity instance to base the schema on.
     """
-    table = self._dataset.table(table_name)
+    table_ref = bigquery.TableReference(self._dataset_ref, table_name)
     entity_schema = _generate_entity_schema(entity_instance)
     table_schema = _generate_schema(entity_schema)
-    table.schema = table_schema
+    table = bigquery.Table(table_ref, schema=table_schema)
     try:
-      table.create()
+      table = self._client.create_table(table)
     except cloud.exceptions.Conflict:
       logging.info('Table %s already exists, attempting to update it.',
                    table_name)
-      table.reload()
       merged_schema = _merge_schemas(table.schema, table_schema)
-      table.patch(schema=merged_schema)
+      table.schema = merged_schema
+      table = self._client.update_table(table, ['schema'])
       logging.info('Table %s updated.', table_name)
     else:
       logging.info('Table %s created.', table_name)
 
-  def stream_table(self, table_name, table):
+  def stream_table(self, table_name, table_data):
     """Inserts table rows into BigQuery.
 
       For each row in a given table, we include a row_id, which is derived
@@ -136,7 +138,7 @@ class BigQueryClient(object):
 
     Args:
       table_name: str, table name to stream to.
-      table: List[tuple], rows for the insert request to the BigQuery API.
+      table_data: List[tuple], rows for the insert request to the BigQuery API.
 
     Raises:
       GetTableError: if an invalid table is passed in or the table is not
@@ -147,15 +149,13 @@ class BigQueryClient(object):
       logging.debug('On local, not connecting to BQ.')
       return
 
-    bq_table = self._dataset.table(table_name)
-
-    if not bq_table.exists():
+    table_ref = self._dataset_ref.table(table_name)
+    try:
+      bq_table = self._client.get_table(table_ref)
+    except cloud.exceptions.NotFound:
       raise GetTableError(
-          'Table {} does not exist or is not initialized'.format(table))
-    bq_table.reload()
-    # A row_id is comprised of each row's ndb key, timestamp, actor, and method.
-    row_ids = [str(row[:5]) for row in table]
-    errors = bq_table.insert_data(table, row_ids=row_ids)
+          'Table {} does not exist or is not initialized'.format(table_name))
+    errors = self._client.insert_rows(bq_table, table_data)
     if errors:
       logging.error('BigQuery insert generated errors.')
       logging.error(errors)
@@ -168,11 +168,10 @@ class BigQueryClient(object):
       serial: str, input used to query the data. An attribute of a device.
 
     Returns:
-      Iterator of tuples with historical data.
+      List of tuples with historical data.
     """
-    query_job = self._client.run_sync_query(SQL_QUERY.format(serial))
-    query_job.run()
-    return query_job.fetch_data()
+    query_job = self._client.query(SQL_QUERY.format(serial))
+    return [row for row in query_job]
 
 
 def _generate_entity_schema(entity):

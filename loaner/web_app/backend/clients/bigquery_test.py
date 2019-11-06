@@ -32,7 +32,6 @@ from google.cloud import bigquery as gcloud_bq
 from google.appengine.ext import ndb
 # pylint: enable=g-bad-import-order
 
-from loaner.web_app import constants
 from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.models import bigquery_row_model
 from loaner.web_app.backend.models import device_model
@@ -47,14 +46,17 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
     bq_patcher = mock.patch.object(gcloud_bq, 'Client', autospec=True)
     self.addCleanup(bq_patcher.stop)
     self.bq_mock = bq_patcher.start()
-    self.dataset = mock.Mock()
-    self.table = mock.Mock()
+    self.dataset_ref = mock.Mock(spec=gcloud_bq.DatasetReference)
+    self.table = mock.Mock(spec=gcloud_bq.Table)
     self.table.schema = []
-    self.table.exists.return_value = True
-    self.table.insert_data.return_value = None
-    self.dataset.table.return_value = self.table
-    self.client = bigquery.BigQueryClient()
-    self.client._dataset = self.dataset
+    self.dataset_ref.table.return_value = self.table
+    with mock.patch.object(
+        bigquery.BigQueryClient, '__init__', return_value=None):
+      self.client = bigquery.BigQueryClient()
+      self.client._client = self.bq_mock()
+      self.client._dataset_ref = self.dataset_ref
+      self.client._client.insert_rows.return_value = None
+      self.client._client.get_table.return_value = self.table
     self.nested_schema = [
         gcloud_bq.SchemaField('nested_string_attribute', 'STRING', 'NULLABLE')]
     self.entity_schema = [
@@ -81,73 +83,52 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
 
   @mock.patch.object(bigquery, '_generate_schema')
   def test_initialize_tables(self, mock_schema):
-    with mock.patch.object(bigquery, 'bigquery'):
-      mock_client = bigquery.BigQueryClient()
-      mock_client._dataset = mock.Mock()
-
-      mock_client.initialize_tables()
-
-      mock_schema.assert_called()
-      mock_client._dataset.create.assert_called()
-      mock_client._dataset.table.called_with(constants.BIGQUERY_DEVICE_TABLE)
-      mock_client._dataset.table.called_with(constants.BIGQUERY_SHELF_TABLE)
-
-  def test_create_table(self):
-    self.table.create.side_effect = cloud.exceptions.Conflict('Exist')
-    self.client._create_table(
-        constants.BIGQUERY_DEVICE_TABLE, device_model.Device())
-    self.assertEqual(self.table.create.call_count, 1)
-    self.assertEqual(self.table.reload.call_count, 1)
-    self.assertEqual(self.table.patch.call_count, 1)
-
-  @mock.patch.object(bigquery, 'bigquery')
-  @mock.patch.object(
-      bigquery, '_generate_schema', return_value=mock.Mock())
-  def test_initialize_tables__dataset_exists(self, mock_schema, unused):
-    del unused
-    mock_client = bigquery.BigQueryClient()
-    mock_client._dataset = mock.Mock()
-    mock_client._dataset.create.side_effect = cloud.exceptions.Conflict(
-        'Already Exists: Dataset Loaner')
-
-    mock_client.initialize_tables()
+    self.client.initialize_tables()
 
     mock_schema.assert_called()
-    mock_client._dataset.create.assert_called()
+    self.client._client.create_dataset.assert_called()
+    self.client._client.create_table.assert_called()
+
+  @mock.patch.object(
+      bigquery, '_generate_schema', return_value=mock.Mock())
+  @mock.patch.object(bigquery.BigQueryClient, '_create_table')
+  def test_initialize_tables__dataset_exists(self, mock_table, mock_schema):
+    self.client._client.create_dataset.side_effect = cloud.exceptions.Conflict(
+        'Already Exists: Dataset Loaner')
+
+    with mock.patch.object(gcloud_bq, 'Dataset') as mock_dataset:
+      mock_dataset.dataset_id = 'test'
+      self.client.initialize_tables()
+
+    mock_table.assert_called()
+    self.client._client.create_dataset.assert_called()
 
   def test_stream_table(self):
     self.client.stream_table('Device', self.test_table)
-    row_id = str((self.test_row_dict['ndb_key'],
-                  self.test_row_dict['timestamp'],
-                  self.test_row_dict['actor'],
-                  self.test_row_dict['method'],
-                  self.test_row_dict['summary']))
-    self.table.insert_data.assert_called_once_with(
-        self.test_table, row_ids=[row_id])
-
-  def test_get_device_info(self):
-    test_serial = 'ABC1234'
-    expected_results = [('ABC1234', 'test@', '0000')]
-    mock_query_job = mock.Mock()
-    mock_query_job.fetch_data.return_value = expected_results
-    self.client._client.run_sync_query.return_value = mock_query_job
-
-    results = self.client.get_device_info(test_serial)
-
-    self.assertEqual(results, expected_results)
-    self.assertTrue(mock_query_job.run.called)
+    self.client._client.insert_rows.assert_called_once_with(
+        self.table, self.test_table)
 
   def test_stream_row_no_table(self):
-    self.table.exists.return_value = False
+    self.client._client.get_table.side_effect = cloud.exceptions.NotFound(
+        'Table does not exist')
     self.assertRaises(
         bigquery.GetTableError,
         self.client.stream_table, 'Device', self.test_table)
 
   def test_stream_row_bq_errors(self):
-    self.table.insert_data.return_value = 'Oh no it exploded'
+    self.client._client.insert_rows.return_value = 'Oh no it exploded'
     self.assertRaises(
         bigquery.InsertError,
         self.client.stream_table, 'Device', self.test_table)
+
+  def test_get_device_info(self):
+    test_serial = 'ABC1234'
+    expected_results = [('ABC1234', 'test@', '0000')]
+    self.client._client.query.return_value = expected_results
+
+    results = self.client.get_device_info(test_serial)
+
+    self.assertEqual(results, expected_results)
 
   def test_generate_schema_no_entity(self):
     generated_schema = bigquery._generate_schema()
