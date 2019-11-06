@@ -1073,6 +1073,30 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.assertEqual(dates.default, now + datetime.timedelta(days=3))
     self.assertEqual(dates.max, now + datetime.timedelta(days=14))
 
+  @mock.patch.object(config_model, 'Config', autospec=True)
+  def test_calculate_return_dates_on_saturday_date(self, mock_config):
+    now = datetime.datetime(year=2019, month=1, day=2)
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.test_device.assignment_date = now
+    mock_config.get.side_effect = [3, 14]
+
+    dates = self.test_device.return_dates
+    self.assertIsInstance(dates, device_model.ReturnDates)
+    self.assertEqual(dates.default, now + datetime.timedelta(days=5))
+    self.assertEqual(dates.max, now + datetime.timedelta(days=14))
+
+  @mock.patch.object(config_model, 'Config', autospec=True)
+  def test_calculate_return_dates_on_sunday_date(self, mock_config):
+    now = datetime.datetime(year=2019, month=1, day=3)
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
+    self.test_device.assignment_date = now
+    mock_config.get.side_effect = [3, 14]
+
+    dates = self.test_device.return_dates
+    self.assertIsInstance(dates, device_model.ReturnDates)
+    self.assertEqual(dates.default, now + datetime.timedelta(days=4))
+    self.assertEqual(dates.max, now + datetime.timedelta(days=14))
+
 
 class DecoratorTest(loanertest.TestCase):
   """Tests for decorators."""

@@ -1015,5 +1015,8 @@ def calculate_return_dates(assignment_date):
       days=config_model.Config.get('loan_duration'))
   max_loan_date = assignment_date + datetime.timedelta(
       days=config_model.Config.get('maximum_loan_duration'))
+  if default_date.weekday() > 4:
+    days_til_weekday = ((default_date.weekday() - 4) % 2) + 1
+    default_date = default_date + datetime.timedelta(days=days_til_weekday)
 
   return ReturnDates(max_loan_date, default_date)
