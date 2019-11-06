@@ -78,8 +78,8 @@ py_library(
     deps = [
         ":auth_lib",
         "//loaner/web_app/backend/common:google_cloud_lib_fixer",
-        "//third_party/py/google/cloud/datastore",
         "@absl_archive//absl/logging",
+        "@gcloud_datastore_archive//:gcloud_datastore",
     ],
 )
 
@@ -136,8 +136,8 @@ py_library(
     srcs_version = "PY2AND3",
     deps = [
         ":auth_lib",
-        "//third_party/py/google/cloud/storage",
         "@absl_archive//absl/logging",
+        "@gcloud_storage_archive//:gcloud_storage",
     ],
 )
 
@@ -237,8 +237,8 @@ py_test(
         ":auth_lib",
         ":common_lib",
         ":datastore_lib",
-        "//third_party/py/google/cloud/datastore",
         "@absl_archive//absl/testing:absltest",
+        "@gcloud_datastore_archive//:gcloud_datastore",
         "@mock_archive//:mock",
     ],
 )
@@ -311,9 +311,9 @@ py_test(
         ":auth_lib",
         ":common_lib",
         ":storage_lib",
-        "//third_party/py/google/cloud/storage",
         "@absl_archive//absl/testing:absltest",
         "@absl_archive//absl/testing:parameterized",
+        "@gcloud_storage_archive//:gcloud_storage",
         "@mock_archive//:mock",
     ],
 )

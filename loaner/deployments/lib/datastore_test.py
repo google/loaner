@@ -20,7 +20,7 @@ from __future__ import print_function
 
 import mock
 
-from google.cloud import datastore as datastore_client
+from google.cloud.datastore import datastore_future as datastore_client
 from google.cloud.datastore import entity
 from google.cloud.datastore import key
 
