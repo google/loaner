@@ -13,9 +13,11 @@ py_library(
     srcs_version = "PY2AND3",
     visibility = ["//visibility:public"],
     deps = [
+        "@gcloud_api_core_archive//:gcloud_api_core",
         "@gcloud_auth_archive//:gcloud_auth",
         "@gcloud_core_archive//:gcloud_core",
         "@gcloud_resumable_media_archive//:gcloud_resumable_media",
         "@requests_archive//:requests",
+        "@setup_tools_archive//:setup_tools",
     ],
 )

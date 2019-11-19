@@ -20,7 +20,7 @@ from __future__ import print_function
 
 from absl import logging
 
-from google.cloud.datastore import datastore_future as datastore
+from google.cloud import datastore
 
 from loaner.deployments.lib import auth
 

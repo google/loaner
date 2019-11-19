@@ -155,23 +155,56 @@ http_archive(
 )
 
 http_archive(
+    name = "futures_archive",
+    build_file = "//third_party:futures.BUILD",
+    sha256 = "9ec02aa7d674acb8618afb127e27fde7fc68994c0437ad759fa094a574adb265",
+    strip_prefix = "futures-3.2.0",
+    urls = [
+        "https://files.pythonhosted.org/packages/1f/9e/7b2ff7e965fc654592269f2906ade1c7d705f1bf25b7d469fa153f7d19eb/futures-3.2.0.tar.gz",
+    ],
+)
+
+bind(
+    name = "futures",
+    actual = "@futures_archive//:futures",
+)
+
+# NOTE: workaround for pkg_resources import issue with gcloud_bigquery.
+http_archive(
+    name = "setup_tools_archive",
+    build_file = "//third_party:setup_tools.BUILD",
+    sha256 = "47881d54ede4da9c15273bac65f9340f8929d4f0213193fa7894be384f2dcfa6",
+    strip_prefix = "setuptools-40.2.0",
+    urls = [
+        "http://mirror.bazel.build/pypi.python.org/packages/source/s/six/setuptools-40.2.0.zip",
+        "https://pypi.python.org/packages/source/s/setuptools/setuptools-40.2.0.zip",
+    ],
+)
+
+http_archive(
     name = "gcloud_bigquery_archive",
     build_file = "//third_party:gcloud_bigquery.BUILD",
-    sha256 = "b38d5669235583ee4334d468b3719ea4a381da4b2abbedbf13cb926d893a11ab",
-    strip_prefix = "google-cloud-bigquery-1.21.0",
+    sha256 = "aed2b1d4db1e21d891522d6d6bb14476e6ba58c681cbb68eeb42c168a4e3fda9",
+    strip_prefix = "google-cloud-bigquery-1.1.0",
     urls = [
-        "https://files.pythonhosted.org/packages/57/5f/444f25bb2cd4c162bb91a5c43efbe0a1bc9bbf05f9fdab12c6ba538b4348/google-cloud-bigquery-1.21.0.tar.gz",
+        "https://mirror.bazel.build/files.pythonhosted.org/packages/24/f8/54a929bc544d4744ef02cee1c9b97c9498d835445608bf2d099268ed8f1c/google-cloud-bigquery-1.1.0.tar.gz",
+        "https://files.pythonhosted.org/packages/24/f8/54a929bc544d4744ef02cee1c9b97c9498d835445608bf2d099268ed8f1c/google-cloud-bigquery-1.1.0.tar.gz",
     ],
+)
+
+bind(
+    name = "gcloud_bigquery",
+    actual = "@gcloud_bigquery_archive//:gcloud_bigquery",
 )
 
 http_archive(
     name = "gcloud_core_archive",
     build_file = "//third_party:gcloud_core.BUILD",
-    sha256 = "1249ee44c445f820eaf99d37904b37961347019dcd3637dbad1f3173260245f2",
-    strip_prefix = "google-cloud-core-0.25.0",
+    sha256 = "89e8140a288acec20c5e56159461d3afa4073570c9758c05d4e6cb7f2f8cc440",
+    strip_prefix = "google-cloud-core-0.28.1",
     urls = [
-        "https://mirror.bazel.build/pypi.python.org/packages/58/d0/c3a30eca2a0073d5ac00254a1a9d259929a899deee6e3dfe4e45264f5187/google-cloud-core-0.25.0.tar.gz",
-        "https://pypi.python.org/packages/58/d0/c3a30eca2a0073d5ac00254a1a9d259929a899deee6e3dfe4e45264f5187/google-cloud-core-0.25.0.tar.gz",
+        "https://mirror.bazel.build/files.pythonhosted.org/packages/22/f0/a062f4d877420e765f451af99045326e44f9b026088d621ca40011f14c66/google-cloud-core-0.28.1.tar.gz",
+        "https://files.pythonhosted.org/packages/22/f0/a062f4d877420e765f451af99045326e44f9b026088d621ca40011f14c66/google-cloud-core-0.28.1.tar.gz",
     ],
 )
 
@@ -472,16 +505,6 @@ http_archive(
     strip_prefix = "semver-2.7.9",
     urls = [
         "https://files.pythonhosted.org/packages/40/56/d1f930872436300b474a447a8042091bd335119f0c58bd8647546d6c3dc0/semver-2.7.9.tar.gz",
-    ],
-)
-
-http_archive(
-    name = "setup_tools_archive",
-    build_file = "//third_party:setup_tools.BUILD",
-    sha256 = "6501fc32f505ec5b3ed36ec65ba48f1b975f52cf2ea101c7b73a08583fd12f75",
-    strip_prefix = "setuptools-38.4.0",
-    urls = [
-        "https://pypi.python.org/packages/41/5f/6da80400340fd48ba4ae1c673be4dc3821ac06cd9821ea60f9c7d32a009f/setuptools-38.4.0.zip",
     ],
 )
 

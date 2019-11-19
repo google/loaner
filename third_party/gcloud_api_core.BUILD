@@ -17,6 +17,7 @@ py_library(
     deps = [
         requirement("grpcio"),
         "@enum_archive//:enum",
+        "@futures_archive//:futures",
         "@gcloud_auth_archive//:gcloud_auth",
         "@gcloud_core_archive//:gcloud_core",
         "@gcloud_resumable_media_archive//:gcloud_resumable_media",

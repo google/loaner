@@ -86,8 +86,10 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
     self.client.initialize_tables()
 
     mock_schema.assert_called()
-    self.client._client.create_dataset.assert_called()
-    self.client._client.create_table.assert_called()
+    # Using assert foo.called here because assert_called() breaks here
+    # in OSS and I'll be honest I'm sick of trying to debug it.
+    assert self.client._client.create_dataset.called
+    assert self.client._client.create_table.called
 
   @mock.patch.object(
       bigquery, '_generate_schema', return_value=mock.Mock())
@@ -101,7 +103,7 @@ class BigQueryClientTest(loanertest.TestCase, parameterized.TestCase):
       self.client.initialize_tables()
 
     mock_table.assert_called()
-    self.client._client.create_dataset.assert_called()
+    assert self.client._client.create_dataset.called
 
   def test_stream_table(self):
     self.client.stream_table('Device', self.test_table)

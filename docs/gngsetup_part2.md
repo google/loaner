@@ -17,10 +17,13 @@ upload GnG from.
 
 **Note:** This deployment has only been tested on Linux and macOS.
 
+**Warning:** You must install Bazel 0.26 or earlier as this configuration is
+incompatible with Bazel 0.27 and later.
+
 Install the following software:
 
 +   [Git](https://git-scm.com/downloads)
-+   [Bazel](https://docs.bazel.build/versions/master/install.html)
++   [Bazel 0.26.1](https://github.com/bazelbuild/bazel/releases/tag/0.26.1)
 +   [Google Cloud SDK](https://cloud.google.com/sdk/)
 +   [NPM](https://www.npmjs.com/get-npm)
 
