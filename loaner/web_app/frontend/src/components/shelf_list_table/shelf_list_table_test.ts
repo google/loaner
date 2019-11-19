@@ -20,7 +20,8 @@ import {RouterTestingModule} from '@angular/router/testing';
 
 import {MatIconRegistry} from '../../core/material_module';
 import {ShelfService} from '../../services/shelf';
-import {ShelfServiceMock} from '../../testing/mocks';
+import {UserService} from '../../services/user';
+import {ShelfServiceMock, UserServiceMock} from '../../testing/mocks';
 
 import {ShelfListTable, ShelfListTableModule} from './index';
 
@@ -40,6 +41,7 @@ describe('ShelfListTableComponent', () => {
           providers: [
             {provide: ComponentFixtureAutoDetect, useValue: true},
             {provide: ShelfService, useClass: ShelfServiceMock},
+            {provide: UserService, useClass: UserServiceMock},
           ],
         })
         .compileComponents();

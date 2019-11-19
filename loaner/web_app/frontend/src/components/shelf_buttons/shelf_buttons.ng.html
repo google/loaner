@@ -1,5 +1,5 @@
 <div class="buttons-container">
-  <button routerLink="/shelf/create" mat-button>
+  <button routerLink="/shelf/create" mat-button *ngIf="canCreateShelf">
     <mat-icon>add</mat-icon>
     ADD NEW SHELF
   </button>

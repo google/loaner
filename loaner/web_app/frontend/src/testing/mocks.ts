@@ -520,6 +520,16 @@ export const TEST_USER = new User({
 TEST_USER.email = 'daredevil@example.com';
 TEST_USER.givenName = 'Daredevil';
 
+export const TEST_USER_SUPERADMIN = new User({
+  superadmin: true,
+});
+TEST_USER.email = 'superadmin@example.com';
+TEST_USER.givenName = 'Superadmin';
+
+export const TEST_USER_NO_PERMISSIONS = new User({});
+TEST_USER.email = 'nopower@example.com';
+TEST_USER.givenName = 'Generic';
+
 export const TEST_USER_WITHOUT_ADMINISTRATE_LOAN = new User({
   permissions: [
     CONFIG.appPermissions.READ_SHELVES,

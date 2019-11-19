@@ -14,8 +14,10 @@
 
 import {ComponentFixture, fakeAsync, flushMicrotasks, TestBed} from '@angular/core/testing';
 import {RouterTestingModule} from '@angular/router/testing';
+
 import {ShelfService} from '../../services/shelf';
-import {ShelfServiceMock} from '../../testing/mocks';
+import {UserService} from '../../services/user';
+import {ShelfServiceMock, UserServiceMock} from '../../testing/mocks';
 
 import {ShelfListView, ShelfListViewModule} from './index';
 
@@ -32,6 +34,7 @@ describe('ShelfListView', () => {
           ],
           providers: [
             {provide: ShelfService, useClass: ShelfServiceMock},
+            {provide: UserService, useClass: UserServiceMock},
           ],
         })
         .compileComponents();
