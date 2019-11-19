@@ -17,6 +17,8 @@ import {AfterViewInit, Component, NgModule, OnInit, ViewChild, ViewEncapsulation
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserModule, Title} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {of} from 'rxjs';
+import {switchMap} from 'rxjs/operators';
 
 import {AnimationMenuModule} from '../../../../shared/components/animation_menu';
 import {FlowState, LoanerFlowSequence, LoanerFlowSequenceButtons, LoanerFlowSequenceModule, Step} from '../../../../shared/components/flow_sequence';
@@ -31,6 +33,7 @@ import {Background} from '../shared/background_service';
 import {ChromeAppPlatformLocation,} from '../shared/chrome_app_platform_location';
 import {FailAction, FailType, Failure, FailureModule} from '../shared/failure';
 import {HttpModule} from '../shared/http/http_module';
+import {Loan} from '../shared/loan';
 import {ReturnDateService} from '../shared/return_date_service';
 
 import {MaterialModule} from './material_module';
@@ -107,6 +110,7 @@ export class AppRoot implements AfterViewInit, OnInit {
       private readonly analyticsService: AnalyticsService,
       private readonly bg: Background,
       private readonly config: ConfigService,
+      private readonly loan: Loan,
       private readonly failure: Failure,
       private readonly networkService: NetworkService,
       private readonly returnService: ReturnDateService,
@@ -157,9 +161,21 @@ export class AppRoot implements AfterViewInit, OnInit {
     this.returnInstructions.animationURL = RETURN_ANIMATION_URL;
 
     // Listen for flow finished
-    this.flowSequenceButtons.finished.subscribe(finished => {
-      if (finished) this.launchManageView();
-    });
+    this.flowSequenceButtons.finished
+        .pipe(switchMap(finished => {
+          return finished ? this.loan.completeOnboard() : of(false);
+        }))
+        .subscribe(
+            () => {
+              this.launchManageView();
+            },
+            error => {
+              const message =
+                  'Something happened when completing the onboarding.';
+              this.failure.register(
+                  message, FailType.Other, FailAction.Quit, error);
+              this.launchManageView();
+            });
 
     // Listen for changes on the valid date observable.
     this.returnService.validDate.subscribe(val => {

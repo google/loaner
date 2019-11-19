@@ -14,6 +14,7 @@
 
 import {HttpClientTestingModule} from '@angular/common/http/testing';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
+import {of} from 'rxjs';
 
 import {AnimationMenuService} from '../../../../shared/components/animation_menu';
 import {Survey, SurveyMock} from '../../../../shared/components/survey';
@@ -86,14 +87,14 @@ describe('Onboarding AppRoot', () => {
     expect(app.currentStep).toBe(1);
   });
 
-  it('FAILs to go forward when canProceed is false', () => {
+  it('fails to go forward when canProceed is false', () => {
     app.flowSequenceButtons.canProceed = false;
     expect(app.currentStep).toBe(0);
     app.flowSequenceButtons.goForward();
     expect(app.currentStep).toBe(0);
   });
 
-  it('should FAIL to go forward when allowButtonClick is false', () => {
+  it('fails to go forward when allowButtonClick is false', () => {
     app.flowSequenceButtons.allowButtonClick = false;
     expect(app.currentStep).toBe(0);
     app.flowSequenceButtons.goForward();
@@ -101,7 +102,7 @@ describe('Onboarding AppRoot', () => {
   });
 
 
-  it('should send survey and update surveySent value', () => {
+  it('sends survey and update surveySent value', () => {
     expect(app.surveySent).toBeFalsy();
     const surveyService = TestBed.get(Survey);
     spyOn(surveyService, 'submitSurvey').and.callThrough();
@@ -121,7 +122,17 @@ describe('Onboarding AppRoot', () => {
     expect(surveyService.submitSurvey).toHaveBeenCalledWith(fakeSurveyData);
   });
 
-  it('should open the manage view and NOT send the survey', () => {
+  it('calls completeOnboard API when finishing all steps', () => {
+    const surveyService: Survey = TestBed.get(Survey);
+    spyOn(surveyService, 'submitSurvey').and.callThrough();
+    const loan: Loan = TestBed.get(Loan);
+    spyOn(loan, 'completeOnboard').and.returnValue(of());
+    app.flowSequenceButtons.goForward();
+    app.flowSequenceButtons.finishFlow();
+    expect(loan.completeOnboard).toHaveBeenCalled();
+  });
+
+  it('opens the manage view and NOT send the survey', () => {
     expect(app.surveySent).toBeFalsy();
     expect(app.surveyAnswer).toBeFalsy();
     const bg = TestBed.get(Background);

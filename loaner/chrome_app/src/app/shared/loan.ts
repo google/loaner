@@ -79,6 +79,18 @@ export class Loan {
     }));
   }
 
+  /** API request to complete onboarding. */
+  completeOnboard(): Observable<void> {
+    let request: DeviceRequestApiParams;
+    return DeviceIdentifier.id().pipe(switchMap(deviceId => {
+      request = {
+        chrome_device_id: deviceId,
+      };
+      const apiUrl = `${this.endpointsDeviceUrl}/user/complete_onboard`;
+      return this.http.post<void>(apiUrl, request);
+    }));
+  }
+
   /** Enable guest mode for the loan. */
   enableGuestMode(): Observable<boolean> {
     let request: DeviceRequestApiParams;
@@ -139,6 +151,10 @@ export class LoanMock {
 
   enableGuestMode(): Observable<boolean> {
     return of(true);
+  }
+
+  completeOnboard(): Observable<void> {
+    return of();
   }
 
   resumeLoan(): Observable<boolean> {
