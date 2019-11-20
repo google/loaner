@@ -148,8 +148,8 @@ found here: https://docs.bazel.build/versions/master/install.html"
           | cut -d ' ' -f3 \
           | sed -E 's/(^0*|\.)//g');;
     esac
-    [[ "${BAZEL_VERSION}" -ge "280" ]] || error_message "The bazel version \
-installed is lower than the minimum required version (0.28.0), please update \
+    [[ "${BAZEL_VERSION}" -ge "260" ]] || error_message "The bazel version \
+installed is lower than the minimum required version (0.26.0), please update \
 bazel."
     success_message "bazel was found on PATH and is at or above the minimum \
 version."

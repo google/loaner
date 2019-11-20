@@ -29,6 +29,7 @@ module.exports = webpackMerge(commonConfig, {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
         loader: '@ngtools/webpack',
       },
+      {test: /\.svg$/, loader: 'svg-inline-loader'}
     ]
   },
   plugins: [
