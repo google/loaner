@@ -18,6 +18,9 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
+from google.appengine.api import datastore_errors
+
 from google.appengine.ext import ndb
 from loaner.web_app.backend.models import base_model
 
@@ -34,11 +37,9 @@ class Fleet(base_model.BaseModel):
   """Model for a fleet organization.
 
   Attributes:
-    config: list|ndb.key|, The list of fleet specific config models.
     description: str, Optional text description of fleet.
     display_name: str, Optional display name, defaults to self.name.
   """
-  config = ndb.KeyProperty(kind='Config', repeated=True)
   description = ndb.StringProperty()
   display_name = ndb.StringProperty()
 
@@ -48,14 +49,12 @@ class Fleet(base_model.BaseModel):
     return self.key.string_id()
 
   @classmethod
-  def create(cls, acting_user, name, config,
-             description=None, display_name=None):
+  def create(cls, acting_user, name, description=None, display_name=None):
     """Creates a new Fleet.
 
     Args:
-      acting_user: str, email address of the user making the request.
+      acting_user: str, email address/name of the user making the request.
       name: str, name of the Fleet.
-      config: list|ndb.key|, The list of fleet specific config models.
       description: str, Optional text description of fleet.
       display_name: str, Optional display name, defaults to self.name.
 
@@ -71,12 +70,28 @@ class Fleet(base_model.BaseModel):
       raise CreateFleetError('Fleet organization already exists', name)
     new_fleet = cls(
         key=ndb.Key(cls, name),
-        config=config or [],
         description=description,
         display_name=display_name or name)
     new_fleet.put()
     new_fleet.stream_to_bq(acting_user, 'Created fleet %s' % display_name)
     return new_fleet
+
+  def remove(self):
+    """delete a model instance."""
+    self.key.delete()
+
+  def update(self, name, display_name=None, description=None):
+    """updates a model's title or body given a name. clear cache."""
+    if not name:
+      raise datastore_errors.BadValueError(
+          'name cannot both be empty.')
+    if not display_name and not description:
+      raise datastore_errors.BadValueError(
+          'display_name and description cannot both be empty.')
+    self.display_name = display_name
+    self.description = description
+    self.put()
+    logging.info('Updating a fleet with name %r.', name)
 
   @classmethod
   def default(cls, acting_user, display_name, description=None):
@@ -96,7 +111,6 @@ class Fleet(base_model.BaseModel):
     return cls.create(
         acting_user=acting_user,
         name='default',
-        config=[],  # The default fleet uses only config_defaults settings.
         description=description or 'The default fleet organization',
         display_name=display_name)
 

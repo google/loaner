@@ -49,7 +49,8 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
         friendly_name=self.original_friendly_name,
         location=self.original_location,
         capacity=self.original_capacity,
-        audit_notification_enabled=True).put().get()
+        audit_notification_enabled=True,
+        associated_fleet=ndb.Key('Fleet', 'default')).put().get()
 
   def test_get_search_index(self):
     self.assertIsInstance(shelf_model.Shelf.get_index(), search.Index)
@@ -79,7 +80,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   def test_audited_property_false(self):
     """Test that the audited property is False outside the interval."""
     now = datetime.datetime.utcnow()
-    config_model.Config.set('audit_interval', 48)
+    config_model.Config.set('audit_interval', 48, 'default')
     with freezegun.freeze_time(now):
       self.test_shelf.last_audit_time = now - datetime.timedelta(hours=49)
       shelf_key = self.test_shelf.put()
@@ -89,7 +90,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   def test_audited_property_true(self):
     """Test that the audited property is True inside the interval."""
     now = datetime.datetime.utcnow()
-    config_model.Config.set('audit_interval', 48)
+    config_model.Config.set('audit_interval', 48, 'default')
     with freezegun.freeze_time(now):
       self.test_shelf.last_audit_time = now - datetime.timedelta(hours=47)
       shelf_key = self.test_shelf.put()
@@ -120,6 +121,33 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     lon = -74.0466891
     new_shelf = shelf_model.Shelf.enroll(
         loanertest.USER_EMAIL, new_location, new_capacity, new_friendly_name,
+        lat, lon, 1.0, loanertest.USER_EMAIL,
+        associated_fleet='test_fleet')
+
+    self.assertEqual(new_shelf.location, new_location)
+    self.assertEqual(new_shelf.capacity, new_capacity)
+    self.assertEqual(new_shelf.friendly_name, new_friendly_name)
+    self.assertEqual(new_shelf.lat_long, ndb.GeoPt(lat, lon))
+    self.assertEqual(new_shelf.latitude, lat)
+    self.assertEqual(new_shelf.longitude, lon)
+    self.assertEqual(new_shelf.associated_fleet.id(), 'test_fleet')
+    mock_logging.info.assert_called_once_with(
+        shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.identifier)
+    mock_stream.assert_called_once_with(
+        new_shelf, loanertest.USER_EMAIL,
+        shelf_model._ENROLL_MSG % new_shelf.identifier)
+    self.testbed.mock_raiseevent.assert_called_once_with(
+        'shelf_enroll', shelf=new_shelf)
+
+  def test_enroll_new_shelf_default_fleet(self):
+    """Test enrolling a new shelf."""
+    new_location = 'US-NYC2'
+    new_capacity = 16
+    new_friendly_name = 'Statue of Liberty'
+    lat = 40.6892534
+    lon = -74.0466891
+    new_shelf = shelf_model.Shelf.enroll(
+        loanertest.USER_EMAIL, new_location, new_capacity, new_friendly_name,
         lat, lon, 1.0, loanertest.USER_EMAIL)
 
     self.assertEqual(new_shelf.location, new_location)
@@ -128,13 +156,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
     self.assertEqual(new_shelf.lat_long, ndb.GeoPt(lat, lon))
     self.assertEqual(new_shelf.latitude, lat)
     self.assertEqual(new_shelf.longitude, lon)
-    mock_logging.info.assert_called_once_with(
-        shelf_model._CREATE_NEW_SHELF_MSG, new_shelf.identifier)
-    mock_stream.assert_called_once_with(
-        new_shelf, loanertest.USER_EMAIL,
-        shelf_model._ENROLL_MSG % new_shelf.identifier)
-    self.testbed.mock_raiseevent.assert_called_once_with(
-        'shelf_enroll', shelf=new_shelf)
+    self.assertEqual(new_shelf.associated_fleet.id(), 'default')
 
   @mock.patch.object(shelf_model.Shelf, 'stream_to_bq', autospec=True)
   @mock.patch.object(shelf_model, 'logging', autospec=True)
@@ -290,7 +312,7 @@ class ShelfModelTest(loanertest.EndpointsTestCase, parameterized.TestCase):
   def test_audit_enabled(
       self, system_value, shelf_value, final_value, mock_logging, mock_stream):
     """Testing the audit_enabled property with different configurations."""
-    config_model.Config.set('shelf_audit', system_value)
+    config_model.Config.set('shelf_audit', system_value, 'default')
     self.test_shelf.audit_notification_enabled = shelf_value
     # Ensure the shelf audit notification status is equal to the expected value.
     self.assertEqual(self.test_shelf.audit_enabled, final_value)

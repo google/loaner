@@ -105,6 +105,7 @@ export class StatusComponent extends LoaderView implements OnInit {
             () => {
               this.extend.finished(this.newReturnDate);
               this.device.dueDate = this.newReturnDate;
+              this.device.overdue = false;
             },
             error => {
               this.loading = false;

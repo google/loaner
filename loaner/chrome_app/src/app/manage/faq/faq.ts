@@ -26,19 +26,22 @@ import * as marked from 'marked';
   templateUrl: './faq.ng.html',
 })
 export class FaqComponent implements OnInit {
-  sanitizedFaqContent!: string|null;
+  sanitizedFaqContent?: string|null;
 
   constructor(
       private readonly http: HttpClient,
       private readonly sanitizer: DomSanitizer) {}
 
   ngOnInit() {
+    const renderer = new marked.Renderer();
     this.getFaq().subscribe((response) => {
+      renderer.link = (href, title, text) =>
+          `<a target="_blank" href="${href}">${text}</a>`;
+      marked.setOptions({renderer});
       this.sanitizedFaqContent =
           this.sanitizer.sanitize(SecurityContext.HTML, marked(response));
     });
   }
-
   /** Gets the FAQ from assets/faq.md file. */
   getFaq(): Observable<string> {
     return this.http.get('./assets/faq.md', {'responseType': 'text'});

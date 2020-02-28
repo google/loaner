@@ -45,16 +45,20 @@ class Tag(base_model.BaseModel):
     protect: bool, whether a tag is protected from user manipulation.
     color: str, the UI color of the tag in human-readable format.
     description: Optional[str], a description for the tag.
+    associated_fleet: ndb.Key, name of the Fleet used to associate this tag to
+        fleets automatically.
   """
   name = ndb.StringProperty(required=True)
   hidden = ndb.BooleanProperty(required=True)
   protect = ndb.BooleanProperty(required=True)
   color = ndb.StringProperty(choices=_TAG_COLORS, required=True)
   description = ndb.StringProperty()
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet', required=True, default=ndb.Key('Fleet', 'default'))
 
   @classmethod
-  def create(
-      cls, user_email, name, hidden, protect, color, description=None):
+  def create(cls, user_email, name, hidden, protect, color, description=None,
+             associated_fleet='default'):
     """Creates a new tag.
 
     Args:
@@ -64,6 +68,8 @@ class Tag(base_model.BaseModel):
       protect: bool, whether a tag is protected from user manipulation.
       color: str, the UI color of the tag in human-readable format.
       description: Optional[str], a description for the tag.
+      associated_fleet: str, name of the Fleet used to associate this answer
+        to fleets automatically.
 
     Returns:
       The new Tag entity.
@@ -76,7 +82,8 @@ class Tag(base_model.BaseModel):
         hidden=hidden,
         protect=protect,
         color=color,
-        description=description)
+        description=description,
+        associated_fleet=ndb.Key('Fleet', associated_fleet))
     if not name:
       raise datastore_errors.BadValueError('The tag name must not be empty.')
     tag.put()

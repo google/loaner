@@ -50,6 +50,10 @@ class BigQueryRow(base_model.BaseModel):
   summary = ndb.StringProperty(required=True)
   entity = ndb.JsonProperty(required=True)
   streamed = ndb.BooleanProperty(default=False)
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet',
+      required=True,
+      default=ndb.Key('Fleet', 'default'))
 
   @classmethod
   def add(cls, model_instance, timestamp, actor, method, summary):
@@ -158,5 +162,5 @@ def _format_for_bq(rows):
     tables[row.model_type].append(
         (entity_dict['ndb_key'], entity_dict['timestamp'],
          entity_dict['actor'], entity_dict['method'], entity_dict['summary'],
-         entity_dict['entity']))
+         entity_dict['entity'], entity_dict['associated_fleet']))
   return tables

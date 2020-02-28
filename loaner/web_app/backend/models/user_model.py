@@ -52,9 +52,14 @@ class Role(ndb.Model):
     permissions: list|str|, a list of string Permissions for that role.
     associated_group: str, name of the Google Group (or other permission
         container) used to associate this role to users automatically.
+    associated_fleet: ndb.Key, fleet id / key used to associate this role to
+        fleets automatically.
   """
   permissions = ndb.StringProperty(repeated=True)
   associated_group = ndb.StringProperty()
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet',
+      required=True)
 
   @property
   def name(self):
@@ -62,7 +67,8 @@ class Role(ndb.Model):
     return self.key.string_id()
 
   @classmethod
-  def create(cls, name, role_permissions=None, associated_group=None):
+  def create(cls, name, role_permissions=None, associated_group=None,
+             associated_fleet='default'):
     """Creates a new role.
 
     Args:
@@ -70,6 +76,8 @@ class Role(ndb.Model):
       role_permissions: list|str|, zero or more Permissions to include.
       associated_group: str, name of the Google Group (or other permission
         container) used to associate this group of permissions to users.
+      associated_fleet: str, fleet name used to associate this fleet to
+        users.
 
     Returns:
       Created Role.
@@ -84,7 +92,8 @@ class Role(ndb.Model):
     new_role = cls(
         key=ndb.Key(cls, name),
         permissions=role_permissions or [],
-        associated_group=associated_group)
+        associated_group=associated_group,
+        associated_fleet=ndb.Key('Fleet', associated_fleet))
     new_role.put()
     return new_role
 
@@ -172,16 +181,25 @@ class User(ndb.Model):
       self.superadmin = superadmin
     self.put()
 
-  def get_permissions(self):
+  def get_permissions(self, associated_fleet='default'):
     """Get permisisons for user.
+
+    Args:
+      associated_fleet: str, name of associated_fleet for request.
 
     Returns:
       Iterable of string Permissions.
     """
     if self.superadmin:
       return permissions.Permissions.ALL
+    if associated_fleet is None:
+      return []
     user_permissions = []
-    for role in self.roles:
-      for permission in role.get().permissions:
+    role_keys_in_fleet = []
+    for role in ndb.get_multi(self.roles):
+      if role.associated_fleet.id() == associated_fleet:
+        role_keys_in_fleet.append(role.key)
+    for role_key in role_keys_in_fleet:
+      for permission in role_key.get().permissions:
         user_permissions.append(permission)
     return list(set(user_permissions))

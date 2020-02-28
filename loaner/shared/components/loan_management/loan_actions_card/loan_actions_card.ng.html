@@ -6,39 +6,40 @@
         your loan, please click the button below.
       </ng-container>
 
-      <ng-container *ngIf="device.isLoanHealthy">
-        <img alt="Icon representing the device's loan status as healthy"
-             src="../../../assets/healthy.svg" class="device-status">
-        <div class="mat-title">
-          Your loaner is due on {{ device.dueDate | date: 'fullDate' }}
-        </div>
-        <span class="mat-body">
-          Please return your loaner on time for your fellow colleague to use next.
-        </span>
-      </ng-container>
+      <ng-container *ngIf="!device.pendingReturn">
+        <ng-container *ngIf="device.isLoanHealthy">
+          <img alt="Icon representing the device's loan status as healthy"
+               src="../../../assets/healthy.svg" class="device-status">
+          <div class="mat-title">
+            Your loaner is due on {{ device.dueDate | date: 'fullDate' }}
+          </div>
+          <span class="mat-body">
+            Please return your loaner on time for your fellow colleague to use next.
+          </span>
+        </ng-container>
 
-      <ng-container *ngIf="device.overdue">
-        <img alt="Icon representing the device's loan status as overdue"
-             src="../../../assets/overdue.svg" class="device-status">
-        <div class="mat-overdue">
-          Your loaner was due on {{ device.dueDate | date: 'fullDate' }}
-        </div>
-        <span class="mat-small">
-          Please return your loaner on time for your fellow colleague to use next.
-        </span>
-      </ng-container>
+        <ng-container *ngIf="device.overdue">
+          <img alt="Icon representing the device's loan status as overdue"
+               src="../../../assets/overdue.svg" class="device-status">
+          <div class="mat-overdue">
+            Your loaner was due on {{ device.dueDate | date: 'fullDate' }}
+          </div>
+          <span class="mat-small">
+            Please return your loaner on time for your fellow colleague to use next.
+          </span>
+        </ng-container>
 
-      <ng-container *ngIf="device.isAlmostOverdue">
-        <img alt="Icon representing the device's loan status as almost overdue"
-             src="../../../assets/almost_overdue.svg" class="device-status">
-        <div class="mat-overdue">
-          Your loaner is almost overdue {{ device.dueDate | date: 'fullDate' }}
-        </div>
-        <span class="mat-small">
-          Please return your loaner on time for your fellow colleague to use next.
-        </span>
+        <ng-container *ngIf="device.isAlmostOverdue">
+          <img alt="Icon representing the device's loan status as almost overdue"
+               src="../../../assets/almost_overdue.svg" class="device-status">
+          <div class="mat-overdue">
+            Your loaner is almost overdue {{ device.dueDate | date: 'fullDate' }}
+          </div>
+          <span class="mat-small">
+            Please return your loaner on time for your fellow colleague to use next.
+          </span>
+        </ng-container>
       </ng-container>
-
     </p>
     <div *ngIf="!device.pendingReturn">
       <ng-content select="loan-button[extendButton]"></ng-content>
@@ -46,10 +47,8 @@
       <ng-content select="loan-button[returnButton]"></ng-content>
     </div>
   </div>
-  <div *ngIf="device.pendingReturn">
-    <ng-content select="loan-button[resumeButton]"></ng-content>
-  </div>
   <div>
+    <ng-content *ngIf="device.pendingReturn" select="loan-button[resumeButton]"></ng-content>
     <ng-content select="loan-button[damagedButton]"></ng-content>
     <ng-content select="loan-button[lostButton]"></ng-content>
   </div>

@@ -96,6 +96,7 @@ class Device(messages.Message):
     overdue: bool, Indicates that the due date has passed.
     tags: List[tag_model.TagData], a list of TagData objects associated with the
         device.
+    onboarded: bool, Indicates that the device has been fully onboarded.
   """
   serial_number = messages.StringField(1)
   asset_tag = messages.StringField(2)
@@ -128,6 +129,7 @@ class Device(messages.Message):
   query = messages.MessageField(shared_messages.SearchRequest, 29)
   overdue = messages.BooleanField(30)
   tags = messages.MessageField(tag_messages.TagData, 31, repeated=True)
+  onboarded = messages.BooleanField(32)
 
 
 class ListDevicesResponse(messages.Message):
@@ -158,7 +160,7 @@ class DamagedRequest(messages.Message):
 class ExtendLoanRequest(messages.Message):
   """ExtendLoanRequest ProtoRPC message.
 
-  Atrributes:
+  Attributes:
     device: DeviceRequest, A device to be fetched.
     extend_date: datetime, The date to extend the loan for.
   """
@@ -173,3 +175,27 @@ class ListUserDeviceResponse(messages.Message):
     devices: List[Device], The list of devices assigned to the user.
   """
   devices = messages.MessageField(Device, 1, repeated=True)
+
+
+class HistoryRequest(messages.Message):
+  """HistoryRequest: ProtoRPC message.
+
+  Attributes:
+    device: DeviceRequest, The device to be used for lookup.
+  """
+  device = messages.MessageField(DeviceRequest, 1)
+
+
+class HistoryResponse(messages.Message):
+  """HistoryResponse: ProtoRPC message.
+
+  Attributes:
+    devices: List[Device], The list of historical changes made to the device.
+    timestamp: datetime, The date and time when the change was made.
+    actor: str, The person or entity who made the change.
+    summary: str, The details of the change that occurred.
+  """
+  devices = messages.MessageField(Device, 1, repeated=True)
+  timestamp = message_types.DateTimeField(2, repeated=True)
+  actor = messages.StringField(3, repeated=True)
+  summary = messages.StringField(4, repeated=True)

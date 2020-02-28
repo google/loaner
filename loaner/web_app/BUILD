@@ -40,7 +40,6 @@ loaner_appengine_library(
     srcs = ["constants.py"],
     deps = [
         "//loaner/web_app/backend/models:template_model",
-        "@endpoints_archive//:endpoints",
     ],
 )
 

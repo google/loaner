@@ -12,19 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python2, python3
 """Tests for deployments.deploy_impl."""
 
 from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
-
-# Prefer Python 3 and fall back on Python 2.
-# pylint:disable=g-statement-before-imports,g-import-not-at-top
-try:
-  import builtins
-except ImportError:
-  import __builtin__ as builtins
-# pylint:enable=g-statement-before-imports,g-import-not-at-top
 
 import datetime
 import json
@@ -34,13 +27,21 @@ from absl import app
 from absl import flags
 from pyfakefs import fake_filesystem
 from pyfakefs import fake_filesystem_shutil
-from pyfakefs import mox3_stubout
-
 import freezegun
 import mock
 
-from absl.testing import absltest
 from loaner.deployments import deploy_impl
+from absl.testing import absltest
+
+# Prefer Python 3 and fall back on Python 2.
+# pylint:disable=g-statement-before-imports,g-import-not-at-top
+try:
+  import builtins
+except ImportError:
+  import six.moves.builtins as builtins
+# pylint:enable=g-statement-before-imports,g-import-not-at-top
+
+from pyfakefs import mox3_stubout
 
 _WORKSPACE_PATH = '/this/is/a/workspace'
 _LOANER_PATH = _WORKSPACE_PATH + '/loaner'
@@ -449,6 +450,38 @@ class DeployImplTest(absltest.TestCase):
     test_chrome_app_config = self.CreateTestChromeAppConfig()
     test_chrome_app_config.DeployChromeApp()
     assert mock_buildchromeapp.call_count == 1
+
+  @mock.patch.object(
+      deploy_impl, 'AppEngineServerConfig', return_value=mock.Mock())
+  def testMainWebApp(self, mocked_appengine_server_config):
+    deploy_impl.main(argv=['first-arg', 'web'])
+    mocked_appengine_server_config.assert_called_once_with(
+        app_servers=deploy_impl.FLAGS.app_servers,
+        build_target=deploy_impl.FLAGS.build_target,
+        deployment_type='local',
+        loaner_path=deploy_impl.FLAGS.loaner_path,
+        web_app_dir=deploy_impl.FLAGS.web_app_dir,
+        yaml_files=deploy_impl.FLAGS.yaml_files,
+        version=deploy_impl.FLAGS.version)
+
+  @mock.patch.object(deploy_impl, 'ChromeAppConfig', return_value=mock.Mock())
+  def testMainChromeApp(self, mocked_chrome_app_config):
+    deploy_impl.main(argv=['first-arg', 'chrome'])
+    mocked_chrome_app_config.assert_called_once_with(
+        chrome_app_dir=deploy_impl.FLAGS.chrome_app_dir,
+        deployment_type='local',
+        loaner_path=deploy_impl.FLAGS.loaner_path)
+
+  @mock.patch.object(app, 'usage', return_value=mock.Mock())
+  def testMainWithoutParam(self, mocked_app_usage):
+    with self.assertRaises(IndexError):
+      deploy_impl.main(argv=[])
+    mocked_app_usage.assert_called_once_with(shorthelp=True, exitcode=1)
+
+  @mock.patch.object(app, 'usage', return_value=mock.Mock())
+  def testMainWithInvalidAppType(self, mocked_app_usage):
+    deploy_impl.main(argv=['first-arg', 'fake-app'])
+    mocked_app_usage.assert_called_once_with(shorthelp=True, exitcode=1)
 
 
 if __name__ == '__main__':

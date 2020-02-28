@@ -42,6 +42,7 @@ loaner_appengine_library(
     ],
     deps = [
         "//loaner/web_app/backend/lib:utils",
+        "@six_archive//:six",
     ],
 )
 
@@ -223,6 +224,7 @@ loaner_appengine_test(
     ],
     deps = [
         ":config_model",
+        ":fleet_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@absl_archive//absl/testing:absltest",
         "@absl_archive//absl/testing:parameterized",
@@ -328,6 +330,7 @@ loaner_appengine_test(
     deps = [
         ":template_model",
         "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )

@@ -1,7 +1,7 @@
 <mat-card>
  <mat-card-title>Role Editor</mat-card-title>
   <mat-card-subtitle>
-    View, add, edit, or delete existing roles
+    View, create, edit, or delete existing roles
   </mat-card-subtitle>
   <mat-card-content>
     <mat-table #table [dataSource]="dataSource">
@@ -9,15 +9,26 @@
         <mat-header-cell *cdkHeaderCellDef>Name</mat-header-cell>
         <mat-cell *cdkCellDef="let role">{{role.name}}</mat-cell>
       </ng-container>
-      <ng-container cdkColumnDef="associated_group">
+      <ng-container cdkColumnDef="associatedGroup">
         <mat-header-cell *cdkHeaderCellDef>Associated Group</mat-header-cell>
-        <mat-cell *cdkCellDef="let role">{{role.associated_group}}</mat-cell>
+        <mat-cell *cdkCellDef="let role">{{role.associatedGroup}}</mat-cell>
       </ng-container>
       <ng-container cdkColumnDef="permissions">
         <mat-header-cell *cdkHeaderCellDef>Permissions</mat-header-cell>
         <mat-cell *cdkCellDef="let role">{{role.permissions}}</mat-cell>
       </ng-container>
-
+      <ng-container cdkColumnDef="tools">
+          <mat-header-cell *cdkHeaderCellDef></mat-header-cell>
+          <mat-cell *cdkCellDef="let role">
+            <button mat-icon-button
+                    (click)="deleteRole(role)"
+                    type="button"
+                    aria-label="Delete role">
+              <mat-icon matTooltip="Delete Role" matTooltipPosition="above">delete
+              </mat-icon>
+            </button>
+          </mat-cell>
+      </ng-container>
       <mat-header-row *cdkHeaderRowDef="displayedColumns"></mat-header-row>
       <mat-row *cdkRowDef="let role; columns: displayedColumns"></mat-row>
     </mat-table>

@@ -18,9 +18,11 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import logging
 import re
 import jinja2
 
+from google.appengine.api import datastore_errors
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
@@ -39,44 +41,106 @@ class NoTemplateError(Error):
 
 
 class Template(ndb.Model):
-  """Model representing a template."""
+  """Model representing a template.
+
+  Attributes:
+    key:  key, key to template entity.
+    title: str, title or subject line of email template
+    body: text, body of email template.
+    jinja: object, jinja object for templating engine.
+    associated_fleet: ndb.Key, name of the Fleet used to associate this template
+      to fleets automatically.
+  """
   title = ndb.StringProperty()
   body = ndb.TextProperty()
+  cached_templates = []
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet', required=True, default=ndb.Key('Fleet', 'default'))
+
+  def __init__(self, *args, **kwds):
+    super(Template, self).__init__(*args, **kwds)
+    self.jinja = jinja2.Environment(
+        loader=jinja2.FunctionLoader(self._get_subtemplate), autoescape=True)
 
   @property
   def name(self):
     """Pseudo-property for name, from the ID."""
     return self.key.id()
 
-  @classmethod
-  def create(cls, name, title=None, body=None):
-    """Creates a model and entity."""
-    entity = cls.get_or_insert(name)
-    entity.title = title
-    entity.body = body
-    entity.put()
-    return entity
-
-
-class TemplateLoader(object):
-  """Loader for Jinja2 templates."""
-
-  def __init__(self):
-    self.jinja = jinja2.Environment(
-        loader=jinja2.FunctionLoader(self._get_subtemplate), autoescape=True)
-    self.templates_cached = False
-
-  def _cache_template(self, template):
+  @staticmethod
+  def _cache_template(template):
     """Caches the title and body of a Template separately in memcache."""
     memcache.set(_CACHED_TITLE_NAME % template.name, template.title)
     memcache.set(_CACHED_BODY_NAME % template.name, template.body)
 
-  def _cache_all_templates(self):
+  @staticmethod
+  def _cache_all_templates():
     """Fetches and caches all Template entities."""
-    for template in Template.query().fetch():
-      self._cache_template(template)
+    if not Template.cached_templates:
+      Template.cached_templates = Template.query().fetch()
+      for template in Template.cached_templates:
+        Template._cache_template(template)
 
-  def _get_subtemplate(self, sub_name):
+  @classmethod
+  def get(cls, name):
+    """Gets a Template by its name.
+
+    Args:
+      name: str, the name of the templatew.
+
+    Returns:
+      A Template model entity.
+    """
+    return cls.get_by_id(name)
+
+  @classmethod
+  def get_all(cls):
+    """Gets a list of objects stored in cache or datastore for this model."""
+    cls._cache_all_templates()
+    return cls.cached_templates
+
+  @classmethod
+  def create(cls, name, title=None, body=None,
+             associated_fleet='default'):
+    """Creates a model and entity."""
+    if not name:
+      raise datastore_errors.BadValueError(
+          'The Template name must not be empty.')
+    entity = cls(title=title,
+                 body=body,
+                 associated_fleet=ndb.Key('Fleet', associated_fleet))
+    template = cls.get_by_id(name)
+    if template is not None:
+      raise datastore_errors.BadValueError(
+          'Create template: A Template entity with name %r already exists.' %
+          name)
+    entity.key = ndb.Key(cls, name)
+    entity.put()
+    logging.info('Creating a new template with name %r.', name)
+    cls.cached_templates = []
+    return entity
+
+  def update(self, name, title=None, body=None):
+    """updates a model's title or body given a name. clear cache."""
+    if not title and not body:
+      raise datastore_errors.BadValueError(
+          'Title and body cannot both be empty.')
+    self.title = title
+    self.body = body
+    self.put()
+    logging.info('Updating a template with name %r.', name)
+    Template.cached_templates = []
+
+  def remove(self):
+    """delete a model instance."""
+    self.key.delete()
+    Template.cached_templates = []
+
+  def __eq__(self, other):
+    return self.name == other.name
+
+  @staticmethod
+  def _get_subtemplate(sub_name):
     """Gets a template from memcache or datastore for the Jinja2 environment.
 
     This gets either a sub-component of a Template entity (title or body).
@@ -93,10 +157,10 @@ class TemplateLoader(object):
     Raises:
       NoTemplateError: if the template with that sub-name does not exist.
     """
-    if not self.templates_cached:
-      self._cache_all_templates()
+
     if sub_name.endswith('_base'):
       sub_name = _CACHED_BODY_NAME % sub_name
+    Template._cache_all_templates()
     cached_template = memcache.get(sub_name)
     if cached_template:
       return cached_template
@@ -107,7 +171,7 @@ class TemplateLoader(object):
       if not stored_template:
         raise NoTemplateError(
             'Template named {} does not exist.'.format(sub_name))
-      self._cache_template(stored_template)
+      Template._cache_template(stored_template)
       return getattr(stored_template, match.group(1))  # 'title' or 'body'.
 
   def render(self, name, config_dict):
@@ -123,3 +187,4 @@ class TemplateLoader(object):
     return (
         self.jinja.get_template(_CACHED_TITLE_NAME % name).render(config_dict),
         self.jinja.get_template(_CACHED_BODY_NAME % name).render(config_dict))
+

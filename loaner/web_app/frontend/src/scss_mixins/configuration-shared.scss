@@ -1,0 +1,44 @@
+@import '../app';
+
+.control-set {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 12px 0;
+  width: 100%;
+
+  .control {
+    display: flex;
+    justify-content: flex-end;
+    width: 50%;
+
+    .loan-duration-value {
+      width: 25%;
+    }
+  }
+
+  .email-value {
+    width: 75%;
+  }
+
+  .label {
+    display: flex;
+    flex-direction: column;
+    width: 50%;
+
+    .sublabel {
+      color: $gray;
+      display: inline-block;
+      font-size: 12px;
+      width: 100%;
+
+      em {
+        display: inline;
+      }
+    }
+  }
+}
+
+mat-card {
+  margin: 12px 0;
+}

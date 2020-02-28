@@ -24,9 +24,14 @@ export declare interface GetRoleRequestApiParams {
   name?: string;
 }
 
+/** Interfaces with fields for our list response from the backend. */
+export declare interface ListRolesResponseApiParams {
+  roles: RoleApiParams[];
+}
+
 /** Interfaces with fields for our list response. */
 export declare interface ListRolesResponse {
-  roles: RoleApiParams[];
+  roles: Role[];
 }
 
 /** A role model with all properties and methods.  */

@@ -23,12 +23,19 @@ import pickle
 import webapp2
 
 from google.appengine.ext import deferred
+from google.appengine.ext import ndb
 
 from loaner.web_app.backend.models import bigquery_row_model
 
 
 class StreamToBigQueryHandler(webapp2.RequestHandler):
   """Handler to add a row and stream to BigQuery if a threshold is reached."""
+
+  @ndb.transactional
+  def stream_rows_wrapper(self):
+    """Streams rows ensuring that it is transactional."""
+    deferred.defer(
+        bigquery_row_model.BigQueryRow.stream_rows, _transactional=True)
 
   def post(self):
     """Adds a BigQuery row to Datastore and streams it using a deferred task.
@@ -41,7 +48,7 @@ class StreamToBigQueryHandler(webapp2.RequestHandler):
     bigquery_row_model.BigQueryRow.add(**payload)
     try:
       if bigquery_row_model.BigQueryRow.threshold_reached():
-        deferred.defer(bigquery_row_model.BigQueryRow.stream_rows)
+        self.stream_rows_wrapper()
       else:
         logging.info('Not streaming rows, thresholds not met.')
     except Exception as e:  # pylint: disable=broad-except

@@ -16,7 +16,6 @@ import {CommonModule} from '@angular/common';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {MatDialogRef} from '@angular/material/dialog';
-import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {DamagedDialogComponent, DamagedModule} from './index';
@@ -58,29 +57,31 @@ describe('DamagedDialogComponent', () => {
 
   it('should render the submit button', () => {
     expect(
-        fixture.debugElement.query(By.css('#submit')).nativeElement.textContent)
+        fixture.debugElement.nativeElement.querySelector('#submit').textContent)
         .toContain('Submit');
   });
 
   it('should render the cancel button', () => {
     expect(
-        fixture.debugElement.query(By.css('#cancel')).nativeElement.textContent)
+        fixture.debugElement.nativeElement.querySelector('#cancel').textContent)
         .toContain('Cancel');
   });
 
   it('should show the correct title', () => {
-    expect(fixture.debugElement.query(By.css('.mat-dialog-title'))
-               .nativeElement.innerText)
+    expect(fixture.debugElement.nativeElement.querySelector('.mat-dialog-title')
+               .innerText)
         .toBe('Oh no!');
   });
 
   it('should show and hide the loader', () => {
     component.waiting();
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.css('loader'))).toBeDefined();
+    expect(fixture.debugElement.nativeElement.querySelector('loader'))
+        .toBeDefined();
     component.ready();
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.css('loader'))).toBeFalsy();
+    expect(fixture.debugElement.nativeElement.querySelector('loader'))
+        .toBeFalsy();
   });
 
   it('should render the close button', () => {
@@ -88,7 +89,7 @@ describe('DamagedDialogComponent', () => {
     component.ready();
     fixture.detectChanges();
     expect(
-        fixture.debugElement.query(By.css('#close')).nativeElement.textContent)
+        fixture.debugElement.nativeElement.querySelector('#close').textContent)
         .toContain('Close');
   });
 });

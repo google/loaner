@@ -15,7 +15,7 @@
 import {Injectable} from '@angular/core';
 import {map, tap} from 'rxjs/operators';
 
-import {GetRoleRequestApiParams, ListRolesResponse, Role, RoleApiParams} from '../models/role';
+import {GetRoleRequestApiParams, ListRolesResponse, ListRolesResponseApiParams, Role, RoleApiParams} from '../models/role';
 
 import {ApiService} from './api';
 
@@ -46,7 +46,13 @@ export class RoleService extends ApiService {
   }
 
   list() {
-    return this.post<ListRolesResponse>('list');
+    return this.post<ListRolesResponseApiParams>('list').pipe(map(res => {
+      const roles = res.roles && res.roles.map(role => new Role(role)) || [];
+      const retrievedRoles: ListRolesResponse = {
+        roles,
+      };
+      return retrievedRoles;
+    }));
   }
 
   delete(role: Role) {

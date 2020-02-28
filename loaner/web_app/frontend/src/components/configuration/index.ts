@@ -18,6 +18,7 @@ import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 
 import {MaterialModule} from '../../core/material_module';
+import {EmailTemplateModule} from '../email_template';
 import {RoleEditorTableModule} from '../role_editor_table';
 import {TagListTableModule} from '../tag_list_table';
 
@@ -35,6 +36,7 @@ export * from './configuration';
   imports: [
     BrowserModule,
     CommonModule,
+    EmailTemplateModule,
     FormsModule,
     MaterialModule,
     TagListTableModule,

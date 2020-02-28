@@ -14,7 +14,6 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FlexLayoutModule} from '@angular/flex-layout';
-import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {ProgressComponent} from './index';
@@ -46,10 +45,10 @@ describe('Shared ProgressComponent', () => {
   it('should set the app progress to 25', () => {
     app.current = 1;
     app.max = 4;
-    const element =
-        fixture.debugElement.query(By.css('mat-progress-bar')).attributes;
     fixture.detectChanges();
     expect(app.progress).toBe(25);
-    expect(element['aria-valuenow']).toBe('25');
+    expect(fixture.debugElement.nativeElement.querySelector('mat-progress-bar')
+               .getAttribute('aria-valuenow'))
+        .toBe('25');
   });
 });

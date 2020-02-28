@@ -17,6 +17,7 @@ import {FormsModule} from '@angular/forms';
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MaterialModule} from '../../core/material_module';
+import {DialogsModule} from '../../services/dialog';
 import {RoleEditorTable} from './role_editor_table';
 
 export * from './role_editor_table';
@@ -31,6 +32,7 @@ export * from './role_editor_table';
   imports: [
     FormsModule,
     BrowserModule,
+    DialogsModule,
     MaterialModule,
     BrowserAnimationsModule,
   ],

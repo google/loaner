@@ -14,10 +14,10 @@
 
 const AngularCompilerPlugin = require('@ngtools/webpack').AngularCompilerPlugin;
 const path = require('path');
-var webpack = require('webpack');
-var UglifyJsPlugin = require('uglifyjs-webpack-plugin');
-var webpackMerge = require('webpack-merge');
-var commonConfig = require('./webpack.common.js');
+const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
+const webpackMerge = require('webpack-merge');
+const commonConfig = require('./webpack.common.js');
 
 const rootDir = path.join(__dirname);
 
@@ -38,17 +38,12 @@ module.exports = webpackMerge(commonConfig, {
       entryModule: path.resolve(rootDir, 'web_app/frontend/src/app#AppModule'),
       sourceMap: true,
     }),
-    new webpack.NoEmitOnErrorsPlugin(), new UglifyJsPlugin({
-      uglifyOptions: {
-        output: {
-          comments: false,
-        },
-      }
-    }),
+    new webpack.NoEmitOnErrorsPlugin(),
+    new TerserPlugin(),
     new webpack.LoaderOptionsPlugin({
       htmlLoader: {
         minimize: false  // workaround for ng2
       }
-    })
+    }),
   ]
 });

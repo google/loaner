@@ -204,6 +204,8 @@ class Device(base_model.BaseModel):
     next_reminder: Reminder, Level, time, and count of the next reminder.
     tags: List[tag_model.Tag], a list of tags associated with the device.
     onboarded: bool, indicates the onboarding status of the device.
+    associated_fleet: ndb.Key, key of the Fleet used to associate this device to
+        fleets automatically.
   """
   serial_number = ndb.StringProperty()
   asset_tag = ndb.StringProperty()
@@ -226,7 +228,11 @@ class Device(base_model.BaseModel):
   last_reminder = ndb.StructuredProperty(Reminder)
   next_reminder = ndb.StructuredProperty(Reminder)
   tags = ndb.StructuredProperty(tag_model.TagData, repeated=True)
-  onboarded = ndb.BooleanProperty(default=True)
+  onboarded = ndb.BooleanProperty(default=False)
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet',
+      required=True,
+      default=ndb.Key('Fleet', 'default'))
 
   _INDEX_NAME = constants.DEVICE_INDEX_NAME
   _SEARCH_PARAMETERS = {
@@ -262,7 +268,8 @@ class Device(base_model.BaseModel):
 
   @property
   def return_dates(self):
-    return calculate_return_dates(self.assignment_date)
+    return calculate_return_dates(self.assignment_date,
+                                  self.associated_fleet.id())
 
   def _post_put_hook(self, future):
     """Overrides the _post_put_hook method."""
@@ -286,13 +293,15 @@ class Device(base_model.BaseModel):
             cls.mark_pending_return_date == None)).fetch()  # pylint: disable=g-equals-none,singleton-comparison
 
   @classmethod
-  def enroll(cls, user_email, serial_number=None, asset_tag=None):
+  def enroll(cls, user_email, serial_number=None, asset_tag=None,
+             associated_fleet='default'):
     """Enrolls a new device.
 
     Args:
       user_email: str, email address of the user making the request.
       serial_number: str, serial number of the device.
       asset_tag: str, optional, asset tag of the device.
+      associated_fleet: str, name of the Fleet associated to this entity.
 
     Returns:
       The enrolled device object.
@@ -306,7 +315,8 @@ class Device(base_model.BaseModel):
       serial_number = serial_number.upper().strip()
     if asset_tag:
       asset_tag = asset_tag.upper().strip()
-    device_identifier_mode = config_model.Config.get('device_identifier_mode')
+    device_identifier_mode = config_model.Config.get('device_identifier_mode',
+                                                     associated_fleet)
     if not asset_tag and device_identifier_mode in (
         config_model.DeviceIdentifierMode.BOTH_REQUIRED,
         config_model.DeviceIdentifierMode.ASSET_TAG):
@@ -321,9 +331,13 @@ class Device(base_model.BaseModel):
 
     existing_device = bool(device)
     if existing_device:
-      device = _update_existing_device(device, user_email, asset_tag)
+      device = _update_existing_device(device, user_email, asset_tag,
+                                       associated_fleet)
     else:
-      device = cls(serial_number=serial_number, asset_tag=asset_tag)
+      device = cls(
+          serial_number=serial_number,
+          asset_tag=asset_tag,
+          associated_fleet=ndb.Key('Fleet', associated_fleet))
 
     identifier = serial_number or asset_tag
     logging.info('Enrolling device %s', identifier)
@@ -349,7 +363,7 @@ class Device(base_model.BaseModel):
         device_by_serial = cls.get(serial_number=serial_number)
         if device_by_serial:
           device = _update_existing_device(
-              device_by_serial, user_email, asset_tag)
+              device_by_serial, user_email, asset_tag, associated_fleet)
           existing_device = True
 
     try:
@@ -399,7 +413,8 @@ class Device(base_model.BaseModel):
     """
     if self.assigned_user:
       self._loan_return(user_email)
-    unenroll_ou = config_model.Config.get('unenroll_ou')
+    unenroll_ou = config_model.Config.get('unenroll_ou',
+                                          self.associated_fleet.id())
     directory_client = directory.DirectoryApiClient(user_email)
     try:
       directory_client.move_chrome_device_org_unit(
@@ -599,7 +614,7 @@ class Device(base_model.BaseModel):
     if self.mark_pending_return_date:
       time_since = datetime.datetime.utcnow() - self.mark_pending_return_date
       if time_since.total_seconds() / 60.0 > config_model.Config.get(
-          'return_grace_period'):
+          'return_grace_period', self.associated_fleet.id()):
         self.resume_loan(
             user_email,
             message='Resuming loan for device %s, since use continued.' %
@@ -662,7 +677,7 @@ class Device(base_model.BaseModel):
     self.move_to_default_ou(user_email=user_email)
     self.last_reminder = None
     self.next_reminder = None
-    self.onboarded = True
+    self.onboarded = False
     self.put()
     self.stream_to_bq(
         user_email, 'Marking device %s as returned.' % self.identifier)
@@ -797,7 +812,7 @@ class Device(base_model.BaseModel):
     """
     if not self.is_assigned:
       raise UnassignedDeviceError(_UNASSIGNED_DEVICE % self.identifier)
-    if config_model.Config.get('allow_guest_mode'):
+    if config_model.Config.get('allow_guest_mode', self.associated_fleet.id()):
       directory_client = directory.DirectoryApiClient(user_email)
       guest_ou = constants.ORG_UNIT_DICT['GUEST']
 
@@ -813,10 +828,12 @@ class Device(base_model.BaseModel):
         self.stream_to_bq(
             user_email, 'Moving device %s into Guest Mode.' % self.identifier)
         self.put()
-        if config_model.Config.get('timeout_guest_mode'):
+        if config_model.Config.get('timeout_guest_mode',
+                                   self.associated_fleet.id()):
           countdown = datetime.timedelta(
               hours=config_model.Config.get(
-                  'guest_mode_timeout_in_hours')).total_seconds()
+                  'guest_mode_timeout_in_hours',
+                  self.associated_fleet.id())).total_seconds()
           deferred.defer(
               self._disable_guest_mode, user_email, _countdown=countdown)
     else:
@@ -964,12 +981,12 @@ class Device(base_model.BaseModel):
             user_email, 'Removed tag %s from device %s' %
             (tag_reference.tag.name, self.identifier))
         return
-    logging.warn(
-        'Tag with name %s is not associated with device %s',
-        tag_name, self.identifier)
+    logging.warn('Tag with name %s is not associated with device %s', tag_name,
+                 self.identifier)
 
 
-def _update_existing_device(device, user_email, asset_tag=None):
+def _update_existing_device(device, user_email, asset_tag=None,
+                            associated_fleet='default'):
   """Updates an existing device entity during a re-enrollment.
 
   Args:
@@ -977,6 +994,7 @@ def _update_existing_device(device, user_email, asset_tag=None):
     user_email: str, email address of the user making a Directory API request.
     asset_tag: str, unique org-specific identifier for the device (if
         available).
+    associated_fleet: str, associated_fleet to update, default if not given.
 
   Returns:
     A modified device model.
@@ -993,6 +1011,7 @@ def _update_existing_device(device, user_email, asset_tag=None):
   device.last_known_healthy = datetime.datetime.utcnow()
   device.assigned_user = None
   device.assignment_date = None
+  device.associated_fleet = ndb.Key('Fleet', associated_fleet)
   device.due_date = None
   device.last_reminder = None
   device.mark_pending_return_date = None
@@ -1002,19 +1021,20 @@ def _update_existing_device(device, user_email, asset_tag=None):
   return device
 
 
-def calculate_return_dates(assignment_date):
+def calculate_return_dates(assignment_date, associated_fleet='default'):
   """Calculates maximum and default return dates for a loan.
 
   Args:
     assignment_date: datetime, The date the device was assigned to a user.
+    associated_fleet: str, name of associated_fleet of configuration.
 
   Returns:
     A ReturnDates NamedTuple of datetimes.
   """
   default_date = assignment_date + datetime.timedelta(
-      days=config_model.Config.get('loan_duration'))
+      days=config_model.Config.get('loan_duration', associated_fleet))
   max_loan_date = assignment_date + datetime.timedelta(
-      days=config_model.Config.get('maximum_loan_duration'))
+      days=config_model.Config.get('maximum_loan_duration', associated_fleet))
   if default_date.weekday() > 4:
     days_til_weekday = ((default_date.weekday() - 4) % 2) + 1
     default_date = default_date + datetime.timedelta(days=days_til_weekday)

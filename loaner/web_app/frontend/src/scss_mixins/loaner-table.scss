@@ -47,7 +47,11 @@
       }
     }
 
-  };
+  }
+
+  ::ng-deep .mat-sort-header-arrow {
+    color: $white;
+  }
 
   .mat-header-row {
     background-color: mat-color($primary, 300);
@@ -56,7 +60,7 @@
       color: $white;
       font-size: 14px;
     }
-  };
+  }
 
   .mat-row {
     &[ng-reflect-router-link] {
@@ -72,6 +76,6 @@
 
   .mat-column-icons {
     max-width: 40px;
-    text-align: right
+    text-align: right;
   }
 }

@@ -1,0 +1,111 @@
+<form [formGroup]="templatesForm" (ngSubmit)="(showNewView) ? addTemplate() : saveTemplate()">
+  <mat-card>
+    <mat-card-title>Email Templates</mat-card-title>
+    <mat-card-subtitle>Configure email templates</mat-card-subtitle>
+    <mat-card-content>
+      <section class="control-set" *ngIf="!showNewView">
+        <div class="label">
+          Email Template Forms
+          <div class="sublabel">
+            Email Template forms for sending emails.
+          </div>
+        </div>
+        <div class="control" formGroupName="selected">
+          <mat-form-field>
+            <mat-select formControlName="template">
+              <mat-option *ngFor="let template of templates" [value]="template">
+                {{template.name}}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </section>
+      <div formGroupName="template">
+        <section class="control-set" *ngIf="showNewView">
+          <div class="label">
+            Name of template
+            <div class="sublabel">
+              Name of an email template.
+            </div>
+          </div>
+          <div class="control">
+            <mat-form-field class="email-value">
+              <input matInput
+                     formControlName="name"
+                     required
+                     type="text">
+            </mat-form-field>
+          </div>
+        </section>
+        <section class="control-set">
+          <div class="label">
+            Subject of email
+            <div class="sublabel">
+              Subject line of an email template.
+            </div>
+          </div>
+          <div class="control">
+            <mat-form-field class="email-value">
+              <input matInput
+                     formControlName="title"
+                     type="text">
+            </mat-form-field>
+          </div>
+        </section>
+        <section class="control-set">
+          <div class="label">
+            Body of email
+            <div class="sublabel">
+              Body text of an email template.
+            </div>
+          </div>
+          <div class="control">
+            <mat-form-field class="email-value">
+              <textarea matInput
+                        formControlName="body"
+                        type="text">
+              </textarea>
+            </mat-form-field>
+          </div>
+        </section>
+      </div>
+      <section class="control-set">
+        <div class="control-right">
+          <div *ngIf="!showNewView">
+            <button mat-button
+                    type="button"
+                    name="remove-template"
+                    (click)="removeTemplate()">
+              Remove
+            </button>
+            <button mat-button
+                    type="button"
+                    name="show-new-template-view"
+                    (click)="addNewView()">
+              Add New
+            </button>
+            <button mat-button
+                    type="submit"
+                    name="save-template">
+              Save
+            </button>
+          </div>
+          <div *ngIf="showNewView">
+            <button mat-button
+                    type="button"
+                    name="back-to-edit-template"
+                    (click)="goBackToEditView()">
+              Back
+            </button>
+            <button mat-button
+                    [disabled]="templatesForm.invalid"
+                    type="submit"
+                    name="add-new-template">
+              Add
+            </button>
+          </div>
+        </div>
+      </section>
+    </mat-card-content>
+  </mat-card>
+</form>

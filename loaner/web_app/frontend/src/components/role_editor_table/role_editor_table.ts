@@ -16,6 +16,8 @@ import {Component, OnInit} from '@angular/core';
 import {MatTableDataSource} from '@angular/material/table';
 
 import {RoleApiParams} from '../../models/role';
+import {Role} from '../../models/role';
+import {Dialog} from '../../services/dialog';
 import {RoleService} from '../../services/role';
 
 /**
@@ -29,21 +31,37 @@ import {RoleService} from '../../services/role';
 export class RoleEditorTable implements OnInit {
   displayedColumns = [
     'name',
-    'associated_group',
+    'associatedGroup',
     'permissions',
+    'tools',
   ];
+  dataSource = new MatTableDataSource<Role>();
 
-  dataSource = new MatTableDataSource<RoleApiParams>();
-
-  constructor(private readonly roleService: RoleService) {}
+  constructor(
+      private readonly roleService: RoleService,
+      private readonly dialogBox: Dialog,
+  ) {}
 
   ngOnInit() {
     this.getRoleList();
   }
 
-  private getRoleList() {
+  getRoleList() {
     this.roleService.list().subscribe(listResponse => {
       this.dataSource.data = listResponse.roles;
+    });
+  }
+
+  /** Upon dialog confirmation, deletes role from datastore. */
+  deleteRole(role: Role) {
+    const dialogTitle = 'Delete role';
+    const dialogContent = 'Are you sure you want to remove this role?';
+    this.dialogBox.confirm(dialogTitle, dialogContent).subscribe(result => {
+      if (result) {
+        this.roleService.delete(role).subscribe(() => {
+          this.getRoleList();
+        });
+      }
     });
   }
 }

@@ -22,6 +22,7 @@ import {MaterialModule} from './material_module';
 
 describe('FaqComponent', () => {
   let fixture: ComponentFixture<FaqComponent>;
+  let httpService: HttpClient;
 
   beforeEach(() => {
     TestBed
@@ -35,10 +36,10 @@ describe('FaqComponent', () => {
         })
         .compileComponents();
     fixture = TestBed.createComponent(FaqComponent);
+    httpService = TestBed.get(HttpClient);
   });
 
   it('should render markdown as HTML', () => {
-    const httpService = TestBed.get(HttpClient);
     const faqMock = `
 # Heading 1
 ## Heading 2
@@ -58,5 +59,20 @@ You can do the following:
         .toContain('Heading 2');
     expect(fixture.debugElement.nativeElement.querySelector('li').textContent)
         .toContain('This way');
+  });
+
+  it('should render links with a target of _blank', () => {
+    const faqMock = `[Test](https://google.com)`;
+    spyOn(httpService, 'get').and.returnValue(of(faqMock));
+    fixture.detectChanges();
+
+    expect(fixture.debugElement.nativeElement.querySelector('a').textContent)
+        .toContain('Test');
+    expect(fixture.debugElement.nativeElement.querySelector('a').getAttribute(
+               'href'))
+        .toContain('https://google.com');
+    expect(fixture.debugElement.nativeElement.querySelector('a').getAttribute(
+               'target'))
+        .toContain('_blank');
   });
 });

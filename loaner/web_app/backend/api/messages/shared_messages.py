@@ -52,7 +52,7 @@ class SearchRequest(messages.Message):
     query_string: str, A query string to conduct a search on an index.
     expressions: List[SearchExpression], A list representing a multi-dimensional
         sort of Documents.
-    returned_fileds: List[str], A list of basestring as facet name to return
+    returned_fields: List[str], A list of basestring as facet name to return
         specific facet with the result.
   """
   query_string = messages.StringField(1)

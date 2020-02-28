@@ -14,7 +14,6 @@
 
 import {Component} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {By} from '@angular/platform-browser';
 
 import {FocusDirective} from './focus';
 
@@ -47,14 +46,14 @@ describe('FocusDirective', () => {
   });
 
   it('should focus the div with loaner-focus', () => {
-    expect(
-        fixture.debugElement.query(By.css('#three')).attributes['loaner-focus'])
+    expect(fixture.debugElement.nativeElement.querySelector('#three')
+               .attributes['loaner-focus'])
         .toBeDefined();
   });
 
   it('should report the fourth div as not focused', () => {
-    expect(
-        fixture.debugElement.query(By.css('#four')).attributes['loaner-focus'])
+    expect(fixture.debugElement.nativeElement.querySelector('#four')
+               .attributes['loaner-focus'])
         .toBeUndefined();
   });
 });

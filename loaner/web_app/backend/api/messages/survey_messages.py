@@ -113,7 +113,7 @@ class QuestionSubmission(messages.Message):
 
   Attributes:
     question_urlsafe_key: str, The urlsafe ndb.Key for a
-        survey_models.Survey instace.
+        survey_models.Survey instance.
     selected_answer: Answer, The answer a user selected.
     more_info_text: str, the extra info optionally provided for the given
         Answer.

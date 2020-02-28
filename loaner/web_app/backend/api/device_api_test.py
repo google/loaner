@@ -34,6 +34,7 @@ from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api.messages import device_messages
 from loaner.web_app.backend.api.messages import shared_messages
 from loaner.web_app.backend.api.messages import shelf_messages
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import search_utils
@@ -210,10 +211,9 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
   @mock.patch('__main__.device_model.Device.device_audit_check')
   def test_device_audit_check(self, mock_device_audit_check):
     request = device_messages.DeviceRequest(identifier='6765')
-    self.assertRaisesRegexp(
-        device_api.endpoints.NotFoundException,
-        device_api._NO_DEVICE_MSG % '6765',
-        self.service.device_audit_check, request)
+    self.assertRaisesRegexp(device_api.endpoints.NotFoundException,
+                           device_api._NO_DEVICE_MSG % '6765',
+                           self.service.device_audit_check, request)
 
     device_model.Device(
         serial_number='12345',
@@ -329,14 +329,24 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     mock_directory_client.given_name.side_effect = test_error
     self.assertIsNone(self.service.get_device(request).given_name)
 
-  @parameterized.parameters(
-      (device_messages.Device(enrolled=True), 2,),
-      (device_messages.Device(current_ou='/'), 2,),
-      (device_messages.Device(enrolled=False), 1,),
-      (device_messages.Device(
-          query=shared_messages.SearchRequest(query_string='sn:6789')), 1,),
-      (device_messages.Device(
-          query=shared_messages.SearchRequest(query_string='at:12345')), 1,))
+  @parameterized.parameters((
+      device_messages.Device(enrolled=True),
+      2,
+  ), (
+      device_messages.Device(current_ou='/'),
+      2,
+  ), (
+      device_messages.Device(enrolled=False),
+      1,
+  ), (
+      device_messages.Device(
+          query=shared_messages.SearchRequest(query_string='sn:6789')),
+      1,
+  ), (
+      device_messages.Device(
+          query=shared_messages.SearchRequest(query_string='at:12345')),
+      1,
+  ))
   def test_list_devices(self, request, response_length):
     response = self.service.list_devices(request)
     self.assertLen(response.devices, response_length)
@@ -352,9 +362,8 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
             expressions=[expressions],
             returned_fields=['serial_number']))
     response = self.service.list_devices(request)
-    self.assertEqual(
-        response.devices[0].serial_number,
-        expected_response.devices[0].serial_number)
+    self.assertEqual(response.devices[0].serial_number,
+                     expected_response.devices[0].serial_number)
     self.assertFalse(response.has_additional_results)
 
   def test_list_devices_with_filter_message(self):
@@ -375,7 +384,8 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
                 lost=False,
                 chrome_device_id='unique_id_2',
                 damaged=False,
-                guest_permitted=True)
+                guest_permitted=True,
+                onboarded=False)
         ],
         has_additional_results=False)
     self.assertEqual(response, expected_response)
@@ -406,8 +416,7 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     self.assertLen(response_devices, 2)
 
   @mock.patch.object(
-      search_utils, 'to_query', return_value='enrolled:enrolled',
-      autospec=True)
+      search_utils, 'to_query', return_value='enrolled:enrolled', autospec=True)
   def test_list_devices_with_malformed_page_token(self, mock_to_query):
     """Test list devices with a fake token, raises BadRequestException."""
     request = device_messages.Device(page_token='malformedtoken')
@@ -429,7 +438,8 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
                 lost=self.unenrolled_device.lost,
                 chrome_device_id=self.unenrolled_device.chrome_device_id,
                 damaged=self.unenrolled_device.damaged,
-                guest_permitted=True)
+                guest_permitted=True,
+                onboarded=False)
         ],
         has_additional_results=False)
     self.assertEqual(expected_response, response)
@@ -664,6 +674,97 @@ class DeviceApiTest(parameterized.TestCase, loanertest.EndpointsTestCase):
     with self.assertRaises(endpoints.UnauthorizedException):
       self.service.resume_loan(
           device_messages.DeviceRequest(urlkey=self.device.key.urlsafe()))
+
+  @mock.patch.object(bigquery, 'BigQueryClient')
+  @mock.patch.object(root_api.Service, 'check_xsrf_token', autospec=True)
+  def test_get_history(self, mock_xsrf_token, mock_bigquery):
+    device_request = device_messages.DeviceRequest()
+    device_request.asset_tag = '12345'
+    request = device_messages.HistoryRequest(device=device_request)
+
+    device_response = device_messages.Device()
+    device_response.asset_tag = '12345'
+
+    expected_response = device_messages.HistoryResponse()
+    for _ in range(2):
+      expected_response.devices.append(device_response)
+      expected_response.timestamp.append(
+          datetime.datetime(2019, 10, 22, 20, 43, 37))
+      expected_response.actor.append('testuser@google.com')
+      expected_response.summary.append(
+          'Beginning new loan for user testuser@google.com with device 12345.')
+
+    bigquery_response = [
+        (u"Key('Device', 5158133238333440)",
+         datetime.datetime(2019, 10, 22, 20, 43,
+                           37), u'testuser@google.com', u'enable_guest_mode',
+         u'Beginning new loan for user testuser@google.com with device 12345.',
+         {
+             u'ou_changed_date': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'current_ou': u'/',
+             u'shelf': None,
+             u'due_date': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'chrome_device_id': u'unique_id_1',
+             u'mark_pending_return_date': None,
+             u'asset_tag': u'12345',
+             u'last_known_healthy': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'locked': False,
+             u'last_reminder': {
+                 u'count': 1,
+                 u'time': datetime.datetime(2019, 10, 22, 20, 43, 37),
+                 u'level': 1
+             },
+             u'next_reminder': None,
+             u'device_model': u'Chromebook',
+             u'enrolled': True,
+             u'serial_number': u'123ABC',
+             u'damaged': False,
+             u'onboarded': True,
+             u'assignment_date': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'damaged_reason': None,
+             u'assigned_user': u'testuser@google.com',
+             u'lost': False,
+             u'last_heartbeat': datetime.datetime(2019, 10, 22, 20, 43, 37)
+         }),
+        (u"Key('Device', 5158133238333440)",
+         datetime.datetime(2019, 10, 22, 20, 43,
+                           37), u'testuser@google.com', u'enable_guest_mode',
+         u'Beginning new loan for user testuser@google.com with device 12345.',
+         {
+             u'ou_changed_date': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'current_ou': u'/',
+             u'shelf': None,
+             u'due_date': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'chrome_device_id': u'unique_id_1',
+             u'mark_pending_return_date': None,
+             u'asset_tag': u'12345',
+             u'last_known_healthy': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'locked': False,
+             u'last_reminder': {
+                 u'count': 1,
+                 u'time': datetime.datetime(2019, 10, 22, 20, 43, 37),
+                 u'level': 1
+             },
+             u'next_reminder': None,
+             u'device_model': u'Chromebook',
+             u'enrolled': True,
+             u'serial_number': u'123ABC',
+             u'damaged': False,
+             u'onboarded': True,
+             u'assignment_date': datetime.datetime(2019, 10, 22, 20, 43, 37),
+             u'damaged_reason': None,
+             u'assigned_user': u'testuser@google.com',
+             u'lost': False,
+             u'last_heartbeat': datetime.datetime(2019, 10, 22, 20, 43, 37)
+         }),
+    ]
+    mock_bigquery_client = mock.Mock()
+    mock_bigquery_client.get_device_info.return_value = bigquery_response
+    mock_bigquery.return_value = mock_bigquery_client
+
+    actual_response = self.service.get_history(request)
+
+    self.assertEqual(actual_response, expected_response)
 
   def test_get_device_errors(self):
     # No identifiers.

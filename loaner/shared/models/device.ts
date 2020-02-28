@@ -170,7 +170,7 @@ export class Device {
    * Property to determine if loan status of the device is almost overdue.
    */
   get isAlmostOverdue(): boolean {
-    return ((moment().diff(this.dueDate, 'days') >= -1) && !this.overdue);
+    return ((moment().diff(this.dueDate, 'days') > -1) && !this.overdue);
   }
 
   /**

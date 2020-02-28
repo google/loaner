@@ -21,46 +21,65 @@ window.onload = () => update();
 /** Updates the debug view with all of the necessary debug values. */
 function update() {
   // Alarms
-  chrome.alarms.getAll(
-      alarms => document.getElementById('alarms').textContent =
-          JSON.stringify(alarms));
+  const alarmsElement = document.getElementById('alarms');
+  chrome.alarms.getAll(alarms => {
+    if (alarmsElement) {
+      alarmsElement.textContent = JSON.stringify(alarms);
+    }
+  });
 
   // Loaner Storage Status
-  chrome.storage.local.get(
-      ['loanerStatus'],
-      status => document.getElementById('enrollment').textContent =
-          JSON.stringify(status));
+  const enrollmentElement = document.getElementById('enrollment');
+  chrome.storage.local.get(['loanerStatus'], status => {
+    if (enrollmentElement) {
+      enrollmentElement.textContent = JSON.stringify(status);
+    }
+  });
 
   // OAuth Token
+  const oauthElement = document.getElementById('oauth');
   chrome.identity.getAuthToken(token => {
-    document.getElementById('oauth').textContent =
-        token ? 'Defined' : 'THERE IS NO TOKEN DEFINED.';
+    if (oauthElement) {
+      oauthElement.textContent =
+          token ? 'Defined' : 'THERE IS NO TOKEN DEFINED.';
+    }
   });
 
   // Device ID
-  if (chrome.enterprise) {
-    chrome.enterprise.deviceAttributes.getDirectoryDeviceId(
-        id => document.getElementById('device').textContent = id);
-  } else {
-    document.getElementById('device').textContent =
-        'chrome.enterprise API is unavailable';
+  const deviceElement = document.getElementById('device');
+  if (deviceElement) {
+    if (chrome.enterprise) {
+      chrome.enterprise.deviceAttributes.getDirectoryDeviceId(
+          id => deviceElement.textContent = id);
+    } else {
+      deviceElement.textContent = 'chrome.enterprise API is unavailable';
+    }
   }
 
   // App Version
-  document.getElementById('version').textContent =
-      chrome.runtime.getManifest().version;
-
+  const appVersionElement = document.getElementById('version');
+  if (appVersionElement) {
+    appVersionElement.textContent = chrome.runtime.getManifest().version;
+  }
   // Public Key
-  document.getElementById('key').textContent = chrome.runtime.getManifest().key;
+  const keyElement = document.getElementById('key');
+  if (keyElement) {
+    keyElement.textContent = chrome.runtime.getManifest().key;
+  }
 
   // Client ID
-  document.getElementById('clientId').textContent =
-      chrome.runtime.getManifest().oauth2.client_id;
+  const clientIdElement = document.getElementById('client-id');
+  if (clientIdElement) {
+    clientIdElement.textContent = chrome.runtime.getManifest().oauth2.client_id;
+  }
 
   // Network Connection
-  document.getElementById('network').textContent = navigator.onLine ?
-      'There is a network connection.' :
-      'There is NO network connection. Please connect to a WiFi network.';
+  const networkElement = document.getElementById('network');
+  if (networkElement) {
+    networkElement.textContent = navigator.onLine ?
+        'There is a network connection.' :
+        'There is NO network connection. Please connect to a WiFi network.';
+  }
 
 }
 

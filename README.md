@@ -24,6 +24,35 @@ The program is comprised of three parts:
 *   A Google App Engine (GAE) application
 *   A Chrome App that runs on each Chrome OS device
 
+## Important notice about Chrome Apps!
+**Note:** [Chrome Apps are being phased out in favor of extensions and progressive web apps](https://blog.chromium.org/2020/01/moving-forward-from-chrome-apps.html)
+
+**If you haven't yet deployed Grab and Go to the Chrome Web Store**
+
+If you plan on implementing Grab and Go, please upload our placeholder app into
+the Chrome Web Store before March 2020 (if you don't have an existing Chrome Web
+Store entry yet) to ensure you will not be blocked from deploying Grab and Go.
+You can replace the placeholder app later on with your customized Grab and Go
+Chrome App when you are ready.
+
+The placeholder app has been provided in the `chrome_app/placeholder_app/`
+folder. You can zip the contents in this folder and upload them directly to
+the Chrome Web Store. You will need to provide a category (we recommend
+Productivity), screenshot, small tile, and icon. All of these files are
+available in the `chrome_app/webstore_assets/` folder.
+
+**If you have deployed Grab and Go to the Chrome Web Store**
+
+You should be in good shape for now! Existing enterprise Chrome Apps (Grab and
+Go included) are not in-scope until June 2022 according to the announcement
+linked above.
+
+**Is there anything else I should do in the meantime?**
+
+Not yet. We are still discussing our migration strategy internally and hope to
+share information with you all as soon as we have more to share. Thanks for your
+continued adoption and patience on the matter!
+
 ## Current release: [Alpha (v0.7.1a)](https://github.com/google/loaner/tree/Alpha-(0.7.1))
 
 Please note that the current release of this application is in ALPHA.

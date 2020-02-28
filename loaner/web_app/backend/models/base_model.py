@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python2, python3
 """Base model class for the loaner project."""
 
 from __future__ import absolute_import
@@ -26,12 +27,12 @@ import pickle
 import string
 
 from protorpc import messages
+import six
 
 from google.appengine.api import search
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.runtime import apiproxy_errors
-
 from loaner.web_app.backend.lib import utils
 
 _PUT_DOC_ERR_MSG = 'Error putting a document (%s) into the index (%s).'
@@ -208,8 +209,9 @@ class BaseModel(ndb.Model):
           name=key, value=search.GeoPoint(value.lat, value.lon))]
 
     return [
-        search.TextField(name=key, value=unicode(value)),
-        search.AtomField(name=key, value=unicode(value))]
+        search.TextField(name=key, value=six.text_type(value)),
+        search.AtomField(name=key, value=six.text_type(value))
+    ]
 
   def _get_document_fields(self):
     """Enumerates search document fields from entity properties.
@@ -244,7 +246,7 @@ class BaseModel(ndb.Model):
     """
     try:
       return search.Document(
-          doc_id=str(self.key.urlsafe()),
+          doc_id=six.ensure_str(self.key.urlsafe()),
           fields=self._get_document_fields())
 
     except (TypeError, ValueError) as e:
@@ -315,7 +317,7 @@ class BaseModel(ndb.Model):
 
 def _sanitize_dict(entity_dict):
   """Sanitizes select values of an entity-derived dictionary."""
-  for key, value in entity_dict.iteritems():
+  for key, value in six.iteritems(entity_dict):
     if isinstance(value, dict):
       entity_dict[key] = _sanitize_dict(value)
     elif isinstance(value, list):

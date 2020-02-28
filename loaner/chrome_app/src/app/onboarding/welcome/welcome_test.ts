@@ -14,7 +14,6 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDialog, MatDialogRef} from '@angular/material/dialog';
-import {By} from '@angular/platform-browser';
 
 import {AnimationMenuService} from '../../../../../shared/services/animation_menu_service';
 import {AnimationMenuServiceMock} from '../../../../../shared/testing/mocks';
@@ -69,9 +68,10 @@ describe('WelcomeComponent', () => {
     component.welcomeAnimationEnabled = true;
     fixture.detectChanges();
     expect(
-        fixture.debugElement.query(By.css('.welcome-animation')).nativeElement)
+        fixture.debugElement.nativeElement.querySelector('.welcome-animation'))
         .toBeTruthy();
-    expect(fixture.debugElement.query(By.css('.welcome-card'))).toBeFalsy();
+    expect(fixture.debugElement.nativeElement.querySelector('.welcome-card'))
+        .toBeFalsy();
   });
 
   it('should have a playback rate of 100% for the welcome animation', () => {
@@ -90,17 +90,18 @@ describe('WelcomeComponent', () => {
   it('should render welcome text instead of animation', () => {
     component.welcomeAnimationEnabled = false;
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.css('.welcome-card')).nativeElement)
+    expect(fixture.debugElement.nativeElement.querySelector('.welcome-card'))
         .toBeTruthy();
-    expect(fixture.debugElement.query(By.css('.welcome-animation')))
+    expect(
+        fixture.debugElement.nativeElement.querySelector('.welcome-animation'))
         .toBeFalsy();
   });
 
   it('should show the welcome text', () => {
     component.welcomeAnimationEnabled = false;
     fixture.detectChanges();
-    expect(fixture.debugElement.query(By.css('.welcome-card'))
-               .nativeElement.textContent)
+    expect(fixture.debugElement.nativeElement.querySelector('.welcome-card')
+               .textContent)
         .toContain('Let\'s get started');
   });
 });

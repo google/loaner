@@ -3,7 +3,7 @@
 
 load(
     "//loaner:builddefs.bzl",
-    "loaner_appengine_library",
+    "loaner_appengine_library",  # @unused
 )
 
 package(
@@ -15,7 +15,6 @@ package(
 # ==============================================================================
 # Libraries
 # ==============================================================================
-
 loaner_appengine_library(
     name = "config_messages",
     srcs = [
@@ -91,6 +90,13 @@ loaner_appengine_library(
     name = "tag_messages",
     srcs = [
         "tag_messages.py",
+    ],
+)
+
+loaner_appengine_library(
+    name = "template_messages",
+    srcs = [
+        "template_messages.py",
     ],
 )
 

@@ -17,10 +17,12 @@ import {BehaviorSubject, Observable, Observer, of} from 'rxjs';
 import {CONFIG} from '../app.config';
 import * as bootstrap from '../models/bootstrap';
 import * as config from '../models/config';
+import * as template from '../models/template';
 import {Device, ListDevicesResponse} from '../models/device';
-import {Role} from '../models/role';
+import {ListRolesResponse, Role} from '../models/role';
 import {ListShelfResponse, Shelf, ShelfRequestParams} from '../models/shelf';
 import {ListTagRequest, ListTagResponse, Tag} from '../models/tag';
+import {Template} from '../models/template';
 import {User} from '../models/user';
 
 /* Disabling jsdocs on this file because they do not add much information   */
@@ -464,6 +466,21 @@ export const CONFIG_RESPONSE_MOCK = [
   {name: 'gcp_cloud_storage_bucket', string_value: 'test_bucket'},
 ];
 
+export const TEMPLATE_RESPONSE_MOCK = {
+  templates: [
+    new Template({
+      name: 'test_email_template_1',
+      body: 'hello world',
+      title: 'test_title'
+    }),
+    new Template({
+      name: 'test_email_template_2',
+      body: '<html><body>world hello<body/><html/>',
+      title: ''
+    }),
+  ]
+};
+
 export class ConfigServiceMock {
   getStringConfig(name: string) {
     return of('');
@@ -486,6 +503,23 @@ export class ConfigServiceMock {
   }
 
   updateAll(configUpdates: config.ConfigUpdate[]) {}
+}
+
+export class TemplateServiceMock {
+  list() {
+    return of(TEMPLATE_RESPONSE_MOCK);
+  }
+  create(templateCreate: template.CreateTemplateRequest) {
+    return of();
+  }
+
+  remove(templateRemove: template.RemoveTemplateRequest) {
+    return of();
+  }
+
+  update(templateUpdate: template.TemplateApiParams) {
+    return of();
+  }
 }
 
 export class AuthServiceMock {
@@ -885,7 +919,23 @@ export class RoleServiceMock {
     return of(this.dataChange);
   }
 
-  deleteRole(role: Role) {
+  delete(role: Role) {
     return of();
   }
 }
+
+export const TEST_ROLE_1 = new Role({
+  name: 'FAKE ROLE 1',
+  associated_group: 'FAKE GROUP 1',
+  permissions: ['fake_permission1', 'fake_permission2', 'fake_permission3'],
+});
+
+export const TEST_ROLE_2 = new Role({
+  name: 'FAKE ROLE 2',
+  associated_group: 'FAKE GROUP 2',
+  permissions: ['fake_permission3', 'fake_permission4'],
+});
+
+export const SET_OF_ROLES: ListRolesResponse = {
+  roles: [TEST_ROLE_1, TEST_ROLE_2],
+};

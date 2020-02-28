@@ -129,10 +129,12 @@ class BigQueryRowModelTest(loanertest.TestCase, parameterized.TestCase):
     test_row_dict_2 = self.test_row_2.to_json_dict()
     test_row_1 = (test_row_dict_1['ndb_key'], test_row_dict_1['timestamp'],
                   test_row_dict_1['actor'], test_row_dict_1['method'],
-                  test_row_dict_1['summary'], test_row_dict_1['entity'])
+                  test_row_dict_1['summary'], test_row_dict_1['entity'],
+                  test_row_dict_1['associated_fleet'])
     test_row_2 = (test_row_dict_2['ndb_key'], test_row_dict_2['timestamp'],
                   test_row_dict_2['actor'], test_row_dict_2['method'],
-                  test_row_dict_2['summary'], test_row_dict_2['entity'])
+                  test_row_dict_2['summary'], test_row_dict_2['entity'],
+                  test_row_dict_2['associated_fleet'])
     expected_tables = {
         self.test_row_1.model_type: [test_row_1],
         self.test_row_2.model_type: [test_row_2]

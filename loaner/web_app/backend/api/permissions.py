@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python2, python3
 """Define permissions for the app APIs.
 
 To see actual permissions please check web_app/permissions.json.
@@ -23,6 +24,8 @@ from __future__ import print_function
 
 import json
 import os
+
+import six
 
 
 # Run code on import.
@@ -36,6 +39,6 @@ json_path = os.path.join(os.sep.join(json_path[:-3]), 'permissions.json')
 with open(json_path) as f:
   permissions_json = json.load(f)
 
-for key, value in permissions_json.iteritems():
+for key, value in six.iteritems(permissions_json):
   setattr(Permissions, key, value)
-  Permissions.ALL.append(value)
+  Permissions.ALL.append(str(value))

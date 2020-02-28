@@ -18,7 +18,6 @@ import {DebugElement} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {FormsModule} from '@angular/forms';
 import {MatRadioButton} from '@angular/material/radio';
-import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {ApiConfig, apiConfigFactory} from '../../services/api_config';
@@ -31,11 +30,6 @@ import {Survey, SurveyResponse, SurveyType} from './survey_service';
 describe('SurveyComponent', () => {
   let app: SurveyComponent;
   let fixture: ComponentFixture<SurveyComponent>;
-
-  /** Radio elements */
-  let radioDebugElements: DebugElement[];
-  let radioInstances: MatRadioButton[];
-  let radioLabelElements: HTMLLabelElement[];
 
   /** Test Data */
   const surveyData: SurveyResponse = {
@@ -100,12 +94,6 @@ describe('SurveyComponent', () => {
     app.surveyData = surveyData;
     app.ready();
     fixture.detectChanges();
-    radioDebugElements =
-        fixture.debugElement.queryAll(By.directive(MatRadioButton));
-    radioLabelElements = radioDebugElements.map(
-        debugEl => debugEl.query(By.css('label')).nativeElement);
-    radioInstances =
-        radioDebugElements.map(debugEl => debugEl.componentInstance);
     const radioButtons = fixture.nativeElement.querySelector('mat-radio-group');
     for (const answer of surveyData.answers) {
       expect(radioButtons.textContent).toContain(answer.text);
@@ -157,16 +145,12 @@ describe('SurveyComponent', () => {
        app.surveyData = surveyData;
        app.ready();
        fixture.detectChanges();
-       radioDebugElements =
-           fixture.debugElement.queryAll(By.directive(MatRadioButton));
-       radioLabelElements = radioDebugElements.map(
-           debugEl => debugEl.query(By.css('label')).nativeElement);
-       radioInstances =
-           radioDebugElements.map(debugEl => debugEl.componentInstance);
+       const radioLabelElements =
+           fixture.debugElement.nativeElement.querySelectorAll(
+               'mat-radio-button > label');
 
        expect(app.surveyAnswer).not.toBeDefined();
        radioLabelElements[0].click();
-       expect(radioInstances[0].checked).toBeTruthy();
        expect(app.surveyAnswer).toBeDefined();
        fixture.detectChanges();
        expect(fixture.nativeElement.textContent)

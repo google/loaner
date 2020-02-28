@@ -52,14 +52,29 @@ class Answer(ndb.Model):
     more_info_enabled: bool, Indicating whether or not more info can be provided
         for this answer.
     placeholder_text: str, The text to be displayed in the more info box as a
-        place holder.
+      place holder.
+    associated_fleet: ndb.Key, name of the Fleet used to associate this answer
+      to fleets automatically.
   """
   text = ndb.StringProperty()
   more_info_enabled = ndb.BooleanProperty()
   placeholder_text = ndb.StringProperty()
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet',
+      required=True,
+      default=ndb.Key('Fleet', 'default'))
 
   @classmethod
-  def create(cls, text, more_info_enabled=False, placeholder_text=None):
+  def assign_to_default_fleet(cls):
+    """Assigns current entities to default fleet.
+    """
+    for entity in cls.query().fetch():
+      entity.associated_fleet = ndb.Key('Fleet', 'default')
+      entity.put()
+
+  @classmethod
+  def create(cls, text, more_info_enabled=False, placeholder_text=None,
+             associated_fleet='default'):
     """Creates a new answer to a survey.
 
     Args:
@@ -67,7 +82,9 @@ class Answer(ndb.Model):
       more_info_enabled: bool, Indicating whether or not more info can be
           provided for this answer.
       placeholder_text: str, The text to be displayed in the more info box as a
-          place holder.
+        place holder.
+      associated_fleet: str, name of the Fleet used to associate this answer
+        to fleets automatically.
 
     Returns:
       The newly created instance of the Answer.
@@ -80,7 +97,8 @@ class Answer(ndb.Model):
       raise ValueError(_MORE_INFO_MSG)
     return cls(
         text=text, more_info_enabled=more_info_enabled,
-        placeholder_text=placeholder_text)
+        placeholder_text=placeholder_text,
+        associated_fleet=ndb.Key('Fleet', associated_fleet))
 
 
 class Question(base_model.BaseModel):
@@ -95,6 +113,8 @@ class Question(base_model.BaseModel):
     answers: List of possible answers for this survey question.
     more_info_text: str, The more_info_text provided in a response.
     response: Answer, The response to the question by the user.
+    associated_fleet: ndb.Key, name of the Fleet used to associate this question
+      to fleets automatically.
   """
   question_type = msgprop.EnumProperty(QuestionType, required=True)
   question_text = ndb.StringProperty(required=True)
@@ -103,9 +123,14 @@ class Question(base_model.BaseModel):
   answers = ndb.StructuredProperty(Answer, repeated=True)
   more_info_text = ndb.StringProperty()
   response = ndb.StructuredProperty(Answer)
+  associated_fleet = ndb.KeyProperty(
+      kind='Fleet',
+      required=True,
+      default=ndb.Key('Fleet', 'default'))
 
   @classmethod
-  def create(cls, question_type, question_text, enabled, rand_weight, answers):
+  def create(cls, question_type, question_text, enabled, rand_weight,
+             answers, associated_fleet='default'):
     """Creates a new question.
 
     Args:
@@ -116,6 +141,8 @@ class Question(base_model.BaseModel):
       rand_weight: int, The weight applied to the question when using random
           question.
       answers: list, A list of Answer models for this survey question.
+      associated_fleet: str, name of the Fleet used to associate this answer
+        to fleets automatically.
 
     Returns:
       The newly created instance of the Question.
@@ -127,7 +154,8 @@ class Question(base_model.BaseModel):
         question_text=question_text,
         enabled=enabled,
         rand_weight=rand_weight,
-        answers=answers)
+        answers=answers,
+        associated_fleet=ndb.Key('Fleet', associated_fleet))
     question.put()
     return question
 
@@ -205,7 +233,7 @@ class Question(base_model.BaseModel):
       selected_answer: An Answer representing the answer the user selected.
       more_info_text: str, The optional more_info_text for the answer provided.
     """
-    if config_model.Config.get('anonymous_surveys'):
+    if config_model.Config.get('anonymous_surveys', self.associated_fleet.id()):
       acting_user = constants.DEFAULT_ACTING_USER
     self.response = selected_answer
     self.more_info_text = more_info_text

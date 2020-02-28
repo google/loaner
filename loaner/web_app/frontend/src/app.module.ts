@@ -36,6 +36,7 @@ import {SearchService} from './services/search';
 import {ShelfService} from './services/shelf';
 import {LoanerSnackBar} from './services/snackbar';
 import {TagService} from './services/tag';
+import {TemplateService} from './services/template';
 import {UserService} from './services/user';
 
 /** Root module of the Loaner app. */
@@ -67,6 +68,7 @@ import {UserService} from './services/user';
     ShelfService,
     Title,
     TagService,
+    TemplateService,
     UserService,
     {
       provide: HTTP_INTERCEPTORS,

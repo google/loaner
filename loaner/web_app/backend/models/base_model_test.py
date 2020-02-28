@@ -22,6 +22,7 @@ import datetime
 
 from absl.testing import parameterized
 import mock
+import six
 
 from google.appengine.api import search
 from google.appengine.ext import ndb
@@ -280,7 +281,7 @@ class BaseModelTest(loanertest.TestCase, parameterized.TestCase):
     fields = [search.AtomField(name='text_field', value='12345ABC')]
     mock_get_document_fields.return_value = fields
     test_document = search.Document(
-        doc_id=test_model.key.urlsafe(), fields=fields)
+        doc_id=six.ensure_str(test_model.key.urlsafe()), fields=fields)
     result = test_model.to_document()
     self.assertEqual(result, test_document)
 

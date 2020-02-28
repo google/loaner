@@ -14,7 +14,6 @@
 
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDialogRef} from '@angular/material/dialog';
-import {By} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
 import {AnimationMenuService} from '../../services/animation_menu_service';
@@ -60,15 +59,15 @@ describe('AnimationMenuComponent', () => {
   });
 
   it('should show the slider', () => {
-    expect(fixture.debugElement.query(By.css('.mat-dialog-title'))
-               .nativeElement.innerText)
+    expect(fixture.debugElement.nativeElement.querySelector('.mat-dialog-title')
+               .innerText)
         .toBe('Animation Menu');
   });
 
   it('should render the close button', () => {
     fixture.detectChanges();
     expect(
-        fixture.debugElement.query(By.css('#close')).nativeElement.textContent)
+        fixture.debugElement.nativeElement.querySelector('#close').textContent)
         .toContain('Close');
   });
 });

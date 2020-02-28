@@ -91,10 +91,26 @@ class TagModelTest(loanertest.TestCase, parameterized.TestCase):
         hidden=False,
         protect=False,
         color='red',
-        description='Description for new tag.')
+        description='Description for new tag.',
+        associated_fleet='test_fleet')
     self.assertEqual(
         tag_entity, tag_model.Tag.get('NewlyCreatedTag'))
     self.assertEqual(mock_stream_to_bq.call_count, 1)
+    self.assertEqual('test_fleet',
+                     tag_model.Tag.get('NewlyCreatedTag').associated_fleet.id())
+
+  def test_create_default_fleet(self):
+    """Test the creation of a Tag."""
+    tag_entity = tag_model.Tag.create(
+        user_email=loanertest.USER_EMAIL,
+        name='NewlyCreatedTag',
+        hidden=False,
+        protect=False,
+        color='red',
+        description='Description for new tag.')
+    self.assertEqual(tag_entity, tag_model.Tag.get('NewlyCreatedTag'))
+    self.assertEqual('default',
+                     tag_model.Tag.get('NewlyCreatedTag').associated_fleet.id())
 
   def test_create_existing(self):
     """Test the creation of an existing Tag."""

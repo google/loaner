@@ -32,6 +32,7 @@ loaner_appengine_library(
         ":shelf_api",
         ":survey_api",
         ":tag_api",
+        ":template_api",
         ":user_api",
     ],
 )
@@ -125,6 +126,7 @@ loaner_appengine_library(
         ":root_api",
         ":shelf_api",
         "//loaner/web_app/backend/api/messages:device_messages",
+        "//loaner/web_app/backend/clients:bigquery",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:search_utils",
@@ -144,6 +146,7 @@ loaner_appengine_library(
     data = [
         "//loaner/web_app:permissions",
     ],
+    deps = ["@six_archive//:six"],
 )
 
 loaner_appengine_library(
@@ -226,6 +229,22 @@ loaner_appengine_library(
         "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:user",
         "//loaner/web_app/backend/models:tag_model",
+        "@endpoints_archive//:endpoints",
+    ],
+)
+
+loaner_appengine_library(
+    name = "template_api",
+    srcs = [
+        "template_api.py",
+    ],
+    deps = [
+        ":auth",
+        ":permissions",
+        ":root_api",
+        "//loaner/web_app/backend/api/messages:template_messages",
+        "//loaner/web_app/backend/lib:api_utils",
+        "//loaner/web_app/backend/models:template_model",
         "@endpoints_archive//:endpoints",
     ],
 )
@@ -342,6 +361,7 @@ loaner_appengine_test(
         "//loaner/web_app/backend/api/messages:device_messages",
         "//loaner/web_app/backend/api/messages:shared_messages",
         "//loaner/web_app/backend/api/messages:shelf_messages",
+        "//loaner/web_app/backend/clients:bigquery",
         "//loaner/web_app/backend/clients:directory",
         "//loaner/web_app/backend/lib:api_utils",
         "//loaner/web_app/backend/lib:search_utils",
@@ -432,6 +452,20 @@ loaner_appengine_test(
         "//loaner/web_app/backend/models:tag_model",
         "//loaner/web_app/backend/testing:loanertest",
         "@endpoints_archive//:endpoints",
+        "@mock_archive//:mock",
+    ],
+)
+
+loaner_appengine_test(
+    name = "template_api_test",
+    srcs = [
+        "template_api_test.py",
+    ],
+    deps = [
+        ":template_api",
+        "//loaner/web_app/backend/models:template_model",
+        "//loaner/web_app/backend/testing:loanertest",
+        "@absl_archive//absl/testing:parameterized",
         "@mock_archive//:mock",
     ],
 )

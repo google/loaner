@@ -511,10 +511,10 @@ http_archive(
 http_archive(
     name = "six_archive",
     build_file = "//third_party:six.BUILD",
-    sha256 = "70e8a77beed4562e7f14fe23a786b54f6296e34344c23bc42f07b15018ff98e9",
-    strip_prefix = "six-1.11.0",
+    sha256 = "236bdbdce46e6e6a3d61a337c0f8b763ca1e8717c03b369e87a7ec7ce1319c0a",
+    strip_prefix = "six-1.14.0",
     urls = [
-        "https://pypi.python.org/packages/16/d8/bc6316cf98419719bd59c91742194c111b6f2e85abac88e496adefaf7afe/six-1.11.0.tar.gz",
+        "https://files.pythonhosted.org/packages/21/9f/b251f7f8a76dec1d6651be194dfba8fb8d7781d10ab3987190de8391d08e/six-1.14.0.tar.gz",
     ],
 )
 

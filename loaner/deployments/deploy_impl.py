@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Lint as: python2, python3
 """The Grab n Go App Management Script.
 
 usage: deploy_impl.py [FLAGS] [APPLICATION] [DEPLOYMENT]
@@ -49,6 +50,7 @@ from absl import app
 from absl import flags
 from absl import logging
 
+import six
 from six.moves import input
 
 
@@ -108,6 +110,36 @@ class ManifestError(Error):
     super(ManifestError, self).__init__()
 
 
+def _EnsureStr(s, encoding='utf-8', errors='strict'):
+  """Coerce *s* to `str`.
+
+  Args:
+    s: string or bytes
+    encoding: string encoding
+    errors: raise errors
+
+  Returns:
+    PY3 and PY3 str type
+
+  For Python 2:
+    - `unicode` -> encoded to `str`
+    - `str` -> `str`
+  For Python 3:
+    - `str` -> `str`
+    - `bytes` -> decoded to `str`
+  # Needs to be removed once six version is uograded to 1.12.0 or above
+  # And replace with `six.ensure_str`
+
+  """
+  if not isinstance(s, (six.text_type, six.binary_type)):
+    raise TypeError("not expecting type '%s'" % type(s))
+  if six.PY2 and isinstance(s, six.text_type):
+    s = s.encode(encoding, errors)
+  elif six.PY3 and isinstance(s, six.binary_type):
+    s = s.decode(encoding, errors)
+  return s
+
+
 def _ParseAppServers(app_servers):
   """Parse the app servers for name and project id.
 
@@ -119,7 +151,7 @@ def _ParseAppServers(app_servers):
     A dictionary with the friendly name as the key and the Google Cloud Project
         ID as the value.
   """
-  return dict(server.split('=', 1) for server in app_servers)
+  return dict(_EnsureStr(server).split('=', 1) for server in app_servers)
 
 
 def _AppServerValidator(app_servers):
@@ -258,7 +290,7 @@ class AppEngineServerConfig(LoanerConfig):
     self._web_app_dir = web_app_dir
     self._yaml_files = yaml_files
     self._app_servers = _ParseAppServers(app_servers)
-    if self._deployment_type not in self._app_servers.keys():
+    if self._deployment_type not in list(self._app_servers.keys()):
       raise app.UsageError(
           'Application name provided is not in the list of App Servers.\n'
           'Please check the name and/or the deploy.sh configuration.')
@@ -503,10 +535,8 @@ def main(argv):
   # No arguments passed, show usage statement.
   if len(argv) < 1:
     app.usage(shorthelp=True, exitcode=1)
-
   # Application to deploy: web or chrome.
   application = argv[0]
-
   # Server to deploy to: local, dev, or prod.
   try:
     deployment_type = argv[1]

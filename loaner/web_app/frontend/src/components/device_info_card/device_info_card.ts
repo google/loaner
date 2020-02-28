@@ -165,6 +165,7 @@ export class DeviceInfoCard implements OnInit {
             () => {
               this.extendService.finished(newReturnDate);
               device.dueDate = newReturnDate;
+              device.overdue = false;
             },
             () => {
               this.extendService.close();
@@ -194,6 +195,7 @@ export class DeviceInfoCard implements OnInit {
             device.pendingReturn = true;
             this.loanedDevices =
                 this.loanedDevices.filter(device => !device.pendingReturn);
+            this.getDevices();
           }
         });
   }

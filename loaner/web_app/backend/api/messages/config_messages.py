@@ -46,7 +46,7 @@ class ConfigResponse(messages.Message):
     name: str, The name of the name being returned..
     string_value: str, The string value of the name.
     integer_value: int, The integer value of the name.
-    boolean_value: bool, The boolean value of the seting.
+    boolean_value: bool, The boolean value of the setting.
     list_value: list, The list value of the name.
   """
   name = messages.StringField(1)
@@ -74,7 +74,7 @@ class UpdateConfig(messages.Message):
     config_type: ConfigType, The type of config for which to request.
     string_value: str, The string value of the name being updated.
     integer_value: int, The integer value of the name being updated.
-    boolean_value: bool, The boolean value of the seting being updated.
+    boolean_value: bool, The boolean value of the setting being updated.
     list_value: list, The list value of the name being updated.
   """
   name = messages.StringField(1, required=True)

@@ -14,7 +14,7 @@
 
 const webpack = require('webpack');
 const webpackMerge = require('webpack-merge');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const TerserPlugin = require('terser-webpack-plugin');
 const commonConfig = require('./webpack.common.js');
 const helpers = require('./helpers');
 
@@ -31,18 +31,12 @@ module.exports = webpackMerge(commonConfig, {
 
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.UglifyJsPlugin({
-      comments: false
-    }),
-    new webpack.DefinePlugin({
-      'process.env': {
-        'ENV': JSON.stringify(ENV)
-      }
-    }),
+    new TerserPlugin(),
+    new webpack.DefinePlugin({'process.env': {'ENV': JSON.stringify(ENV)}}),
     new webpack.LoaderOptionsPlugin({
       htmlLoader: {
-        minimize: false // workaround for ng2
+        minimize: false  // workaround for ng2
       }
-    })
+    }),
   ]
 });

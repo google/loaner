@@ -33,11 +33,15 @@ module.exports = {
         test: /\.ts$/,
         loader: '@ngtools/webpack',
       },
-      {test: /\.html$/, loader: 'html-loader'}, {
+      {test: /\.html$/, loader: 'html-loader'},
+      {
         test: /\.(png|jpe?g|gif|woff|svg|woff2|ttf|eot|ico)$/,
-        loader: 'file-loader?name=assets/[name].[hash].[ext]'
+        loader: 'file-loader?name=assets/[name].[hash].[ext]',
+        options: {
+          esModule: false,  // Prevents [object Module] output in IMG SRC.
+        },
       },
-      {test: /\.scss$/, use: ['raw-loader', 'sass-loader']}
+      {test: /\.scss$/, use: ['raw-loader', 'sass-loader']},
     ]
   },
   plugins: [

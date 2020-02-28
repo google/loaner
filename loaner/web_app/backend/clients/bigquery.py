@@ -41,10 +41,12 @@ NDB_TO_BIGQUERY_TYPE = {
     'GeoPtProperty': 'STRING',
 }
 
-SQL_QUERY = (""" SELECT *
-           FROM [loaner.Device]
-           WHERE entity.serial_number = "{}"
-           LIMIT 100 """)
+DEVICE_QUERY = (""" SELECT *
+           FROM {dataset}.{table}
+           WHERE entity.serial_number = "{serial}"
+           LIMIT 20 """).format(dataset=constants.BIGQUERY_DATASET_NAME,
+                                table=constants.BIGQUERY_DEVICE_TABLE,
+                                serial='{}')  # Serial will be added later.
 
 
 class Error(Exception):
@@ -170,7 +172,7 @@ class BigQueryClient(object):
     Returns:
       List of tuples with historical data.
     """
-    query_job = self._client.query(SQL_QUERY.format(serial))
+    query_job = self._client.query(DEVICE_QUERY.format(serial))
     return [row for row in query_job]
 
 

@@ -40,7 +40,6 @@ class CoreEventTest(loanertest.TestCase):
 
   def test_core_event(self):
     self.assertEqual(event_models.CoreEvent.get('foo'), None)
-
     test_event = event_models.CoreEvent.create(
         'test_core_event', 'Happens when a thing has occurred.')
     test_event.actions = ['do_thing1', 'do_thing2', 'do_thing3']
@@ -241,11 +240,13 @@ class ReminderEventTest(loanertest.TestCase):
 
   def test_get_and_put(self):
     self.assertEqual(event_models.ReminderEvent.get(0), None)
-    test_event = event_models.ReminderEvent.create(0)
+    test_event = event_models.ReminderEvent.create(
+        0, 'test_fleet')
 
     self.assertEqual(test_event.level, 0)  # Tests @property taken from ID.
     self.assertEqual(test_event.model, 'Device')
     self.assertEqual(test_event.name, 'reminder_level_0')
+    self.assertEqual(test_event.associated_fleet.id(), 'test_fleet')
     self.assertEqual(
         event_models.ReminderEvent.make_name(0), 'reminder_level_0')
 
@@ -263,6 +264,15 @@ class ReminderEventTest(loanertest.TestCase):
     test_event.put()
 
     self.assertEqual(test_event, event_models.ReminderEvent.get(0))
+
+  def test_create_default_fleet(self):
+    self.assertEqual(event_models.ReminderEvent.get(0), None)
+    test_event = event_models.ReminderEvent.create(0)
+
+    self.assertEqual(test_event.level, 0)  # Tests @property taken from ID.
+    self.assertEqual(test_event.model, 'Device')
+    self.assertEqual(test_event.name, 'reminder_level_0')
+    self.assertEqual(test_event.associated_fleet.id(), 'default')
 
   def test_create_existing(self):
     existing_event = event_models.ReminderEvent.create(0)

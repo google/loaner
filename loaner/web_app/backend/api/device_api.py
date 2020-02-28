@@ -22,13 +22,12 @@ from protorpc import message_types
 
 from google.appengine.api import datastore_errors
 
-import endpoints
-
 from loaner.web_app.backend.api import auth
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.api import root_api
 from loaner.web_app.backend.api import shelf_api
 from loaner.web_app.backend.api.messages import device_messages
+from loaner.web_app.backend.clients import bigquery
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import api_utils
 from loaner.web_app.backend.lib import search_utils
@@ -36,10 +35,12 @@ from loaner.web_app.backend.lib import user as user_lib
 from loaner.web_app.backend.models import config_model
 from loaner.web_app.backend.models import device_model
 from loaner.web_app.backend.models import user_model
+import endpoints
 
+# pylint:disable=g-import-not-at-top,g-bad-import-order,reimported
+from loaner.web_app import constants
 
-_NO_DEVICE_MSG = (
-    'Device could not be found using device_identifier "%s".')
+_NO_DEVICE_MSG = ('Device could not be found using device_identifier "%s".')
 _NO_IDENTIFIERS_MSG = 'No identifier supplied to find device.'
 _BAD_URLKEY_MSG = 'No device found because the URL-safe key was invalid: %s'
 _LIST_DEVICES_USER_MISMATCH_MSG = (
@@ -68,9 +69,8 @@ class DeviceApi(root_api.Service):
           asset_tag=request.asset_tag,
           serial_number=request.serial_number,
           user_email=user_email)
-    except (
-        datastore_errors.BadValueError,
-        device_model.DeviceCreationError) as error:
+    except (datastore_errors.BadValueError,
+            device_model.DeviceCreationError) as error:
       raise endpoints.BadRequestException(str(error))
     return message_types.VoidMessage()
 
@@ -106,9 +106,8 @@ class DeviceApi(root_api.Service):
     user_email = user_lib.get_user_email()
     try:
       device.unlock(user_email)
-    except (
-        directory.DirectoryRPCError,
-        device_model.UnableToMoveToDefaultOUError) as error:
+    except (directory.DirectoryRPCError,
+            device_model.UnableToMoveToDefaultOUError) as error:
       raise endpoints.BadRequestException(str(error))
     return message_types.VoidMessage()
 
@@ -125,10 +124,9 @@ class DeviceApi(root_api.Service):
     device = _get_device(request)
     try:
       device.device_audit_check()
-    except (
-        device_model.DeviceNotEnrolledError,
-        device_model.UnableToMoveToShelfError,
-        device_model.DeviceAuditEventError) as err:
+    except (device_model.DeviceNotEnrolledError,
+            device_model.UnableToMoveToShelfError,
+            device_model.DeviceAuditEventError) as err:
       raise endpoints.BadRequestException(str(err))
     return message_types.VoidMessage()
 
@@ -142,8 +140,8 @@ class DeviceApi(root_api.Service):
     """Gets a device using any identifier in device_messages.DeviceRequest."""
     device = _get_device(request)
     if not device.enrolled:
-      raise endpoints.BadRequestException(
-          device_model.DEVICE_NOT_ENROLLED_MSG % device.identifier)
+      raise endpoints.BadRequestException(device_model.DEVICE_NOT_ENROLLED_MSG %
+                                          device.identifier)
     user_email = user_lib.get_user_email()
     datastore_user = user_model.User.get_user(user_email)
     if (permissions.Permissions.READ_DEVICES not in
@@ -156,8 +154,7 @@ class DeviceApi(root_api.Service):
     directory_client = directory.DirectoryApiClient(user_email)
     try:
       given_name = directory_client.given_name(user_email)
-    except (
-        directory.DirectoryRPCError, directory.GivenNameDoesNotExistError):
+    except (directory.DirectoryRPCError, directory.GivenNameDoesNotExistError):
       given_name = None
     message = api_utils.build_device_message_from_model(
         device, config_model.Config.get('allow_guest_mode'))
@@ -191,8 +188,10 @@ class DeviceApi(root_api.Service):
     cursor = search_utils.get_search_cursor(request.page_token)
 
     search_results = device_model.Device.search(
-        query_string=query, query_limit=request.page_size,
-        cursor=cursor, sort_options=sort_options,
+        query_string=query,
+        query_limit=request.page_size,
+        cursor=cursor,
+        sort_options=sort_options,
         returned_fields=returned_fields)
     new_search_cursor = None
     if search_results.cursor:
@@ -203,6 +202,8 @@ class DeviceApi(root_api.Service):
       message = search_utils.document_to_message(
           document, device_messages.Device())
       message.guest_permitted = guest_permitted
+      if message.current_ou == constants.ORG_UNIT_DICT['GUEST']:
+        message.guest_enabled = True
       messages.append(message)
 
     return device_messages.ListDevicesResponse(
@@ -242,10 +243,9 @@ class DeviceApi(root_api.Service):
       device.enable_guest_mode(user_email)
     except device_model.EnableGuestError as err:
       raise endpoints.InternalServerErrorException(str(err))
-    except (
-        device_model.UnassignedDeviceError,
-        device_model.GuestNotAllowedError,
-        device_model.UnauthorizedError) as err:
+    except (device_model.UnassignedDeviceError,
+            device_model.GuestNotAllowedError,
+            device_model.UnauthorizedError) as err:
       raise endpoints.UnauthorizedException(str(err))
     else:
       return message_types.VoidMessage()
@@ -263,14 +263,12 @@ class DeviceApi(root_api.Service):
     user_email = user_lib.get_user_email()
     try:
       device.loan_extend(
-          extend_date_time=request.extend_date,
-          user_email=user_email)
+          extend_date_time=request.extend_date, user_email=user_email)
       return message_types.VoidMessage()
     except device_model.ExtendError as err:
       raise endpoints.BadRequestException(str(err))
-    except (
-        device_model.UnassignedDeviceError,
-        device_model.UnauthorizedError)as err:
+    except (device_model.UnassignedDeviceError,
+            device_model.UnauthorizedError) as err:
       raise endpoints.UnauthorizedException(str(err))
 
   @auth.method(
@@ -286,8 +284,7 @@ class DeviceApi(root_api.Service):
     user_email = user_lib.get_user_email()
     try:
       device.mark_damaged(
-          user_email=user_email,
-          damaged_reason=request.damaged_reason)
+          user_email=user_email, damaged_reason=request.damaged_reason)
     except device_model.UnauthorizedError as err:
       raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
@@ -338,9 +335,8 @@ class DeviceApi(root_api.Service):
     user_email = user_lib.get_user_email()
     try:
       device.mark_pending_return(user_email=user_email)
-    except (
-        device_model.UnassignedDeviceError,
-        device_model.UnauthorizedError) as err:
+    except (device_model.UnassignedDeviceError,
+            device_model.UnauthorizedError) as err:
       raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
@@ -378,6 +374,33 @@ class DeviceApi(root_api.Service):
       raise endpoints.UnauthorizedException(str(err))
     return message_types.VoidMessage()
 
+  @auth.method(
+      device_messages.HistoryRequest,
+      device_messages.HistoryResponse,
+      name='history',
+      path='history',
+      http_method='POST',
+      permission=permissions.Permissions.READ_DEVICES)
+  def get_history(self, request):
+    """Gets historical data for a given device."""
+    self.check_xsrf_token(self.request_state)
+    client = bigquery.BigQueryClient()
+    device = _get_device(request.device)
+    serial = device.serial_number
+    info = client.get_device_info(serial)
+    if not info:
+      raise endpoints.NotFoundException(
+          'No history for the requested serial number.')
+    historical_device = device_messages.Device()
+    response = device_messages.HistoryResponse()
+    historical_device.asset_tag = info[0][5]['asset_tag']
+    for row in info:
+      response.devices.append(historical_device)
+      response.timestamp.append(row[1])
+      response.actor.append(row[2])
+      response.summary.append(row[4])
+    return response
+
 
 def _get_identifier_from_request(device_request):
   """Parses the DeviceMessage for an identifier to use to get a Device entity.
@@ -395,7 +418,8 @@ def _get_identifier_from_request(device_request):
     return 'urlkey'
 
   for device_identifier in [
-      'asset_tag', 'chrome_device_id', 'serial_number', 'identifier']:
+      'asset_tag', 'chrome_device_id', 'serial_number', 'identifier'
+  ]:
     if getattr(device_request, device_identifier, None):
       return device_identifier
   raise endpoints.BadRequestException(_NO_IDENTIFIERS_MSG)

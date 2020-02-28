@@ -21,7 +21,9 @@ import {of} from 'rxjs';
 import {ConfigService} from '../../services/config';
 import {RoleService} from '../../services/role';
 import {SearchService} from '../../services/search';
+import {TemplateService} from '../../services/template';
 import {ConfigServiceMock, RoleServiceMock, SearchServiceMock} from '../../testing/mocks';
+import {TemplateServiceMock} from '../../testing/mocks';
 
 import {Configuration, ConfigurationModule} from './index';
 
@@ -42,6 +44,7 @@ describe('ConfigurationComponent', () => {
             {provide: ConfigService, useClass: ConfigServiceMock},
             {provide: SearchService, useClass: SearchServiceMock},
             {provide: RoleService, useClass: RoleServiceMock},
+            {provide: TemplateService, useClass: TemplateServiceMock},
           ],
         })
         .compileComponents();

@@ -1,0 +1,7 @@
+@import '../../scss_mixins/configuration-shared';
+
+.control-right {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+}

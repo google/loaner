@@ -31,6 +31,7 @@ py_binary(
     srcs_version = "PY2AND3",
     deps = [
         ":deploy_impl_lib",
+        "@six_archive//:six",
     ],
 )
 
