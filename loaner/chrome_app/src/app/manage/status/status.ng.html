@@ -10,7 +10,8 @@
 
   <loaner-loan-actions-card tabindex="0"
                             [additionalManagementText]="additionalText"
-                            [device]="device">
+                            [device]="device"
+                            [showImage]="false">
     <loan-button extendButton (done)="onExtended($event)"></loan-button>
     <loan-button guestButton (done)="onGuestModeEnabled()"></loan-button>
     <loan-button returnButton (done)="onReturned()"></loan-button>

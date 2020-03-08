@@ -61,6 +61,7 @@ export class LoanActionsCardComponent implements DoCheck, OnInit {
   @Input() device!: Device;
   @ContentChild(ExtendButton, {static: true}) extendButton!: ExtendButton;
   @ContentChild(GuestButton, {static: true}) guestButton!: GuestButton;
+  @Input() showImage = true;  // Shows plant health icons.
 
   ngOnInit() {
     if (!this.device) {

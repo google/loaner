@@ -9,7 +9,8 @@
       <ng-container *ngIf="!device.pendingReturn">
         <ng-container *ngIf="device.isLoanHealthy">
           <img alt="Icon representing the device's loan status as healthy"
-               src="../../../assets/healthy.svg" class="device-status">
+               src="../../../assets/healthy.svg" class="device-status"
+               *ngIf="showImage">
           <div class="mat-title">
             Your loaner is due on {{ device.dueDate | date: 'fullDate' }}
           </div>
@@ -20,7 +21,8 @@
 
         <ng-container *ngIf="device.overdue">
           <img alt="Icon representing the device's loan status as overdue"
-               src="../../../assets/overdue.svg" class="device-status">
+               src="../../../assets/overdue.svg" class="device-status"
+               *ngIf="showImage">
           <div class="mat-overdue">
             Your loaner was due on {{ device.dueDate | date: 'fullDate' }}
           </div>
@@ -31,7 +33,8 @@
 
         <ng-container *ngIf="device.isAlmostOverdue">
           <img alt="Icon representing the device's loan status as almost overdue"
-               src="../../../assets/almost_overdue.svg" class="device-status">
+               src="../../../assets/almost_overdue.svg" class="device-status"
+               *ngIf="showImage">
           <div class="mat-overdue">
             Your loaner is almost overdue {{ device.dueDate | date: 'fullDate' }}
           </div>
