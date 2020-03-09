@@ -20,8 +20,8 @@ from __future__ import print_function
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
-from loaner.web_app import constants
 from loaner.web_app.backend.lib import utils
+
 
 _CONFIG_NOT_FOUND_MSG = 'No such name "%s" exists in default configurations.'
 
@@ -38,27 +38,18 @@ class Config(ndb.Model):
     integer_value: int, value for a given config name.
     bool_value: bool, value for a given config name.
     list_value: list, value for a given config name.
-    associated_fleet: ndb|Key|, name of the Fleet used to associate this config
-      to fleets automatically.
-    is_global: bool, value to tell if a config value is global.
   """
   string_value = ndb.StringProperty()
   integer_value = ndb.IntegerProperty()
   bool_value = ndb.BooleanProperty()
   list_value = ndb.StringProperty(repeated=True)
-  associated_fleet = ndb.KeyProperty(
-      kind='Fleet',
-      default=ndb.Key('Fleet', 'default'))
-  is_global = ndb.BooleanProperty()
 
   @classmethod
-  def get(cls, name, associated_fleet=''):
+  def get(cls, name):
     """Checks memcache for name, if not available, check datastore.
 
     Args:
       name: str, name of config name.
-      associated_fleet: str, name of the Fleet used to associate this
-        config to fleets automatically.
 
     Returns:
       The config value from memcache, datastore, or config file.
@@ -66,16 +57,12 @@ class Config(ndb.Model):
     Raises:
       KeyError: An error occurred when name does not exist.
     """
-    conf_id = name
-    if associated_fleet:
-      conf_id = constants.FLEET_CONFIG_NAME_ID.format(name, associated_fleet)
-    is_global = True if associated_fleet is None else False
-    memcache_config = memcache.get(conf_id)
+    memcache_config = memcache.get(name)
     cached_config = None
     if memcache_config:
       return memcache_config
 
-    stored_config = cls.get_by_id(conf_id, use_memcache=False)
+    stored_config = cls.get_by_id(name, use_memcache=False)
     if stored_config:
       if stored_config.string_value:
         cached_config = stored_config.string_value
@@ -87,63 +74,55 @@ class Config(ndb.Model):
         cached_config = stored_config.list_value
     # Conversion from use_asset_tags to device_identifier_mode.
     if name == 'device_identifier_mode' and not cached_config:
-      if cls.get('use_asset_tags', associated_fleet):
+      if cls.get('use_asset_tags'):
         cached_config = DeviceIdentifierMode.BOTH_REQUIRED
-        cls.set(name, cached_config, associated_fleet, is_global)
-        memcache.set(conf_id, cached_config)
+        cls.set(name, cached_config)
+        memcache.set(name, cached_config)
     if cached_config is not None:
-      memcache.set(conf_id, cached_config)
+      memcache.set(name, cached_config)
       return cached_config
     config_defaults = utils.load_config_from_yaml()
     if name in config_defaults:
       value = config_defaults[name]
-      cls.set(name, value, associated_fleet, is_global)
+      cls.set(name, value)
       return value
 
     raise KeyError(_CONFIG_NOT_FOUND_MSG, name)
 
   @classmethod
-  def set(cls, name, value, associated_fleet='', is_global=False,
-          validate=True):
+  def set(cls, name, value, validate=True):
     """Stores values for a config name in memcache and datastore.
 
     Args:
       name: str, name of the config setting.
       value: str, int, bool, list value to set or change config setting.
-      associated_fleet: str, name of the Fleet used to associate this
-        config to fleets automatically.
-      is_global: bool, determines whether this is a global config or not.
       validate: bool, checks keys against config_defaults if enabled.
-
     Raises:
       KeyError: Error raised when name does not exist in config.py file.
     """
-    conf_id = name
-    if associated_fleet:
-      conf_id = constants.FLEET_CONFIG_NAME_ID.format(name, associated_fleet)
     if validate:
       config_defaults = utils.load_config_from_yaml()
       if name not in config_defaults:
         raise KeyError(_CONFIG_NOT_FOUND_MSG % name)
 
     if isinstance(value, basestring):
-      stored_config = cls.get_or_insert(conf_id)
+      stored_config = cls.get_or_insert(name)
       stored_config.string_value = value
+      stored_config.put()
     if isinstance(value, bool) and isinstance(value, int):
-      stored_config = cls.get_or_insert(conf_id)
+      stored_config = cls.get_or_insert(name)
       stored_config.bool_value = value
+      stored_config.put()
     if isinstance(value, int) and not isinstance(value, bool):
-      stored_config = cls.get_or_insert(conf_id)
+      stored_config = cls.get_or_insert(name)
       stored_config.integer_value = value
+      stored_config.put()
     if isinstance(value, list):
-      stored_config = cls.get_or_insert(conf_id)
+      stored_config = cls.get_or_insert(name)
       stored_config.list_value = value
-    if associated_fleet:
-      stored_config.associated_fleet = ndb.Key('Fleet', associated_fleet)
-    stored_config.is_global = is_global
-    stored_config.put()
+      stored_config.put()
 
-    memcache.set(conf_id, value)
+    memcache.set(name, value)
 
 
 class DeviceIdentifierMode(object):

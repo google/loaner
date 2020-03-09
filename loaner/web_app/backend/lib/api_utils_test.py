@@ -172,8 +172,7 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
     test_role = user_model.Role(
         key=ndb.Key(user_model.Role, 'test_role'),
         permissions=['get', 'put'],
-        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL,
-        associated_fleet=ndb.Key('Fleet', 'default')).put().get()
+        associated_group=loanertest.TECHNICAL_ADMIN_EMAIL).put().get()
 
     expected_message = user_messages.Role(
         name='test_role',
@@ -181,10 +180,8 @@ class ApiUtilsTest(parameterized.TestCase, loanertest.TestCase):
         associated_group=loanertest.TECHNICAL_ADMIN_EMAIL)
 
     actual_message = api_utils.build_role_message_from_model(test_role)
-    self.assertEqual(actual_message.name, expected_message.name)
-    self.assertEqual(actual_message.permissions, expected_message.permissions)
-    self.assertEqual(actual_message.associated_group,
-                     expected_message.associated_group)
+
+    self.assertEqual(actual_message, expected_message)
 
   @parameterized.named_parameters(
       {'testcase_name': 'with_lat_long', 'message': shelf_messages.Shelf(

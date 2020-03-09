@@ -33,7 +33,6 @@ from google.appengine.ext import ndb
 from absl.testing import absltest
 from loaner.web_app import constants
 from loaner.web_app.backend.models import config_model
-from loaner.web_app.backend.models import fleet_model
 from loaner.web_app.backend.testing import loanertest
 
 _config_defaults_yaml = """
@@ -41,9 +40,7 @@ test_config: 'test_value'
 use_asset_tags: True
 string_config: 'config value 1'
 integer_config: 1
-associated_fleet: 'test_fleet'
-is_global: False
-bool_config: True
+bool_config: True,
 list_config: ['email1', 'email2']
 device_identifier_mode: 'serial_number'
 """
@@ -59,15 +56,10 @@ def _create_config_parameters():
   integer_config_value = 1
   bool_config_value = True
   list_config_value = ['email1', 'email2']
-  associated_fleet_value = 'test_fleet'
-  is_global_value = False
-  config_ids = [
-      'string_config', 'integer_config', 'bool_config', 'list_config',
-      'associated_fleet', 'is_global'
-  ]
+  config_ids = ['string_config', 'integer_config', 'bool_config', 'list_config']
   config_values = [
       string_config_value, integer_config_value, bool_config_value,
-      list_config_value, associated_fleet_value, is_global_value
+      list_config_value
   ]
   for i in itertools.izip(config_ids, config_values):
     yield [i]
@@ -86,27 +78,14 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
     self.stubs = mox3_stubout.StubOutForTesting()
     self.stubs.SmartSet(__builtin__, 'open', self.open)
     self.stubs.SmartSet(os, 'path', self.os.path)
-    test_fleet_key = ndb.Key(fleet_model.Fleet, 'test_fleet')
+
     config_file = constants.CONFIG_DEFAULTS_PATH
     self.fs.CreateFile(config_file, contents=_config_defaults_yaml)
-    config_model.Config(
-        id='string_config',
-        string_value='config value 1',
-        associated_fleet=test_fleet_key,
-        is_global=False).put()
-    config_model.Config(
-        id='integer_config', integer_value=1,
-        associated_fleet=test_fleet_key,
-        is_global=False).put()
-    config_model.Config(
-        id='bool_config', bool_value=True,
-        associated_fleet=test_fleet_key,
-        is_global=False).put()
-    config_model.Config(
-        id='list_config',
-        list_value=['email1', 'email2'],
-        associated_fleet=test_fleet_key,
-        is_global=False).put()
+
+    config_model.Config(id='string_config', string_value='config value 1').put()
+    config_model.Config(id='integer_config', integer_value=1).put()
+    config_model.Config(id='bool_config', bool_value=True).put()
+    config_model.Config(id='list_config', list_value=['email1', 'email2']).put()
 
   def tearDown(self):
     super(ConfigurationTest, self).tearDown()
@@ -116,18 +95,15 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
 
   @parameterized.parameters(_create_config_parameters())
   def test_get_from_datastore(self, test_config):
-    test_fleet_key = 'test_fleet'
-    config = config_model.Config.get(test_config[0], test_fleet_key)
+    config = config_model.Config.get(test_config[0])
     self.assertEqual(config, test_config[1])
 
   def test_get_from_memcache(self):
     config = 'string_config'
     config_value = 'this should be read.'
-    fleet_key = 'test_fleet'
-    memcache.set(
-        constants.FLEET_CONFIG_NAME_ID.format(config, fleet_key), config_value)
+    memcache.set(config, config_value)
     reference_datastore_config = config_model.Config.get_by_id(config)
-    config_memcache = config_model.Config.get(config, fleet_key)
+    config_memcache = config_model.Config.get(config)
 
     self.assertEqual(config_memcache, config_value)
     self.assertEqual(reference_datastore_config.string_value, 'config value 1')
@@ -139,22 +115,18 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
       self, mock_get_by_id, mock_memcache_get, mock_config_model_set):
     config = 'test_config'
     expected_value = 'test_value'
-    expected_fleet = 'default'
-    config_datastore = config_model.Config.get(config, expected_fleet)
-    mock_config_model_set.assert_called_once_with(config, expected_value,
-                                                  expected_fleet, False)
+    config_datastore = config_model.Config.get(config)
+    mock_config_model_set.assert_called_once_with(config, expected_value)
     self.assertEqual(config_datastore, expected_value)
 
   def test_get_identifier_with_use_asset(self):
-    config_model.Config.set('use_asset_tags', True, 'default')
-    config_datastore = config_model.Config.get('device_identifier_mode',
-                                               'default')
+    config_model.Config.set('use_asset_tags', True)
+    config_datastore = config_model.Config.get('device_identifier_mode')
     self.assertEqual(config_datastore,
                      config_model.DeviceIdentifierMode.BOTH_REQUIRED)
 
   def test_get_identifier_without_use_asset(self):
-    config_datastore = config_model.Config.get('device_identifier_mode',
-                                               'default')
+    config_datastore = config_model.Config.get('device_identifier_mode')
     self.assertEqual(config_datastore, 'both_required')
 
   def test_get_nonexistent(self):
@@ -163,15 +135,11 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
 
   @parameterized.parameters(_create_config_parameters())
   def test_set(self, test_config):
-    default_fleet_key = 'default'
-    config_model.Config.set(test_config[0], test_config[1], default_fleet_key)
-    memcache_config = constants.FLEET_CONFIG_NAME_ID.format(
-        test_config[0], default_fleet_key)
-    config = config_model.Config.get(test_config[0], default_fleet_key)
+    config_model.Config.set(test_config[0], test_config[1])
+    memcache_config = memcache.get(test_config[0])
+    config = config_model.Config.get(test_config[0])
 
-    self.assertEqual(
-        memcache_config,
-        constants.FLEET_CONFIG_NAME_ID.format(test_config[0], 'default'))
+    self.assertEqual(memcache_config, test_config[1])
     self.assertEqual(config, test_config[1])
 
   def test_set_nonexistent(self):
@@ -182,37 +150,9 @@ class ConfigurationTest(parameterized.TestCase, loanertest.TestCase):
   def test_set_no_validation(self):
     fake_key = 'fake_int'
     fake_value = 23
-    default_key = 'default'
-    config_model.Config.set(fake_key, fake_value, default_key, validate=False)
-    result = config_model.Config.get(fake_key, default_key)
+    config_model.Config.set(fake_key, fake_value, False)
+    result = config_model.Config.get(fake_key)
     self.assertEqual(result, fake_value)
-
-  def test_set_with_fleet(self):
-    test_fleet_key = 'test_fleet'
-    test_config_name = 'new_config'
-    old_config_name = 'string_config'
-    configs = config_model.Config.query().fetch()
-    self.assertLen(configs, 4)
-    config_model.Config.set(
-        test_config_name, 'test', test_fleet_key, validate=False)
-    config_model.Config.set(
-        old_config_name, 'test_old', is_global=True, validate=False)
-    memcache_config = constants.FLEET_CONFIG_NAME_ID.format(
-        test_config_name, test_fleet_key)
-    config = config_model.Config.get_by_id(
-        constants.FLEET_CONFIG_NAME_ID.format(test_config_name,
-                                              test_fleet_key))
-    old_config = config_model.Config.get_by_id(old_config_name)
-
-    self.assertEqual(
-        memcache_config,
-        constants.FLEET_CONFIG_NAME_ID.format(test_config_name, 'test_fleet'))
-    self.assertEqual(config.associated_fleet.id(), 'test_fleet')
-    configs = config_model.Config.query().fetch()
-    self.assertLen(configs, 5)
-    self.assertEqual(config.string_value, 'test')
-    self.assertEqual(old_config.string_value, 'test_old')
-    self.assertEqual(old_config.is_global, True)
 
 
 if __name__ == '__main__':

@@ -29,8 +29,6 @@ from google.appengine.api import datastore_errors
 from google.appengine.api import search
 from google.appengine.ext import deferred
 
-from google.appengine.ext import ndb
-
 from loaner.web_app import constants
 from loaner.web_app.backend.clients import directory
 from loaner.web_app.backend.lib import events
@@ -47,11 +45,9 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
   def setUp(self):
     super(DeviceModelTest, self).setUp()
-    self.default_key = ndb.Key('Fleet', 'default')
     config_model.Config.set(
         'device_identifier_mode',
-        config_model.DeviceIdentifierMode.SERIAL_NUMBER,
-        self.default_key.id())
+        config_model.DeviceIdentifierMode.SERIAL_NUMBER)
     self.shelf = shelf_model.Shelf.enroll(
         user_email=loanertest.USER_EMAIL, location='MTV', capacity=10,
         friendly_name='MTV office')
@@ -104,8 +100,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     # Provide serial number when asset tag required.
     config_model.Config.set(
         'device_identifier_mode',
-        config_model.DeviceIdentifierMode.ASSET_TAG,
-        self.default_key.id())
+        config_model.DeviceIdentifierMode.ASSET_TAG)
     with self.assertRaisesWithLiteralMatch(
         datastore_errors.BadValueError, device_model._ASSET_TAGS_REQUIRED_MSG):
       device_model.Device.enroll(
@@ -114,8 +109,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     # Provide insufficient data when both asset tag and serial number required.
     config_model.Config.set(
         'device_identifier_mode',
-        config_model.DeviceIdentifierMode.BOTH_REQUIRED,
-        self.default_key.id())
+        config_model.DeviceIdentifierMode.BOTH_REQUIRED)
     with self.assertRaisesWithLiteralMatch(
         datastore_errors.BadValueError,
         device_model._SERIAL_NUMBERS_REQUIRED_MSG):
@@ -126,8 +120,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
       device_model.Device.enroll(
           serial_number='test_serial', user_email=loanertest.USER_EMAIL)
 
-  def enroll_test_device(self, device_to_enroll,
-                         associated_fleet='default'):
+  def enroll_test_device(self, device_to_enroll):
     self.patcher_directory = mock.patch.object(
         directory, 'DirectoryApiClient', autospec=True)
     self.mock_directoryclass = self.patcher_directory.start()
@@ -138,18 +131,10 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     default_ou = constants.ORG_UNIT_DICT.get('DEFAULT')
     self.test_device = device_model.Device.enroll(
         user_email=loanertest.USER_EMAIL, serial_number='123456',
-        asset_tag='123ABC', associated_fleet=associated_fleet)
+        asset_tag='123ABC')
     if device_to_enroll.get('orgUnitPath') != default_ou:
       self.assertTrue(
           self.mock_directoryclient.move_chrome_device_org_unit.called)
-
-  def test_enroll_default_fleet(self):
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE1)
-    self.assertEqual(self.test_device.associated_fleet.id(), 'default')
-    self.enroll_test_device(
-        loanertest.TEST_DIR_DEVICE1,
-        associated_fleet='test_fleet')
-    self.assertEqual(self.test_device.associated_fleet.id(), 'test_fleet')
 
   def test_identifier(self):
     # Devices without an asset tag should return the serial number.
@@ -180,8 +165,8 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
   @mock.patch.object(logging, 'info')
   def test_enroll_new_device(self, mock_loginfo):
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE1, 'test_fleet')
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT, 'test_fleet')
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE1)
+    self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
 
     mock_loginfo.assert_called_with('Enrolling device %s', '123456')
     self.test_device.set_last_reminder(0)
@@ -199,7 +184,6 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.test_device.set_next_reminder(1, next_reminder_delta)
     self.assertTrue(self.test_device.next_reminder.time)
     self.assertEqual(self.test_device.next_reminder.level, 1)
-    self.assertEqual(self.test_device.associated_fleet.id(), 'test_fleet')
     self.testbed.mock_raiseevent.assert_any_call(
         'device_enroll', device=self.test_device)
 
@@ -264,7 +248,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
     config_model.Config.set(
         'device_identifier_mode',
-        config_model.DeviceIdentifierMode.ASSET_TAG, self.default_key.id())
+        config_model.DeviceIdentifierMode.ASSET_TAG)
     self.testbed.raise_event_patcher.stop()
     special_mock_raiseevent = mock.Mock(side_effect=special_side_effect)
     special_raise_event_patcher = mock.patch.object(
@@ -309,7 +293,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
 
     config_model.Config.set(
         'device_identifier_mode',
-        config_model.DeviceIdentifierMode.ASSET_TAG, self.default_key.id())
+        config_model.DeviceIdentifierMode.ASSET_TAG)
     self.testbed.raise_event_patcher.stop()
     special_mock_raiseevent = mock.Mock(side_effect=special_side_effect)
     special_raise_event_patcher = mock.patch.object(
@@ -443,7 +427,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.mock_directoryclient.reset_mock()
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError(err_message))
-    unenroll_ou = config_model.Config.get('unenroll_ou', self.default_key.id())
+    unenroll_ou = config_model.Config.get('unenroll_ou')
     with self.assertRaisesRegexp(
         device_model.FailedToUnenrollError,
         device_model._FAILED_TO_MOVE_DEVICE_MSG % (
@@ -484,7 +468,6 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
         device_id=u'unique_id', org_unit_path='/')
 
   def test_list_by_user(self):
-    self.enroll_test_device(loanertest.TEST_DIR_DEVICE1)
     self.device1.assigned_user = loanertest.SUPER_ADMIN_EMAIL
     self.device1.put()
     self.device2.assigned_user = loanertest.SUPER_ADMIN_EMAIL
@@ -493,17 +476,6 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.assertListEqual(
         [device.serial_number for device in devices],
         [self.device1.serial_number, self.device2.serial_number])
-
-  def test_list_by_user_with_pending_return(self):
-    self.device1.assigned_user = loanertest.SUPER_ADMIN_EMAIL
-    self.device1.put()
-    self.device2.assigned_user = loanertest.SUPER_ADMIN_EMAIL
-    self.device2.mark_pending_return_date = datetime.datetime.utcnow()
-    self.device2.put()
-    devices = device_model.Device.list_by_user(loanertest.SUPER_ADMIN_EMAIL)
-    self.assertListEqual(
-        [device.serial_number for device in devices],
-        [self.device1.serial_number])
 
   @mock.patch.object(directory, 'DirectoryApiClient', autospec=True)
   def test_create_unenrolled(self, mock_directoryclass):
@@ -662,17 +634,15 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   @mock.patch.object(device_model.Device, 'resume_loan', autospec=True)
   def test_loan_resumes_if_late(self, mock_resume_loan):
     """Tests loan resumption within and outside the post-return grace period."""
-    config_model.Config.set('return_grace_period', 15, self.default_key.id())
+    config_model.Config.set('return_grace_period', 15)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
 
     assign_time = datetime.datetime(year=2017, month=1, day=1)
     resume_time = datetime.datetime(year=2017, month=1, day=2)
     within_grace_period = datetime.timedelta(
-        minutes=config_model.Config.get('return_grace_period',
-                                        self.default_key.id()) - 1)
+        minutes=config_model.Config.get('return_grace_period') - 1)
     beyond_grace_period = datetime.timedelta(
-        minutes=config_model.Config.get('return_grace_period',
-                                        self.default_key.id()) + 1)
+        minutes=config_model.Config.get('return_grace_period') + 1)
 
     with freezegun.freeze_time(assign_time):
       self.test_device.loan_assign(loanertest.USER_EMAIL)
@@ -702,8 +672,8 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_extend(self):
     now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    config_model.Config.set('loan_duration', 3, self.default_key.id())
-    config_model.Config.set('maximum_loan_duration', 14, self.default_key.id())
+    config_model.Config.set('loan_duration', 3)
+    config_model.Config.set('maximum_loan_duration', 14)
     requested_extension = datetime.datetime(year=2017, month=1, day=5)
 
     with freezegun.freeze_time(now):
@@ -723,8 +693,8 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_extend_past_date(self):
     now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    config_model.Config.set('loan_duration', 3, self.default_key.id())
-    config_model.Config.set('maximum_loan_duration', 14, self.default_key.id())
+    config_model.Config.set('loan_duration', 3)
+    config_model.Config.set('maximum_loan_duration', 14)
     requested_extension = datetime.datetime(year=2016, month=1, day=1)
 
     with freezegun.freeze_time(now):
@@ -736,8 +706,8 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   def test_extend_outside_range(self):
     now = datetime.datetime(year=2017, month=1, day=1)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
-    config_model.Config.set('loan_duration', 3, self.default_key.id())
-    config_model.Config.set('maximum_loan_duration', 14, self.default_key.id())
+    config_model.Config.set('loan_duration', 3)
+    config_model.Config.set('maximum_loan_duration', 14)
     requested_extension = datetime.datetime(year=2017, month=3, day=1)
 
     with freezegun.freeze_time(now):
@@ -868,7 +838,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
   @mock.patch.object(deferred, 'defer', autospec=True)
   def test_enable_guest_mode_allowed(self, mock_defer):
     now = datetime.datetime(year=2017, month=1, day=1)
-    config_model.Config.set('allow_guest_mode', True, self.default_key.id())
+    config_model.Config.set('allow_guest_mode', True)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
 
     with freezegun.freeze_time(now):
@@ -880,16 +850,16 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
           self.test_device.current_ou)
       self.assertEqual(now, self.test_device.ou_changed_date)
       config_model.Config.set(
-          'guest_mode_timeout_in_hours', 12, self.default_key.id())
+          'guest_mode_timeout_in_hours', 12)
       countdown = datetime.timedelta(
-          hours=config_model.Config.get('guest_mode_timeout_in_hours',
-                                        self.default_key.id())).total_seconds()
+          hours=config_model.Config.get(
+              'guest_mode_timeout_in_hours')).total_seconds()
       mock_defer.assert_called_once_with(
           self.test_device._disable_guest_mode, loanertest.USER_EMAIL,
           _countdown=countdown)
 
   def test_enable_guest_mode_unassigned(self):
-    config_model.Config.set('allow_guest_mode', False, self.default_key.id())
+    config_model.Config.set('allow_guest_mode', False)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     with self.assertRaisesWithLiteralMatch(
         device_model.UnassignedDeviceError,
@@ -897,7 +867,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
       self.test_device.enable_guest_mode(loanertest.USER_EMAIL)
 
   def test_enable_guest_mode_not_allowed(self):
-    config_model.Config.set('allow_guest_mode', False, self.default_key.id())
+    config_model.Config.set('allow_guest_mode', False)
     self.enroll_test_device(loanertest.TEST_DIR_DEVICE_DEFAULT)
     self.test_device.assigned_user = loanertest.USER_EMAIL
     self.test_device.put()
@@ -916,7 +886,7 @@ class DeviceModelTest(parameterized.TestCase, loanertest.TestCase):
     self.mock_directoryclient.reset_mock()
     self.mock_directoryclient.move_chrome_device_org_unit.side_effect = (
         directory.DirectoryRPCError('Guest move failed.'))
-    config_model.Config.set('allow_guest_mode', True, 'default')
+    config_model.Config.set('allow_guest_mode', True)
 
     with self.assertRaisesWithLiteralMatch(
         device_model.EnableGuestError,

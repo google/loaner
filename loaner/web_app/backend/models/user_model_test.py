@@ -18,8 +18,6 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-from google.appengine.ext import ndb
-
 from loaner.web_app.backend.api import permissions
 from loaner.web_app.backend.models import user_model
 from loaner.web_app.backend.testing import loanertest
@@ -33,30 +31,14 @@ class RoleModelTest(loanertest.TestCase):
     self.permissions = (permissions.Permissions.BOOTSTRAP,
                         permissions.Permissions.MODIFY_SHELF)
     self.associated_group = 'technicians@example.com'
-    self.associated_fleet = ndb.Key('Fleet', 'test_fleet')
 
   def test_create_role(self):
     user_model.Role.create(
-        self.role_name,
-        self.permissions,
-        self.associated_group,
-        self.associated_fleet.id())
+        self.role_name, self.permissions, self.associated_group)
 
     created_role = user_model.Role.get_by_id(self.role_name)
     self.assertEqual(created_role.name, self.role_name)
     self.assertCountEqual(created_role.permissions, self.permissions)
-    self.assertEqual(created_role.associated_fleet, self.associated_fleet)
-
-  def test_create_role_default_fleet(self):
-    user_model.Role.create(
-        self.role_name,
-        self.permissions,
-        self.associated_group)
-
-    created_role = user_model.Role.get_by_id(self.role_name)
-    self.assertEqual(created_role.name, self.role_name)
-    self.assertCountEqual(created_role.permissions, self.permissions)
-    self.assertEqual(created_role.associated_fleet.id(), 'default')
 
   def test_create_role__create_superadmin(self):
     self.assertRaises(
@@ -90,7 +72,6 @@ class RoleModelTest(loanertest.TestCase):
 
     self.assertCountEqual(role.permissions, updated_permissions)
     self.assertEqual(role.associated_group, self.associated_group)
-    self.assertEqual(role.associated_fleet.id(), 'default')
 
   def test_update__name_error(self):
     user_model.Role.create(
@@ -135,24 +116,6 @@ class UserModelTest(loanertest.TestCase):
             permissions.Permissions.MODIFY_SHELF,
         ],
         associated_group='operations@example.com')
-    self.tech_role_in_fleet = user_model.Role.create(
-        name='tech_in_fleet',
-        role_permissions=[
-            permissions.Permissions.AUDIT_SHELF,
-            permissions.Permissions.READ_SHELVES,
-        ],
-        associated_group='technicians@example.com',
-        associated_fleet='test_fleet'
-        )
-    self.ops_role_in_fleet = user_model.Role.create(
-        name='ops_in_fleet',
-        role_permissions=[
-            permissions.Permissions.MODIFY_DEVICE,
-            permissions.Permissions.MODIFY_SHELF,
-        ],
-        associated_group='operations@example.com',
-        associated_fleet='test_fleet'
-        )
 
   def test_role_names(self):
     user = user_model.User(id=loanertest.USER_EMAIL)
@@ -220,7 +183,7 @@ class UserModelTest(loanertest.TestCase):
 
   def test_get_permissions__one_role(self):
     user = user_model.User(id=loanertest.USER_EMAIL)
-    user.update(roles=['technician'],)
+    user.update(roles=['technician'])
 
     self.assertCountEqual(user.get_permissions(),
                           self.technician_role.permissions)
@@ -236,26 +199,6 @@ class UserModelTest(loanertest.TestCase):
     ]
 
     self.assertCountEqual(user.get_permissions(), expected_permissions)
-
-  def test_get_permissions_in_fleet__one_role(self):
-    user = user_model.User(id=loanertest.USER_EMAIL)
-    user.update(roles=['tech_in_fleet'],)
-
-    self.assertCountEqual(user.get_permissions('test_fleet'),
-                          self.tech_role_in_fleet.permissions)
-
-  def test_get_permissions_in_fleet__multiple_roles(self):
-    user = user_model.User(id=loanertest.USER_EMAIL)
-    user.update(roles=['tech_in_fleet', 'ops_in_fleet'])
-    expected_permissions = [
-        permissions.Permissions.AUDIT_SHELF,
-        permissions.Permissions.READ_SHELVES,
-        permissions.Permissions.MODIFY_DEVICE,
-        permissions.Permissions.MODIFY_SHELF,
-    ]
-
-    self.assertCountEqual(
-        user.get_permissions('test_fleet'), expected_permissions)
 
   def test_get_permissions__superadmin(self):
     user = user_model.User.get_user(email=loanertest.SUPER_ADMIN_EMAIL)

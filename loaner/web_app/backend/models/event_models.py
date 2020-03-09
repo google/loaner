@@ -178,17 +178,13 @@ class CustomEvent(CoreEvent):
   Note that the rules of NDB queries apply (e.g., including more than one
     inequality filter will result in a BadRequestError).
 
-  Attributes:
+  Attribues:
     model: The name of the NDB model on which the app queries.
     conditions: Triplet of objects the cron job uses with the model to build an
       NDB query.
-    associated_fleet: ndb.Key, name of the Fleet used to associate this event to
-        fleets automatically.
   """
   model = ndb.StringProperty(choices=['Device', 'Shelf'])
   conditions = ndb.StructuredProperty(CustomEventCondition, repeated=True)
-  associated_fleet = ndb.KeyProperty(
-      kind='Fleet', required=True, default=ndb.Key('Fleet', 'default'))
 
   @classmethod
   def get_all_enabled(cls):
@@ -294,15 +290,13 @@ class ReminderEvent(CustomEvent):
     return int(self.key.id())
 
   @classmethod
-  def create(cls, level, associated_fleet='default'):
+  def create(cls, level):
     """Creates a ReminderEvent model for a particular reminder level.
 
     Uses the level as the ID in the NDB key, and puts prior to returning.
 
     Args:
       level: int, the level of the reminder event.
-      associated_fleet: str, name of the Fleet used to associate this event to
-        fleets automatically.
 
     Returns:
       The ReminderrEvent model.
@@ -317,10 +311,7 @@ class ReminderEvent(CustomEvent):
       raise ExistingEventError(
           'Cannot create Reminder Event because one for that level exists.')
     reminder_event = cls(
-        model='Device',
-        actions=['send_reminder'],
-        id=str(level),
-        associated_fleet=ndb.Key('Fleet', associated_fleet))
+        model='Device', actions=['send_reminder'], id=str(level))
     reminder_event.put()
     return reminder_event
 

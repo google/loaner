@@ -30,7 +30,7 @@ from loaner.web_app.backend.models import template_model
 # The application version (MAJOR.MINOR.PATCH-[pre-release]).
 # This should be iterated on all official releases or for any bootstrap
 # affecting changes.
-APP_VERSION = '0.7.6-alpha'
+APP_VERSION = '0.7.3-alpha'
 
 # The application id for this project otherwise known as the Google Cloud
 # Project ID.
@@ -92,9 +92,6 @@ MAINTENANCE = False
 # NOTE: The account used here must at least have access to the OAuth2 Scopes
 # listed below in the DIRECTORY_SCOPES variable.
 ADMIN_EMAIL = '{ADMIN_EMAIL}'
-
-# Fleet string that makes display of key / id of fleet config easier to reead
-FLEET_CONFIG_NAME_ID = '{}-{}'
 
 # The email address application emails will come from.
 SEND_EMAIL_AS = 'noreply@example.com'

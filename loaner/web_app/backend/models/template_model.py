@@ -41,21 +41,10 @@ class NoTemplateError(Error):
 
 
 class Template(ndb.Model):
-  """Model representing a template.
-
-  Attributes:
-    key:  key, key to template entity.
-    title: str, title or subject line of email template
-    body: text, body of email template.
-    jinja: object, jinja object for templating engine.
-    associated_fleet: ndb.Key, name of the Fleet used to associate this template
-      to fleets automatically.
-  """
+  """Model representing a template."""
   title = ndb.StringProperty()
   body = ndb.TextProperty()
   cached_templates = []
-  associated_fleet = ndb.KeyProperty(
-      kind='Fleet', required=True, default=ndb.Key('Fleet', 'default'))
 
   def __init__(self, *args, **kwds):
     super(Template, self).__init__(*args, **kwds)
@@ -100,15 +89,13 @@ class Template(ndb.Model):
     return cls.cached_templates
 
   @classmethod
-  def create(cls, name, title=None, body=None,
-             associated_fleet='default'):
+  def create(cls, name, title=None, body=None):
     """Creates a model and entity."""
     if not name:
       raise datastore_errors.BadValueError(
           'The Template name must not be empty.')
     entity = cls(title=title,
-                 body=body,
-                 associated_fleet=ndb.Key('Fleet', associated_fleet))
+                 body=body)
     template = cls.get_by_id(name)
     if template is not None:
       raise datastore_errors.BadValueError(
@@ -137,6 +124,9 @@ class Template(ndb.Model):
     Template.cached_templates = []
 
   def __eq__(self, other):
+    print('here')
+    print(self)
+    print(other)
     return self.name == other.name
 
   @staticmethod
@@ -187,4 +177,3 @@ class Template(ndb.Model):
     return (
         self.jinja.get_template(_CACHED_TITLE_NAME % name).render(config_dict),
         self.jinja.get_template(_CACHED_BODY_NAME % name).render(config_dict))
-

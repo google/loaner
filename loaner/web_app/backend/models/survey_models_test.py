@@ -49,41 +49,19 @@ class QuestionTest(loanertest.TestCase):
     self.answer1 = survey_models.Answer.create(
         text=self.answer1_text,
         more_info_enabled=self.answer1_more_info_enabled,
-        placeholder_text=None,
-        associated_fleet='test_fleet')
+        placeholder_text=None)
     self.answer2 = survey_models.Answer.create(
         text=self.answer2_text,
         more_info_enabled=self.answer2_more_info_enabled,
-        placeholder_text=self.answer2_placeholder_text,
-        associated_fleet='test_fleet')
+        placeholder_text=self.answer2_placeholder_text)
     self.answer3 = survey_models.Answer.create(
         text=self.answer3_text,
         more_info_enabled=self.answer3_more_info_enabled,
-        placeholder_text=None,
-        associated_fleet='test_fleet')
+        placeholder_text=None)
     self.answer4 = survey_models.Answer.create(
         text=self.answer4_text,
         more_info_enabled=self.answer4_more_info_enabled,
-        placeholder_text=self.answer4_placeholder_text,
-        associated_fleet='test_fleet')
-
-  def test_answers_default_fleet(self):
-    """Create test answers and verify default fleet."""
-    created_answer = survey_models.Answer.create(
-        text=self.answer1_text,
-        more_info_enabled=self.answer1_more_info_enabled,
-        placeholder_text=None)
-    self.assertEqual(created_answer.associated_fleet.id(), 'default')
-
-  def test_questions_default_fleet(self):
-    """Create test questions and verify default fleet."""
-    created_question = survey_models.Question.create(
-        question_type=survey_models.QuestionType.ASSIGNMENT,
-        question_text=self.question_text1,
-        enabled=True,
-        rand_weight=1,
-        answers=[self.answer1, self.answer2])
-    self.assertEqual(created_question.associated_fleet.id(), 'default')
+        placeholder_text=self.answer4_placeholder_text)
 
   def test_answer_validation(self):
     """Tests that more_info_enabled validation works."""
@@ -91,15 +69,13 @@ class QuestionTest(loanertest.TestCase):
         survey_models.Answer.create,
         survey_models._MORE_INFO_MSG,
         text='Answer text',
-        more_info_enabled=True,
-        associated_fleet='test_fleet')
+        more_info_enabled=True)
     self.assertRaisesRegexp(
         survey_models.Answer.create,
         survey_models._MORE_INFO_MSG,
         text='Answer text',
         more_info_enabled=False,
-        placeholder_text='Forbidden placeholder text',
-        associated_fleet='test_fleet')
+        placeholder_text='Forbidden placeholder text')
 
   def create_test_questions(self):
     """Create the test surveys to use in other tests."""
@@ -109,30 +85,26 @@ class QuestionTest(loanertest.TestCase):
         question_text=self.question_text1,
         enabled=True,
         rand_weight=1,
-        answers=[self.answer1, self.answer2],
-        associated_fleet='test_fleet')
+        answers=[self.answer1, self.answer2])
     self.question2 = survey_models.Question.create(
         # The following line verifies we can specify enum items by string.
         question_type='RETURN',
         question_text=self.question_text2,
         enabled=True,
         rand_weight=2,
-        answers=[self.answer2],
-        associated_fleet='test_fleet')
+        answers=[self.answer2])
     self.question3 = survey_models.Question.create(
         question_type=survey_models.QuestionType.ASSIGNMENT,
         question_text=self.question_text3,
         enabled=False,
         rand_weight=3,
-        answers=[self.answer3, self.answer4],
-        associated_fleet='test_fleet')
+        answers=[self.answer3, self.answer4])
     self.question4 = survey_models.Question.create(
         question_type=survey_models.QuestionType.RETURN,
         question_text=self.question_text4,
         enabled=False,
         rand_weight=4,
-        answers=[self.answer4],
-        associated_fleet='test_fleet')
+        answers=[self.answer4])
 
   def test_create_surveys(self):
     """Test the creation of surveys."""
@@ -144,7 +116,6 @@ class QuestionTest(loanertest.TestCase):
     self.assertEqual(self.question1.rand_weight, 1)
     self.assertListEqual(
         self.question1.answers, [self.answer1, self.answer2])
-    self.assertEqual(self.question1.associated_fleet.id(), 'test_fleet')
 
     self.assertEqual(
         self.question2.question_type,
@@ -153,7 +124,6 @@ class QuestionTest(loanertest.TestCase):
     self.assertTrue(self.question2.enabled)
     self.assertEqual(self.question2.rand_weight, 2)
     self.assertListEqual(self.question2.answers, [self.answer2])
-    self.assertEqual(self.question2.associated_fleet.id(), 'test_fleet')
 
     self.assertEqual(
         self.question3.question_type,
@@ -163,7 +133,6 @@ class QuestionTest(loanertest.TestCase):
     self.assertEqual(self.question3.rand_weight, 3)
     self.assertListEqual(
         self.question3.answers, [self.answer3, self.answer4])
-    self.assertEqual(self.question3.associated_fleet.id(), 'test_fleet')
 
     self.assertEqual(
         self.question4.question_type,
@@ -172,7 +141,6 @@ class QuestionTest(loanertest.TestCase):
     self.assertFalse(self.question4.enabled)
     self.assertEqual(self.question4.rand_weight, 4)
     self.assertListEqual(self.question4.answers, [self.answer4])
-    self.assertEqual(self.question4.associated_fleet.id(), 'test_fleet')
 
   def test_get_survey_random(self):
     """Test the get survey with a random choice."""
@@ -238,8 +206,7 @@ class QuestionTest(loanertest.TestCase):
 
   def test_submit_survey_anonymously(self):
     """Test the submission of a survey anonymously."""
-    survey_models.config_model.Config.set('anonymous_surveys', True,
-                                          'test_fleet')
+    survey_models.config_model.Config.set('anonymous_surveys', True)
     with mock.patch.object(
         self.question1, 'stream_to_bq', autospec=True) as mock_stream:
       self.question1.submit(
@@ -262,8 +229,7 @@ class QuestionTest(loanertest.TestCase):
 
   def test_submit_survey(self):
     """Test the submission of a question."""
-    survey_models.config_model.Config.set('anonymous_surveys', False,
-                                          'test_fleet')
+    survey_models.config_model.Config.set('anonymous_surveys', False)
     with mock.patch.object(
         self.question1, 'stream_to_bq', autospec=True) as mock_stream:
       self.question1.submit(

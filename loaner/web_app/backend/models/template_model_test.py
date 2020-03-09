@@ -23,7 +23,6 @@ import datetime
 from absl.testing import parameterized
 from google.appengine.api import datastore_errors
 from google.appengine.api import memcache
-from google.appengine.ext import ndb
 from loaner.web_app.backend.models import template_model
 from loaner.web_app.backend.testing import loanertest
 
@@ -47,11 +46,8 @@ def _create_template_parameters():
   template_name_value = 'this_template'
   body_value = 'body update test'
   title_value = 'title update test'
-  associated_fleet = ndb.Key('Fleet', 'test_fleet', app='_')
 
-  template_parameters = [
-      template_name_value, title_value, body_value, associated_fleet
-  ]
+  template_parameters = [template_name_value, title_value, body_value]
   yield [template_parameters]
 
 
@@ -184,26 +180,11 @@ class TemplateTest(parameterized.TestCase, loanertest.TestCase):
   @parameterized.parameters(_create_template_parameters())
   def test_create(self, test_template):
     created_template = template_model.Template.create(
-        name='new_created_one', title=test_template[1], body=test_template[2],
-        associated_fleet='test_fleet')
-    templates = template_model.Template.get_all()
-    index = templates.index(created_template)
-    self.assertEqual(templates[index].title, test_template[1])
-    self.assertEqual(templates[index].body, test_template[2])
-    self.assertEqual(templates[index].associated_fleet.id(),
-                     test_template[3].id())
-    self.assertLen(templates, 3)
-    created_template.remove()
-
-  @parameterized.parameters(_create_template_parameters())
-  def test_create_default_fleet(self, test_template):
-    created_template = template_model.Template.create(
         name='new_created_one', title=test_template[1], body=test_template[2])
     templates = template_model.Template.get_all()
     index = templates.index(created_template)
     self.assertEqual(templates[index].title, test_template[1])
     self.assertEqual(templates[index].body, test_template[2])
-    self.assertEqual(templates[index].associated_fleet.id(), 'default')
     self.assertLen(templates, 3)
     created_template.remove()
 

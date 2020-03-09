@@ -85,8 +85,6 @@ class Shelf(base_model.BaseModel):
     responsible_for_audit: A string for the party responsible for audits.
     last_audit_time: A datetime indicating the last audit time.
     last_audit_by: A string indicating the last user to audit the shelf.
-    associated_fleet: ndb.Key, name of the Fleet used to associate this shelf to
-        fleets automatically.
   """
   enabled = ndb.BooleanProperty(default=True)
   friendly_name = ndb.StringProperty()
@@ -100,8 +98,6 @@ class Shelf(base_model.BaseModel):
   responsible_for_audit = ndb.StringProperty()
   last_audit_time = ndb.DateTimeProperty()
   last_audit_by = ndb.StringProperty()
-  associated_fleet = ndb.KeyProperty(
-      kind='Fleet', required=True, default=ndb.Key('Fleet', 'default'))
 
   _INDEX_NAME = constants.SHELF_INDEX_NAME
   _SEARCH_PARAMETERS = {
@@ -129,7 +125,7 @@ class Shelf(base_model.BaseModel):
   @property
   def audit_enabled(self):
     return self.audit_notification_enabled and config_model.Config.get(
-        'shelf_audit', self.associated_fleet.id())
+        'shelf_audit')
 
   @property
   def audited(self):
@@ -140,8 +136,7 @@ class Shelf(base_model.BaseModel):
     """
     return datetime.datetime.utcnow() < (
         self.last_audit_time + datetime.timedelta(
-            hours=config_model.Config.get('audit_interval',
-                                          self.associated_fleet.id())))
+            hours=config_model.Config.get('audit_interval')))
 
   def _post_put_hook(self, future):
     """Overrides the _post_put_hook method."""
@@ -150,11 +145,10 @@ class Shelf(base_model.BaseModel):
     index.put(self.to_document())
 
   @classmethod
-  def enroll(cls, user_email, location, capacity, friendly_name=None,
-             latitude=None, longitude=None, altitude=None,
-             responsible_for_audit=None,
-             audit_notification_enabled=True, audit_interval_override=None,
-             associated_fleet='default'):
+  def enroll(
+      cls, user_email, location, capacity, friendly_name=None,
+      latitude=None, longitude=None, altitude=None, responsible_for_audit=None,
+      audit_notification_enabled=True, audit_interval_override=None):
     """Creates a new shelf or reactivates an existing one.
 
     Args:
@@ -171,10 +165,8 @@ class Shelf(base_model.BaseModel):
       audit_notification_enabled: bool, optional, enable or disable shelf audit
           notifications.
       audit_interval_override: An integer for the number of hours to allow a
-        shelf to remain unaudited, overriding the global shelf_audit_interval
-        setting.
-      associated_fleet: str, name of the Fleet used to associate this shelf
-        to fleets automatically.
+          shelf to remain unaudited, overriding the global shelf_audit_interval
+          setting.
 
     Returns:
       The newly created or reactivated shelf.
@@ -204,8 +196,7 @@ class Shelf(base_model.BaseModel):
           altitude=altitude,
           audit_notification_enabled=audit_notification_enabled,
           responsible_for_audit=responsible_for_audit,
-          audit_interval_override=audit_interval_override,
-          associated_fleet=ndb.Key('Fleet', associated_fleet))
+          audit_interval_override=audit_interval_override)
       if latitude is not None and longitude is not None:
         shelf.lat_long = ndb.GeoPt(latitude, longitude)
       logging.info(_CREATE_NEW_SHELF_MSG, shelf.identifier)
