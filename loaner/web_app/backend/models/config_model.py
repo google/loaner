@@ -17,6 +17,7 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+import six
 from google.appengine.api import memcache
 from google.appengine.ext import ndb
 
@@ -105,7 +106,7 @@ class Config(ndb.Model):
       if name not in config_defaults:
         raise KeyError(_CONFIG_NOT_FOUND_MSG % name)
 
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
       stored_config = cls.get_or_insert(name)
       stored_config.string_value = value
       stored_config.put()

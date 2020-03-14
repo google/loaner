@@ -66,13 +66,15 @@ loaner_appengine_library(
     ],
 )
 
-loaner_appengine_library(
+py_library(
     name = "config_model",
     srcs = [
         "config_model.py",
     ],
+    srcs_version = "PY2AND3",
     deps = [
         "//loaner/web_app/backend/lib:utils",
+        "@six_archive//:six",
     ],
 )
 

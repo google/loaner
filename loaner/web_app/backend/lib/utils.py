@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility methods to perform actions in consitent ways across the app."""
+"""Utility methods to perform actions in consistent ways across the app."""
 
 from __future__ import absolute_import
 from __future__ import division
