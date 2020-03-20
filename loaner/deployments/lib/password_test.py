@@ -29,7 +29,7 @@ class PasswordTest(parameterized.TestCase, absltest.TestCase):
   @parameterized.parameters(8, 20, 50, 70, 100)
   def test_generate(self, length):
     pw = password.generate(length)
-    self.assertEqual(length, len(pw))
+    self.assertLen(pw, length)
 
   @parameterized.parameters(2, 7, 101, 200)
   def test_generate__value_error(self, length):

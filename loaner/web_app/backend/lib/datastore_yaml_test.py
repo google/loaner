@@ -136,15 +136,15 @@ class ImportYamlTest(loanertest.TestCase):
         loanertest.TEST_DIR_DEVICE_DEFAULT, loanertest.TEST_DIR_DEVICE2
     ]
     datastore_yaml.import_yaml(ALL_YAML, loanertest.USER_EMAIL)
-    self.assertEqual(len(shelf_model.Shelf.query().fetch()), 2)
-    self.assertEqual(len(device_model.Device.query().fetch()), 2)
-    self.assertEqual(len(event_models.CoreEvent.query().fetch()), 1)
-    self.assertEqual(len(event_models.ShelfAuditEvent.query().fetch()), 1)
-    self.assertEqual(len(event_models.CustomEvent.query().fetch()), 1)
-    self.assertEqual(len(event_models.ReminderEvent.query().fetch()), 1)
-    self.assertEqual(len(survey_models.Question.query().fetch()), 1)
-    self.assertEqual(len(template_model.Template.query().fetch()), 1)
-    self.assertEqual(len(user_model.User.query().fetch()), 2)
+    self.assertLen(shelf_model.Shelf.query().fetch(), 2)
+    self.assertLen(device_model.Device.query().fetch(), 2)
+    self.assertLen(event_models.CoreEvent.query().fetch(), 1)
+    self.assertLen(event_models.ShelfAuditEvent.query().fetch(), 1)
+    self.assertLen(event_models.CustomEvent.query().fetch(), 1)
+    self.assertLen(event_models.ReminderEvent.query().fetch(), 1)
+    self.assertLen(survey_models.Question.query().fetch(), 1)
+    self.assertLen(template_model.Template.query().fetch(), 1)
+    self.assertLen(user_model.User.query().fetch(), 2)
 
   @mock.patch('__main__.directory.DirectoryApiClient', autospec=True)
   def test_yaml_import_with_randomized_shelves(self, mock_directoryclass):
@@ -161,10 +161,10 @@ class ImportYamlTest(loanertest.TestCase):
         randomize_shelving=True)
     devices = device_model.Device.query().fetch()
     shelves = shelf_model.Shelf.query().fetch()
-    self.assertEqual(len(devices), 2)
-    self.assertEqual(len(shelves), 2)
+    self.assertLen(devices, 2)
+    self.assertLen(shelves, 2)
     for device in devices:
-      self.assertTrue(device.shelf in [shelf.key for shelf in shelves])
+      self.assertIn(device.shelf, [shelf.key for shelf in shelves])
 
   @mock.patch('__main__.directory.DirectoryApiClient', autospec=True)
   def test_yaml_import_with_wipe(self, mock_directoryclass):
@@ -215,14 +215,12 @@ class ImportYamlTest(loanertest.TestCase):
     self.assertLen(templates, 1)
     self.assertLen(users, 2)
 
-    self.assertTrue(test_device.serial_number not in
-                    [device.serial_number for device in devices])
-    self.assertTrue(
-        test_shelf.location not in [shelf.location for shelf in shelves])
-    self.assertTrue(
-        test_event.name not in [event.name for event in core_events])
-    self.assertTrue(isinstance(
-        custom_events[0].conditions[0].value, datetime.timedelta))
+    self.assertNotIn(test_device.serial_number,
+                     [device.serial_number for device in devices])
+    self.assertNotIn(test_shelf.location, [shelf.location for shelf in shelves])
+    self.assertNotIn(test_event.name, [event.name for event in core_events])
+    self.assertIsInstance(custom_events[0].conditions[0].value,
+                          datetime.timedelta)
 
 
 if __name__ == '__main__':
