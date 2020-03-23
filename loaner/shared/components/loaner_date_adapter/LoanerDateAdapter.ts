@@ -41,7 +41,7 @@ export class LoanerDateAdapter extends NativeDateAdapter {
     'December',
   ];
   format(date: Date, displayFormat: {}): string {
-    return `${this.monthNames[date.getUTCMonth()]} ${date.getUTCDate()}, ${
-        date.getUTCFullYear()}`;
+    return `${this.monthNames[date.getMonth()]} ${date.getDate()}, ${
+        date.getFullYear()}`;
   }
 }

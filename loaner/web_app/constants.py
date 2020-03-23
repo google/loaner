@@ -107,7 +107,7 @@ if ON_PROD:
   # The OAuth2 Client ID for the Web Application Frontend.
   WEB_CLIENT_ID = ''
   # The location of the Client Secrets file relative to the Bazel WORKSPACE for
-  # the Directory API Service Account with Domain Wide Delegated privilage.
+  # the Directory API Service Account with Domain Wide Delegated privilege.
   # i.e. loaner/web_app/client-secret.json
   SECRETS_FILE = ''
   # The parent Org Unit this application will use to move devices within. This
