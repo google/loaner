@@ -29,7 +29,15 @@ module.exports = webpackMerge(commonConfig, {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
         loader: '@ngtools/webpack',
       },
-      {test: /\.svg$/, loader: 'svg-inline-loader'}
+      {
+        test: /\.svg$/,
+        loader: 'file-loader',
+        options: {
+          name: '[name].[ext]',
+          esModule: false,  // Prevents [object Module] output in IMG SRC.
+          outputPath: 'shared/assets/',
+        },
+      },
     ]
   },
   plugins: [
