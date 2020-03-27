@@ -41,6 +41,10 @@ linked above.
 
 ## Current release: [Alpha (v0.7.1a)](https://github.com/google/loaner/tree/Alpha-(0.7.1))
 
+**Note: If you are doing a new deployment please deploy from master as we work
+on cutting a new release. For current deployments, please hold off on upgrading
+until we can test the next numbered release.**
+
 Please note that the current release of this application is in ALPHA.
 We will be actively contributing to the project. Please keep an eye out for
 future updates and features!
@@ -49,7 +53,15 @@ future updates and features!
 **Note:** To build this project you must install Bazel 0.26. Currently
 Bazel 0.27 or later is unsupported.
 
-To clone this release run the following command:
+To use the **latest code (also known as master)**, run the following
+command:
+
+```
+git clone https://github.com/google/loaner.git
+cd loaner
+```
+
+To use release number **0.7.1**, run the following command:
 
 ```
 git clone -b Alpha-\(0.7.1\) https://github.com/google/loaner.git

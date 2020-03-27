@@ -5,10 +5,9 @@
 
 ## Notes on Master branch
 
-If you are planning on deploying this program for use on your domain we
-recommend pulling from one of the branched releases as opposed to the master
-branch. While we try to keep the master branch working we consider it "unstable"
-and don't recommend using it unless you want to develop for the project.
+**If you are doing a new deployment please deploy from master as we work
+on cutting a new release. For current deployments, please hold off on upgrading
+until we can test the next numbered release.**
 
 ## [Alpha 0.7.1](https://github.com/google/loaner/tree/Alpha-\(0.7.1\))
 
