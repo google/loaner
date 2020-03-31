@@ -17,6 +17,7 @@ import {MatDialog, MatDialogRef} from '@angular/material/dialog';
 import * as moment from 'moment';
 import {Subject} from 'rxjs';
 
+import {ConfigService} from '../../config';
 import {LoaderView} from '../loader';
 
 /** Creates the actual dialog for the extend flow. */
@@ -70,7 +71,10 @@ export class ExtendDialogComponent extends LoaderView implements OnInit {
   toBeSubmitted = true;
   validDate = true;
 
-  constructor(public dialogRef: MatDialogRef<ExtendDialogComponent>) {
+  constructor(
+      public dialogRef: MatDialogRef<ExtendDialogComponent>,
+      private readonly config: ConfigService,
+  ) {
     super(false);
   }
 
@@ -135,7 +139,7 @@ export class ExtendDialogComponent extends LoaderView implements OnInit {
   extendDate() {
     /** Updates the new return date to the proper API format. */
     const formattedNewDueDate =
-        moment(this.newReturnDate!).format(`YYYY-MM-DD[T][00]:[00]:[00]`);
+        moment(this.newReturnDate!).format(this.config.momentLongDateFormat);
 
     if (this.validateDate(formattedNewDueDate)) {
       this.loading = true;

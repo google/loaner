@@ -161,6 +161,8 @@ export class ConfigService {
   devTrack!: boolean;
   private standardEndpoint!: string;
   private chromeEndpoint!: string;
+  momentDueDateFormat = 'MMM Do, YYYY';
+  momentLongDateFormat = 'YYYY-MM-DD[T][00]:[00]:[00]';
 
   // Checks what environment the app is running in.
   get appMode() {

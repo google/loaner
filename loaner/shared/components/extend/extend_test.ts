@@ -16,6 +16,8 @@ import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {MatDialogRef} from '@angular/material/dialog';
 import * as moment from 'moment';
 
+import {ConfigService} from '../../config';
+
 import {ExtendDialogComponent, ExtendModule} from './index';
 
 /** Mock material DialogRef. */
@@ -25,20 +27,25 @@ describe('ExtendDialogComponent', () => {
   let component: ExtendDialogComponent;
   let fixture: ComponentFixture<ExtendDialogComponent>;
   let compiled: HTMLElement;
+  let config: ConfigService;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         ExtendModule,
       ],
-      providers: [{
-        provide: MatDialogRef,
-        useClass: MatDialogRefMock,
-      }],
+      providers: [
+        {
+          provide: MatDialogRef,
+          useClass: MatDialogRefMock,
+        },
+        ConfigService
+      ],
     });
 
     fixture = TestBed.createComponent(ExtendDialogComponent);
     component = fixture.debugElement.componentInstance;
+    config = TestBed.get(ConfigService);
 
     component.dueDate = new Date(2018, 1, 1);
     component.maxExtendDate = new Date(2018, 1, 2);
@@ -74,7 +81,7 @@ describe('ExtendDialogComponent', () => {
     component.maxExtendDate =
         moment(component.maxExtendDate).add(14, 'days').toDate();
     const formattedNewDueDate =
-        moment(component.newReturnDate).format(`YYYY-MM-DD[T][00]:[00]:[00]`);
+        moment(component.newReturnDate).format(config.momentLongDateFormat);
 
     expect(component.validateDate(formattedNewDueDate)).toBe(true);
   });
@@ -89,7 +96,7 @@ describe('ExtendDialogComponent', () => {
     component.maxExtendDate =
         moment(component.maxExtendDate).add(14, 'days').toDate();
     const formattedNewDueDate =
-        moment(component.newReturnDate).format(`YYYY-MM-DD[T][00]:[00]:[00]`);
+        moment(component.newReturnDate).format(config.momentLongDateFormat);
 
     expect(component.validateDate(formattedNewDueDate)).toBe(false);
   });

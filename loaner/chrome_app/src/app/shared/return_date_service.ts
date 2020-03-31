@@ -16,6 +16,8 @@ import {Injectable} from '@angular/core';
 import * as moment from 'moment';
 import {BehaviorSubject, Observable} from 'rxjs';
 
+import {ConfigService} from '../../../../shared/config';
+
 import {FailAction, FailType, Failure} from './failure';
 import {Loan} from './loan';
 
@@ -28,7 +30,7 @@ export class ReturnDateService {
 
   /** Formats the new requested due date via moment for API interaction. */
   get formattedNewDueDate() {
-    return moment(this.newReturnDate!).format(`YYYY-MM-DD[T][00]:[00]:[00]`);
+    return moment(this.newReturnDate!).format(this.config.momentLongDateFormat);
   }
 
   /** Validates the date using the new formatted due date. */
@@ -46,7 +48,11 @@ export class ReturnDateService {
 
   validDate = this.validDateSource.asObservable();
 
-  constructor(private readonly loan: Loan, private readonly failure: Failure) {}
+  constructor(
+      private readonly loan: Loan,
+      private readonly failure: Failure,
+      private readonly config: ConfigService,
+  ) {}
 
   /**
    * Used to update the new return date using behavior subjects.
